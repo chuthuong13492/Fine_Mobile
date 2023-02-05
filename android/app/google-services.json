@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "879820098286",
+    "project_id": "fine-mobile-21acd",
+    "storage_bucket": "fine-mobile-21acd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:879820098286:android:4ca73cae7f56e83ce381ff",
+        "android_client_info": {
+          "package_name": "com.example.fine_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "879820098286-jvgvpl8jvkd1ls9aca581n4ov5ie40vc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcsDAajVRAd3BY4IDUbvSPz-YSARQxmeE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "879820098286-jvgvpl8jvkd1ls9aca581n4ov5ie40vc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "879820098286-up9hor49v5ap1bd3qj8c2s8u7dpp5e3f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.fine"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
