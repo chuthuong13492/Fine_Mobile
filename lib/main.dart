@@ -50,7 +50,8 @@ class MyApp extends StatelessWidget {
         }
       },
       theme: ThemeData(
-        primaryColor: primary,
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: StartUpView(),
     );

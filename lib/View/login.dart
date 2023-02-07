@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return ScopedModel(
-      model: Get.put(LoginViewModel()),
+      model: LoginViewModel(),
       child: Scaffold(
         body: getBody(),
       ),

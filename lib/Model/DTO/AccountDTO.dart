@@ -1,64 +1,75 @@
 class AccountDTO {
   int? id;
-  String? fullName;
-  int? gender;
-  String? imageUrl;
+  String? name;
   String? phone;
   String? email;
-  String? address;
-  String? dayOfBirth;
-  String? bio;
-  bool? isFirstLogin;
-  int? status;
-  int? badge;
-  int? roleId;
+  int? brandId;
+  DateTime? dateOfBirth;
+  String? imageUrl;
 
   AccountDTO(
       {this.id,
-      this.fullName,
-      this.gender,
-      this.imageUrl,
+      this.name,
       this.phone,
       this.email,
-      this.isFirstLogin,
-      this.address,
-      this.dayOfBirth,
-      this.bio,
-      this.status,
-      this.badge,
-      this.roleId});
+      this.brandId,
+      this.dateOfBirth,
+      this.imageUrl});
 
   AccountDTO.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    fullName = json['fullName'];
-    gender = json['gender'];
-    imageUrl = json['imageUrl'];
+    name = json['name'];
     phone = json['phone'];
     email = json['email'];
-    address = json['address'];
-    isFirstLogin = json['isFirstLogin'];
-    dayOfBirth = json['dayOfBirth'];
-    bio = json['bio'];
-    status = json['status'];
-    badge = json['badge'];
-    roleId = json['roleId'];
+    brandId = json['brandId'];
+    dateOfBirth = DateTime.parse(json['dateOfBirth'] as String);
+    imageUrl = json['imageUrl'];
   }
+  // factory AccountDTO.fromJson(dynamic json) => AccountDTO(
+  //       id: json["id"],
+  //       name: json['name'] as String,
+  //       email: json['email'] as String,
+  //       phone: json['phone'] as String,
+  //       brandId: json['brandId'],
+  //       imageUrl: json['imageUrl'] as String,
+  //       // gender: (json['gender']),
+  //       // balance: json['balance'],
+  //       // point: json['point'],
+  //       // isFirstLogin: (json['is_first_login'] as bool) ?? false,
+  //       // ignore: unnecessary_null_comparison
+  //       // dateOfBirth: json['dateOfBirth'] as String != null ? DateTime.parse(json['dateOfBirth'] as String) : '',
+  //       dateOfBirth: DateTime.parse(json['dateOfBirth'] as String),
+
+  //       // referalCode: json['ref_code']
+  //     );
+
+  // static List<AccountDTO> fromList(dynamic jsonList) {
+  //   var list = jsonList as List;
+  //   return list.map((map) => AccountDTO.fromJson(map)).toList();
+  // }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
-    data['fullName'] = this.fullName;
-    data['gender'] = this.gender;
-    data['imageUrl'] = this.imageUrl;
+    data['name'] = this.name;
     data['phone'] = this.phone;
     data['email'] = this.email;
-    data['isFirstLogin'] = this.isFirstLogin;
-    data['address'] = this.address;
-    data['dayOfBirth'] = this.dayOfBirth;
-    data['bio'] = this.bio;
-    data['status'] = this.status;
-    data['badge'] = this.badge;
-    data['roleId'] = this.roleId;
+    data['brandId'] = this.brandId;
+    data['dateOfBirth'] = this.dateOfBirth;
+    data['imageUrl'] = this.imageUrl;
     return data;
   }
+
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     "id": id.toString(),
+  //     "name": name,
+  //     "email": email,
+  //     "phone": phone,
+  //     // "gender": gender,
+  //     "dateOfBirth": dateOfBirth?.toString(),
+  //     "imageUrl": imageUrl,
+  //     // "ref_code": referalCode
+  //   };
+  // }
 }

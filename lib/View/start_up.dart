@@ -14,38 +14,37 @@ class StartUpView extends StatelessWidget {
           builder: (context, child, model) {
         return Scaffold(
           backgroundColor: Colors.white,
-          body: Stack(
-            children: [
-              Center(
-                child: Container(
-                  width: 250.0,
-                  color: Colors.white,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // LoadingBean(),
-                        SizedBox(height: 16),
-                        Text(
-                          "Bean Ơi",
-                          style: Get.theme.textTheme.headline1,
-                        )
-                      ],
+          body: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage("assets/images/background_blue.jpg"),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: Center(
+              child: Container(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image(
+                      image: AssetImage("assets/icons/logo.png"),
                     ),
-                  ),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Text(
+                      "Fine Delivery",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 34,
+                          fontWeight: FontWeight.w700),
+                    )
+                  ],
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'Đặt ngay chờ chi 😎',
-                    style: Get.theme.textTheme.headline3,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         );
       }),
