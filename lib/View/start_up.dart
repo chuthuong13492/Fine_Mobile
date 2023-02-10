@@ -28,12 +28,12 @@ class StartUpView extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image(
-                      image: AssetImage("assets/icons/logo.png"),
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
+                    // Image(
+                    //   image: AssetImage("assets/icons/logo.png"),
+                    // ),
+                    // SizedBox(
+                    //   width: 8,
+                    // ),
                     Text(
                       "Fine Delivery",
                       style: TextStyle(

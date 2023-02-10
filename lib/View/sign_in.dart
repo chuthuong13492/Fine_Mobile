@@ -124,19 +124,19 @@ class _SignInState extends State<SignIn> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      height: 90,
+                      height: 80,
                     ),
                     Container(
-                      height: 90,
+                      height: MediaQuery.of(context).size.height * 0.1,
                       width: 360,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        // crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Text(
                             "Chào mừng trở lại với Fine",
                             style: GoogleFonts.roboto(
-                                fontSize: 28,
+                                fontSize: 30,
                                 fontWeight: FontWeight.w900,
                                 color: Color(0xFF4BB8F4)),
                           ),
@@ -144,7 +144,7 @@ class _SignInState extends State<SignIn> {
                             height: 15,
                           ),
                           Text(
-                            "Đăng nhập và tận hưởng những ưu đãi yêu thích của bạn!",
+                            "Đăng nhập và tận hưởng những ưu đãi \nyêu thích của bạn!",
                             style: GoogleFonts.roboto(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
@@ -205,7 +205,7 @@ class _SignInState extends State<SignIn> {
                                                         top: 20,
                                                         right: 30),
                                                     child: Text(
-                                                      "Shipper",
+                                                      "Tài Xế",
                                                       style: GoogleFonts.roboto(
                                                           fontWeight:
                                                               FontWeight.w600,
@@ -248,7 +248,7 @@ class _SignInState extends State<SignIn> {
                                                     margin: EdgeInsets.only(
                                                         left: 30, top: 20),
                                                     child: Text(
-                                                      "User",
+                                                      "Sinh viên",
                                                       style: GoogleFonts.roboto(
                                                           fontWeight:
                                                               FontWeight.w600,
@@ -260,7 +260,7 @@ class _SignInState extends State<SignIn> {
                                                     height: 5,
                                                   ),
                                                   Container(
-                                                      width: 75,
+                                                      width: 130,
                                                       margin: EdgeInsets.only(
                                                         left: 30,
                                                       ),
@@ -283,7 +283,7 @@ class _SignInState extends State<SignIn> {
                                                     ),
                                                     height: 200,
                                                     child: Text(
-                                                      "Các homies vui lòng đăng nhập bằng Gmail của trường 😘 để có một trải nghiệm tốt nhất nè ^^",
+                                                      "Các homies vui lòng đăng nhập bằng Gmail của trường nhé 😘 ",
                                                       style: GoogleFonts.roboto(
                                                           fontSize: 26,
                                                           fontWeight:
@@ -416,7 +416,7 @@ class _SignInState extends State<SignIn> {
                                                                   top: 20,
                                                                   right: 30),
                                                           child: Text(
-                                                            "User",
+                                                            "Sinh viên",
                                                             style: GoogleFonts.roboto(
                                                                 fontWeight:
                                                                     FontWeight
@@ -464,9 +464,9 @@ class _SignInState extends State<SignIn> {
                                                                 EdgeInsets.only(
                                                                     left: 30,
                                                                     top: 20,
-                                                                    right: 20),
+                                                                    right: 30),
                                                             child: Text(
-                                                              "Shipper",
+                                                              "Tài Xế",
                                                               style: GoogleFonts.roboto(
                                                                   fontWeight:
                                                                       FontWeight
@@ -493,7 +493,7 @@ class _SignInState extends State<SignIn> {
                                                                   .only(
                                                                       left: 30,
                                                                       right:
-                                                                          25),
+                                                                          30),
                                                               height: 12,
                                                               child: Card(
                                                                   elevation: 2,
@@ -679,36 +679,43 @@ class _SignInState extends State<SignIn> {
                   size: 12,
                 ),
               ),
-              Positioned(
-                top: MediaQuery.of(context).size.height * 0.22,
-                left: MediaQuery.of(context).size.width * 0.21,
-                child: Icon(
-                  LineIcons.byName('close'),
-                  color: Color(0xFF4BB8F4),
-                  size: 24,
-                ),
-              ),
+              // Positioned(
+              //   top: MediaQuery.of(context).size.height * 0.22,
+              //   left: MediaQuery.of(context).size.width * 0.21,
+              //   child: Icon(
+              //     LineIcons.byName('close'),
+              //     color: Color(0xFF4BB8F4),
+              //     size: 24,
+              //   ),
+              // ),
               Positioned(
                   bottom: MediaQuery.of(context).size.height * 0.07,
-                  left: MediaQuery.of(context).size.width * 0.46,
-                  child: GestureDetector(
-                    onTap: () {
-                      if (islogin) {
-                        setState(() {
-                          islogin = false;
-                        });
-                      } else {
-                        setState(() {
-                          islogin = true;
-                        });
-                      }
-                    },
-                    child: Text(
-                      islogin ? "Shipper" : "User",
-                      style: GoogleFonts.roboto(
-                          fontSize: 16,
-                          color: Color(0xFF4BB8F4),
-                          fontWeight: FontWeight.w500),
+                  left: MediaQuery.of(context).size.width * 0.36,
+                  child: Container(
+                    width: 160,
+                    child: GestureDetector(
+                      onTap: () {
+                        if (islogin) {
+                          setState(() {
+                            islogin = false;
+                          });
+                        } else {
+                          setState(() {
+                            islogin = true;
+                          });
+                        }
+                      },
+                      child: Center(
+                        child: Text(
+                          islogin
+                              ? "Bạn có phải tài xế ?"
+                              : "Sinh viên qua đây nè!",
+                          style: GoogleFonts.roboto(
+                              fontSize: 16,
+                              color: Color(0xFF4BB8F4),
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
                     ),
                   ))
             ],

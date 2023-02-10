@@ -2,7 +2,7 @@ import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DAO/index.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/ViewModel/base_model.dart';
-import 'package:fine/utils/shared_pref.dart';
+import 'package:fine/Utils/shared_pref.dart';
 
 class AccountViewModel extends BaseModel {
   late AccountDAO _dao;

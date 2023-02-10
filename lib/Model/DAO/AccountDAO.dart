@@ -2,8 +2,8 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:fine/Model/DTO/AccountDTO.dart';
-import 'package:fine/utils/request.dart';
-import 'package:fine/utils/shared_pref.dart';
+import 'package:fine/Utils/request.dart';
+import 'package:fine/Utils/shared_pref.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -16,8 +16,8 @@ class AccountDAO extends BaseDAO {
     try {
       Response response = await request
           .post("customer/GoogleLogin", data: {"idToken": idToken});
-      final user = response.data;
-      final userDTO = AccountDTO.fromJson(response.data);
+      final user = response.data['data'];
+      final userDTO = AccountDTO.fromJson(user);
       final accessToken = user["accessToken"] as String;
 
       // set access token
