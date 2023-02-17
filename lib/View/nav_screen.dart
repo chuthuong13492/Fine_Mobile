@@ -2,6 +2,7 @@ import 'package:fine/View/home.dart';
 import 'package:fine/View/orderHistory.dart';
 import 'package:fine/View/profile.dart';
 import 'package:fine/Utils/constrant.dart';
+import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/theme/color.dart';
 import 'package:fine/widgets/bottom_bar_item.dart';
 import 'package:flutter/material.dart';
@@ -17,18 +18,18 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   int activeTab = 0;
   List barItems = [
     {
-      "icon": "assets/icons/home.svg",
-      "active_icon": "assets/icons/home.svg",
+      "icon": "assets/icons/Shop_duotone.svg",
+      "active_icon": "assets/icons/Shop_duotone.svg",
       "page": HomeScreen(),
     },
     {
-      "icon": "assets/icons/play.svg",
-      "active_icon": "assets/icons/play.svg",
+      "icon": "assets/icons/Paper_duotone.svg",
+      "active_icon": "assets/icons/Paper_duotone.svg",
       "page": OrderHistoryScreen(),
     },
     {
-      "icon": "assets/icons/profile.svg",
-      "active_icon": "assets/icons/profile.svg",
+      "icon": "assets/icons/User_circle.svg",
+      "active_icon": "assets/icons/User_circle.svg",
       "page": ProfileScreen(),
     },
   ];
@@ -74,7 +75,7 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
 
   Widget MainScreen() {
     return Scaffold(
-        backgroundColor: appBgColor,
+        backgroundColor: FineTheme.palettes.neutral200,
         bottomNavigationBar: getBottomBar(),
         body: getBarPage());
   }

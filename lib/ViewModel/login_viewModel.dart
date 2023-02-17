@@ -33,10 +33,11 @@ class LoginViewModel extends BaseModel {
     try {
       setState(ViewStatus.Loading);
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
+      if (googleUser == null) {
+        return null;
+      }
       final GoogleSignInAuthentication? googleAuth =
-          await googleUser?.authentication;
-
+          await googleUser.authentication;
       if (googleAuth?.accessToken != null && googleAuth?.idToken != null) {
         final credential = GoogleAuthProvider.credential(
           accessToken: googleAuth?.accessToken,
@@ -49,20 +50,21 @@ class LoginViewModel extends BaseModel {
         final fcmToken = await FirebaseMessaging.instance.getToken();
         print('idToken: ' + idToken);
         print('fcmToken: ' + fcmToken.toString());
-        userInfo = await dao.login(idToken);
-        await _analyticsService.setUserProperties(userInfo);
+        // userInfo = await dao.login(idToken);
+        // await _analyticsService.setUserProperties(userInfo);
         // ignore: unnecessary_null_comparison
-        if (userInfo != null) {
-          await Get.find<RootViewModel>().startUp();
-          Get.rawSnackbar(
-              message: "Đăng nhập thành công!!",
-              duration: Duration(seconds: 2),
-              snackPosition: SnackPosition.BOTTOM,
-              margin: EdgeInsets.only(left: 8, right: 8, bottom: 32),
-              borderRadius: 8);
+        // if (userInfo == null) {
+        //   await Get.find<RootViewModel>().startUp();
+        //   Get.rawSnackbar(
+        //       message: "Đăng nhập thành công!!",
+        //       duration: Duration(seconds: 2),
+        //       snackPosition: SnackPosition.BOTTOM,
+        //       margin: EdgeInsets.only(left: 8, right: 8, bottom: 32),
+        //       borderRadius: 8);
 
-          await Get.offAllNamed(RoutHandler.NAV);
-        }
+        //   await Get.offAllNamed(RoutHandler.NAV);
+        // }
+        await Get.offAllNamed(RoutHandler.NAV);
       }
       await Future.delayed(Duration(microseconds: 500));
       setState(ViewStatus.Completed);
