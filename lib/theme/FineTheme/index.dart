@@ -1,6 +1,6 @@
-import 'package:fine/theme/FineTheme/color.dart';
-import 'package:fine/theme/FineTheme/spacing.dart';
-import 'package:fine/theme/FineTheme/typography.dart';
+import 'color.dart';
+import 'spacing.dart';
+import 'typography.dart';
 
 class FineTheme {
   static ColorPalettes palettes = ColorPalettes();

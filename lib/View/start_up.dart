@@ -19,7 +19,7 @@ class StartUpView extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("assets/images/background_blue.jpg"),
+                image: AssetImage("assets/images/bgLandingPage.jpg"),
                 fit: BoxFit.cover,
               ),
             ),
@@ -39,7 +39,8 @@ class StartUpView extends StatelessWidget {
                       style: TextStyle(
                           color: Colors.white,
                           fontSize: 34,
-                          fontWeight: FontWeight.w700),
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Fira Sans'),
                     )
                   ],
                 ),

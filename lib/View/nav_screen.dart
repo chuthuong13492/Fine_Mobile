@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:fine/View/home.dart';
 import 'package:fine/View/orderHistory.dart';
 import 'package:fine/View/profile.dart';
@@ -18,18 +20,18 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   int activeTab = 0;
   List barItems = [
     {
-      "icon": "assets/icons/Shop_duotone.svg",
-      "active_icon": "assets/icons/Shop_duotone.svg",
+      "icon": "assets/icons/Home.svg",
+      "active_icon": "assets/icons/Home_fill.svg",
       "page": HomeScreen(),
     },
     {
-      "icon": "assets/icons/Paper_duotone.svg",
-      "active_icon": "assets/icons/Paper_duotone.svg",
+      "icon": "assets/icons/Order.svg",
+      "active_icon": "assets/icons/Order_fill.svg",
       "page": OrderHistoryScreen(),
     },
     {
-      "icon": "assets/icons/User_circle.svg",
-      "active_icon": "assets/icons/User_circle.svg",
+      "icon": "assets/icons/Profile.svg",
+      "active_icon": "assets/icons/Profile_fill.svg",
       "page": ProfileScreen(),
     },
   ];
@@ -89,37 +91,78 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
 
   Widget getBottomBar() {
     return Container(
-      height: 68,
+      height: 78,
       width: double.infinity,
       decoration: BoxDecoration(
-          color: bottomBarColor,
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-          boxShadow: [
-            BoxShadow(
-                color: shadowColor.withOpacity(0.2),
-                blurRadius: 1,
-                spreadRadius: 1,
-                offset: Offset(1, 1))
-          ]),
-      child: Padding(
-          padding: const EdgeInsets.only(
-            left: 32,
-            right: 32,
-            bottom: 12,
+        gradient: LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              FineTheme.palettes.primary200,
+              FineTheme.palettes.primary100,
+              FineTheme.palettes.secondary100
+            ]),
+      ),
+      child: Stack(
+        children: [
+          Container(
+            padding: const EdgeInsets.only(
+              left: 58,
+              right: 58,
+              bottom: 12,
+            ),
+            child: BackdropFilter(
+                filter: ImageFilter.blur(
+              sigmaX: 5,
+              sigmaY: 5,
+            )),
           ),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(
-                  barItems.length,
-                  (index) => BottomBarItem(
-                        barItems[index]["icon"],
-                        isActive: activeTab == index,
-                        activeColor: primary,
-                        onTap: () {
-                          onPageChanged(index);
-                        },
-                      )))),
+          Container(
+              decoration: BoxDecoration(
+                // color: FineTheme.palettes.primary100,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24)),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    // Color(0xFF4ACADA).withOpacity(0.4),
+                    // Color(0xFF4ACADA).withOpacity(0.1),
+                    // Color(0xFF4ACADA).withOpacity(0.4),
+                    Colors.white.withOpacity(0.8),
+                    Colors.white.withOpacity(0.8),
+                  ],
+                ),
+                // boxShadow: [
+                //   BoxShadow(
+                //       color: shadowColor.withOpacity(0.2),
+                //       blurRadius: 1,
+                //       spreadRadius: 1,
+                //       offset: Offset(1, 1))
+                // ],
+              ),
+              alignment: Alignment.center,
+              padding: const EdgeInsets.only(
+                left: 58,
+                right: 58,
+                bottom: 12,
+              ),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(
+                      barItems.length,
+                      (index) => BottomBarItem(
+                            barItems[index]["active_icon"],
+                            barItems[index]["icon"],
+                            isActive: activeTab == index,
+                            activeColor: primary,
+                            onTap: () {
+                              onPageChanged(index);
+                            },
+                          ))))
+        ],
+      ),
     );
   }
 }

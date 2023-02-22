@@ -1,64 +1,76 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
 class FineTypograhpy {
-  TextStyle h1 = TextStyle(
+  TextStyle h1 = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w700,
-      fontSize: 24);
-  TextStyle h2 = TextStyle(
+      fontSize: 24,
+      height: 1.2);
+  TextStyle h2 = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w600,
-      fontSize: 20);
-  TextStyle buttonLg = TextStyle(
+      fontSize: 20,
+      height: 1.2);
+  TextStyle buttonLg = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w700,
-      fontSize: 16);
-  TextStyle buttonMd = TextStyle(
+      fontSize: 16,
+      height: 1.2);
+  TextStyle buttonMd = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w600,
-      fontSize: 14);
-  TextStyle buttonSm = TextStyle(
+      fontSize: 14,
+      height: 1.2);
+  TextStyle buttonSm = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w500,
-      fontSize: 12);
-  TextStyle subtitle1 = TextStyle(
+      fontSize: 12,
+      height: 1.2);
+  TextStyle subtitle1 = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w600,
-      fontSize: 16);
-  TextStyle subtitle2 = TextStyle(
+      fontSize: 16,
+      height: 1.2);
+  TextStyle subtitle2 = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w500,
-      fontSize: 14);
-  TextStyle body1 = TextStyle(
+      fontSize: 14,
+      height: 1.2);
+  TextStyle body1 = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w500,
-      fontSize: 16);
-  TextStyle body2 = TextStyle(
+      fontSize: 16,
+      height: 1.2);
+  TextStyle body2 = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w400,
-      fontSize: 14);
-  TextStyle caption1 = TextStyle(
+      fontSize: 14,
+      height: 1.2);
+  TextStyle caption1 = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w500,
-      fontSize: 12);
-  TextStyle caption2 = TextStyle(
+      fontSize: 12,
+      height: 1.2);
+  TextStyle caption2 = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w400,
-      fontSize: 12);
-  TextStyle overline = TextStyle(
+      fontSize: 12,
+      height: 1.2);
+  TextStyle overline = const TextStyle(
       fontStyle: FontStyle.normal,
-      fontFamily: 'Montserrat',
+      fontFamily: 'Fira Sans',
       fontWeight: FontWeight.w400,
-      fontSize: 10);
+      fontSize: 10,
+      height: 1.2);
 }

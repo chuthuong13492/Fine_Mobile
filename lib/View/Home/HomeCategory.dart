@@ -22,7 +22,7 @@ class HomeCategory extends StatefulWidget {
 }
 
 class _HomeCategoryState extends State<HomeCategory> {
-  // CategoryViewModel? _categoryViewModel;
+  CategoryViewModel? _categoryViewModel;
 
   HomeViewModel? _homeViewModal;
 

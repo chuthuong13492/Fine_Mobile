@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   AccountDAO? dao;
   String error = '';
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void setIsLoading() {
     setState(() {
@@ -80,6 +80,7 @@ class _LoginPageState extends State<LoginPage> {
           ScopedModelDescendant<LoginViewModel>(
               builder: (context, child, model) {
             return Container(
+              height: 30,
               padding: EdgeInsets.all(8),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
@@ -92,12 +93,12 @@ class _LoginPageState extends State<LoginPage> {
                     : SizedBox(
                         width: 240,
                         height: 60,
-                        child: SignInButton(
-                          Buttons.Google,
-                          onPressed: () {
-                            model.signInWithGoogle();
-                          },
-                        ),
+                        // child: SignInButton(
+                        //   Buttons.Google,
+                        //   onPressed: () {
+                        //     model.signInWithGoogle();
+                        //   },
+                        // ),
                       ),
               ),
             );

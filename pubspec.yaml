@@ -45,6 +45,8 @@ dependencies:
   intl: ^0.17.0
   reactive_forms: ^10.7.0
   shimmer: ^2.0.0
+  flutter_neumorphic: ^3.2.0
+  smooth_page_indicator: ^1.0.1
 
 dependency_overrides:
   firebase_auth_platform_interface: 6.11.7
@@ -64,9 +66,28 @@ flutter:
   - assets/images/
 
   fonts:
-    - family: Montserrat
+    - family: Fira Sans
       fonts:
-        - asset: assets/fonts/Montserrat-Italic-VariableFont_wght.ttf
-        - asset: assets/fonts/Montserrat-VariableFont_wght.ttf
-          style: normal
+        - asset: assets/fonts/FiraSans-Black.ttf
+        - asset: assets/fonts/FiraSans-BlackItalic.ttf
+        - asset: assets/fonts/FiraSans-Bold.ttf
+        - asset: assets/fonts/FiraSans-BoldItalic.ttf
+        - asset: assets/fonts/FiraSans-ExtraBold.ttf
+        - asset: assets/fonts/FiraSans-ExtraBoldItalic.ttf
+        - asset: assets/fonts/FiraSans-ExtraLight.ttf
+        - asset: assets/fonts/FiraSans-ExtraLightItalic.ttf
+        - asset: assets/fonts/FiraSans-Italic.ttf
+        - asset: assets/fonts/FiraSans-Light.ttf
+        - asset: assets/fonts/FiraSans-LightItalic.ttf
+        - asset: assets/fonts/FiraSans-Medium.ttf
+        - asset: assets/fonts/FiraSans-MediumItalic.ttf
+        - asset: assets/fonts/FiraSans-Regular.ttf
+        - asset: assets/fonts/FiraSans-SemiBold.ttf
+        - asset: assets/fonts/FiraSans-SemiBoldItalic.ttf
+        - asset: assets/fonts/FiraSans-Thin.ttf
+        - asset: assets/fonts/FiraSans-ThinItalic.ttf
+
+
+
+
 

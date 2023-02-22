@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fine/setup.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,6 +48,13 @@ Future<String?> getToken() async {
   return prefs.getString('token');
 }
 
+Future<void> removeALL() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+  Get.reset(clearRouteBindings: true);
+  createRouteBindings();
+  await setIsFirstOnboard(false);
+}
 // Future<bool> setUser(A value) async {
 //   final SharedPreferences prefs = await SharedPreferences.getInstance();
 //   return prefs.setString('token', value);

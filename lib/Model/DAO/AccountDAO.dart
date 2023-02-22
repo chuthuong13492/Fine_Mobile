@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 import 'package:fine/Model/DTO/AccountDTO.dart';
+import 'package:fine/Service/firebase_auth.dart';
+import 'package:fine/Service/push_notification_service.dart';
 import 'package:fine/Utils/request.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,16 +14,15 @@ import 'BaseDAO.dart';
 // TODO: Test Start_up Screen + FCM TOken
 
 class AccountDAO extends BaseDAO {
-  Future<AccountDTO> login(String idToken) async {
+  Future<AccountDTO> login(String idToken, String fcmToken) async {
     try {
-      Response response = await request
-          .post("customer/GoogleLogin", data: {"idToken": idToken});
+      Response response = await request.post("customer/login",
+          data: {"idToken": idToken, 'fcmToken': fcmToken});
       final user = response.data['data'];
-      final userDTO = AccountDTO.fromJson(user);
-      final accessToken = user["accessToken"] as String;
+      final userDTO = AccountDTO.fromJson(user['customer']);
+      final accessToken = user["access_token"] as String;
 
       // set access token
-      print("accessToken    $accessToken");
       requestObj.setToken = accessToken;
       setToken(accessToken);
       return userDTO;
@@ -70,11 +71,12 @@ class AccountDAO extends BaseDAO {
     //     MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
   }
 
-  // Future<void> logOut() async {
-  //   await AuthService().signOut();
-  //   String fcmToken = await PushNotificationService.getInstance().getFcmToken();
-  //   await request.post("logout", data: {"fcm_token": fcmToken});
-  // }
+  Future<void> logOut() async {
+    await AuthService().signOut();
+    String? fcmToken =
+        await PushNotificationService.getInstance()!.getFcmToken();
+    await request.post("customer/logout", data: {"fcmToken": fcmToken});
+  }
 
   Future<AccountDTO> updateUser(AccountDTO updateUser) async {
     var dataJson = updateUser.toJson();

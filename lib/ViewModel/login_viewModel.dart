@@ -48,23 +48,25 @@ class LoginViewModel extends BaseModel {
         User userToken = FirebaseAuth.instance.currentUser!;
         final idToken = await userToken.getIdToken();
         final fcmToken = await FirebaseMessaging.instance.getToken();
-        print('idToken: ' + idToken);
-        print('fcmToken: ' + fcmToken.toString());
-        // userInfo = await dao.login(idToken);
-        // await _analyticsService.setUserProperties(userInfo);
-        // ignore: unnecessary_null_comparison
-        // if (userInfo == null) {
-        //   await Get.find<RootViewModel>().startUp();
-        //   Get.rawSnackbar(
-        //       message: "Đăng nhập thành công!!",
-        //       duration: Duration(seconds: 2),
-        //       snackPosition: SnackPosition.BOTTOM,
-        //       margin: EdgeInsets.only(left: 8, right: 8, bottom: 32),
-        //       borderRadius: 8);
+        // print('idToken: ' + idToken);
+        log('idToken: ' + idToken);
+        log('fcmToken: ' + fcmToken.toString());
 
-        //   await Get.offAllNamed(RoutHandler.NAV);
-        // }
-        await Get.offAllNamed(RoutHandler.NAV);
+        // print('fcmToken: ' + fcmToken.toString());
+        userInfo = await dao.login(idToken, fcmToken!);
+        await _analyticsService.setUserProperties(userInfo);
+        if (userInfo != null) {
+          await Get.find<RootViewModel>().startUp();
+          // Get.rawSnackbar(
+          //     message: "Đăng nhập thành công!!",
+          //     duration: Duration(seconds: 2),
+          //     snackPosition: SnackPosition.BOTTOM,
+          //     margin: EdgeInsets.only(left: 8, right: 8, bottom: 32),
+          //     borderRadius: 8);
+
+          await Get.offAllNamed(RoutHandler.NAV);
+        }
+        // await Get.offAllNamed(RoutHandler.NAV);
       }
       await Future.delayed(Duration(microseconds: 500));
       setState(ViewStatus.Completed);
@@ -73,5 +75,11 @@ class LoginViewModel extends BaseModel {
       // });
       setState(ViewStatus.Completed);
     }
+  }
+
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+    await GoogleSignIn().signOut();
+    Get.offAllNamed(RoutHandler.LOGIN);
   }
 }
