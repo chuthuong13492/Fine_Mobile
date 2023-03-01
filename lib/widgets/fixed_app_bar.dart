@@ -41,11 +41,12 @@ class _FixedAppBarState extends State<FixedAppBar> {
           builder: (context, child, model) {
             return Container(
               color: Colors.transparent,
-              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 8),
+              padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // ignore: avoid_unnecessary_containers
                   Container(
                     child: Text(
                       '*Địa điểm giao',
@@ -72,12 +73,13 @@ class _FixedAppBarState extends State<FixedAppBar> {
                         alignment: Alignment.center,
                         height: 32,
                         decoration: BoxDecoration(
-                          color: FineTheme.palettes.secondary200,
+                          color: FineTheme.palettes.primary300,
                           borderRadius: BorderRadius.circular(6),
-                          boxShadow: const [
+                          boxShadow: [
                             BoxShadow(
-                              color: Color.fromRGBO(21, 126, 52, 0.8),
-                              offset: Offset(
+                              color: FineTheme.palettes.primary300
+                                  .withOpacity(0.8),
+                              offset: const Offset(
                                 0,
                                 4.0,
                               ),
@@ -93,11 +95,11 @@ class _FixedAppBarState extends State<FixedAppBar> {
                             Flexible(
                               child: Icon(
                                 Icons.arrow_drop_down,
-                                color: FineTheme.palettes.secondary200,
+                                color: FineTheme.palettes.primary300,
                                 size: 34,
                               ),
                             ),
-                            Center(
+                            const Center(
                               // width: 400,
                               child: Text(
                                 "Trường Đại Học FPT - Khu công nghệ",
@@ -113,7 +115,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
                             // SizedBox(
                             //   width: 8,
                             // ),
-                            Flexible(
+                            const Flexible(
                               child: Icon(
                                 Icons.arrow_drop_down,
                                 color: Colors.white,

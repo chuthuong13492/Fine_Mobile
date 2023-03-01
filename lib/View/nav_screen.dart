@@ -98,9 +98,11 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
             colors: [
-              FineTheme.palettes.primary200,
-              FineTheme.palettes.primary100,
-              FineTheme.palettes.secondary100
+              // FineTheme.palettes.primary200,
+              // FineTheme.palettes.primary100,
+              // FineTheme.palettes.secondary100
+              FineTheme.palettes.neutral200,
+              FineTheme.palettes.neutral200
             ]),
       ),
       child: Stack(
@@ -119,28 +121,30 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
           ),
           Container(
               decoration: BoxDecoration(
-                // color: FineTheme.palettes.primary100,
+                color: Colors.white,
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24)),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    // Color(0xFF4ACADA).withOpacity(0.4),
-                    // Color(0xFF4ACADA).withOpacity(0.1),
-                    // Color(0xFF4ACADA).withOpacity(0.4),
-                    Colors.white.withOpacity(0.8),
-                    Colors.white.withOpacity(0.8),
-                  ],
-                ),
-                // boxShadow: [
-                //   BoxShadow(
-                //       color: shadowColor.withOpacity(0.2),
-                //       blurRadius: 1,
-                //       spreadRadius: 1,
-                //       offset: Offset(1, 1))
-                // ],
+                // gradient: LinearGradient(
+                //   begin: Alignment.topLeft,
+                //   end: Alignment.bottomRight,
+                //   colors: [
+                //     Color(0xFF4ACADA).withOpacity(0.4),
+                //     Color(0xFF4ACADA).withOpacity(0.1),
+                //     Color(0xFF4ACADA).withOpacity(0.4),
+
+                //     // Colors.white.withOpacity(0.8),
+                //     // Colors.white.withOpacity(0.8),
+                //   ],
+                // ),
+                boxShadow: [
+                  BoxShadow(
+                    color: FineTheme.palettes.primary200,
+                    blurRadius: 8,
+                    // spreadRadius: 1,
+                    // offset: Offset(1, 1),
+                  )
+                ],
               ),
               alignment: Alignment.center,
               padding: const EdgeInsets.only(

@@ -17,7 +17,7 @@ class StartUpView extends StatelessWidget {
           body: Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 image: AssetImage("assets/images/bgLandingPage.jpg"),
                 fit: BoxFit.cover,
@@ -25,9 +25,10 @@ class StartUpView extends StatelessWidget {
             ),
             child: Center(
               child: Container(
+                width: Get.width,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                  children: const [
                     // Image(
                     //   image: AssetImage("assets/icons/logo.png"),
                     // ),

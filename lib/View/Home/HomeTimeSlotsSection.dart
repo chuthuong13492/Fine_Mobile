@@ -24,6 +24,7 @@ class HomeTimeSlotsSection extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // ignore: sized_box_for_whitespace
                   Container(
                     height: 32,
                     width: Get.width,
@@ -80,10 +81,10 @@ class HomeTimeSlotsSection extends StatelessWidget {
                         style: NeumorphicStyle(
                           lightSource: const LightSource(-4, -4),
                           depth: -16,
-                          shadowDarkColor: FineTheme.palettes.secondary200,
+                          shadowDarkColor: FineTheme.palettes.primary200,
                           color: isSelect
                               // ignore: dead_code
-                              ? FineTheme.palettes.secondary200
+                              ? FineTheme.palettes.primary200
                               : Colors.white,
                         ),
                         duration: const Duration(milliseconds: 300),
@@ -94,6 +95,7 @@ class HomeTimeSlotsSection extends StatelessWidget {
                             // padding: const EdgeInsets.only(top: 4, bottom: 4),
                             child: Text(model.TimeSlot[index]['timeSlot'],
                                 style: isSelect
+                                    // ignore: dead_code
                                     ? FineTheme.typograhpy.subtitle2
                                         .copyWith(color: Colors.white)
                                     // ignore: dead_code

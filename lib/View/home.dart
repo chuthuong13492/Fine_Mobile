@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fine/Accessories/draggable_bottom_sheet.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/View/Home/HomeCategory.dart';
+import 'package:fine/View/Home/HomeCategorySection.dart';
 import 'package:fine/View/Home/HomeTimeSlotsSection.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
@@ -41,18 +42,33 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
             colors: [
               FineTheme.palettes.primary200,
-              FineTheme.palettes.primary100,
-              FineTheme.palettes.secondary100
+              FineTheme.palettes.primary200.withOpacity(0.8),
+              FineTheme.palettes.primary200.withOpacity(0.2),
+              // FineTheme.palettes.primary200.withOpacity(0.7),
+              // FineTheme.palettes.primary200.withOpacity(0.6),
+              // FineTheme.palettes.primary200.withOpacity(0.5),
+              // FineTheme.palettes.primary200.withOpacity(0.4),
+              // FineTheme.palettes.primary200.withOpacity(0.3),
+              // FineTheme.palettes.primary200.withOpacity(0.2),
+              // FineTheme.palettes.primary200.withOpacity(0.1),
+
+              // FineTheme.palettes.primary200,
+
+              // FineTheme.palettes.primary200.withOpacity(0.4),
+
+              FineTheme.palettes.shades100,
+              FineTheme.palettes.shades100,
             ]),
       ),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         body: SafeArea(
+          // ignore: sized_box_for_whitespace
           child: Container(
             // color: FineTheme.palettes.primary100,
             height: Get.height,
@@ -68,24 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       Expanded(
                         child: Container(
-                          // decoration: BoxDecoration(
-                          //   gradient: LinearGradient(
-                          //       begin: Alignment.topCenter,
-                          //       end: Alignment.bottomCenter,
-                          //       colors: [
-                          //         // FineTheme.palettes.primary100,
-                          //         // FineTheme.palettes.neutral200,
-                          //         // FineTheme.palettes.neutral200,
-                          //         // FineTheme.palettes.neutral200
-                          //         FineTheme.palettes.secondary100,
-                          //         // FineTheme.palettes.secondary100,
-                          //         // FineTheme.palettes.secondary200,
-                          //         FineTheme.palettes.primary200,
-                          //         FineTheme.palettes.neutral200,
-                          //       ]),
-                          // ),
-                          // color: FineTheme.palettes.neutral200,
-                          padding: EdgeInsets.only(top: 0),
+                          padding: const EdgeInsets.only(top: 0),
                           child: RefreshIndicator(
                             key: _refreshIndicatorKey,
                             onRefresh: _refresh,
@@ -107,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 8),
+                                    // ignore: sized_box_for_whitespace
                                     Container(
                                       width: 300,
                                       height: 300,
@@ -183,7 +183,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return [
       banner(),
       const SizedBox(height: 8),
+      // ignore: prefer_const_constructors
       HomeTimeSlotsSection(),
+      // const SizedBox(height: 8),
+      // ignore: prefer_const_constructors
+      HomeCategorySection(),
       // HomeCategory(),
       // timeRecieve(),
     ];
@@ -192,6 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget banner() {
     return ScopedModel<BlogsViewModel>(
         model: BlogsViewModel(),
+        // ignore: avoid_unnecessary_containers
         child: Container(
           // color: Colors.white,
           // padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
@@ -215,6 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (model.blogs == null || model.blogs.isEmpty) {
                     return const SizedBox.shrink();
                   }
+                  // ignore: sized_box_for_whitespace
                   return Container(
                     height: (Get.width) * (747 / 1914),
                     width: (Get.width),

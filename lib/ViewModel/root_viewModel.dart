@@ -2,6 +2,7 @@ import 'package:fine/Model/DTO/AccountDTO.dart';
 import 'package:fine/Model/DTO/CampusDTO.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
+import 'package:fine/ViewModel/category_viewModel.dart';
 import 'package:get/get.dart';
 
 class RootViewModel extends BaseModel {
@@ -17,5 +18,6 @@ class RootViewModel extends BaseModel {
   ];
   Future startUp() async {
     // await Get.find<AccountViewModel>().fetchUser();
+    await Get.find<CategoryViewModel>().getCategories();
   }
 }
