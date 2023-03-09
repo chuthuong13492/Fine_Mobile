@@ -3,37 +3,41 @@ const defaultImg =
 
 class CategoryDTO {
   int? id;
+  String? categoryCode;
   String? categoryName;
-  int? position;
-  String? picUrl;
+  String? imageUrl;
   bool? showOnHome;
-  int? type;
+  String? createAt;
+  String? updateAt;
 
   CategoryDTO(
       {this.id,
+      this.categoryCode,
       this.categoryName,
-      this.position,
-      this.picUrl,
+      this.imageUrl,
       this.showOnHome,
-      this.type});
+      this.createAt,
+      this.updateAt});
 
   CategoryDTO.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    categoryName = json['category_name'];
-    position = json['position'];
-    picUrl = json['pic_url'];
-    showOnHome = json['show_on_home'];
-    type = json['type'];
+    id = json["id"];
+    categoryCode = json["categoryCode"];
+    categoryName = json["categoryName"];
+    imageUrl = json["imageUrl"];
+    showOnHome = json["showOnHome"];
+    createAt = json["createAt"];
+    updateAt = json["updateAt"];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['category_name'] = this.categoryName;
-    data['position'] = this.position;
-    data['pic_url'] = this.picUrl;
-    data['show_on_home'] = this.showOnHome;
-    data['type'] = this.type;
-    return data;
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["categoryCode"] = categoryCode;
+    _data["categoryName"] = categoryName;
+    _data["imageUrl"] = imageUrl;
+    _data["showOnHome"] = showOnHome;
+    _data["createAt"] = createAt;
+    _data["updateAt"] = updateAt;
+    return _data;
   }
 }

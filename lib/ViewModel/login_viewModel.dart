@@ -52,7 +52,6 @@ class LoginViewModel extends BaseModel {
         log('idToken: ' + idToken);
         log('fcmToken: ' + fcmToken.toString());
 
-        // print('fcmToken: ' + fcmToken.toString());
         userInfo = await dao.login(idToken, fcmToken!);
         await _analyticsService.setUserProperties(userInfo);
         if (userInfo != null) {
@@ -68,7 +67,7 @@ class LoginViewModel extends BaseModel {
         }
         // await Get.offAllNamed(RoutHandler.NAV);
       }
-      await Future.delayed(Duration(microseconds: 500));
+      await Future.delayed(const Duration(microseconds: 500));
       setState(ViewStatus.Completed);
     } on FirebaseAuthException catch (e) {
       log(e.message!);

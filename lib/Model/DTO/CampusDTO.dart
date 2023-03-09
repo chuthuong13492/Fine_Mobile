@@ -116,46 +116,43 @@ class DestinationDTO {
   }
 }
 
-class TimeSlot {
-  int? menuId;
-  String? from;
-  String? to;
-  String? arrive;
-  List<dynamic> arriveRange;
-  bool? available;
+class TimeSlotDTO {
+  int? id;
+  int? campusId;
+  String? arriveTime;
+  String? checkoutTime;
+  bool? isActive;
+  String? createAt;
+  String? updateAt;
 
-  TimeSlot(
-      {this.menuId,
-      this.from,
-      this.to,
-      this.available,
-      this.arrive,
-      this.arriveRange = const []});
+  TimeSlotDTO(
+      {this.id,
+      this.campusId,
+      this.arriveTime,
+      this.checkoutTime,
+      this.isActive,
+      this.createAt,
+      this.updateAt});
 
-  factory TimeSlot.fromJson(dynamic json) {
-    var arriveRange = json['arrive_time_range'] != "null"
-        ? json['arrive_time_range']
-        : ["00:00:00", "03:00:00"];
-    print(json);
-    var timeSlot = TimeSlot(
-        menuId: json['menu_id'],
-        from: json['from'],
-        to: json['to'].toString(),
-        available: json['available'] ?? false,
-        // arriveRange: arriveRange,
-        arrive: json['arrive_time']);
-    // timeSlot.arriveRange = arriveRange;
-    return timeSlot;
+  TimeSlotDTO.fromJson(Map<String, dynamic> json) {
+    id = json["id"];
+    campusId = json["campusId"];
+    arriveTime = json["arriveTime"];
+    checkoutTime = json["checkoutTime"];
+    isActive = json["isActive"];
+    createAt = json["createAt"];
+    updateAt = json["updateAt"];
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      "menu_id": menuId,
-      "from": from,
-      "to": to,
-      "available": available,
-      'arrive_time': arrive,
-      'arrive_time_range': arriveRange.toString()
-    };
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["campusId"] = campusId;
+    _data["arriveTime"] = arriveTime;
+    _data["checkoutTime"] = checkoutTime;
+    _data["isActive"] = isActive;
+    _data["createAt"] = createAt;
+    _data["updateAt"] = updateAt;
+    return _data;
   }
 }

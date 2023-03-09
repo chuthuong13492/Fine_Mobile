@@ -1,7 +1,8 @@
+// ignore_for_file: avoid_unnecessary_containers
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fine/Accessories/draggable_bottom_sheet.dart';
 import 'package:fine/Constant/view_status.dart';
-import 'package:fine/View/Home/HomeCategory.dart';
 import 'package:fine/View/Home/HomeCategorySection.dart';
 import 'package:fine/View/Home/HomeTimeSlotsSection.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
@@ -46,8 +47,10 @@ class _HomeScreenState extends State<HomeScreen> {
             end: Alignment.bottomCenter,
             colors: [
               FineTheme.palettes.primary200,
-              FineTheme.palettes.primary200.withOpacity(0.8),
-              FineTheme.palettes.primary200.withOpacity(0.2),
+              FineTheme.palettes.primary200.withOpacity(0.7),
+              // FineTheme.palettes.primary200.withOpacity(0.2),
+              // FineTheme.palettes.primary200.withOpacity(0.1),
+
               // FineTheme.palettes.primary200.withOpacity(0.7),
               // FineTheme.palettes.primary200.withOpacity(0.6),
               // FineTheme.palettes.primary200.withOpacity(0.5),
@@ -61,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // FineTheme.palettes.primary200.withOpacity(0.4),
 
               FineTheme.palettes.shades100,
-              FineTheme.palettes.shades100,
+              // FineTheme.palettes.shades100,
             ]),
       ),
       child: Scaffold(
@@ -73,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
             // color: FineTheme.palettes.primary100,
             height: Get.height,
             child: ScopedModel(
-              model: HomeViewModel(),
+              model: Get.find<HomeViewModel>(),
               child: Stack(
                 children: [
                   Column(
@@ -195,8 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget banner() {
     return ScopedModel<BlogsViewModel>(
-        model: BlogsViewModel(),
-        // ignore: avoid_unnecessary_containers
+        model: Get.find<BlogsViewModel>(),
         child: Container(
           // color: Colors.white,
           // padding: EdgeInsets.fromLTRB(0, 0, 8, 0),
@@ -217,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 case ViewStatus.Error:
                   return const SizedBox.shrink();
                 default:
-                  if (model.blogs == null || model.blogs.isEmpty) {
+                  if (model.blogs == null || model.blogs!.isEmpty) {
                     return const SizedBox.shrink();
                   }
                   // ignore: sized_box_for_whitespace
@@ -230,15 +232,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           // await launch(
                           //     "https://www.youtube.com/embed/wu32Wj_Uix4");
                         },
-                        autoplay: model.blogs.length > 1 ? true : false,
+                        autoplay: model.blogs!.length > 1 ? true : false,
                         autoplayDelay: 5000,
                         viewportFraction: 0.9,
                         pagination: const SwiperPagination(
                             alignment: Alignment.bottomCenter),
-                        itemCount: model.blogs.length,
+                        itemCount: model.blogs!.length,
                         itemBuilder: (context, index) {
-                          if (model.blogs[index]['images'] == null ||
-                              model.blogs[index]['images'] == "")
+                          if (model.blogs![index].imageUrl == null ||
+                              model.blogs![index].imageUrl == "")
                             // ignore: curly_braces_in_flow_control_structures
                             return Icon(
                               MaterialIcons.broken_image,
@@ -247,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
 
                           return CachedNetworkImage(
-                            imageUrl: model.blogs[index]['images'],
+                            imageUrl: model.blogs![index].imageUrl!,
                             imageBuilder: (context, imageProvider) => InkWell(
                               onTap: () {
                                 // Get.toNamed(RouteHandler.BANNER_DETAIL,

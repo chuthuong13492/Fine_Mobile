@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fine/Model/DTO/CampusDTO.dart';
 import 'package:fine/setup.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -12,6 +13,23 @@ Future<bool> setIsFirstOnboard(bool isFirstOnboard) async {
 Future<bool?> getIsFirstOnboard() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.getBool('isFirstOnBoard');
+}
+
+Future<void> setStore(CampusDTO dto) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  if (dto != null) {
+    print(dto.toJson().toString());
+    prefs.setString('STORE', jsonEncode(dto?.toJson()));
+  }
+}
+
+Future<CampusDTO?> getStore() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? encodedCart = prefs.getString('STORE');
+  if (encodedCart != null) {
+    return CampusDTO.fromJson(jsonDecode(encodedCart));
+  }
+  return null;
 }
 
 Future<bool> setFCMToken(String value) async {

@@ -1,3 +1,4 @@
+import 'package:fine/Constant/view_status.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
@@ -26,7 +27,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
       duration: const Duration(milliseconds: 300),
       // decoration: const BoxDecoration(
       //   boxShadow: [
-      //     BoxShadow(
+      //                     BoxShadow(
       //         color: Colors.grey,
       //         spreadRadius: 3,
       //         // blurRadius: 6,
@@ -39,6 +40,11 @@ class _FixedAppBarState extends State<FixedAppBar> {
         model: RootViewModel(),
         child: ScopedModelDescendant<RootViewModel>(
           builder: (context, child, model) {
+            String text = "Đợi tý đang load...";
+            final status = model.status;
+            if (status == ViewStatus.Error) {
+              text = "Có lỗi xảy ra...";
+            }
             return Container(
               color: Colors.transparent,
               padding: const EdgeInsets.only(left: 8, right: 8, bottom: 12),
@@ -65,8 +71,8 @@ class _FixedAppBarState extends State<FixedAppBar> {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
-                        AccountViewModel root = Get.find<AccountViewModel>();
-                        root.processSignout();
+                        // AccountViewModel root = Get.find<AccountViewModel>();
+                        // root.processSignout();
                       },
                       child: Container(
                         // color: Colors.transparent,

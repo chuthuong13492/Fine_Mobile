@@ -1,32 +1,52 @@
-import 'dart:convert';
-
 class BlogDTO {
   int? id;
+  int? storeId;
   String? title;
+  String? blogContent;
   String? imageUrl;
-  String? content;
+  bool? active;
   bool? isDialog;
-  Map<String, dynamic>? metaData;
+  String? metadata;
+  String? createAt;
+  String? updateAt;
 
   BlogDTO(
       {this.id,
+      this.storeId,
       this.title,
+      this.blogContent,
       this.imageUrl,
-      this.content,
+      this.active,
       this.isDialog,
-      this.metaData});
+      this.metadata,
+      this.createAt,
+      this.updateAt});
 
-  factory BlogDTO.fromJson(dynamic data) {
-    var value = data['meta_data'];
-    if (value != null) {
-      value = jsonDecode(value);
-    }
-    return BlogDTO(
-        id: data['id'],
-        imageUrl: data['image_url'],
-        content: data['blog_content'],
-        title: data['title'],
-        isDialog: data['is_dialog'],
-        metaData: value);
+  BlogDTO.fromJson(Map<String, dynamic> json) {
+    id = json["id"];
+    storeId = json["storeId"];
+    title = json["title"];
+    blogContent = json["blogContent"];
+    imageUrl = json["imageUrl"];
+    active = json["active"];
+    isDialog = json["isDialog"];
+    metadata = json["metadata"];
+    createAt = json["createAt"];
+    updateAt = json["updateAt"];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["storeId"] = storeId;
+    _data["title"] = title;
+    _data["blogContent"] = blogContent;
+    _data["imageUrl"] = imageUrl;
+    _data["active"] = active;
+    _data["isDialog"] = isDialog;
+    _data["metadata"] = metadata;
+    _data["createAt"] = createAt;
+    _data["updateAt"] = updateAt;
+    return _data;
   }
 }

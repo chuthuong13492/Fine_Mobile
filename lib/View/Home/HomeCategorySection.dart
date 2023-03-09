@@ -1,3 +1,5 @@
+// ignore_for_file: sized_box_for_whitespace
+
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/ViewModel/category_viewModel.dart';
@@ -26,8 +28,8 @@ class _HomeCategorySectionState extends State<HomeCategorySection> {
   void initState() {
     super.initState();
     _categoryViewModel = CategoryViewModel();
-    Get.find<CategoryViewModel>().getCategories();
-    // _categoryViewModel?.getCategories(params: {"type": 1, "showOnHome": true});
+    // Get.find<CategoryViewModel>().getCategories();
+    _categoryViewModel?.getCategories();
   }
 
   @override
@@ -38,10 +40,6 @@ class _HomeCategorySectionState extends State<HomeCategorySection> {
           builder: (context, child, model) {
             ViewStatus status = model.status;
             // ViewStatus status = ViewStatus.Completed;
-
-            // var categories = model.categoryList
-            //     .where((element) => element.showOnHome!)
-            //     .toList();
             var categories = model.categories
                 ?.where((element) => element.showOnHome!)
                 .toList();
@@ -102,60 +100,28 @@ class _HomeCategorySectionState extends State<HomeCategorySection> {
                     ),
                   );
                 }
-                return Container(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-
-                    // children: [
-                    //   Padding(
-                    //     padding: const EdgeInsets.fromLTRB(0, 10, 0, 12),
-                    //     child: Text(
-                    //       'Quán ngon hôm nay',
-                    //       style: BeanOiTheme.typography.subtitle1.copyWith(
-                    //           color: BeanOiTheme.palettes.shades200,
-                    //           fontFamily: 'Inter'),
-                    //       textAlign: TextAlign.left,
-                    //     ),
-                    //   ),
-                    // ColorFiltered(
-                    //   colorFilter: ColorFilter.mode(
-                    //     isMenuAvailable ? Colors.transparent : Colors.grey,
-                    //     BlendMode.saturation,
-                    //   ),
-                    //   child: Column(
-                    //     children: [
-                    //       ...model.suppliers
-                    //           .where((supplier) => supplier.available)
-                    //           .map((supplier) => InkWell(
-                    //               onTap: () {
-                    //                 model.selectSupplier(supplier);
-                    //               },
-                    //               child: buildSupplier(supplier)))
-                    //           .toList(),
-                    //     ],
-                    //   ),
-                    // ),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 12, 0, 8),
-                        child: Text(
-                          'Quán ngon hôm nay',
-                          style: FineTheme.typograhpy.h2
-                              .copyWith(color: Colors.white),
-                          textAlign: TextAlign.left,
-                        ),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 12, 0, 8),
+                      child: Text(
+                        'Danh mục',
+                        style: FineTheme.typograhpy.h2
+                            .copyWith(color: Colors.white),
+                        textAlign: TextAlign.left,
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        color: Colors.transparent,
-                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                        child: buildSupplierSection(categories),
-                      ),
-                      // SizedBox(height: 8),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      color: Colors.transparent,
+                      // padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      child: buildSupplierSection(categories),
+                    ),
+                    // SizedBox(height: 8),
 
-                      // SizedBox(height: 4),
-                    ],
-                  ),
+                    // SizedBox(height: 4),
+                  ],
                 );
             }
           },
@@ -200,6 +166,7 @@ class _HomeCategorySectionState extends State<HomeCategorySection> {
         ],
       );
     }
+    // ignore: sized_box_for_whitespace
     return Container(
       width: Get.width,
       height: 90,
@@ -241,13 +208,13 @@ class _HomeCategorySectionState extends State<HomeCategorySection> {
               borderRadius: BorderRadius.circular(4),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  offset: const Offset(4, 4),
-                ),
+                    color: Colors.black.withOpacity(0.4),
+                    offset: const Offset(0, 3),
+                    blurRadius: 4),
               ],
             ),
             child: CacheImage(
-              imageUrl: cate!.picUrl!,
+              imageUrl: cate!.imageUrl!,
             ),
             // child: ColorFiltered(
             //   colorFilter: ColorFilter.mode(

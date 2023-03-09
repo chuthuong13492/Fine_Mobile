@@ -1,3 +1,5 @@
+// ignore_for_file: sized_box_for_whitespace, avoid_unnecessary_containers
+
 import 'dart:ui';
 
 import 'package:fine/ViewModel/login_viewModel.dart';
@@ -54,6 +56,7 @@ class SignIn extends StatelessWidget {
                     children: [
                       BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5)),
+                      // ignore: sized_box_for_whitespace
                       Container(
                         width: 150,
                         height: 150,
@@ -68,7 +71,7 @@ class SignIn extends StatelessWidget {
                                       .palettes.secondary200, //color of shadow
                                   blurRadius: 100.0, // soften the shadow
                                   spreadRadius: 0.0, //extend the shadow
-                                  offset: Offset(
+                                  offset: const Offset(
                                       -5, // Move to right 10  horizontally
                                       -5 // Move to bottom 5 Vertically
                                       )),
@@ -78,7 +81,7 @@ class SignIn extends StatelessWidget {
                                       .palettes.secondary200, //color of shadow
                                   blurRadius: 100.0, // soften the shadow
                                   spreadRadius: 0.0, //extend the shadow
-                                  offset: Offset(
+                                  offset: const Offset(
                                       5, // Move to right 10  horizontally
                                       5 //Move to bottom 5 Vertically
                                       )),
@@ -119,7 +122,7 @@ class SignIn extends StatelessWidget {
                                       .palettes.primary200, //color of shadow
                                   blurRadius: 100.0, // soften the shadow
                                   spreadRadius: 0.0, //extend the shadow
-                                  offset: Offset(
+                                  offset: const Offset(
                                       -5, // Move to right 10  horizontally
                                       -5 // Move to bottom 5 Vertically
                                       )),
@@ -129,7 +132,7 @@ class SignIn extends StatelessWidget {
                                       .palettes.primary200, //color of shadow
                                   blurRadius: 100.0, // soften the shadow
                                   spreadRadius: 0.0, //extend the shadow
-                                  offset: Offset(
+                                  offset: const Offset(
                                       5, // Move to right 10  horizontally
                                       5 //Move to bottom 5 Vertically
                                       )),

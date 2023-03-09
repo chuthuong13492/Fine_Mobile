@@ -28,7 +28,7 @@ class StartUpView extends StatelessWidget {
                 width: Get.width,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     // Image(
                     //   image: AssetImage("assets/icons/logo.png"),
                     // ),
@@ -36,12 +36,13 @@ class StartUpView extends StatelessWidget {
                     //   width: 8,
                     // ),
                     Text(
-                      "Fine Delivery",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 34,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'Fira Sans'),
+                      "F.i.n.e".toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 34,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Fira Sans',
+                      ),
                     )
                   ],
                 ),
@@ -69,7 +70,7 @@ class LoadingScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // LoadingBean(),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 this.title,
                 style: Get.theme.textTheme.headline1,

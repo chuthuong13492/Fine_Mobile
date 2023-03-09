@@ -54,10 +54,10 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Center(
             child: Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               width: 180,
               height: 180,
-              child: CustomImage2(
+              child: const CustomImage2(
                 "https://cdn-icons-png.flaticon.com/512/3820/3820331.png",
                 bgColor: appBgColor,
                 isSVG: false,
@@ -65,16 +65,16 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Center(
+          const Center(
             child: Text(
               "Fine Deliver",
               style: TextStyle(color: secondary, fontSize: 28),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 28,
           ),
           ScopedModelDescendant<LoginViewModel>(
@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
                         height: 60,
                         width: 240,
                       )
-                    : SizedBox(
+                    : const SizedBox(
                         width: 240,
                         height: 60,
                         // child: SignInButton(

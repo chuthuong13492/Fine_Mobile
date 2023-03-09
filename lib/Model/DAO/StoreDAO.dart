@@ -1,5 +1,7 @@
 import 'package:fine/Model/DAO/BaseDAO.dart';
 import 'package:fine/Model/DTO/BlogDTO.dart';
+import 'package:fine/Model/DTO/MetaDataDTO.dart';
+import 'package:fine/Utils/request.dart';
 
 class StoreDAO extends BaseDAO {
   //   Future<List<CampusDTO>> getStores({int id}) async {
@@ -43,15 +45,18 @@ class StoreDAO extends BaseDAO {
   //   }
   //   return null;
   // }
-  // Future<List<BlogDTO>> getBlogs(int store_id) async {
-  //   final res = await request.get("/stores/${store_id}/blog_posts",
-  //       queryParameters: {"active": true});
-  //   if (res.data['data'] != null) {
-  //     var listJson = res.data['data'] as List;
-  //     return listJson.map((e) => BlogDTO.fromJson(e)).toList();
-  //   }
-  //   return null;
-  // }
+  Future<List<BlogDTO>?> getBlogs() async {
+    final res = await request.get(
+      "/blog-post",
+      // queryParameters: {"page": page, "size": size}..addAll(params),
+    );
+    if (res.data['data'] != null) {
+      var listJson = res.data['data'] as List;
+      metaDataDTO = MetaDataDTO.fromJson(res.data['metadata']);
+      return listJson.map((e) => BlogDTO.fromJson(e)).toList();
+    }
+    return null;
+  }
   //   Future<List<LocationDTO>> getLocations(int storeId) async {
   //   final res = await request.get('stores/$storeId/locations');
   //   var jsonList = res.data["data"] as List;
