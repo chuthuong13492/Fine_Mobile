@@ -39,9 +39,9 @@ const listColors = [
   yellow,
 ];
 
-const primary = Color(0xff0D6efd);
+const primary = Color(0xFF228E9C);
 const third = Color(0xff258e46);
-const secondary = Color(0xff6C757D);
+const secondary = Color(0xFF54B59C);
 const success = Color(0xff198754);
 const info = Color(0xff0dcaf0);
 const warning = Color(0xffffc107);

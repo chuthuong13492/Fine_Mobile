@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   AccountDAO? dao;
   String error = '';
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void setIsLoading() {
     setState(() {
@@ -54,10 +54,10 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           Center(
             child: Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               width: 180,
               height: 180,
-              child: CustomImage2(
+              child: const CustomImage2(
                 "https://cdn-icons-png.flaticon.com/512/3820/3820331.png",
                 bgColor: appBgColor,
                 isSVG: false,
@@ -65,21 +65,22 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
-          Center(
+          const Center(
             child: Text(
               "Fine Deliver",
               style: TextStyle(color: secondary, fontSize: 28),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 28,
           ),
           ScopedModelDescendant<LoginViewModel>(
               builder: (context, child, model) {
             return Container(
+              height: 30,
               padding: EdgeInsets.all(8),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
@@ -89,15 +90,15 @@ class _LoginPageState extends State<LoginPage> {
                         height: 60,
                         width: 240,
                       )
-                    : SizedBox(
+                    : const SizedBox(
                         width: 240,
                         height: 60,
-                        child: SignInButton(
-                          Buttons.Google,
-                          onPressed: () {
-                            model.signInWithGoogle();
-                          },
-                        ),
+                        // child: SignInButton(
+                        //   Buttons.Google,
+                        //   onPressed: () {
+                        //     model.signInWithGoogle();
+                        //   },
+                        // ),
                       ),
               ),
             );

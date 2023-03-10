@@ -1,75 +1,58 @@
 class AccountDTO {
   int? id;
   String? name;
-  String? phone;
+  String? customerCode;
   String? email;
-  int? brandId;
+  String? phone;
   DateTime? dateOfBirth;
   String? imageUrl;
+  int? campusId;
+  int? campusInfoId;
+  String? createAt;
+  String? updateAt;
 
   AccountDTO(
       {this.id,
       this.name,
-      this.phone,
+      this.customerCode,
       this.email,
-      this.brandId,
+      this.phone,
       this.dateOfBirth,
-      this.imageUrl});
+      this.imageUrl,
+      this.campusId,
+      this.campusInfoId,
+      this.createAt,
+      this.updateAt});
 
   AccountDTO.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    phone = json['phone'];
+    customerCode = json['customerCode'];
     email = json['email'];
-    brandId = json['brandId'];
-    dateOfBirth = DateTime.parse(json['dateOfBirth'] as String);
+    phone = json['phone'];
+    dateOfBirth = json['dateOfBirth'] as String != null
+        ? DateTime.parse(json['dateOfBirth'] as String)
+        : null;
     imageUrl = json['imageUrl'];
+    campusId = json['campusId'];
+    campusInfoId = json['campusInfoId'];
+    createAt = json['createAt'];
+    updateAt = json['updateAt'];
   }
-  // factory AccountDTO.fromJson(dynamic json) => AccountDTO(
-  //       id: json["id"],
-  //       name: json['name'] as String,
-  //       email: json['email'] as String,
-  //       phone: json['phone'] as String,
-  //       brandId: json['brandId'],
-  //       imageUrl: json['imageUrl'] as String,
-  //       // gender: (json['gender']),
-  //       // balance: json['balance'],
-  //       // point: json['point'],
-  //       // isFirstLogin: (json['is_first_login'] as bool) ?? false,
-  //       // ignore: unnecessary_null_comparison
-  //       // dateOfBirth: json['dateOfBirth'] as String != null ? DateTime.parse(json['dateOfBirth'] as String) : '',
-  //       dateOfBirth: DateTime.parse(json['dateOfBirth'] as String),
-
-  //       // referalCode: json['ref_code']
-  //     );
-
-  // static List<AccountDTO> fromList(dynamic jsonList) {
-  //   var list = jsonList as List;
-  //   return list.map((map) => AccountDTO.fromJson(map)).toList();
-  // }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['name'] = this.name;
-    data['phone'] = this.phone;
+    data['customerCode'] = this.customerCode;
     data['email'] = this.email;
-    data['brandId'] = this.brandId;
-    data['dateOfBirth'] = this.dateOfBirth;
+    data['phone'] = this.phone;
+    data['dateOfBirth'] = this.dateOfBirth.toString();
     data['imageUrl'] = this.imageUrl;
+    data['campusId'] = this.campusId;
+    data['campusInfoId'] = this.campusInfoId;
+    data['createAt'] = this.createAt;
+    data['updateAt'] = this.updateAt;
     return data;
   }
-
-  // Map<String, dynamic> toJson() {
-  //   return {
-  //     "id": id.toString(),
-  //     "name": name,
-  //     "email": email,
-  //     "phone": phone,
-  //     // "gender": gender,
-  //     "dateOfBirth": dateOfBirth?.toString(),
-  //     "imageUrl": imageUrl,
-  //     // "ref_code": referalCode
-  //   };
-  // }
 }

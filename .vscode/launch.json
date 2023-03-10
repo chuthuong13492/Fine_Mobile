@@ -7,19 +7,28 @@
         {
             "name": "fine_mobile",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": [
+                "--no-sound-null-safety"
+               ]
         },
         {
             "name": "fine_mobile (profile mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "profile",
+            "args": [
+                "--no-sound-null-safety"
+               ]
         },
         {
             "name": "fine_mobile (release mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+            "args": [
+                "--no-sound-null-safety"
+               ]
         }
     ]
 }

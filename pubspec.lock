@@ -105,6 +105,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  curved_navigation_bar:
+    dependency: "direct main"
+    description:
+      name: curved_navigation_bar
+      sha256: ea6412d00c5d83501bbf1cf9d1ac2ff11a20fbaf910c103c95ace7de82910334
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.3"
   dio:
     dependency: "direct main"
     description:
@@ -286,6 +294,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.0"
+  flutter_lints:
+    dependency: "direct dev"
+    description:
+      name: flutter_lints
+      sha256: aeb0b80a8b3709709c9cc496cdc027c5b3216796bc0af0ce1007eaf24464fd4c
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
+  flutter_neumorphic:
+    dependency: "direct main"
+    description:
+      name: flutter_neumorphic
+      sha256: "02606d937a3ceaa497b8a7c25f3efa95188bf93d77ebf0bd6552e432db4c2ec6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.0"
+  flutter_page_indicator:
+    dependency: transitive
+    description:
+      name: flutter_page_indicator
+      sha256: a5b2992228c2827b69faed3977681a3f5c313c7f13d72272decbb2923d1d7176
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   flutter_signin_button:
     dependency: "direct main"
     description:
@@ -302,6 +334,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.22.0"
+  flutter_swiper:
+    dependency: "direct main"
+    description:
+      name: flutter_swiper
+      sha256: e52a0e894abfa4099a5d4e5098a00597f3b55e25617cdd19e6fe6be5d24858c7
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.6"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -424,6 +464,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  lints:
+    dependency: transitive
+    description:
+      name: lints
+      sha256: "5e4a9cd06d447758280a8ac2405101e0e2094d2a1dbdd3756aec3fe7775ba593"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.1"
+  logger:
+    dependency: "direct main"
+    description:
+      name: logger
+      sha256: c40f9ef51e5bffb4ce69ad2d8c8aad7bd47ec109c090521109b63a4e2bc27191
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.2"
   matcher:
     dependency: transitive
     description:
@@ -688,11 +744,27 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.3"
+  shimmer:
+    dependency: "direct main"
+    description:
+      name: shimmer
+      sha256: "1f1009b5845a1f88f1c5630212279540486f97409e9fc3f63883e71070d107bf"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   sky_engine:
     dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.99"
+  smooth_page_indicator:
+    dependency: "direct main"
+    description:
+      name: smooth_page_indicator
+      sha256: "8c301bc686892306cd41672c1880167f140c16be305d5ede8201fefd9fcda829"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   source_span:
     dependency: transitive
     description:
@@ -765,6 +837,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.16"
+  transformer_page_view:
+    dependency: transitive
+    description:
+      name: transformer_page_view
+      sha256: "2210531bc4148831061c575070173f32693415be8bbbf5bd2159a38f2adff61c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.6"
   typed_data:
     dependency: transitive
     description:

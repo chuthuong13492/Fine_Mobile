@@ -2,7 +2,7 @@ import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DAO/AccountDAO.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/color.dart';
-import 'package:fine/utils/shared_pref.dart';
+import 'package:fine/Utils/shared_pref.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:introduction_screen/introduction_screen.dart';
@@ -29,20 +29,20 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
         title: "Chọn món từ nhiều cửa hàng",
         body:
             "Đặt được nhiều đơn hàng từ nhiều cửa hàng khác nhau mà chi phí lại rẻ đến bất ngờ.",
-        image: _buildImage('onboard_1.png'),
+        image: _buildImage('onboard-welcome-bg.png'),
         decoration: pageDecoration,
       ),
       PageViewModel(
         title: "Ăn đúng bữa",
         body:
-            "Đặt hàng theo khung giờ và fine sẽ nhắc bạn ăn cơm đúng bữa để tránh chiếc bụng đói.",
-        image: _buildImage('onboard_2.png'),
+            "Đặt hàng theo khung giờ và Bean sẽ nhắc bạn ăn cơm đúng bữa để tránh chiếc bụng đói.",
+        image: _buildImage('onboard-earn-points-bg.png'),
         decoration: pageDecoration,
       ),
       PageViewModel(
-        title: "Tích thật nhiều đậu",
-        body: "Tích góp thật nhiều đậu và đổi được những phần quà hay ho nhá.",
-        image: _buildImage('onboard_3.png'),
+        title: "Tích thật nhiều điểm",
+        body: "Tích góp thật nhiều điểm và đổi được những phần quà hay ho nhá.",
+        image: _buildImage('onboard_rewards_bg.png'),
         decoration: pageDecoration,
       ),
     ];

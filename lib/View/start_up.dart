@@ -17,29 +17,32 @@ class StartUpView extends StatelessWidget {
           body: Container(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage("assets/images/background_blue.jpg"),
+                image: AssetImage("assets/images/bgLandingPage.jpg"),
                 fit: BoxFit.cover,
               ),
             ),
             child: Center(
               child: Container(
+                width: Get.width,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image(
-                      image: AssetImage("assets/icons/logo.png"),
-                    ),
-                    SizedBox(
-                      width: 8,
-                    ),
+                    // Image(
+                    //   image: AssetImage("assets/icons/logo.png"),
+                    // ),
+                    // SizedBox(
+                    //   width: 8,
+                    // ),
                     Text(
-                      "Fine Delivery",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 34,
-                          fontWeight: FontWeight.w700),
+                      "F.i.n.e".toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 34,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Fira Sans',
+                      ),
                     )
                   ],
                 ),
@@ -67,7 +70,7 @@ class LoadingScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // LoadingBean(),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 this.title,
                 style: Get.theme.textTheme.headline1,

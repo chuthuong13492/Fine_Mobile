@@ -2,6 +2,8 @@ import 'package:fine/Model/DTO/AccountDTO.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 
+import '../Model/DTO/index.dart';
+
 class AnalyticsService {
   final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
   static AnalyticsService? _instance;
@@ -45,5 +47,35 @@ class AnalyticsService {
 
   Future logSignUp(String method) async {
     await _analytics.logSignUp(signUpMethod: method);
+  }
+
+  Future logChangeCart(ProductDTO product, int quantity, bool isAdd) async {
+    if (isAdd) {
+      await _analytics.logAddToCart(
+        items: [
+          AnalyticsEventItem(
+            itemId: product.id.toString(),
+            itemName: product.productName,
+            itemCategory: product.categoryId.toString(),
+            quantity: quantity,
+          )
+        ],
+        // itemId: product.id.toString(),
+        // itemName: product.name,
+        // itemCategory: product.catergoryId.toString(),
+        // quantity: quantity,
+      );
+    } else {
+      await _analytics.logRemoveFromCart(
+        items: [
+          AnalyticsEventItem(
+            itemId: product.id.toString(),
+            itemName: product.productName,
+            itemCategory: product.categoryId.toString(),
+            quantity: quantity,
+          ),
+        ],
+      );
+    }
   }
 }
