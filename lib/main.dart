@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:fine/Accessories/theme_data.dart';
 import 'package:fine/Constant/route_constraint.dart';
+import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/View/home.dart';
 import 'package:fine/View/login.dart';
 import 'package:fine/View/nav_screen.dart';
 import 'package:fine/View/notFoundScreen.dart';
 import 'package:fine/View/onboard.dart';
+import 'package:fine/View/product_detail.dart';
+import 'package:fine/View/product_filter_list.dart';
 import 'package:fine/View/sign_in.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/ViewModel/startup_viewModel.dart';
@@ -46,6 +49,18 @@ class MyApp extends StatelessWidget {
           //             title: settings.arguments ?? "Đang xử lý...",
           //           ),
           //       settings: settings);
+          case RoutHandler.PRODUCT_DETAIL:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => ProductDetailScreen(
+                      dto: settings.arguments as ProductDTO,
+                    ),
+                settings: settings);
+          case RoutHandler.PRODUCT_FILTER_LIST:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => ProductsFilterPage(
+                      params: settings.arguments as Map<String, dynamic>,
+                    ),
+                settings: settings);
           case RoutHandler.NAV:
             return CupertinoPageRoute(
                 builder: (context) => const RootScreen(), settings: settings);

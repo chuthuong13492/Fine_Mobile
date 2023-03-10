@@ -1,7 +1,8 @@
 import 'package:fine/Model/DAO/BaseDAO.dart';
-import 'package:fine/Model/DTO/BlogDTO.dart';
 import 'package:fine/Model/DTO/MetaDataDTO.dart';
 import 'package:fine/Utils/request.dart';
+
+import '../DTO/index.dart';
 
 class StoreDAO extends BaseDAO {
   //   Future<List<CampusDTO>> getStores({int id}) async {
@@ -57,6 +58,7 @@ class StoreDAO extends BaseDAO {
     }
     return null;
   }
+
   //   Future<List<LocationDTO>> getLocations(int storeId) async {
   //   final res = await request.get('stores/$storeId/locations');
   //   var jsonList = res.data["data"] as List;

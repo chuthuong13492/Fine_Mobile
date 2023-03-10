@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:fine/Accessories/cart_button.dart';
 import 'package:fine/View/home.dart';
 import 'package:fine/View/orderHistory.dart';
 import 'package:fine/View/profile.dart';
@@ -77,6 +78,7 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
 
   Widget MainScreen() {
     return Scaffold(
+        floatingActionButton: CartButton(),
         backgroundColor: FineTheme.palettes.neutral200,
         bottomNavigationBar: getBottomBar(),
         body: getBarPage());

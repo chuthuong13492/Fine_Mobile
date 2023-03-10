@@ -4,3 +4,5 @@ export 'StoreDAO.dart';
 export 'CategoryDAO.dart';
 export 'CollectionDAO.dart';
 export 'CampusDAO.dart';
+export 'ProductDAO.dart';
+export 'OrderDAO.dart';

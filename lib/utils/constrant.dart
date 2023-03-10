@@ -1,6 +1,9 @@
+const String CART_TAG = "cartTag";
 const int ANIMATED_BODY_MS = 500;
 const phoneReg = r'^(0|\+)([0-9])+$';
 const int DEFAULT_SIZE = 50;
+const String defaultImage =
+    "https://firebasestorage.googleapis.com/v0/b/unidelivery-fad6f.appspot.com/o/images%2Fdefault_image.png?alt=media&token=3c1cf2f4-52be-4df1-aed5-cdb5fd4990d8";
 
 class CourseStatus {
   static const int DRAFT = 1;

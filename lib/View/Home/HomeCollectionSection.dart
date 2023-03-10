@@ -1,6 +1,10 @@
+import 'dart:ffi';
+
+import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/CollectionDTO.dart';
 import 'package:fine/Model/DTO/ProductDTO.dart';
+import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
@@ -35,33 +39,58 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
   @override
   Widget build(BuildContext context) {
     return ScopedModel(
-        model: HomeViewModel(),
+        model: Get.find<HomeViewModel>(),
         child: ScopedModelDescendant<HomeViewModel>(
           builder: (context, child, model) {
-            var collections = model.homeCollections;
+            var collections = model.homeMenu;
             if (model.status == ViewStatus.Loading ||
                 collections == null ||
                 collections?.length == 0) {
               return _buildLoading();
             }
             return Column(
-              children: collections
-                  .where((element) =>
-                      element.products != null && element.products?.length != 0)
-                  .map(
-                    (c) => Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        color: Colors.white,
-                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                        child: buildHomeCollection(c)),
-                  )
-                  .toList(),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: Text(
+                    'Bộ Sưu Tập',
+                    style:
+                        FineTheme.typograhpy.h2.copyWith(color: Colors.white),
+                  ),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                Column(
+                  children: collections
+                      // .where((element) =>
+                      //     element.isActive == true ||
+                      //     element.products!.isNotEmpty)
+                      .where((element) =>
+                          element.products != null &&
+                          element.products!.isNotEmpty)
+                      .map(
+                        (c) => Container(
+                            margin: const EdgeInsets.only(
+                                bottom: 8, left: 12, right: 12),
+                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                            decoration: BoxDecoration(
+                                color: FineTheme.palettes.shades100,
+                                borderRadius: BorderRadius.circular(8)),
+                            child: buildHomeCollection(c)),
+                      )
+                      .toList(),
+                ),
+              ],
             );
           },
         ));
   }
 
-  Widget buildHomeCollection(CollectionDTO collection) {
+  Widget buildHomeCollection(MenuDTO collection) {
+    // HomeViewModel root = HomeViewModel();
+    // root.getProductInMenu(collection.id);
     return TouchOpacity(
       onTap: () {
         // RootViewModel root = Get.find<RootViewModel>();
@@ -84,65 +113,78 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    collection.name!,
-                    style: FineTheme.typograhpy.subtitle1
-                        .copyWith(fontFamily: 'Inter'),
+                    collection.menuName!,
+                    style: FineTheme.typograhpy.subtitle1.copyWith(
+                        fontFamily: 'Inter',
+                        color: FineTheme.palettes.primary300),
                   ),
-                  collection.description != null
-                      ? Text(
-                          collection.description ?? "",
-                          style: FineTheme.typograhpy.buttonSm
-                              .copyWith(color: FineTheme.palettes.neutral600),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        )
-                      : const SizedBox(
-                          height: 0,
-                        )
+                  // collection.description != null
+                  //     ? Text(
+                  //         collection.description ?? "",
+                  //         style: FineTheme.typograhpy.buttonSm
+                  //             .copyWith(color: FineTheme.palettes.neutral600),
+                  //         maxLines: 2,
+                  //         overflow: TextOverflow.ellipsis,
+                  //       )
+                  //     : const SizedBox(
+                  //         height: 0,
+                  //       )
                 ],
               ),
               Text(
                 'Xem tất cả',
-                style: FineTheme.typograhpy.buttonSm
-                    .copyWith(color: FineTheme.palettes.primary300),
-                // style: Get.find<RootViewModel>().isCurrentMenuAvailable()
-                //     ? FineTheme.typograhpy.buttonSm
-                //         .copyWith(color: FineTheme.palettes.primary300)
-                //     : const TextStyle(color: Colors.grey),
+                // style: FineTheme.typograhpy.buttonSm
+                //     .copyWith(color: FineTheme.palettes.primary300),
+                style: Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
+                    ? FineTheme.typograhpy.buttonSm
+                        .copyWith(color: FineTheme.palettes.primary300)
+                    : const TextStyle(color: Colors.grey),
               )
             ],
           ),
           const SizedBox(height: 8),
-          Container(
-            width: Get.width,
-            height: 155,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              separatorBuilder: (context, index) =>
-                  SizedBox(width: FineTheme.spacing.xs),
-              itemBuilder: (context, index) {
-                var product = collection.products![index];
-                return Material(
-                  color: Colors.white,
-                  child: TouchOpacity(
-                    onTap: () {
-                      // RootViewModel root = Get.find<RootViewModel>();
-                      // // var firstTimeSlot = root.currentStore.timeSlots?.first;
-                      // if (!root.isCurrentMenuAvailable()) {
-                      //   showStatusDialog(
-                      //       "assets/images/global_error.png",
-                      //       "Opps",
-                      //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-                      // } else {
-                      //   if (product.type == ProductType.MASTER_PRODUCT) {}
-                      //   root.openProductDetail(product, fetchDetail: true);
-                      // }
+          ScopedModel(
+            model: Get.find<HomeViewModel>(),
+            child: ScopedModelDescendant<HomeViewModel>(
+              builder: (context, child, model) {
+                // model.getProductInMenu(
+                //     collection.id); // root.getProductInMenu(collection.id);
+                // var product = model.productList;
+                return Container(
+                  width: Get.width,
+                  height: 155,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    separatorBuilder: (context, index) =>
+                        SizedBox(width: FineTheme.spacing.xs),
+                    itemBuilder: (context, index) {
+                      var product = collection.products![index];
+                      return Material(
+                        color: Colors.white,
+                        child: TouchOpacity(
+                          onTap: () {
+                            RootViewModel root = Get.find<RootViewModel>();
+                            // // var firstTimeSlot = root.currentStore.timeSlots?.first;
+                            if (!root.isCurrentTimeSlotAvailable()) {
+                              showStatusDialog(
+                                  "assets/images/error.png",
+                                  "Opps",
+                                  "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+                            } else {
+                              // if (product.type == ProductType.MASTER_PRODUCT) {}
+                              root.openProductDetail(product,
+                                  fetchDetail: true);
+                            }
+                          },
+                          child: buildProductInCollection(product),
+                        ),
+                      );
                     },
-                    child: buildProductInCollection(product),
+                    // itemCount: collection.products!.length,
+                    itemCount: collection.products!.length,
                   ),
                 );
               },
-              itemCount: collection.products!.length,
             ),
           )
         ],
@@ -161,41 +203,43 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
             width: 110,
             height: 110,
             child: ColorFiltered(
-              colorFilter: const ColorFilter.mode(
-                Colors.transparent,
-                BlendMode.saturation,
-              ),
               // colorFilter: ColorFilter.mode(
-              //   Get.find<RootViewModel>().isCurrentMenuAvailable()
-              //       ? Colors.transparent
-              //       : Colors.grey,
+              //   Colors.transparent,
               //   BlendMode.saturation,
               // ),
-              child: CacheImage(
-                imageUrl: product.imageURL!,
+              colorFilter: ColorFilter.mode(
+                Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
+                    ? Colors.transparent
+                    : Colors.grey,
+                BlendMode.saturation,
+              ),
+              child: const CacheImage(
+                imageUrl:
+                    'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908',
               ),
             ),
           ),
           SizedBox(height: FineTheme.spacing.xxs),
           Text(
-            product.name!,
-            style: FineTheme.typograhpy.buttonSm
-                .copyWith(color: FineTheme.palettes.shades200),
-            // style: Get.find<RootViewModel>().isCurrentMenuAvailable()
-            //     ? FineTheme.typograhpy.buttonSm
-            //         .copyWith(color: FineTheme.palettes.shades200)
-            //     : Get.theme.textTheme.headline5?.copyWith(
-            //         color: Colors.grey,
-            //       ),
+            product.productName!,
+            // style: FineTheme.typograhpy.buttonSm
+            //     .copyWith(color: FineTheme.palettes.shades200),
+            style: Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
+                ? FineTheme.typograhpy.buttonSm
+                    .copyWith(color: FineTheme.palettes.shades200)
+                : FineTheme.typograhpy.buttonSm.copyWith(
+                    color: Colors.grey,
+                  ),
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
           Container(
             // height: 40,
             child: Text(
-              product.type != ProductType.MASTER_PRODUCT
-                  ? '${formatPriceWithoutUnit(product.price!)} đ'
-                  : 'từ ${formatPriceWithoutUnit(product.minPrice! ?? product.price!)} đ',
+              '${formatPriceWithoutUnit(product.price!)} đ',
+              // product.type != ProductType.MASTER_PRODUCT
+              //     ? '${formatPriceWithoutUnit(product.price!)} đ'
+              //     : 'từ ${formatPriceWithoutUnit(product.minPrice! ?? product.price!)} đ',
               style: FineTheme.typograhpy.caption1
                   .copyWith(color: FineTheme.palettes.primary300),
               textAlign: TextAlign.center,
@@ -231,9 +275,12 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
 
 Widget _buildLoading() {
   return Container(
-    margin: const EdgeInsets.only(bottom: 8),
-    color: Colors.white,
+    margin: const EdgeInsets.only(bottom: 8, left: 12, right: 12),
     padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+    decoration: BoxDecoration(
+      color: FineTheme.palettes.shades100,
+      borderRadius: BorderRadius.circular(8),
+    ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

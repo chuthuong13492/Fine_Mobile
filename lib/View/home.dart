@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fine/Accessories/draggable_bottom_sheet.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/View/Home/HomeCategorySection.dart';
+import 'package:fine/View/Home/HomeCollectionSection.dart';
 import 'package:fine/View/Home/HomeTimeSlotsSection.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
@@ -47,23 +48,14 @@ class _HomeScreenState extends State<HomeScreen> {
             end: Alignment.bottomCenter,
             colors: [
               FineTheme.palettes.primary200,
-              FineTheme.palettes.primary200.withOpacity(0.7),
-              // FineTheme.palettes.primary200.withOpacity(0.2),
-              // FineTheme.palettes.primary200.withOpacity(0.1),
-
               // FineTheme.palettes.primary200.withOpacity(0.7),
               // FineTheme.palettes.primary200.withOpacity(0.6),
               // FineTheme.palettes.primary200.withOpacity(0.5),
               // FineTheme.palettes.primary200.withOpacity(0.4),
-              // FineTheme.palettes.primary200.withOpacity(0.3),
-              // FineTheme.palettes.primary200.withOpacity(0.2),
-              // FineTheme.palettes.primary200.withOpacity(0.1),
+              FineTheme.palettes.primary200.withOpacity(0.1),
+              // FineTheme.palettes.shades100.withOpacity(0.2),
+              // FineTheme.palettes.shades100.withOpacity(0.2),
 
-              // FineTheme.palettes.primary200,
-
-              // FineTheme.palettes.primary200.withOpacity(0.4),
-
-              FineTheme.palettes.shades100,
               // FineTheme.palettes.shades100,
             ]),
       ),
@@ -114,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       width: 300,
                                       height: 300,
                                       child: Image.asset(
-                                        'assets/images/global_error.png',
+                                        'assets/images/error.png',
                                         fit: BoxFit.contain,
                                       ),
                                     ),
@@ -191,6 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // const SizedBox(height: 8),
       // ignore: prefer_const_constructors
       HomeCategorySection(),
+      HomeCollectionSection(),
       // HomeCategory(),
       // timeRecieve(),
     ];

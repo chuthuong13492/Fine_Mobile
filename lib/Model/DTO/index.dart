@@ -5,3 +5,6 @@ export 'CategoryDTO.dart';
 export 'CollectionDTO.dart';
 export 'ProductDTO.dart';
 export 'CampusDTO.dart';
+export 'OrderDTO.dart';
+export 'SupplierNoteDTO.dart';
+export 'MenuDTO.dart';

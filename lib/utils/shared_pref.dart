@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:fine/Model/DTO/CampusDTO.dart';
+import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/setup.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +20,7 @@ Future<void> setStore(CampusDTO dto) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   if (dto != null) {
     print(dto.toJson().toString());
-    prefs.setString('STORE', jsonEncode(dto?.toJson()));
+    prefs.setString('STORE', jsonEncode(dto.toJson()));
   }
 }
 
@@ -30,6 +31,118 @@ Future<CampusDTO?> getStore() async {
     return CampusDTO.fromJson(jsonDecode(encodedCart));
   }
   return null;
+}
+
+Future<void> setCart(Cart cart) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('CART', jsonEncode(cart.toJson()));
+}
+
+Future<void> setMart(Cart cart) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.setString('MART', jsonEncode(cart.toJson()));
+}
+
+Future<Cart?> getCart() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? encodedCart = prefs.getString('CART');
+  if (encodedCart != null) {
+    Cart cart = Cart.fromJson(jsonDecode(encodedCart));
+    return cart;
+  }
+  return null;
+}
+
+Future<Cart?> getMart() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? encodedCart = prefs.getString('MART');
+  if (encodedCart != null) {
+    Cart cart = Cart.fromJson(jsonDecode(encodedCart));
+    return cart;
+  }
+  return null;
+}
+
+Future<void> addItemToCart(CartItem item) async {
+  Cart? cart = await getCart();
+  if (cart == null) {
+    cart = new Cart();
+  }
+  cart.addItem(item);
+  await setCart(cart);
+}
+
+Future<void> addItemToMart(CartItem item) async {
+  Cart? cart = await getMart();
+  if (cart == null) {
+    cart = new Cart();
+  }
+  cart.addItem(item);
+  await setMart(cart);
+}
+
+Future<bool> removeItemFromCart(CartItem item) async {
+  Cart? cart = await getCart();
+  if (cart == null) {
+    return false;
+  }
+  cart.removeItem(item);
+  print("Delete success!");
+  print("Items: ${cart.items?.length.toString()}");
+  if (cart.items?.length == 0) {
+    await deleteCart();
+    return true;
+  } else {
+    await setCart(cart);
+    return false;
+  }
+}
+
+Future<bool> removeItemFromMart(CartItem item) async {
+  Cart? cart = await getMart();
+  if (cart == null) {
+    return false;
+  }
+  cart.removeItem(item);
+
+  if (cart.items?.length == 0) {
+    await deleteMart();
+    return true;
+  } else {
+    await setMart(cart);
+    return false;
+  }
+}
+
+Future<void> deleteCart() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.remove("CART");
+}
+
+Future<void> deleteMart() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove("MART");
+}
+
+Future<void> updateItemFromCart(CartItem item) async {
+  Cart? cart = await getCart();
+  if (cart == null) {
+    return;
+  }
+  cart.updateQuantity(item);
+  await setCart(cart);
+  print("Save");
+}
+
+Future<void> updateItemFromMart(CartItem item) async {
+  Cart? cart = await getMart();
+  if (cart == null) {
+    return;
+  }
+  cart.updateQuantity(item);
+  print(
+      "Updated Quantity: ${cart.items?.firstWhere((element) => element.findCartItem(item)).quantity}");
+  await setMart(cart);
 }
 
 Future<bool> setFCMToken(String value) async {

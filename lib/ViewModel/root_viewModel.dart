@@ -1,10 +1,13 @@
 import 'package:fine/Accessories/dialog.dart';
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DAO/CampusDAO.dart';
+import 'package:fine/Model/DAO/ProductDAO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
 import 'package:fine/ViewModel/category_viewModel.dart';
+import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:get/get.dart';
 
 class RootViewModel extends BaseModel {
@@ -12,23 +15,54 @@ class RootViewModel extends BaseModel {
   CampusDTO? currentStore;
   TimeSlotDTO? selectedTimeSlot;
   List<TimeSlotDTO>? listTimeSlot;
+  ProductDAO? _productDAO;
   bool changeAddress = false;
 
   RootViewModel() {
+    _productDAO = ProductDAO();
     selectedTimeSlot = null;
   }
   Future refreshMenu() async {
     // fetchStore();
     // await Get.find<HomeViewModel>().getSuppliers();
-    // await Get.find<HomeViewModel>().getCollections();
+    await Get.find<HomeViewModel>().getCollections();
     // await Get.find<OrderViewModel>().getUpSellCollections();
     // await Get.find<GiftViewModel>().getGifts();
   }
+
   Future startUp() async {
     // await Get.find<AccountViewModel>().fetchUser();
     await Get.find<RootViewModel>().getListTimeSlot();
+    await Get.find<HomeViewModel>().getCollections();
     await Get.find<CategoryViewModel>().getCategories();
     await Get.find<BlogsViewModel>().getBlogs();
+  }
+
+  Future<void> openProductDetail(ProductDTO? product,
+      {showOnHome = true, fetchDetail = false}) async {
+    Get.put<bool>(
+      showOnHome,
+      tag: "showOnHome",
+    );
+    try {
+      if (fetchDetail) {
+        showLoadingDialog();
+        // CampusDTO store = await getStore();
+        // product = await _productDAO.getProductDetail(
+        //     product.id, store.id, selectedMenu.menuId);
+        product = await _productDAO?.getProductsByMenuId(product?.id);
+      }
+      await Get.toNamed(RoutHandler.PRODUCT_DETAIL, arguments: product);
+      //
+      hideDialog();
+      await Get.delete<bool>(
+        tag: "showOnHome",
+      );
+      notifyListeners();
+    } catch (e) {
+      await showErrorDialog(errorTitle: "Không tìm thấy sản phẩm");
+      hideDialog();
+    }
   }
 
   Future<void> getListTimeSlot() async {
@@ -81,13 +115,11 @@ class RootViewModel extends BaseModel {
 
   Future<void> confirmTimeSlot(TimeSlotDTO? timeSlot) async {
     if (timeSlot?.id != selectedTimeSlot?.id) {
-      // if (!isTimeSlotAvailable(timeSlot)) {
-      //   showStatusDialog(
-      //       "assets/images/global_error.png",
-      //       "Khung giờ đã qua rồi",
-      //       "Hiện tại khung giờ này đã đóng vào lúc ${timeSlot.checkoutTime}, bạn hãy xem khung giờ khác nhé 😃.");
-      //   return;
-      // }
+      if (!isTimeSlotAvailable(timeSlot)) {
+        showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
+            "Hiện tại khung giờ này đã đóng vào lúc ${timeSlot?.checkoutTime}, bạn hãy xem khung giờ khác nhé 😃.");
+        return;
+      }
       int option = 1;
       // Cart cart = Get.find<OrderViewModel>().currentCart;
       // if (cart != null) {
@@ -105,6 +137,23 @@ class RootViewModel extends BaseModel {
         notifyListeners();
       }
     }
+  }
+
+  bool isCurrentTimeSlotAvailable() {
+    final currentDate = DateTime.now();
+    String currentTimeSlot = selectedTimeSlot!.checkoutTime!;
+    var beanTime = DateTime(
+      currentDate.year,
+      currentDate.month,
+      currentDate.day,
+      double.parse(currentTimeSlot.split(':')[0]).round(),
+      double.parse(currentTimeSlot.split(':')[1]).round(),
+    );
+    int differentTime = beanTime.difference(currentDate).inMilliseconds;
+    if (differentTime <= 0) {
+      return false;
+    } else
+      return true;
   }
 
   bool isTimeSlotAvailable(TimeSlotDTO? timeSlot) {
