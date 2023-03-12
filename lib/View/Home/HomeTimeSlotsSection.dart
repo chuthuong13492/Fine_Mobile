@@ -32,6 +32,9 @@ class _HomeTimeSlotsSectionState extends State<HomeTimeSlotsSection> {
       model: Get.find<RootViewModel>(),
       child: ScopedModelDescendant<RootViewModel>(
         builder: (context, child, model) {
+          var list = model.listTimeSlot
+              ?.where((element) => element.isActive == true)
+              .toList();
           if (model.currentStore == null) {
             final status = model.status;
             if (status == ViewStatus.Loading) {
@@ -83,10 +86,10 @@ class _HomeTimeSlotsSectionState extends State<HomeTimeSlotsSection> {
                   child: ListView.builder(
                     shrinkWrap: true,
                     scrollDirection: Axis.horizontal,
-                    itemCount: model.listTimeSlot?.length,
+                    itemCount: list?.length,
                     itemBuilder: (context, index) {
-                      bool isSelect = model.selectedTimeSlot?.id ==
-                          model.listTimeSlot?[index].id;
+                      bool isSelect =
+                          model.selectedTimeSlot?.id == list?[index].id;
                       // bool isSelect = false;
                       return Container(
                         height: 40,
@@ -132,9 +135,9 @@ class _HomeTimeSlotsSectionState extends State<HomeTimeSlotsSection> {
                             alignment: Alignment.center,
                             // padding: const EdgeInsets.only(top: 4, bottom: 4),
                             child: Text(
-                                '${model.listTimeSlot?[index].arriveTime}' +
+                                '${list?[index].arriveTime}' +
                                     ' - ' +
-                                    '${model.listTimeSlot?[index].checkoutTime}',
+                                    '${list?[index].checkoutTime}',
                                 style: isSelect
                                     // ignore: dead_code
                                     ? FineTheme.typograhpy.subtitle2
