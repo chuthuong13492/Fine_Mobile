@@ -8,6 +8,7 @@ import 'package:fine/View/login.dart';
 import 'package:fine/View/nav_screen.dart';
 import 'package:fine/View/notFoundScreen.dart';
 import 'package:fine/View/onboard.dart';
+import 'package:fine/View/order.dart';
 import 'package:fine/View/product_detail.dart';
 import 'package:fine/View/product_filter_list.dart';
 import 'package:fine/View/sign_in.dart';
@@ -55,6 +56,9 @@ class MyApp extends StatelessWidget {
                       dto: settings.arguments as ProductDTO,
                     ),
                 settings: settings);
+          case RoutHandler.ORDER:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => OrderScreen(), settings: settings);
           case RoutHandler.PRODUCT_FILTER_LIST:
             return CupertinoPageRoute<bool>(
                 builder: (context) => ProductsFilterPage(

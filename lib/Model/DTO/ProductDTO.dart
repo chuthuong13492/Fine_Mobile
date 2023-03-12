@@ -207,9 +207,11 @@ class ProductDTO {
     price = json["price"] ?? '';
     isAvailable = json["isAvailable"];
     status = json["status"];
-    createdAt = json['createdAt'] as String != null
-        ? DateTime.parse(json['createdAt'] as String)
-        : null;
+    // createdAt = json['createdAt'] as String != null
+    //     ? DateTime.parse(json['createdAt'] as String)
+    //     : null;
+    createdAt:
+    json['createdAt'] == null;
     updatedAt = json['updatedAt'] as String != null
         ? DateTime.parse(json['updatedAt'] as String)
         : null;

@@ -29,7 +29,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _productDetailViewModel = ProductDetailViewModel(widget.dto);
+    _productDetailViewModel = ProductDetailViewModel(dto: widget.dto);
     // if (widget.dto.type == ProductType.MASTER_PRODUCT ||
     //     widget.dto.type == ProductType.COMPLEX_PRODUCT) {
     //   affectPriceTabs = new List<String>();
@@ -72,7 +72,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               Container(
                 width: MediaQuery.of(context).size.width,
                 child: ScopedModel(
-                  model: ProductDetailViewModel(widget.dto),
+                  model: ProductDetailViewModel(dto: widget.dto),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -437,7 +437,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ],
       ),
       child: ScopedModel(
-        model: ProductDetailViewModel(widget.dto),
+        model: ProductDetailViewModel(dto: widget.dto),
         child: ListView(
           shrinkWrap: true,
           children: [
@@ -472,7 +472,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             ),
             // padding: const EdgeInsets.all(8),
             onPressed: () async {
-              // await model.addProductToCart();
+              await model.addProductToCart();
             },
             // textColor: kBackgroundGrey[0],
 

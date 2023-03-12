@@ -88,8 +88,8 @@ Future<bool> removeItemFromCart(CartItem item) async {
   }
   cart.removeItem(item);
   print("Delete success!");
-  print("Items: ${cart.items?.length.toString()}");
-  if (cart.items?.length == 0) {
+  print("Items: ${cart.orderDetails?.length.toString()}");
+  if (cart.orderDetails?.length == 0) {
     await deleteCart();
     return true;
   } else {
@@ -105,7 +105,7 @@ Future<bool> removeItemFromMart(CartItem item) async {
   }
   cart.removeItem(item);
 
-  if (cart.items?.length == 0) {
+  if (cart.orderDetails?.length == 0) {
     await deleteMart();
     return true;
   } else {
@@ -141,7 +141,7 @@ Future<void> updateItemFromMart(CartItem item) async {
   }
   cart.updateQuantity(item);
   print(
-      "Updated Quantity: ${cart.items?.firstWhere((element) => element.findCartItem(item)).quantity}");
+      "Updated Quantity: ${cart.orderDetails?.firstWhere((element) => element.findCartItem(item)).quantity}");
   await setMart(cart);
 }
 

@@ -16,16 +16,17 @@ import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginViewModel extends BaseModel {
-  late AccountDAO dao = AccountDAO();
+  AccountDAO? _dao;
   late String verificationId;
   late AnalyticsService _analyticsService;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   // final FirebaseAuth _auth;
   // User get user => _auth.currentUser!;
 
-  late AccountDTO userInfo;
+  AccountDTO? userInfo;
 
   LoginViewModel() {
+    _dao = AccountDAO();
     _analyticsService = AnalyticsService.getInstance()!;
   }
 
@@ -52,8 +53,8 @@ class LoginViewModel extends BaseModel {
         log('idToken: ' + idToken);
         log('fcmToken: ' + fcmToken.toString());
 
-        userInfo = await dao.login(idToken, fcmToken!);
-        await _analyticsService.setUserProperties(userInfo);
+        userInfo = await _dao?.login(idToken, fcmToken!);
+        await _analyticsService.setUserProperties(userInfo!);
         if (userInfo != null) {
           await Get.find<RootViewModel>().startUp();
           // Get.rawSnackbar(

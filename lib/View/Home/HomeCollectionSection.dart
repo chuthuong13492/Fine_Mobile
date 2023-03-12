@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:fine/Accessories/dialog.dart';
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/CollectionDTO.dart';
 import 'package:fine/Model/DTO/ProductDTO.dart';
@@ -93,14 +94,14 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
     // root.getProductInMenu(collection.id);
     return TouchOpacity(
       onTap: () {
-        // RootViewModel root = Get.find<RootViewModel>();
-        // if (!root.isCurrentMenuAvailable()) {
-        //   showStatusDialog("assets/images/global_error.png", "Opps",
-        //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-        // } else {
-        //   Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
-        //       arguments: {"collection-id": collection.id});
-        // }
+        RootViewModel root = Get.find<RootViewModel>();
+        if (!root.isCurrentTimeSlotAvailable()) {
+          showStatusDialog("assets/images/global_error.png", "Opps",
+              "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+        } else {
+          Get.toNamed(RoutHandler.PRODUCT_FILTER_LIST,
+              arguments: {"collection-id": collection.id});
+        }
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -29,8 +29,9 @@ class ProductDetailViewModel extends BaseModel {
   bool? isExtra;
   //List size
   ProductDTO? master;
+  Cart? currentCart;
 
-  ProductDetailViewModel(ProductDTO? dto) {
+  ProductDetailViewModel({ProductDTO? dto}) {
     master = dto;
     isExtra = false;
 
@@ -226,7 +227,6 @@ class ProductDetailViewModel extends BaseModel {
   Future<void> addProductToCart({bool backToHome = true}) async {
     showLoadingDialog();
     bool showOnHome = Get.find<bool>(tag: "showOnHome");
-    List<ProductDTO> listChoices = [];
     // if (master.type == ProductType.MASTER_PRODUCT) {
     //   Map choice = new Map();
     //   for (int i = 0; i < affectPriceContent.keys.toList().length; i++) {
@@ -248,7 +248,9 @@ class ProductDetailViewModel extends BaseModel {
     // }
 
     String description = "";
-    CartItem item = new CartItem(master, listChoices, description, count);
+    // Cart newCart = Cart(5, '0902915671', 4);
+
+    CartItem item = new CartItem(master!.id, 0, count, null);
 
     // if (master.type == ProductType.GIFT_PRODUCT) {
     //   AccountViewModel account = Get.find<AccountViewModel>();
@@ -258,7 +260,6 @@ class ProductDetailViewModel extends BaseModel {
 
     //   double totalBean = account.currentUser.point;
 
-    //   Cart cart = showOnHome ? await getCart() : await getMart();
     //   if (cart != null) {
     //     cart.items.forEach((element) {
     //       if (element.master.type == ProductType.GIFT_PRODUCT) {
@@ -277,14 +278,16 @@ class ProductDetailViewModel extends BaseModel {
     // print("Item: " + item.master.productInMenuId.toString());
 
     showOnHome ? await addItemToCart(item) : await addItemToMart(item);
+    // Cart? currentCart = await getCart();
+    // cart.addItem(item);
     await AnalyticsService.getInstance()!
-        .logChangeCart(item.master!, item.quantity, true);
+        .logChangeCart(master!, item.quantity, true);
     hideDialog();
     if (backToHome) {
-      // Get.find<OrderViewModel>().prepareOrder();
+      Get.find<OrderViewModel>().prepareOrder();
       // Get.back(result: true);
     } else {
-      // Get.find<OrderViewModel>().prepareOrder();
+      Get.find<OrderViewModel>().prepareOrder();
     }
   }
 }

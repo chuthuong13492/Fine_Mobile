@@ -1,7 +1,11 @@
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
+import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Utils/constrant.dart';
+import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
+import 'package:fine/ViewModel/productFilter_viewModel.dart';
+import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -9,8 +13,10 @@ import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class CartButton extends StatefulWidget {
-  final bool isMart;
-  CartButton({this.isMart = false});
+  // final bool isMart;
+  CartButton({
+    super.key,
+  });
 
   @override
   State<StatefulWidget> createState() {
@@ -29,7 +35,10 @@ class _CartButtonState extends State<CartButton> {
             return const SizedBox.shrink();
           }
           if (model.currentCart == null) return const SizedBox.shrink();
+          // Cart? cart = getCart();
+          // model.getCartItem();
           int quantity = model.currentCart!.itemQuantity();
+          // int quantity = cart!.itemQuantity();
           return Container(
             margin: const EdgeInsets.only(bottom: 40),
             child: FloatingActionButton(
@@ -41,7 +50,7 @@ class _CartButtonState extends State<CartButton> {
                 // side: BorderSide(color: Colors.red),
               ),
               onPressed: () async {
-                // await Get.toNamed(RoutHandler.ORDER);
+                await Get.toNamed(RoutHandler.ORDER);
               },
               child: Stack(
                 clipBehavior: Clip.none,

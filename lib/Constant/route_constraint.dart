@@ -5,6 +5,7 @@ class RoutHandler {
   static const String ONBOARD = "/onboard";
   static const String LOADING = "/loading";
   static const String PRODUCT_DETAIL = "/product_detail";
+  static const String ORDER = "/order";
 
   static const String PRODUCT_FILTER_LIST = "/product_filter_list";
 }
