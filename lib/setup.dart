@@ -5,6 +5,7 @@ import 'package:fine/ViewModel/blogs_viewModel.dart';
 import 'package:fine/ViewModel/category_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
+import 'package:fine/ViewModel/orderHistory_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
@@ -25,7 +26,7 @@ void createRouteBindings() async {
   Get.put(HomeViewModel());
   Get.put(LoginViewModel());
   Get.put(AccountViewModel());
-  // Get.put(ProductDetailViewModel());
+  Get.put(OrderHistoryViewModel());
   Get.put(BlogsViewModel());
   Get.put(CategoryViewModel());
   Get.put(OrderViewModel());

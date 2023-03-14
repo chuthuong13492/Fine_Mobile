@@ -67,7 +67,7 @@ class Cart {
       deliveryPhone: json['deliveryPhone'] as String,
       orderType: 2,
       timeSlotId: json['timeSlotId'],
-      roomId: 1,
+      roomId: 2,
       // notes: (json['supplier_notes'] as List)
       //     .map((e) => SupplierNoteDTO.fromJson(e))
       //     .toList(),

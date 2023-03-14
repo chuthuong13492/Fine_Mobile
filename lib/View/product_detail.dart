@@ -473,6 +473,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             // padding: const EdgeInsets.all(8),
             onPressed: () async {
               await model.addProductToCart();
+              Get.back();
             },
             // textColor: kBackgroundGrey[0],
 

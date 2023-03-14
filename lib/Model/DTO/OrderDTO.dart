@@ -1,3 +1,15 @@
+import 'package:logger/logger.dart';
+
+final logger = Logger(
+    printer: PrettyPrinter(
+  methodCount: 0,
+  errorMethodCount: 5,
+  lineLength: 50,
+  colors: true,
+  printEmojis: true,
+  printTime: false,
+));
+
 class OrderDTO {
   int? id;
   String? orderCode;
@@ -100,6 +112,40 @@ class OrderDTO {
     }
     return _data;
   }
+
+  Map<String, dynamic> toJsonAPi() {
+    List<Map<String, dynamic>> listItem = [];
+    inverseGeneralOrder!.forEach((element) {
+      listItem.add(element.toJson());
+    });
+
+    Map<String, dynamic> map = {
+      "orderCode": orderCode,
+      "deliveryPhone": '0902915671',
+      "checkInDate": checkInDate,
+      "totalAmount": totalAmount,
+      "discount": discount ?? 0,
+      "finalAmount": finalAmount,
+      "shippingFee": shippingFee,
+      "orderStatus": orderStatus,
+      "orderType": orderType,
+      "customerId": customer!.id,
+      "timeSlotId": timeSlot!.id,
+      "roomId": room!.id,
+      "note": note ?? '',
+      "isConfirm": isConfirm,
+      "isPartyMode": isPartyMode,
+      "shipperId": shipperId,
+      "inverseGeneralOrder": listItem
+      // "supplier_notes":
+      //     note != null ? note!.map((e) => e.toJson()).toList() : [],
+      // "vouchers": vouchers != null
+      //     ? vouchers?.map((voucher) => voucher.voucherCode)?.toList()
+      //     : null,
+    };
+    logger.i("Create Order: " + map.toString());
+    return map;
+  }
 }
 
 class InverseGeneralOrder {
@@ -153,7 +199,7 @@ class InverseGeneralOrder {
     _data["generalOrderId"] = generalOrderId;
     _data["orderCode"] = orderCode;
     _data["totalAmount"] = totalAmount;
-    _data["discount"] = discount;
+    _data["discount"] = discount ?? 0;
     _data["finalAmount"] = finalAmount;
     _data["orderStatus"] = orderStatus;
     _data["storeId"] = storeId;
@@ -232,13 +278,14 @@ class OrderDetails {
     _data["productInMenuId"] = productInMenuId;
     _data["productCode"] = productCode;
     _data["productName"] = productName;
-    _data["comboId"] = comboId;
+    // _data["comboId"] = comboId;
+    _data["comboId"] = null;
     _data["unitPrice"] = unitPrice;
     _data["quantity"] = quantity;
     _data["totalAmount"] = totalAmount;
-    _data["discount"] = discount;
+    _data["discount"] = discount ?? 0;
     _data["finalAmount"] = finalAmount;
-    _data["note"] = note;
+    _data["note"] = note ?? '';
     return _data;
   }
 }

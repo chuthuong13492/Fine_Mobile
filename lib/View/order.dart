@@ -240,6 +240,7 @@ class _OrderScreenState extends State<OrderScreen> {
     //     (element) => element.id == orderViewModel.currentCart.timeSlotId);
     // String currentTimeSlot = currentTime.arriveTime.replaceAll(';', ' - ');
     return Container(
+      padding: const EdgeInsets.only(bottom: 4),
       width: MediaQuery.of(context).size.width,
       child: InkWell(
         onTap: () {
@@ -334,20 +335,15 @@ class _OrderScreenState extends State<OrderScreen> {
     //   (element) => element.supplierId == list[0].master.supplierId,
     //   orElse: () => null,
     // );
-    List<Widget> card = [];
-    // String data = inverseGeneralOrder;
 
-    // Map<String, dynamic> orderData = json.decode(data);
-    // List<dynamic> orderDetailsList = orderData['orderDetails'];
-    // List<OrderDetails> orderDetails = orderDetailsList
-    //     .map((detail) => OrderDetails.fromJson(detail))
-    //     .toList();
-    // List<OrderDetails> list = [];
-    for (OrderDetails item in inverseGeneralOrder.orderDetails!) {
+    List<Widget> card = [];
+    List<OrderDetails> orderDetailList = inverseGeneralOrder.orderDetails!;
+
+    for (OrderDetails item in orderDetailList) {
       card.add(productCard(item));
     }
 
-    for (int i = 0; i < inverseGeneralOrder.orderDetails!.length; i++) {
+    for (int i = 0; i < orderDetailList.length; i++) {
       if (i % 2 != 0) {
         card.insert(
             i,
@@ -376,12 +372,22 @@ class _OrderScreenState extends State<OrderScreen> {
                         .copyWith(color: FineTheme.palettes.primary300),
                   ),
                   Text(
-                    inverseGeneralOrder.orderDetails!
-                            .fold(
-                                0,
-                                (previousValue, element) =>
-                                    previousValue ?? 0 + element.quantity!)
-                            .toString() +
+                    // ignore: prefer_interpolation_to_compose_strings
+                    inverseGeneralOrder.orderDetails!.fold<int>(0,
+                            (previousValue, element) {
+                          return previousValue + element.quantity;
+
+                          // return previousValue ?? 0 + element.quantity;
+                        }).toString()
+                        // .fold(
+                        //   0,
+                        //   (previousValue, element) => previousValue != 0
+                        //       ? previousValue ??= 0 + element.quantity
+                        //       : previousValue =
+                        //           element.quantity + element.quantity,
+                        // )
+                        // .toString()
+                        +
                         " món",
                     style: FineTheme.typograhpy.subtitle2
                         .copyWith(color: FineTheme.palettes.primary300),
@@ -440,8 +446,6 @@ class _OrderScreenState extends State<OrderScreen> {
             //     ))
           ]),
           ...card
-          // productCard(inverseGeneralOrder.orderDetails!
-          //     .map((e) => OrderDetails.fromList(e) as List)),
         ],
       ),
     );
@@ -460,6 +464,7 @@ class _OrderScreenState extends State<OrderScreen> {
     // }
     if (orderDetails.id != null) {
       price = orderDetails.unitPrice! * orderDetails.quantity;
+      startProduct = 1;
     }
     List<OrderDetails>? orderDetailList = [];
     orderDetailList.add(orderDetails);
@@ -643,7 +648,7 @@ class _OrderScreenState extends State<OrderScreen> {
       child: Container(
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
-          color: FineTheme.palettes.neutral200,
+          color: FineTheme.palettes.shades100,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -776,103 +781,113 @@ class _OrderScreenState extends State<OrderScreen> {
   Widget bottomBar() {
     var isMenuAvailable =
         Get.find<RootViewModel>().isCurrentTimeSlotAvailable();
-    return Container(
-      padding: const EdgeInsets.only(left: 8, right: 8, top: 8),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey,
-            offset: Offset(0.0, 1.0), //(x,y)
-            blurRadius: 6.0,
-          ),
-        ],
-      ),
-      child: ListView(
-        shrinkWrap: true,
-        children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  flex: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 0, 0, 8),
-                    child: Container(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Tổng cộng",
-                            style: FineTheme.typograhpy.caption1
-                                .copyWith(color: FineTheme.palettes.neutral600),
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            _orderViewModel!.status == ViewStatus.Loading
-                                ? "..."
-                                : formatPrice(
-                                    _orderViewModel!.orderDTO!.finalAmount!),
-                            style: FineTheme.typograhpy.subtitle1
-                                .copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+    return ScopedModel(
+      model: Get.find<OrderViewModel>(),
+      child: ScopedModelDescendant<OrderViewModel>(
+        builder: (context, child, model) {
+          return Container(
+            padding: const EdgeInsets.only(left: 8, right: 8, top: 8),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey,
+                  offset: Offset(0.0, 1.0), //(x,y)
+                  blurRadius: 6.0,
                 ),
-                Expanded(
-                  flex: 7,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 8, 8),
-                    child: InkWell(
-                      onTap: () {},
-                      child: Container(
-                        height: 41,
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: FineTheme.palettes.primary300,
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: FineTheme.palettes.primary300,
-                            width: 1,
-                            style: BorderStyle.solid,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: FineTheme.palettes.primary300
-                                  .withOpacity(0.8),
-                              offset: const Offset(0, 3),
+              ],
+            ),
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 0, 0, 8),
+                          child: Container(
+                            alignment: Alignment.centerLeft,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Tổng cộng",
+                                  style: FineTheme.typograhpy.caption1.copyWith(
+                                      color: FineTheme.palettes.neutral600),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  _orderViewModel!.status == ViewStatus.Loading
+                                      ? "..."
+                                      : formatPrice(_orderViewModel!
+                                          .orderDTO!.finalAmount!),
+                                  style: FineTheme.typograhpy.subtitle1
+                                      .copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                                isMenuAvailable
-                                    ? "Đặt đơn"
-                                    : "Khung giờ đã kết thúc",
-                                style: FineTheme.typograhpy.subtitle1.copyWith(
-                                    color: isMenuAvailable
-                                        ? Colors.white
-                                        : FineTheme.palettes.neutral800)),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                      Expanded(
+                        flex: 7,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 8, 8),
+                          child: InkWell(
+                            onTap: () async {
+                              await model.orderCart();
+                            },
+                            child: Container(
+                              height: 41,
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: FineTheme.palettes.primary200,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: FineTheme.palettes.primary200,
+                                  width: 1,
+                                  style: BorderStyle.solid,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: FineTheme.palettes.primary300,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      isMenuAvailable
+                                          ? "Đặt đơn"
+                                          : "Khung giờ đã kết thúc",
+                                      style: FineTheme.typograhpy.subtitle1
+                                          .copyWith(
+                                              color: isMenuAvailable
+                                                  ? Colors.white
+                                                  : FineTheme
+                                                      .palettes.neutral800)),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }

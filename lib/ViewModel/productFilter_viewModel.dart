@@ -9,26 +9,27 @@ class ProductFilterViewModel extends BaseModel {
   ProductDAO? _productDAO;
   CategoryDAO? _categoryDAO = CategoryDAO();
   List<CategoryDTO>? categories;
-
+  MenuDTO? menuDTO;
   // PARAM
   // PRODUCT-NAME
   // CATEGORY
   // COLLECTION
 
-  Map<String, dynamic> _params = {};
+  // Map<String, dynamic> _params = {};
 
-  ProductFilterViewModel() {
+  ProductFilterViewModel({MenuDTO? menu}) {
+    menuDTO = menu;
     _productDAO = ProductDAO();
   }
 
-  Map<String, dynamic> get params => _params;
-  List get categoryParams => _params['category-id'] ?? [];
+  // Map<String, dynamic> get params => _params;
+  // List get categoryParams => _params['id'] ?? [];
 
-  setParam(Map<String, dynamic> param) {
-    _params.addAll(param);
-    print(_params);
-    notifyListeners();
-  }
+  // setParam(int param) {
+  //   _params.addAll(param);
+  //   print(_params);
+  //   notifyListeners();
+  // }
 
   Future getProductsWithFilter() async {
     // RootViewModel root = Get.find<RootViewModel>();
@@ -44,6 +45,8 @@ class ProductFilterViewModel extends BaseModel {
       //   params: this.params,
       // );
       // listProducts = products;
+      var products = await _productDAO?.getProductsByMenuId(menuDTO!.id!);
+      listProducts = products;
       setState(ViewStatus.Completed);
     } catch (e) {
       setState(ViewStatus.Error, e.toString());

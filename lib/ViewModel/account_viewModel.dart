@@ -1,3 +1,4 @@
+import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DAO/index.dart';
@@ -8,7 +9,7 @@ import 'package:get/get.dart';
 
 class AccountViewModel extends BaseModel {
   late AccountDAO _dao;
-  late AccountDTO currentUser;
+  AccountDTO? currentUser;
 
   AccountViewModel() {
     _dao = AccountDAO();
@@ -33,18 +34,33 @@ class AccountViewModel extends BaseModel {
       setState(ViewStatus.Completed);
     } catch (e, stacktrace) {
       print(e.toString() + stacktrace.toString());
+      currentUser = null;
+      setState(ViewStatus.Error);
+      // bool result = await showErrorDialog();
+      // if (result) {
+      //   await fetchUser();
+      // } else {
+      //   setState(ViewStatus.Error);
+      // }
     }
   }
 
   Future<void> processSignout() async {
-    // int option = await showOptionDialog("Mình sẽ nhớ bạn lắm ó huhu :'(((");
-    // if (option == 1) {
-    //   await _dao.logOut();
-    //   await removeALL();
-    //   Get.offAllNamed(RouteHandler.LOGIN);
-    // }
-    await _dao.logOut();
-    await removeALL();
-    Get.off(RoutHandler.LOGIN);
+    try {
+      int option = await showOptionDialog("Mình sẽ nhớ bạn lắm ó huhu :'(((");
+      if (option == 1) {
+        await _dao.logOut();
+        await removeALL();
+        // Get.testMode = true;
+        if (Get.testMode == false) {
+          Get.testMode = false;
+          Get.offAndToNamed(RoutHandler.NAV);
+        }
+        Get.offAllNamed(RoutHandler.LOGIN);
+      }
+    } catch (e) {
+      print(e);
+      // setState(ViewStatus.Error);
+    }
   }
 }

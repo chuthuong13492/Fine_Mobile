@@ -5,20 +5,20 @@ class CustomTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       fontFamily: 'Fira Sans',
-      primarySwatch: Colors.green,
+      // primarySwatch: Color(0xFF157380),
       primaryColor: FineTheme.palettes.primary200,
       scaffoldBackgroundColor: Color(0xFFF5F5F5),
       toggleableActiveColor: FineTheme.palettes.primary200,
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      // textTheme: TextTheme(
-      //     headline1: BeanOiTheme.typography.h1,
-      //     headline2: BeanOiTheme.typography.h2,
-      //     headline3: kTitleTextStyle,
-      //     headline4: kSubtitleTextStyle,
-      //     headline5: kDescriptionTextStyle,
-      //     headline6: kSubdescriptionTextStyle,
-      //     subtitle1: BeanOiTheme.typography.subtitle1,
-      //     subtitle2: BeanOiTheme.typography.subtitle2),
+      textTheme: TextTheme(
+          headline1: FineTheme.typograhpy.h1,
+          headline2: FineTheme.typograhpy.h2,
+          // headline3: kTitleTextStyle,
+          // headline4: kSubtitleTextStyle,
+          // headline5: kDescriptionTextStyle,
+          // headline6: kSubdescriptionTextStyle,
+          subtitle1: FineTheme.typograhpy.subtitle1,
+          subtitle2: FineTheme.typograhpy.h2),
     );
   }
 }

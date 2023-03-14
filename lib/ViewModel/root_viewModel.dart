@@ -2,12 +2,16 @@ import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DAO/CampusDAO.dart';
 import 'package:fine/Model/DAO/ProductDAO.dart';
+import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/shared_pref.dart';
+import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
 import 'package:fine/ViewModel/category_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
+import 'package:fine/ViewModel/login_viewModel.dart';
+import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:get/get.dart';
 
 class RootViewModel extends BaseModel {
@@ -31,7 +35,7 @@ class RootViewModel extends BaseModel {
   }
 
   Future startUp() async {
-    // await Get.find<AccountViewModel>().fetchUser();
+    await Get.find<AccountViewModel>().fetchUser();
     await Get.find<RootViewModel>().getListTimeSlot();
     await Get.find<HomeViewModel>().getCollections();
     await Get.find<CategoryViewModel>().getCategories();
@@ -50,7 +54,7 @@ class RootViewModel extends BaseModel {
         // CampusDTO store = await getStore();
         // product = await _productDAO.getProductDetail(
         //     product.id, store.id, selectedMenu.menuId);
-        product = await _productDAO?.getProductsByMenuId(product?.id);
+        product = await _productDAO?.getProductDetail(product?.id);
       }
       await Get.toNamed(RoutHandler.PRODUCT_DETAIL, arguments: product);
       //
@@ -121,16 +125,16 @@ class RootViewModel extends BaseModel {
         return;
       }
       int option = 1;
-      // Cart cart = Get.find<OrderViewModel>().currentCart;
-      // if (cart != null) {
-      //   option = await showOptionDialog(
-      //       "Bạn có chắc không? Đổi khung giờ rồi là giỏ hàng bị xóa đó!!");
-      // }
+      Cart? cart = Get.find<OrderViewModel>().currentCart;
+      if (cart != null) {
+        option = await showOptionDialog(
+            "Bạn có chắc không? Đổi khung giờ rồi là giỏ hàng bị xóa đó!!");
+      }
 
       if (option == 1) {
         // showLoadingDialog();
         selectedTimeSlot = timeSlot;
-        // await Get.find<OrderViewModel>().removeCart();
+        await Get.find<OrderViewModel>().removeCart();
         // await setStore(currentStore);
         await refreshMenu();
         // hideDialog();

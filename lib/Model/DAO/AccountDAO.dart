@@ -40,9 +40,9 @@ class AccountDAO extends BaseDAO {
   }
 
   Future<AccountDTO> getUser() async {
-    Response response = await request.get("users/me");
+    Response response = await request.get("/customer/token");
     // set access token
-    final user = response.data;
+    final user = response.data['data'];
     return AccountDTO.fromJson(user);
     // return AccountDTO(uid: idToken, name: "Default Name");
   }
@@ -75,7 +75,7 @@ class AccountDAO extends BaseDAO {
     await AuthService().signOut();
     String? fcmToken =
         await PushNotificationService.getInstance()!.getFcmToken();
-    await request.post("customer/logout", data: {"fcmToken": fcmToken});
+    await request.post("/customer/logout", data: {"fcmToken": fcmToken});
   }
 
   Future<AccountDTO> updateUser(AccountDTO updateUser) async {

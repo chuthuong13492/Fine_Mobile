@@ -7,6 +7,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class HomeTimeSlotsSection extends StatefulWidget {

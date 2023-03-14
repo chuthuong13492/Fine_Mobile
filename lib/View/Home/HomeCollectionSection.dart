@@ -70,7 +70,8 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                       //     element.products!.isNotEmpty)
                       .where((element) =>
                           element.products != null &&
-                          element.products!.isNotEmpty)
+                          element.products!.isNotEmpty &&
+                          element.isActive == true)
                       .map(
                         (c) => Container(
                             margin: const EdgeInsets.only(
@@ -96,11 +97,10 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
       onTap: () {
         RootViewModel root = Get.find<RootViewModel>();
         if (!root.isCurrentTimeSlotAvailable()) {
-          showStatusDialog("assets/images/global_error.png", "Opps",
+          showStatusDialog("assets/images/error.png", "Opps",
               "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
         } else {
-          Get.toNamed(RoutHandler.PRODUCT_FILTER_LIST,
-              arguments: {"collection-id": collection.id});
+          Get.toNamed(RoutHandler.PRODUCT_FILTER_LIST, arguments: collection);
         }
       },
       child: Column(
@@ -117,7 +117,10 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                     collection.menuName!,
                     style: FineTheme.typograhpy.subtitle1.copyWith(
                         fontFamily: 'Inter',
-                        color: FineTheme.palettes.primary300),
+                        color: Get.find<RootViewModel>()
+                                .isCurrentTimeSlotAvailable()
+                            ? FineTheme.palettes.primary300
+                            : Colors.grey),
                   ),
                   // collection.description != null
                   //     ? Text(
@@ -241,8 +244,10 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
               // product.type != ProductType.MASTER_PRODUCT
               //     ? '${formatPriceWithoutUnit(product.price!)} đ'
               //     : 'từ ${formatPriceWithoutUnit(product.minPrice! ?? product.price!)} đ',
-              style: FineTheme.typograhpy.caption1
-                  .copyWith(color: FineTheme.palettes.primary300),
+              style: FineTheme.typograhpy.caption1.copyWith(
+                  color: Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
+                      ? FineTheme.palettes.primary300
+                      : Colors.grey),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

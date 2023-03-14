@@ -1,10 +1,13 @@
 import 'package:dio/dio.dart';
 import 'package:fine/Accessories/dialog.dart';
+import 'package:fine/Constant/order_status.dart';
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Service/analytic_service.dart';
 import 'package:fine/Utils/shared_pref.dart';
+import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
 import 'package:fine/ViewModel/product_viewModel.dart';
@@ -38,8 +41,14 @@ class OrderViewModel extends BaseModel {
       //   RootViewModel root = Get.find<RootViewModel>();
       //   campusDTO = root.currentStore;
       // }
+      AccountViewModel accountRoot = Get.find<AccountViewModel>();
+      AccountDTO? user = accountRoot.currentUser!;
+      RootViewModel root = Get.find<RootViewModel>();
       currentCart = await getCart();
-      currentCart?.addProperties(5, '0902915671', 4);
+
+      currentCart?.addProperties(
+          user.id!, user.phone!, root.selectedTimeSlot!.id!);
+      // currentCart?.addProperties(5, '0902915671', root.selectedTimeSlot!.id!);
       // currentCart = await getCart();
 
       // await deleteCart();
@@ -60,6 +69,7 @@ class OrderViewModel extends BaseModel {
       listError.clear();
       if (currentCart != null) {
         orderDTO = await _dao?.prepareOrder(currentCart!);
+        // Get.back();
       } else {
         await deleteCart();
         await deleteMart();
@@ -91,6 +101,48 @@ class OrderViewModel extends BaseModel {
           setState(ViewStatus.Error);
         }
       }
+    }
+  }
+
+  Future<void> orderCart() async {
+    try {
+      int option =
+          await showOptionDialog("Bạn vui lòng xác nhận lại giỏ hàng nha 😊.");
+
+      if (option != 1) {
+        return;
+      }
+      showLoadingDialog();
+      // LocationDTO location =
+      //     campusDTO.locations.firstWhere((element) => element.isSelected);
+
+      // DestinationDTO destination =
+      //     location.destinations.firstWhere((element) => element.isSelected);
+      OrderStatus? result = await _dao?.createOrders(orderDTO!);
+      // await Get.find<AccountViewModel>().fetchUser();
+      if (result!.statusCode == 200) {
+        await removeCart();
+        hideDialog();
+        await showStatusDialog("assets/images/icon-success.png", 'Success',
+            'Bạn đã đặt hàng thành công');
+        // await Get.find<OrderHistoryViewModel>().getNewOrder();
+        Get.offAndToNamed(
+          RoutHandler.ORDER_HISTORY_DETAIL,
+          arguments: result.order,
+        );
+        // prepareOrder();
+        // Get.back(result: true);
+      } else {
+        hideDialog();
+        await showStatusDialog(
+            "assets/images/error.png", result.code!, result.message!);
+      }
+    } catch (e) {
+      bool result = await showErrorDialog();
+      if (result) {
+        await prepareOrder();
+      } else
+        setState(ViewStatus.Error);
     }
   }
 
@@ -148,5 +200,12 @@ class OrderViewModel extends BaseModel {
     await updateItemFromCart(cartItem);
     await prepareOrder();
     // notifyListeners();
+  }
+
+  Future<void> removeCart() async {
+    await deleteCart();
+    await deleteMart();
+    currentCart = null;
+    notifyListeners();
   }
 }
