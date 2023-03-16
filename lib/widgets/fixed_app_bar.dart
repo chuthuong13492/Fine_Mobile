@@ -1,3 +1,4 @@
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
@@ -37,11 +38,25 @@ class _FixedAppBarState extends State<FixedAppBar> {
       //   // color: FineTheme.palettes.primary100,
       // ),
       child: ScopedModel(
-        model: RootViewModel(),
+        model: Get.find<RootViewModel>(),
         child: ScopedModelDescendant<RootViewModel>(
           builder: (context, child, model) {
             String text = "Đợi tý đang load...";
             final status = model.status;
+            // if (model.changeAddress) {
+            //   text = "Đang thay đổi...";
+            // } else if (location != null) {
+            //   // text = destinationDTO.name + " - " + location.address;
+            //   text = model.currentStore!.name!;
+            // } else {
+            //   text = "Chưa chọn";
+            // }
+            if (model.currentStore != null) {
+              text = model.currentStore!.name!;
+            } else {
+              text = 'Chưa chọn khu vực';
+            }
+
             if (status == ViewStatus.Error) {
               text = "Có lỗi xảy ra...";
             }
@@ -70,9 +85,10 @@ class _FixedAppBarState extends State<FixedAppBar> {
                   Container(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () {
+                      onTap: () async {
                         // AccountViewModel root = Get.find<AccountViewModel>();
                         // root.processSignout();
+                        Get.offAllNamed(RoutHandler.STORE_SELECT);
                       },
                       child: Container(
                         // color: Colors.transparent,
@@ -105,10 +121,10 @@ class _FixedAppBarState extends State<FixedAppBar> {
                                 size: 34,
                               ),
                             ),
-                            const Center(
+                            Center(
                               // width: 400,
                               child: Text(
-                                "Trường Đại Học FPT - Khu công nghệ",
+                                text,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: TextStyle(

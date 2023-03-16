@@ -5,6 +5,7 @@ import 'package:fine/Accessories/draggable_bottom_sheet.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/View/Home/HomeCategorySection.dart';
 import 'package:fine/View/Home/HomeCollectionSection.dart';
+import 'package:fine/View/Home/HomeStoreSection.dart';
 import 'package:fine/View/Home/HomeTimeSlotsSection.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
@@ -183,6 +184,11 @@ class _HomeScreenState extends State<HomeScreen> {
       // const SizedBox(height: 8),
       // ignore: prefer_const_constructors
       HomeCategorySection(),
+      const SizedBox(height: 8),
+
+      HomeStoreSection(),
+      const SizedBox(height: 8),
+
       HomeCollectionSection(),
       // HomeCategory(),
       // timeRecieve(),

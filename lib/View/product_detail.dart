@@ -1,6 +1,7 @@
 import 'package:fine/Model/DTO/ProductDTO.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/format_price.dart';
+import 'package:fine/ViewModel/productFilter_viewModel.dart';
 import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
@@ -54,7 +55,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 child: Container(
                   child: IconButton(
                       padding: const EdgeInsets.all(0),
-                      onPressed: () {
+                      onPressed: () async {
                         Get.back();
                       },
                       icon: const Icon(
@@ -445,9 +446,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               height: 8,
             ),
             Center(child: selectQuantity()),
-            const SizedBox(
-              height: 8,
-            ),
+            // const SizedBox(
+            //   height: 8,
+            // ),
             orderButton(),
             const SizedBox(
               height: 8,
@@ -461,7 +462,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   Widget orderButton() {
     return ScopedModelDescendant<ProductDetailViewModel>(
       builder: (context, child, model) {
-        return Padding(
+        return Container(
+          height: 60,
           padding: const EdgeInsets.all(8.0),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -473,11 +475,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             // padding: const EdgeInsets.all(8),
             onPressed: () async {
               await model.addProductToCart();
-              Get.back();
+              // Get.back();
             },
             // textColor: kBackgroundGrey[0],
 
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(
                   height: 8,

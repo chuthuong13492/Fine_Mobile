@@ -13,8 +13,10 @@ import 'package:fine/View/order_detail.dart';
 import 'package:fine/View/order_history.dart';
 import 'package:fine/View/product_detail.dart';
 import 'package:fine/View/product_filter_list.dart';
+import 'package:fine/View/profile.dart';
 import 'package:fine/View/sign_in.dart';
 import 'package:fine/View/start_up.dart';
+import 'package:fine/View/store_select_screen.dart';
 import 'package:fine/ViewModel/startup_viewModel.dart';
 import 'package:fine/setup.dart';
 import 'package:fine/theme/FineTheme/index.dart';
@@ -52,6 +54,12 @@ class MyApp extends StatelessWidget {
           //             title: settings.arguments ?? "Đang xử lý...",
           //           ),
           //       settings: settings);
+          case RoutHandler.PROFILE:
+            return CupertinoPageRoute(
+                builder: (context) => const ProfileScreen(),
+                settings: settings);
+          case RoutHandler.STORE_SELECT:
+            return ScaleRoute(page: StoreSelectScreen());
           case RoutHandler.ORDER_HISTORY_DETAIL:
             return SlideBottomRoute(
               page: OrderHistoryDetail(order: settings.arguments as OrderDTO),
@@ -68,7 +76,7 @@ class MyApp extends StatelessWidget {
           case RoutHandler.PRODUCT_FILTER_LIST:
             return CupertinoPageRoute<bool>(
                 builder: (context) => ProductsFilterPage(
-                      dto: settings.arguments as MenuDTO,
+                      params: settings.arguments as Map<String, dynamic>,
                     ),
                 settings: settings);
           case RoutHandler.NAV:

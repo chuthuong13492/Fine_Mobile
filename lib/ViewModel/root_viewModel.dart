@@ -1,7 +1,10 @@
+import 'package:collection/collection.dart';
 import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/route_constraint.dart';
+import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DAO/CampusDAO.dart';
 import 'package:fine/Model/DAO/ProductDAO.dart';
+import 'package:fine/Model/DAO/StoreDAO.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/shared_pref.dart';
@@ -13,10 +16,12 @@ import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class RootViewModel extends BaseModel {
   AccountDTO? user;
   CampusDTO? currentStore;
+  List<CampusDTO>? campusList;
   TimeSlotDTO? selectedTimeSlot;
   List<TimeSlotDTO>? listTimeSlot;
   ProductDAO? _productDAO;
@@ -28,7 +33,7 @@ class RootViewModel extends BaseModel {
   }
   Future refreshMenu() async {
     // fetchStore();
-    // await Get.find<HomeViewModel>().getSuppliers();
+    await Get.find<HomeViewModel>().getListSupplier();
     await Get.find<HomeViewModel>().getCollections();
     // await Get.find<OrderViewModel>().getUpSellCollections();
     // await Get.find<GiftViewModel>().getGifts();
@@ -38,6 +43,7 @@ class RootViewModel extends BaseModel {
     await Get.find<AccountViewModel>().fetchUser();
     await Get.find<RootViewModel>().getListTimeSlot();
     await Get.find<HomeViewModel>().getCollections();
+    await Get.find<HomeViewModel>().getListSupplier();
     await Get.find<CategoryViewModel>().getCategories();
     await Get.find<BlogsViewModel>().getBlogs();
   }
@@ -67,6 +73,53 @@ class RootViewModel extends BaseModel {
       await showErrorDialog(errorTitle: "Không tìm thấy sản phẩm");
       hideDialog();
     }
+  }
+
+  Future<void> getListCampus() async {
+    try {
+      setState(ViewStatus.Loading);
+      CampusDAO campusDAO = CampusDAO();
+      campusList = await campusDAO.getCampusList();
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      campusList = null;
+      setState(ViewStatus.Error);
+    }
+  }
+
+  Future<void> setCurrentCampus(CampusDTO campus) async {
+    showLoadingDialog();
+    // Function eq = const ListEquality().equals;
+    // StoreDAO _storeDAO = new StoreDAO();
+    currentStore = campus;
+    // List<LocationDTO> locations = await _storeDAO.getLocations(currentStore.id);
+    // if (!eq(locations, currentStore.locations)) {
+    //   currentStore.locations.forEach((location) {
+    //     if (location.isSelected) {
+    //       DestinationDTO destination = location.destinations
+    //           .where(
+    //             (element) => element.isSelected,
+    //           )
+    //           .first;
+    //       locations.forEach((element) {
+    //         if (element.id == location.id) {
+    //           element.isSelected = true;
+    //           element.destinations.forEach((des) {
+    //             if (des.id == destination.id) des.isSelected = true;
+    //           });
+    //         }
+    //       });
+    //     }
+    //   });
+
+    //   currentStore.locations = locations;
+    await setStore(currentStore!);
+    setState(ViewStatus.Completed);
+    // await getListTimeSlot(currentStore.id);
+    await getListTimeSlot();
+    await startUp();
+    hideDialog();
+    Get.toNamed(RoutHandler.NAV);
   }
 
   Future<void> getListTimeSlot() async {
@@ -115,6 +168,35 @@ class RootViewModel extends BaseModel {
     //     Get.find<OrderViewModel>().removeCart();
     //   }
     // }
+  }
+
+  Future<void> showProductByStore(SupplierDTO? supplierDTO,
+      {showOnHome = true, fetchDetail = false}) async {
+    Get.put<bool>(
+      showOnHome,
+      tag: "showOnHome",
+    );
+    try {
+      if (fetchDetail) {
+        showLoadingDialog();
+        List<ProductDTO>? productDTO;
+        // CampusDTO store = await getStore();
+        // product = await _productDAO.getProductDetail(
+        //     product.id, store.id, selectedMenu.menuId);
+        productDTO =
+            await _productDAO?.getProductsInMenuByStoreId(supplierDTO?.id);
+      }
+      await Get.toNamed(RoutHandler.PRODUCT_DETAIL, arguments: supplierDTO);
+      //
+      hideDialog();
+      await Get.delete<bool>(
+        tag: "showOnHome",
+      );
+      notifyListeners();
+    } catch (e) {
+      await showErrorDialog(errorTitle: "Không tìm thấy sản phẩm");
+      hideDialog();
+    }
   }
 
   Future<void> confirmTimeSlot(TimeSlotDTO? timeSlot) async {

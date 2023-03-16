@@ -5,7 +5,11 @@ import 'package:fine/Model/DAO/index.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:fine/Utils/shared_pref.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+import 'root_viewModel.dart';
 
 class AccountViewModel extends BaseModel {
   late AccountDAO _dao;
@@ -51,11 +55,16 @@ class AccountViewModel extends BaseModel {
       if (option == 1) {
         await _dao.logOut();
         await removeALL();
+        await FirebaseAuth.instance.signOut();
+        await GoogleSignIn().signOut();
         // Get.testMode = true;
-        if (Get.testMode == false) {
-          Get.testMode = false;
-          Get.offAndToNamed(RoutHandler.NAV);
-        }
+        // if (Get.testMode == false) {
+        //   // TestWidgetsFlutterBinding.ensureInitialized();
+        //   Get.testMode = true;
+        //   Get.testMode = true;
+        //   Get.offAll(RoutHandler.LOGIN);
+        // }
+        // await Get.find<RootViewModel>().startUp();
         Get.offAllNamed(RoutHandler.LOGIN);
       }
     } catch (e) {

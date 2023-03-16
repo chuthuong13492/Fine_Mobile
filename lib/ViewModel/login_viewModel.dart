@@ -70,7 +70,7 @@ class LoginViewModel extends BaseModel {
           //     margin: EdgeInsets.only(left: 8, right: 8, bottom: 32),
           //     borderRadius: 8);
           hideDialog();
-          await Get.offAllNamed(RoutHandler.NAV);
+          await Get.offAllNamed(RoutHandler.STORE_SELECT);
         }
         // await Get.offAllNamed(RoutHandler.NAV);
       }

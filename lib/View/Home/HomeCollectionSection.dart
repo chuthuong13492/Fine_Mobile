@@ -34,7 +34,7 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
   void initState() {
     super.initState();
     _homeCollectionViewModel = HomeViewModel();
-    _homeCollectionViewModel?.getCollections();
+    Get.find<HomeViewModel>().getCollections();
   }
 
   @override
@@ -44,9 +44,7 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
         child: ScopedModelDescendant<HomeViewModel>(
           builder: (context, child, model) {
             var collections = model.homeMenu;
-            if (model.status == ViewStatus.Loading ||
-                collections == null ||
-                collections?.length == 0) {
+            if (model.status == ViewStatus.Loading || collections == null) {
               return _buildLoading();
             }
             return Column(
@@ -100,7 +98,8 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
           showStatusDialog("assets/images/error.png", "Opps",
               "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
         } else {
-          Get.toNamed(RoutHandler.PRODUCT_FILTER_LIST, arguments: collection);
+          Get.toNamed(RoutHandler.PRODUCT_FILTER_LIST,
+              arguments: {'menu': collection.toJson()});
         }
       },
       child: Column(
@@ -154,6 +153,9 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                 // model.getProductInMenu(
                 //     collection.id); // root.getProductInMenu(collection.id);
                 // var product = model.productList;
+                var list = collection.products!
+                    .where((element) => element.isAvailable == true)
+                    .toList();
                 return Container(
                   width: Get.width,
                   height: 155,
@@ -162,7 +164,8 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                     separatorBuilder: (context, index) =>
                         SizedBox(width: FineTheme.spacing.xs),
                     itemBuilder: (context, index) {
-                      var product = collection.products![index];
+                      var product = list[index];
+
                       return Material(
                         color: Colors.white,
                         child: TouchOpacity(
@@ -185,7 +188,7 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                       );
                     },
                     // itemCount: collection.products!.length,
-                    itemCount: collection.products!.length,
+                    itemCount: list.length,
                   ),
                 );
               },
@@ -300,30 +303,44 @@ Widget _buildLoading() {
         ),
         const SizedBox(height: 8),
         Container(
+          padding: const EdgeInsets.only(bottom: 8),
           width: Get.width,
-          height: 155,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              ShimmerBlock(
+          height: 120,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) {
+              return const ShimmerBlock(
                 height: 110,
                 width: 110,
                 borderRadius: 16,
-              ),
-              SizedBox(width: 8),
-              ShimmerBlock(
-                height: 110,
-                width: 110,
-                borderRadius: 16,
-              ),
-              SizedBox(width: 8),
-              ShimmerBlock(
-                height: 110,
-                width: 110,
-                borderRadius: 16,
-              ),
-            ],
+              );
+            },
+            separatorBuilder: (context, index) =>
+                SizedBox(width: FineTheme.spacing.xs),
+            itemCount: 4,
           ),
+          // child: Row(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: const [
+          //     ShimmerBlock(
+          //       height: 110,
+          //       width: 110,
+          //       borderRadius: 16,
+          //     ),
+          //     SizedBox(width: 8),
+          //     ShimmerBlock(
+          //       height: 110,
+          //       width: 110,
+          //       borderRadius: 16,
+          //     ),
+          //     SizedBox(width: 8),
+          //     ShimmerBlock(
+          //       height: 110,
+          //       width: 110,
+          //       borderRadius: 16,
+          //     ),
+          //   ],
+          // ),
         ),
       ],
     ),

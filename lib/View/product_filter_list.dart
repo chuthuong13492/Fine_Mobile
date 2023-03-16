@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/MenuDTO.dart';
 import 'package:fine/View/product_search.dart';
@@ -13,8 +15,9 @@ import 'package:scoped_model/scoped_model.dart';
 import '../Accessories/index.dart';
 
 class ProductsFilterPage extends StatefulWidget {
-  final MenuDTO? dto;
-  const ProductsFilterPage({Key? key, this.dto}) : super(key: key);
+  final Map<String, dynamic> params;
+  const ProductsFilterPage({Key? key, this.params = const {}})
+      : super(key: key);
 
   @override
   State<ProductsFilterPage> createState() => _ProductsFilterPageState();
@@ -27,14 +30,18 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
   ProductFilterViewModel? _prodFilterModel;
 
   Future<void> _refreshHandler() async {
-    await _prodFilterModel?.getProductsWithFilter();
+    await Get.find<ProductFilterViewModel>().getProductsWithFilter();
   }
 
   @override
   void initState() {
     super.initState();
-    _prodFilterModel = ProductFilterViewModel(menu: widget.dto);
-    _prodFilterModel?.getProductsWithFilter();
+    _prodFilterModel = ProductFilterViewModel();
+    Get.find<ProductFilterViewModel>().setParam(this.widget.params);
+    // Timer.periodic(const Duration(seconds: 5), (_) {
+    //   Get.find<ProductFilterViewModel>().getProductsWithFilter();
+    // });
+    Get.find<ProductFilterViewModel>().getProductsWithFilter();
   }
 
   @override
@@ -58,9 +65,13 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
 
   Widget _buildListProduct() {
     return ScopedModel(
-      model: ProductFilterViewModel(menu: widget.dto),
+      model: Get.find<ProductFilterViewModel>(),
       child: ScopedModelDescendant<ProductFilterViewModel>(
         builder: (context, child, model) {
+          // var list = model.listProducts!
+          //     .where((element) => element.isAvailable!)
+          //     .toList();
+
           if (model.status == ViewStatus.Loading) {
             return _buildLoading();
           }
@@ -75,13 +86,24 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
               ),
             );
           }
+          if (model.listProducts == null) {
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  "Bạn đã xem hết rồi đấy 🐱‍👓",
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
 
           return Flexible(
             child: ListView.separated(
-              itemCount: widget.dto!.products!.length + 1,
+              itemCount: model.listProducts!.length + 1,
               separatorBuilder: (context, index) => const SizedBox(height: 2),
               itemBuilder: (context, index) {
-                if (index == widget.dto!.products!.length) {
+                if (index == model.listProducts!.length) {
                   return const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
@@ -90,8 +112,11 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
                     ),
                   );
                 }
-                final product = widget.dto!.products!.elementAt(index);
-                return ProductSearchItem(product: product, index: index);
+                final product = model.listProducts!.elementAt(index);
+                return ProductSearchItem(
+                  product: product,
+                  index: index,
+                );
               },
             ),
           );

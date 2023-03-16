@@ -1,5 +1,6 @@
 import 'package:fine/Model/DAO/index.dart';
 import 'package:fine/Model/DTO/index.dart';
+import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/request.dart';
 
 class ProductDAO extends BaseDAO {
@@ -24,15 +25,42 @@ class ProductDAO extends BaseDAO {
   }
 
   Future<List<ProductDTO>?> getProductsByMenuId(
-    int? menuId, {
-    Map<String, dynamic>? params,
+    int menuId, {
+    int? page,
+    int? size,
+    int? type,
+    Map<String, dynamic> params = const {},
   }) async {
+    // final query = convertToQueryParams({
+    //   "page": (page ?? 1).toString(),
+    //   "size": (size ?? DEFAULT_SIZE).toString(),
+    //   // "menu-id": menuID,
+    //   // "fields": ['ChildProducts', 'CollectionId', 'Extras']
+    // }..addAll(params));
+    // var menuId = params["menu"]["id"];
+
     final res = await request.get(
-      '/menu/${menuId}',
-      queryParameters: params,
+      '/menu/$menuId',
+      // queryParameters: params,
     );
     if (res.data['data'] != null) {
       var listJson = res.data['data']['products'] as List;
+      // metaDataDTO = MetaDataDTO.fromJson(res.data["metadata"]);
+      return listJson.map((e) => ProductDTO.fromJson(e)).toList();
+    }
+    return null;
+  }
+
+  Future<List<ProductDTO>?> getProductsInMenuByStoreId(
+    int? storeId, {
+    Map<String, dynamic>? params,
+  }) async {
+    final res = await request.get(
+      '/product-in-menu/productInMenu/store/$storeId',
+      queryParameters: params,
+    );
+    if (res.data != null) {
+      var listJson = res.data as List;
       // metaDataDTO = MetaDataDTO.fromJson(res.data["metadata"]);
       return listJson.map((e) => ProductDTO.fromJson(e)).toList();
     }

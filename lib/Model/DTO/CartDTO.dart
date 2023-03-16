@@ -19,7 +19,7 @@ class Cart {
   List<CartItem>? orderDetails;
   // int? payment;
   int? orderType;
-  int? customerId;
+  // int? customerId;
   String? deliveryPhone;
   int? roomId;
   int? timeSlotId;
@@ -31,7 +31,7 @@ class Cart {
   // List<VoucherDTO> vouchers;
 
   Cart.get({
-    this.customerId,
+    // this.customerId,
     this.deliveryPhone,
     this.orderType,
     this.timeSlotId,
@@ -41,7 +41,7 @@ class Cart {
   });
 
   Cart({
-    this.customerId,
+    // this.customerId,
     this.deliveryPhone,
     this.timeSlotId,
   }) {
@@ -63,7 +63,7 @@ class Cart {
       list = itemJson.map((e) => CartItem.fromJson(e)).toList();
     }
     return Cart.get(
-      customerId: json['customerID'],
+      // customerId: json['customerID'],
       deliveryPhone: json['deliveryPhone'] as String,
       orderType: 2,
       timeSlotId: json['timeSlotId'],
@@ -79,12 +79,12 @@ class Cart {
     );
   }
 
-  void addProperties(int Id, String phone, int timeSlot) {
-    if (customerId == null) {
-      customerId = Id;
-      deliveryPhone = phone;
-      timeSlotId = timeSlot;
-    }
+  void addProperties(String phone, int timeSlot) {
+    // if (customerId == null) {
+    //   customerId = Id;
+    deliveryPhone = phone;
+    timeSlotId = timeSlot;
+    // }
   }
 
   // void addVoucher(VoucherDTO voucher) {
@@ -104,14 +104,14 @@ class Cart {
   Map<String, dynamic> toJson() {
     List listCartItem = orderDetails!.map((e) => e.toJson()).toList();
     return {
-      "customerId": customerId,
+      // "customerId": customerId,
       "deliveryPhone": deliveryPhone,
       "orderType": orderType,
       "timeSlotId": timeSlotId,
       "roomId": roomId,
       // "supplier_notes":
       //     note != null ? note!.map((e) => e.toJson())?.toList() : [],
-      "note": note,
+      "note": note ?? null,
       // "vouchers": vouchers != null
       //     ? vouchers?.map((voucher) => voucher.toJson())?.toList()
       //     : null,
@@ -126,12 +126,12 @@ class Cart {
     });
 
     Map<String, dynamic> map = {
-      "customerId": customerId,
+      // "customerId": customerId,
       "deliveryPhone": deliveryPhone,
       "orderType": orderType,
       "timeSlotId": timeSlotId,
       "roomId": roomId,
-      "note": note,
+      "note": note ?? null,
       "orderDetails": listCartItem,
       // "supplier_notes":
       //     note != null ? note!.map((e) => e.toJson()).toList() : [],
@@ -224,7 +224,7 @@ class CartItem {
     _data["productInMenuId"] = productInMenuId;
     _data["comboId"] = comboId;
     _data["quantity"] = quantity;
-    _data["note"] = note;
+    _data["note"] = note ?? null;
     return _data;
   }
 }

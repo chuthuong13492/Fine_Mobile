@@ -182,8 +182,8 @@ Future<String?> getToken() async {
 Future<void> removeALL() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.clear();
-  Get.reset(clearRouteBindings: true);
-  createRouteBindings();
+  // Get.reset(clearRouteBindings: true);
+  // createRouteBindings();
   await setIsFirstOnboard(false);
 }
 // Future<bool> setUser(A value) async {

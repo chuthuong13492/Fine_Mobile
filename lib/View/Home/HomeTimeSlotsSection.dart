@@ -24,7 +24,7 @@ class _HomeTimeSlotsSectionState extends State<HomeTimeSlotsSection> {
     super.initState();
     _rootViewModel = RootViewModel();
     // Get.find<CategoryViewModel>().getCategories();
-    _rootViewModel?.getListTimeSlot();
+    Get.find<RootViewModel>().getListTimeSlot();
   }
 
   @override
@@ -36,7 +36,7 @@ class _HomeTimeSlotsSectionState extends State<HomeTimeSlotsSection> {
           var list = model.listTimeSlot
               ?.where((element) => element.isActive == true)
               .toList();
-          if (model.currentStore == null) {
+          if (model.currentStore != null) {
             final status = model.status;
             if (status == ViewStatus.Loading) {
               return Column(
@@ -82,20 +82,31 @@ class _HomeTimeSlotsSectionState extends State<HomeTimeSlotsSection> {
                 ),
                 Container(
                   // alignment: Alignment.center,
-                  height: 40,
+                  height: 60,
                   width: Get.width,
-                  child: ListView.builder(
+                  child: ListView.separated(
                     shrinkWrap: true,
                     scrollDirection: Axis.horizontal,
-                    itemCount: list?.length,
+                    separatorBuilder: (context, index) =>
+                        SizedBox(width: FineTheme.spacing.xs),
+                    itemCount: list!.length,
                     itemBuilder: (context, index) {
+                      DateFormat inputFormat = DateFormat('HH:mm:ss');
+                      DateTime arrive =
+                          inputFormat.parse(list[index].arriveTime!);
+                      DateTime checkout =
+                          inputFormat.parse(list[index].checkoutTime!);
+                      DateFormat outputFormat = DateFormat('HH:mm');
+                      String arriveTime = outputFormat.format(arrive);
+                      String checkoutTime = outputFormat.format(checkout);
+
                       bool isSelect =
-                          model.selectedTimeSlot?.id == list?[index].id;
+                          model.selectedTimeSlot?.id == list[index].id;
                       // bool isSelect = false;
                       return Container(
-                        height: 40,
-                        // padding: const EdgeInsets.only(left: 12, right: 12),
-                        margin: const EdgeInsets.only(right: 8),
+                        // height: 30,
+                        padding: const EdgeInsets.only(top: 6, bottom: 6),
+                        // margin: const EdgeInsets.only(right: 8),
                         // curve: Neumorphic.DEFAULT_CURVE,
                         // style: NeumorphicStyle(
                         //   lightSource: LightSource.bottom,
@@ -126,19 +137,16 @@ class _HomeTimeSlotsSectionState extends State<HomeTimeSlotsSection> {
                                   ? FineTheme.palettes.primary200
                                   : Colors.white,
                               boxShadow: [
-                                // BoxShadow(
-                                //   color: Colors.black.withOpacity(0.4),
-                                //   offset: const Offset(0, 3),
-                                //   blurRadius: 4,
-                                // ),
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.4),
+                                  offset: const Offset(0, 3),
+                                  blurRadius: 4,
+                                ),
                               ],
                             ),
                             alignment: Alignment.center,
                             // padding: const EdgeInsets.only(top: 4, bottom: 4),
-                            child: Text(
-                                '${list?[index].arriveTime}' +
-                                    ' - ' +
-                                    '${list?[index].checkoutTime}',
+                            child: Text('$arriveTime - $checkoutTime',
                                 style: isSelect
                                     // ignore: dead_code
                                     ? FineTheme.typograhpy.subtitle2

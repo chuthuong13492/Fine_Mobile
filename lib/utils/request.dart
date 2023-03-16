@@ -115,7 +115,7 @@ class MyRequest {
   }
 
   set setToken(token) {
-    options.headers["accessToken"] = "$token";
+    options.headers["Authorization"] = "Bearer $token";
   }
 }
 

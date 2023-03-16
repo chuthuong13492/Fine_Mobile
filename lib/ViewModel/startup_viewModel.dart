@@ -21,7 +21,7 @@ class StartUpViewModel extends BaseModel {
       Get.offAndToNamed(RoutHandler.ONBOARD);
     } else if (hasLoggedInUser) {
       await Get.find<RootViewModel>().startUp();
-      Get.offAndToNamed(RoutHandler.NAV);
+      Get.offAndToNamed(RoutHandler.STORE_SELECT);
     } else {
       Get.offAndToNamed(RoutHandler.LOGIN);
     }

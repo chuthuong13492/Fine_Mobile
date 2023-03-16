@@ -124,7 +124,7 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
           Container(
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24)),
                 // gradient: LinearGradient(
