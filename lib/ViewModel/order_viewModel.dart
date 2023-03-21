@@ -41,12 +41,12 @@ class OrderViewModel extends BaseModel {
       //   RootViewModel root = Get.find<RootViewModel>();
       //   campusDTO = root.currentStore;
       // }
-      // AccountViewModel accountRoot = Get.find<AccountViewModel>();
-      // AccountDTO? user = accountRoot.currentUser!;
+      AccountViewModel accountRoot = Get.find<AccountViewModel>();
+      AccountDTO? user = accountRoot.currentUser!;
       RootViewModel root = Get.find<RootViewModel>();
       currentCart = await getCart();
 
-      currentCart?.addProperties('0902915671', root.selectedTimeSlot!.id!);
+      currentCart?.addProperties(user.phone!, root.selectedTimeSlot!.id!);
       // currentCart?.addProperties(5, '0902915671', root.selectedTimeSlot!.id!);
       // currentCart = await getCart();
 

@@ -169,7 +169,7 @@ class _HomeCategorySectionState extends State<HomeCategorySection> {
     // ignore: sized_box_for_whitespace
     return Container(
       width: Get.width,
-      height: 90,
+      height: 92,
       child: ListView.separated(
           scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) {

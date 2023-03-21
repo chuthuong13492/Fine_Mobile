@@ -2,10 +2,32 @@ import 'package:dio/dio.dart';
 import 'package:fine/Constant/order_status.dart';
 import 'package:fine/Model/DAO/index.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
+import 'package:fine/Model/DTO/MetaDataDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
+import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/request.dart';
 
 class OrderDAO extends BaseDAO {
+  Future<List<OrderDTO>?> getOrders({int? page, int? size}) async {
+    final res = await request.get(
+      '/customer/orders',
+      queryParameters: {
+        // "order-status":
+        //     filter == OrderFilter.NEW ? ORDER_NEW_STATUS : ORDER_DONE_STATUS,
+        "size": size ?? DEFAULT_SIZE,
+        "page": page ?? 1
+      },
+    );
+    List<OrderDTO>? orderSummaryList;
+    if (res.statusCode == 200) {
+      var listJson = res.data['data'] as List;
+      metaDataDTO = MetaDataDTO.fromJson(res.data["metadata"]);
+      // orderSummaryList = OrderDTO.fromList(res.data['data']);
+      return listJson.map((e) => OrderDTO.fromJson(e)).toList();
+    }
+    return null;
+  }
+
   Future<OrderDTO?> prepareOrder(Cart cart) async {
     if (cart != null) {
       // print("Request Note: " + note);

@@ -105,7 +105,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
                               AutoScrollTag(
                                 index: 1,
-                                key: ValueKey(1),
+                                key: const ValueKey(1),
                                 controller: controller!,
                                 highlightColor: Colors.black.withOpacity(0.1),
                                 child: timeRecieve(),
@@ -156,7 +156,9 @@ class _OrderScreenState extends State<OrderScreen> {
     //     orElse: () => null,
     //   );
     // }
-    String destination = "Trường Đại Học FPT - Khu công nghệ";
+    RootViewModel root = Get.find<RootViewModel>();
+    final destination = root.currentStore!.name;
+    // String destination = "Trường Đại Học FPT - Khu công nghệ";
     return Container(
       width: MediaQuery.of(context).size.width,
       child: InkWell(
@@ -187,7 +189,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               padding: const EdgeInsets.only(left: 5),
                               width: 120,
                               child: Text(
-                                "Nơi nhận:",
+                                "Địa điểm:",
                                 style: FineTheme.typograhpy.subtitle2,
                               ),
                             ),
@@ -376,18 +378,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     inverseGeneralOrder.orderDetails!.fold<int>(0,
                             (previousValue, element) {
                           return previousValue + element.quantity;
-
-                          // return previousValue ?? 0 + element.quantity;
-                        }).toString()
-                        // .fold(
-                        //   0,
-                        //   (previousValue, element) => previousValue != 0
-                        //       ? previousValue ??= 0 + element.quantity
-                        //       : previousValue =
-                        //           element.quantity + element.quantity,
-                        // )
-                        // .toString()
-                        +
+                        }).toString() +
                         " món",
                     style: FineTheme.typograhpy.subtitle2
                         .copyWith(color: FineTheme.palettes.primary300),

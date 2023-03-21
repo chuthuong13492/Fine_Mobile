@@ -183,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
       HomeTimeSlotsSection(),
       // const SizedBox(height: 8),
       // ignore: prefer_const_constructors
-      HomeCategorySection(),
+      // HomeCategorySection(),
       const SizedBox(height: 8),
 
       HomeStoreSection(),

@@ -68,7 +68,7 @@ class OrderDTO {
     room = json["room"] == null ? null : Room.fromJson(json["room"]);
     isConfirm = json["isConfirm"];
     isPartyMode = json["isPartyMode"];
-    shipperId = json["shipperId"];
+    shipperId = json["shipperId"] ?? null;
     note = json["note"];
     inverseGeneralOrder = json["inverseGeneralOrder"] == null
         ? null
@@ -121,7 +121,7 @@ class OrderDTO {
 
     Map<String, dynamic> map = {
       "orderCode": orderCode,
-      "deliveryPhone": '0902915671',
+      "deliveryPhone": deliveryPhone,
       "checkInDate": checkInDate,
       "totalAmount": totalAmount,
       "discount": discount ?? 0,
@@ -181,7 +181,7 @@ class InverseGeneralOrder {
     finalAmount = json["finalAmount"];
     orderStatus = json["orderStatus"];
     storeId = json["storeId"];
-    storeName = json["storeName"];
+    storeName = json["storeName"] ?? null;
     orderDetails = json["orderDetails"] == null
         ? null
         : (json["orderDetails"] as List)
@@ -246,13 +246,13 @@ class OrderDetails {
         json["productInMenuId"] as int,
         json["productCode"] as String,
         json["productName"] as String,
-        json["comboId"] as int,
+        json["comboId"] as int ?? null,
         json["unitPrice"] as double,
         json["quantity"] as int,
         json["totalAmount"] as double,
-        json["discount"] as double,
+        json["discount"] as double ?? 0,
         json["finalAmount"] as double,
-        json["note"] as String);
+        json["note"] as String ?? '');
     // id = json["id"];
     // orderId = json["orderId"];
     // productInMenuId = json["productInMenuId"];

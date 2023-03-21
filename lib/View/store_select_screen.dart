@@ -25,116 +25,125 @@ class _StoreSelectScreenState extends State<StoreSelectScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        height: MediaQuery.of(context).size.height,
+        height: Get.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(color: FineTheme.palettes.neutral100),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
-              margin: const EdgeInsets.only(top: 50),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Image(
-                    image: AssetImage('assets/images/logo.png'),
-                    height: 200,
-                    width: 200,
-                  ),
-                ],
+            Expanded(
+              child: Container(
+                margin: const EdgeInsets.only(top: 50),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Image(
+                      image: AssetImage('assets/images/logo.png'),
+                      height: 200,
+                      width: 200,
+                    ),
+                  ],
+                ),
               ),
             ),
-            Column(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 16),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'CHỌN KHU VỰC ĐẶT ĐƠN',
-                    style: FineTheme.typograhpy.h2.copyWith(
-                        color: FineTheme.palettes.primary300,
-                        fontWeight: FontWeight.bold),
+            Container(
+              height: Get.height * 0.72,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 16),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'CHỌN KHU VỰC ĐẶT ĐƠN',
+                      style: FineTheme.typograhpy.h2.copyWith(
+                          color: FineTheme.palettes.primary300,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-                ScopedModel(
-                  model: Get.find<RootViewModel>(),
-                  child: ScopedModelDescendant<RootViewModel>(
-                      builder: (context, child, model) {
-                    final status = model.status;
-                    final stores = model.campusList;
+                  ScopedModel(
+                    model: Get.find<RootViewModel>(),
+                    child: ScopedModelDescendant<RootViewModel>(
+                        builder: (context, child, model) {
+                      final status = model.status;
+                      final stores = model.campusList;
 
-                    if (status == ViewStatus.Loading)
-                      return AspectRatio(
-                        aspectRatio: 1,
-                        child: Container(
-                            height: 50,
-                            width: MediaQuery.of(context).size.width,
-                            child: Center(child: CircularProgressIndicator())),
-                      );
+                      if (status == ViewStatus.Loading) {
+                        return AspectRatio(
+                          aspectRatio: 1,
+                          child: Container(
+                              height: 50,
+                              width: MediaQuery.of(context).size.width,
+                              child: const Center(
+                                  child: CircularProgressIndicator())),
+                        );
+                      }
 
-                    if (stores == null)
-                      return Center(
-                        child: Text('Không có cửa khu vực nào'),
-                      );
+                      if (stores == null) {
+                        return const Center(
+                          child: Text('Không có cửa khu vực nào'),
+                        );
+                      }
 
-                    return Container(
-                        margin: EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: FineTheme.palettes.neutral300,
-                                blurRadius: 6.0, // soften the shadow
-                                offset: const Offset(
-                                  0.0, // Move to right 10  horizontally
-                                  5.0, // Move to bottom 10 Vertically
-                                ),
-                              )
-                            ]),
-                        child: Column(
-                          children: stores
-                              .map((store) => buildStoreSelect(store))
-                              .toList(),
-                        ));
-                  }),
-                ),
-                Container(
-                  margin: const EdgeInsets.only(top: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        child: const Text('Không có trong khu vực bạn muốn?'),
-                      ),
-                      Container(
-                        child: Container(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              InkWell(
-                                onTap: () {
-                                  print('Gợi ý is tapped');
-                                },
-                                child: Text(
-                                  'Gợi ý',
-                                  style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      color: FineTheme.palettes.primary300,
-                                      fontWeight: FontWeight.w800),
-                                ),
-                              ),
-                              const Text(' cho chúng mình nhé')
-                            ],
-                          ),
+                      return Container(
+                          margin: const EdgeInsets.all(24),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: FineTheme.palettes.neutral300,
+                                  blurRadius: 6.0, // soften the shadow
+                                  offset: const Offset(
+                                    0.0, // Move to right 10  horizontally
+                                    5.0, // Move to bottom 10 Vertically
+                                  ),
+                                )
+                              ]),
+                          child: Column(
+                            children: stores
+                                .map((store) => buildStoreSelect(store))
+                                .toList(),
+                          ));
+                    }),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          child: const Text('Không có trong khu vực bạn muốn?'),
                         ),
-                      )
-                    ],
-                  ),
-                )
-              ],
+                        Container(
+                          child: Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    print('Gợi ý is tapped');
+                                  },
+                                  child: Text(
+                                    'Gợi ý',
+                                    style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        color: FineTheme.palettes.primary300,
+                                        fontWeight: FontWeight.w800),
+                                  ),
+                                ),
+                                const Text(' cho chúng mình nhé')
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
             // Row(
             //   mainAxisAlignment: MainAxisAlignment.end,

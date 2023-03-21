@@ -40,7 +40,7 @@ class AccountDAO extends BaseDAO {
   }
 
   Future<AccountDTO> getUser() async {
-    Response response = await request.get("/customer/token");
+    Response response = await request.get("/customer/Authorization");
     // set access token
     final user = response.data['data'];
     return AccountDTO.fromJson(user);

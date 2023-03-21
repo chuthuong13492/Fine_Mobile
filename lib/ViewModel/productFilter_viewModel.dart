@@ -59,6 +59,7 @@ class ProductFilterViewModel extends BaseModel {
         params.clear();
       }
       setState(ViewStatus.Completed);
+      notifyListeners();
     } catch (e) {
       setState(ViewStatus.Error, e.toString());
     }
