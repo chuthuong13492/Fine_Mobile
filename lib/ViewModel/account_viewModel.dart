@@ -53,6 +53,7 @@ class AccountViewModel extends BaseModel {
     try {
       int option = await showOptionDialog("Mình sẽ nhớ bạn lắm ó huhu :'(((");
       if (option == 1) {
+        showLoadingDialog();
         await _dao.logOut();
         await removeALL();
         // await FirebaseAuth.instance.signOut();
@@ -65,6 +66,7 @@ class AccountViewModel extends BaseModel {
         //   Get.offAll(RoutHandler.LOGIN);
         // }
         // await Get.find<RootViewModel>().startUp();
+        hideDialog();
         Get.offAllNamed(RoutHandler.LOGIN);
       }
     } catch (e) {

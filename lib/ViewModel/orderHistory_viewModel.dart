@@ -1,8 +1,10 @@
 import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Utils/constrant.dart';
+import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../Model/DAO/index.dart';
 import '../Model/DTO/index.dart';
@@ -86,6 +88,41 @@ class OrderHistoryViewModel extends BaseModel {
         setState(ViewStatus.Error);
       }
     } finally {}
+  }
+
+  Future<void> cancelOrder(int orderId) async {
+    try {
+      int option = await showOptionDialog("Hãy thử những món khác bạn nhé 😥.");
+      if (option == 1) {
+        showLoadingDialog();
+        // CampusDTO storeDTO = await getStore();
+        final success = await _orderDAO?.cancelOrder(orderId);
+        if (success!) {
+          clearNewOrder(orderId);
+          await showStatusDialog("assets/images/icon-success.png", "Thành công",
+              "Hãy xem thử các món khác bạn nhé 😓");
+          Get.back();
+          await getOrders();
+        } else {
+          await showStatusDialog(
+            "assets/images/error.png",
+            "Thất bại",
+            "Chưa hủy đươc đơn bạn vui lòng thử lại nhé 😓",
+          );
+        }
+      }
+    } catch (e) {
+      await showStatusDialog(
+        "assets/images/global_error.png",
+        "Thất bại",
+        "Chưa hủy đươc đơn bạn vui lòng thử lại nhé 😓",
+      );
+    }
+  }
+
+  void clearNewOrder(int orderId) {
+    newTodayOrders = null;
+    notifyListeners();
   }
 
   Future<void> getMoreOrders() async {

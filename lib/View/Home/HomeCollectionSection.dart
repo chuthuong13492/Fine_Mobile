@@ -221,9 +221,10 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                     : Colors.grey,
                 BlendMode.saturation,
               ),
-              child: const CacheImage(
-                imageUrl:
-                    'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908',
+              child: CacheImage(
+                imageUrl: product.imageUrl == null
+                    ? 'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908'
+                    : product.imageUrl!,
               ),
             ),
           ),

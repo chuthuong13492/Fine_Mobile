@@ -63,6 +63,15 @@ class OrderDAO extends BaseDAO {
     return null;
   }
 
+  Future<bool> cancelOrder(int orderId) async {
+    final res = await request.put(
+      '/order/usercancel?orderId=$orderId',
+      // data: ORDER_CANCEL_STATUS,
+    );
+
+    return res.statusCode == 200;
+  }
+
   Future<OrderStatus?> createOrders(OrderDTO orderDTO) async {
     try {
       if (orderDTO != null) {

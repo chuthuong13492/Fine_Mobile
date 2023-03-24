@@ -74,7 +74,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       final orderSummaryList = model.orderThumbnail
           .where((element) =>
               element.itemQuantity != 0 &&
-              element.inverseGeneralOrder!.isNotEmpty)
+              element.inverseGeneralOrder!.isNotEmpty &&
+              element.orderStatus == 4)
           .toList();
       orderSummaryList.sort((a, b) {
         DateTime aDate = DateTime.parse(a.checkInDate!);

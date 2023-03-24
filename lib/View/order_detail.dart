@@ -15,7 +15,9 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:scoped_model/scoped_model.dart';
 import "package:collection/collection.dart";
+// import 'package:url_launcher/url_launcher.dart';
 
+import '../Accessories/index.dart';
 import '../Model/DTO/index.dart';
 
 class OrderHistoryDetail extends StatefulWidget {
@@ -43,7 +45,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
     return ScopedModel(
       model: Get.find<OrderHistoryViewModel>(),
       child: Scaffold(
-        // bottomNavigationBar: _buildCancelBtn(),
+        bottomNavigationBar: _buildCancelBtn(),
         appBar: AppBar(
             centerTitle: true,
             title: Text('Đơn hàng',
@@ -502,6 +504,71 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
         ),
       ),
     );
+  }
+
+  Widget _buildCancelBtn() {
+    return ScopedModelDescendant<OrderHistoryViewModel>(
+        builder: (context, child, model) {
+      return Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              offset: Offset(0.0, 1.0), //(x,y)
+              blurRadius: 6.0,
+            ),
+          ],
+        ),
+        height: 125,
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+        child: Container(
+          child: ListView(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                      color: FineTheme.palettes.primary300, width: 2),
+                ),
+                child: TextButton(
+                    onPressed: () async {
+                      // int option = await showOptionDialog(
+                      //     "Vui lòng liên hệ FanPage",
+                      //     firstOption: "Quay lại",
+                      //     secondOption: "Liên hệ");
+                      // if (option == 1) {
+                      //   if (!await launch(
+                      //       "https://www.facebook.com/profile.php?id=100090581135614"))
+                      //     throw 'Could not launch https://www.facebook.com/profile.php?id=100090581135614';
+                      // }
+                    },
+                    child: Text(
+                      "Ét o ét! Liên hệ FINE ngay! ",
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: FineTheme.palettes.primary300,
+                          fontSize: 16),
+                    )),
+              ),
+              const SizedBox(
+                height: 6,
+              ),
+              Center(
+                child: InkWell(
+                  onTap: () {
+                    model.cancelOrder(this.widget.order.id!);
+                  },
+                  child: Text("Hủy đơn 😢",
+                      style: FineTheme.typograhpy.subtitle1
+                          .copyWith(color: Colors.grey)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 
   // Widget _buildCancelBtn() {

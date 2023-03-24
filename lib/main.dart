@@ -31,9 +31,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (!GetPlatform.isWeb) {
-    HttpOverrides.global = MyHttpOverrides();
-  }
+  // if (!GetPlatform.isWeb) {
+
+  // }
+  HttpOverrides.global = MyHttpOverrides();
   await setup();
   await deleteCart();
   createRouteBindings();

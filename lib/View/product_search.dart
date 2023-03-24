@@ -44,9 +44,12 @@ class ProductSearchItem extends StatelessWidget {
                     // color: Colors.grey,
                   ),
                   // width: 110,
-                  child: const AspectRatio(
+                  child: AspectRatio(
                     aspectRatio: 1,
-                    child: CacheImage(imageUrl: defaultImg),
+                    child: CacheImage(
+                        imageUrl: product!.imageUrl == null
+                            ? defaultImg
+                            : product!.imageUrl!),
                   ),
                 ),
                 const SizedBox(width: 16),

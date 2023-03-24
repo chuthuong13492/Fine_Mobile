@@ -50,6 +50,7 @@ dependencies:
   logger: ^1.2.2
   scroll_to_index: ^3.0.1
   collection: ^1.17.0
+  # url_launcher: ^6.1.10
 
 dependency_overrides:
   firebase_auth_platform_interface: 6.11.7

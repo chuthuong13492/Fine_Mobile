@@ -123,6 +123,8 @@ class OrderViewModel extends BaseModel {
         hideDialog();
         await showStatusDialog("assets/images/icon-success.png", 'Success',
             'Bạn đã đặt hàng thành công');
+        // await Get.find<OrderHistoryViewModel>().getOrders();
+
         await Get.find<OrderHistoryViewModel>().getNewOrder();
         // Get.offAndToNamed(
         //   RoutHandler.ORDER_HISTORY_DETAIL,
