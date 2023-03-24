@@ -116,7 +116,7 @@ class RootViewModel extends BaseModel {
     await setStore(currentStore!);
     setState(ViewStatus.Completed);
     // await getListTimeSlot(currentStore.id);
-    await getListTimeSlot();
+    // await getListTimeSlot();
     await startUp();
     hideDialog();
     Get.toNamed(RoutHandler.NAV);

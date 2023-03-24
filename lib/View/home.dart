@@ -2,6 +2,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fine/Accessories/draggable_bottom_sheet.dart';
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/View/Home/HomeCategorySection.dart';
 import 'package:fine/View/Home/HomeCollectionSection.dart';
@@ -9,6 +10,7 @@ import 'package:fine/View/Home/HomeStoreSection.dart';
 import 'package:fine/View/Home/HomeTimeSlotsSection.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
+import 'package:fine/ViewModel/orderHistory_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/fixed_app_bar.dart';
@@ -166,6 +168,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
+                  Positioned(
+                    left: 0,
+                    bottom: 0,
+                    child: buildNewOrder(),
+                  ),
                 ],
               ),
             ),
@@ -292,5 +299,102 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ));
+  }
+
+  void _onTapOrderHistory(order) async {
+    // get orderDetail
+    await Get.find<OrderHistoryViewModel>().getOrders();
+    await Get.toNamed(RoutHandler.ORDER_HISTORY_DETAIL, arguments: order);
+  }
+
+  Widget buildNewOrder() {
+    RootViewModel root = Get.find<RootViewModel>();
+    final campus = root.currentStore;
+    return ScopedModel<OrderHistoryViewModel>(
+      model: Get.find<OrderHistoryViewModel>(),
+      child: ScopedModelDescendant<OrderHistoryViewModel>(
+          builder: (context, child, model) {
+        if (model.status == ViewStatus.Loading ||
+            model.newTodayOrders == null) {
+          return const SizedBox();
+        }
+        return Container(
+          width: Get.width,
+          height: 80,
+          child: Card(
+            margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+            elevation: 3,
+            child: AnimatedContainer(
+              duration: const Duration(seconds: 2),
+              decoration: BoxDecoration(
+                  border: Border(
+                      left: BorderSide(
+                          color: FineTheme.palettes.primary300, width: 3))),
+              width: Get.width * 0.95,
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          _onTapOrderHistory(model.newTodayOrders);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Text(
+                                  //   model.newTodayOrders!.id!.toString(),
+                                  //   style: FineTheme.typograhpy.subtitle2,
+                                  // ),
+                                  // const SizedBox(height: 8),
+                                  Text('Đơn hàng mới',
+                                      style: FineTheme.typograhpy.caption1)
+                                ],
+                              ),
+                              const SizedBox(width: 24),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      campus!.name!,
+                                      style: FineTheme.typograhpy.caption1,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text('Nhận đơn tại',
+                                        style: FineTheme.typograhpy.caption1)
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Get.find<OrderHistoryViewModel>()
+                            .closeNewOrder(model.newTodayOrders!.id);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }),
+    );
   }
 }

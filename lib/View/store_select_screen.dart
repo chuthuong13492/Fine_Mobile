@@ -165,7 +165,7 @@ class _StoreSelectScreenState extends State<StoreSelectScreen> {
 
   Widget buildStoreSelect(CampusDTO area) {
     return Padding(
-      padding: EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8),
       child: InkWell(
         onTap: () {
           Get.find<RootViewModel>().setCurrentCampus(area);

@@ -11,7 +11,8 @@ import 'package:fine/widgets/bottom_bar_item.dart';
 import 'package:flutter/material.dart';
 
 class RootScreen extends StatefulWidget {
-  const RootScreen({Key? key}) : super(key: key);
+  final int initScreenIndex;
+  const RootScreen({Key? key, required this.initScreenIndex}) : super(key: key);
 
   @override
   State<RootScreen> createState() => _RootScreenState();
@@ -49,6 +50,7 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    activeTab = widget.initScreenIndex;
     _controller.forward();
   }
 

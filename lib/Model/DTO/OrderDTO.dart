@@ -27,6 +27,7 @@ class OrderDTO {
   bool? isConfirm;
   bool? isPartyMode;
   int? shipperId;
+  int? itemQuantity;
   String? note;
   List<InverseGeneralOrder>? inverseGeneralOrder;
 
@@ -47,6 +48,7 @@ class OrderDTO {
       this.isConfirm,
       this.isPartyMode,
       this.shipperId,
+      this.itemQuantity,
       this.note,
       this.inverseGeneralOrder});
 
@@ -69,6 +71,7 @@ class OrderDTO {
     isConfirm = json["isConfirm"];
     isPartyMode = json["isPartyMode"];
     shipperId = json["shipperId"] ?? null;
+    itemQuantity = json["itemQuantity"];
     note = json["note"];
     inverseGeneralOrder = json["inverseGeneralOrder"] == null
         ? null
@@ -105,6 +108,7 @@ class OrderDTO {
     _data["isConfirm"] = isConfirm;
     _data["isPartyMode"] = isPartyMode;
     _data["shipperId"] = shipperId;
+    _data["itemQuantity"] = itemQuantity;
     _data["note"] = note;
     if (inverseGeneralOrder != null) {
       _data["inverseGeneralOrder"] =
@@ -122,20 +126,21 @@ class OrderDTO {
     Map<String, dynamic> map = {
       "orderCode": orderCode,
       "deliveryPhone": deliveryPhone,
-      "checkInDate": checkInDate,
+      // "checkInDate": checkInDate,
       "totalAmount": totalAmount,
       "discount": discount ?? 0,
       "finalAmount": finalAmount,
       "shippingFee": shippingFee,
-      "orderStatus": orderStatus,
+      // "orderStatus": orderStatus,
       "orderType": orderType,
-      "customerId": customer!.id,
+      // "customerId": customer!.id,
       "timeSlotId": timeSlot!.id,
       "roomId": room!.id,
-      "note": note ?? '',
+      // "note": note ?? '',
       "isConfirm": isConfirm,
       "isPartyMode": isPartyMode,
-      "shipperId": shipperId,
+      // "shipperId": shipperId,
+      "itemQuantity": itemQuantity,
       "inverseGeneralOrder": listItem
       // "supplier_notes":
       //     note != null ? note!.map((e) => e.toJson()).toList() : [],
@@ -158,6 +163,7 @@ class InverseGeneralOrder {
   int? orderStatus;
   int? storeId;
   String? storeName;
+  String? note;
   List<OrderDetails>? orderDetails;
 
   InverseGeneralOrder(
@@ -170,6 +176,7 @@ class InverseGeneralOrder {
       this.orderStatus,
       this.storeId,
       this.storeName,
+      this.note,
       this.orderDetails});
 
   InverseGeneralOrder.fromJson(Map<String, dynamic> json) {
@@ -195,15 +202,16 @@ class InverseGeneralOrder {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["generalOrderId"] = generalOrderId;
+    // _data["id"] = id;
+    // _data["generalOrderId"] = generalOrderId;
     _data["orderCode"] = orderCode;
     _data["totalAmount"] = totalAmount;
     _data["discount"] = discount ?? 0;
     _data["finalAmount"] = finalAmount;
-    _data["orderStatus"] = orderStatus;
+    // _data["orderStatus"] = orderStatus;
     _data["storeId"] = storeId;
-    _data["storeName"] = storeName;
+    _data["note"] = note;
+    // _data["storeName"] = storeName;
     if (orderDetails != null) {
       _data["orderDetails"] = orderDetails?.map((e) => e.toJson()).toList();
     }
@@ -273,17 +281,16 @@ class OrderDetails {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["orderId"] = orderId;
+    // _data["id"] = id;
+    // _data["orderId"] = orderId;
     _data["productInMenuId"] = productInMenuId;
     _data["productCode"] = productCode;
     _data["productName"] = productName;
-    // _data["comboId"] = comboId;
     _data["comboId"] = null;
     _data["unitPrice"] = unitPrice;
     _data["quantity"] = quantity;
     _data["totalAmount"] = totalAmount;
-    _data["discount"] = discount ?? 0;
+    // _data["discount"] = discount ?? 0;
     _data["finalAmount"] = finalAmount;
     _data["note"] = note ?? '';
     return _data;

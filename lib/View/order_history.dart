@@ -1,3 +1,4 @@
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/OrderDTO.dart';
 import 'package:fine/Utils/format_price.dart';
@@ -26,14 +27,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<RefreshIndicatorState>();
 
+  int count = 0;
   @override
   void initState() {
     super.initState();
     model.getOrders();
+    // Get.find<OrderHistoryViewModel>().getMoreOrders();
   }
 
   Future<void> refreshFetchOrder() async {
     await model.getOrders();
+    // await model.getMoreOrders();
   }
 
   @override
@@ -52,8 +56,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             const SizedBox(height: 16),
             Expanded(
               child: Container(
+                // ignore: sort_child_properties_last
                 child: _buildOrders(),
-                color: Color(0xffefefef),
+                color: const Color(0xffefefef),
               ),
             ),
           ],
@@ -66,7 +71,16 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     return ScopedModelDescendant<OrderHistoryViewModel>(
         builder: (context, child, model) {
       final status = model.status;
-      final orderSummaryList = model.orderThumbnail;
+      final orderSummaryList = model.orderThumbnail
+          .where((element) =>
+              element.itemQuantity != 0 &&
+              element.inverseGeneralOrder!.isNotEmpty)
+          .toList();
+      orderSummaryList.sort((a, b) {
+        DateTime aDate = DateTime.parse(a.checkInDate!);
+        DateTime bDate = DateTime.parse(b.checkInDate!);
+        return bDate.compareTo(aDate);
+      });
       if (status == ViewStatus.Loading) {
         return const Center(
           child: LoadingFine(),
@@ -82,7 +96,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 const Text('Bạn chưa đặt đơn hàng nào hôm nay 😵'),
                 MaterialButton(
                   onPressed: () {
-                    Get.back();
+                    Get.offAndToNamed(RoutHandler.NAV);
                   },
                   child: Text(
                     '🥡 Đặt ngay 🥡',
@@ -115,7 +129,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         child: Container(
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            controller: model.scrollController,
+            controller: Get.find<OrderHistoryViewModel>().scrollController,
             padding: const EdgeInsets.all(8),
             children: [
               ...orderSummaryList
@@ -167,20 +181,21 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   style: FineTheme.typograhpy.subtitle1
                       .copyWith(color: Colors.black)),
         ),
-        ...orderSummary.inverseGeneralOrder!
-            .toList()
-            .map((order) => _buildOrderItem(order))
-            .toList(),
+        // ...orderSummary.inverseGeneralOrder!
+        //     .toList()
+        //     .map((order) => _buildOrderItem(order))
+        //     .toList(),
+        _buildOrderItem(orderSummary),
       ],
     );
   }
 
-  Widget _buildOrderItem(InverseGeneralOrder inverseGeneralOrder) {
+  Widget _buildOrderItem(OrderDTO orderDTO) {
     var campus = Get.find<RootViewModel>().currentStore;
-    final itemQuantity = inverseGeneralOrder.orderDetails!.fold<int>(0,
-        (previousValue, element) {
-      return previousValue + element.quantity;
-    }).toString();
+    // final itemQuantity = inverseGeneralOrder.orderDetails!.fold<int>(0,
+    //     (previousValue, element) {
+    //   return previousValue + element.quantity;
+    // }).toString();
     return Container(
       // height: 80,
       margin: const EdgeInsets.fromLTRB(8, 0, 8, 16),
@@ -198,7 +213,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           children: [
             ListTile(
               onTap: () {
-                // _onTapOrderHistory(inverseGeneralOrder);
+                _onTapOrderHistory(orderDTO);
               },
               contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               title: Column(
@@ -208,7 +223,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                   Row(
                     children: [
                       Text(
-                        "${inverseGeneralOrder.id} / ${itemQuantity} món",
+                        "Mã đơn: ${orderDTO.id} / ${orderDTO.itemQuantity} món",
                         style: FineTheme.typograhpy.h2.copyWith(
                             color: Colors.black, fontWeight: FontWeight.bold),
                       ),
@@ -218,7 +233,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     height: 8,
                   ),
                   Text(
-                    campus!.address!,
+                    campus!.name!,
                     style: FineTheme.typograhpy.subtitle2,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -235,7 +250,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                     // order.paymentType == PaymentTypeEnum.BeanCoin
                     //     ? "${formatBean(order.finalAmount)} Bean"
                     //     :
-                    "${formatPrice(inverseGeneralOrder.finalAmount!)}",
+                    "${formatPrice(orderDTO.finalAmount!)}",
                     textAlign: TextAlign.right,
                     style: FineTheme.typograhpy.h2,
                   )
@@ -251,7 +266,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
   void _onTapOrderHistory(order) async {
     // get orderDetail
-    // await Get.toNamed(RouteHandler.ORDER_HISTORY_DETAIL, arguments: order);
+    await Get.toNamed(RoutHandler.ORDER_HISTORY_DETAIL, arguments: order);
     model.getOrders();
   }
 }

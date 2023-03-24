@@ -14,7 +14,7 @@ class OrderHistoryViewModel extends BaseModel {
   OrderDTO? orderDetail;
   ScrollController? scrollController;
   List<bool> selections = [true, false];
-  List<OrderDTO>? newTodayOrders;
+  OrderDTO? newTodayOrders;
 
   OrderHistoryViewModel({OrderDTO? dto}) {
     orderDetail = dto;
@@ -43,14 +43,48 @@ class OrderHistoryViewModel extends BaseModel {
       // OrderFilter filter = selections[0] ? OrderFilter.NEW : OrderFilter.DONE;
       final data = await _orderDAO?.getOrders();
       orderThumbnail = data!;
+      // if (_orderDAO!.metaDataDTO.size! != _orderDAO!.metaDataDTO.total!) {
+      //   int size = _orderDAO!.metaDataDTO.total!;
+      //   final data = await _orderDAO?.getOrders(size: size);
+      //   orderThumbnail = data!;
+      // }
 
+      // print(size);
       setState(ViewStatus.Completed);
+      // notifyListeners();
     } catch (e) {
       bool result = await showErrorDialog();
       if (result) {
         await getOrders();
-      } else
+      } else {
         setState(ViewStatus.Error);
+      }
+    } finally {}
+  }
+
+  Future<void> getNewOrder() async {
+    try {
+      setState(ViewStatus.Loading);
+      final data = await _orderDAO?.getOrders();
+      final currentDateData = data?.firstWhere(
+          (orderSummary) =>
+              DateTime.parse(orderSummary.checkInDate!)
+                  .difference(DateTime.now())
+                  .inDays ==
+              0,
+          orElse: () => null as dynamic);
+      if (currentDateData != null) {
+        orderThumbnail.add(currentDateData);
+        newTodayOrders = currentDateData;
+      }
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      bool result = await showErrorDialog();
+      if (result) {
+        await getNewOrder();
+      } else {
+        setState(ViewStatus.Error);
+      }
     } finally {}
   }
 
@@ -60,19 +94,26 @@ class OrderHistoryViewModel extends BaseModel {
       // OrderFilter filter =
       //     selections[0] ? OrderFilter.ORDERING : OrderFilter.DONE;
 
-      final data =
-          await _orderDAO?.getOrders(page: _orderDAO!.metaDataDTO.page! + 1);
+      final data = await _orderDAO?.getMoreOrders(
+          page: _orderDAO!.metaDataDTO.page! + 1);
 
       orderThumbnail += data!;
 
       await Future.delayed(const Duration(milliseconds: 1000));
       setState(ViewStatus.Completed);
+      // notifyListeners();
     } catch (e) {
       bool result = await showErrorDialog();
       if (result) {
         await getMoreOrders();
-      } else
+      } else {
         setState(ViewStatus.Error);
+      }
     }
+  }
+
+  Future<void> closeNewOrder(orderId) async {
+    newTodayOrders = null;
+    notifyListeners();
   }
 }

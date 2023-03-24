@@ -18,7 +18,7 @@ class HomeStoreSection extends StatefulWidget {
 }
 
 class _HomeStoreSectionState extends State<HomeStoreSection> {
-  HomeViewModel? _homeCollectionViewModel;
+  HomeViewModel? _homeCollectionViewModel = Get.find<HomeViewModel>();
 
   @override
   void initState() {
@@ -33,7 +33,9 @@ class _HomeStoreSectionState extends State<HomeStoreSection> {
         model: Get.find<HomeViewModel>(),
         child: ScopedModelDescendant<HomeViewModel>(
           builder: (context, child, model) {
-            var suppliers = model.supplierList;
+            var suppliers = model.supplierList!
+                .where((element) => element.imageUrl != null)
+                .toList();
             if (suppliers != null) {
               final status = model.status;
               if (status == ViewStatus.Loading) {

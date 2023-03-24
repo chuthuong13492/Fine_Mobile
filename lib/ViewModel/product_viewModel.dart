@@ -66,7 +66,7 @@ class ProductDetailViewModel extends BaseModel {
     // // total = fixTotal + extraTotal;
     total = fixTotal;
 
-    // verifyOrder();
+    verifyOrder();
     notifyListeners();
   }
 
@@ -196,20 +196,20 @@ class ProductDetailViewModel extends BaseModel {
     notifyListeners();
   }
 
-  // void verifyOrder() {
-  //   order = true;
+  void verifyOrder() {
+    order = true;
 
-  //   for (int i = 0; i < affectPriceContent.keys.toList().length; i++) {
-  //     if (selectedAttributes[affectPriceContent.keys.elementAt(i)] == null) {
-  //       order = false;
-  //     }
-  //   }
+    for (int i = 0; i < affectPriceContent!.keys.toList().length; i++) {
+      if (selectedAttributes![affectPriceContent!.keys.elementAt(i)] == null) {
+        order = false;
+      }
+    }
 
-  //   if (order) {
-  //     addColor = kPrimary;
-  //   }
-  //   // setState(ViewStatus.Completed);
-  // }
+    if (order!) {
+      addColor = FineTheme.palettes.primary300;
+    }
+    // setState(ViewStatus.Completed);
+  }
 
   // void changExtra(bool value, int i) {
   //   extraTotal = 0;

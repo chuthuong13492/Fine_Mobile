@@ -56,7 +56,10 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                     size: 24,
                     color: FineTheme.palettes.primary300,
                   ),
-                  onPressed: () {
+                  onPressed: () async {
+                    // await Get.find<OrderHistoryViewModel>().getOrders();
+
+                    // await Get.find<OrderHistoryViewModel>().getMoreOrders();
                     Get.back();
                   }),
             )),
@@ -67,11 +70,12 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
               var timeSlot = root.selectedTimeSlot;
               final status = model.status;
 
-              if (status == ViewStatus.Loading)
-                return AspectRatio(
+              if (status == ViewStatus.Loading) {
+                return const AspectRatio(
                   aspectRatio: 1,
                   child: Center(child: CircularProgressIndicator()),
                 );
+              }
 
               final orderDetail = model.orderDetail;
 
@@ -214,7 +218,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                         margin:
                             const EdgeInsets.only(left: 16, right: 16, top: 8),
                         decoration: BoxDecoration(
-                            color: Color(0xffFFFFFF),
+                            color: const Color(0xffFFFFFF),
                             borderRadius: BorderRadius.circular(8)),
                         child: Column(
                           children: [
@@ -458,7 +462,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                                       child: Row(
                                         children: [
                                           Text(
-                                              'Xem chi tiết đơn hàng (${2} Món)',
+                                              'Xem chi tiết đơn hàng (${widget.order.itemQuantity} Món)',
                                               style: FineTheme
                                                   .typograhpy.caption2
                                                   .copyWith(
@@ -631,13 +635,17 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
               shrinkWrap: true,
               itemBuilder: (context, index) {
                 List<InverseGeneralOrder> items = map.values.elementAt(index);
-                List<OrderDetails>? orderDetails =
-                    widget.order.inverseGeneralOrder!.map((e) => e.orderDetails)
-                        as List<OrderDetails>;
-                int count = 0;
-                orderDetails.forEach((element) {
-                  count += element.quantity;
-                });
+                final itemQuantity = items[0].orderDetails!.fold<int>(0,
+                    (previousValue, element) {
+                  return previousValue + element.quantity;
+                }).toString();
+                // List<OrderDetails>? orderDetails =
+                //     items.map((e) => e.orderDetails)
+                //         ;
+                // int count = 0;
+                // orderDetails.forEach((element) {
+                //   count += element.quantity;
+                // });
                 // SupplierNoteDTO note = orderDetail.notes?.firstWhere(
                 //     (element) => element.supplierId == items[0].supplierId,
                 //     orElse: () => null);
@@ -648,12 +656,12 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          items[0].storeName!,
+                          items[0].storeName ?? 'Cửa hàng',
                           style: FineTheme.typograhpy.subtitle1
                               .copyWith(fontSize: 14, color: Colors.black),
                         ),
                         Text(
-                          count.toString() + " x ",
+                          itemQuantity.toString() + " x ",
                           style: FineTheme.typograhpy.subtitle1
                               .copyWith(fontSize: 14, color: Colors.black),
                         ),
@@ -686,10 +694,9 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                       ),
                       child: ListView.separated(
                           shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           itemBuilder: (context, index) {
-                            return buildOrderItem(
-                                items[index], orderDetails[index]);
+                            return buildOrderItem(items[index]);
                           },
                           separatorBuilder: (context, index) =>
                               // MySeparator()
@@ -719,9 +726,12 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
     );
   }
 
-  Widget buildOrderItem(InverseGeneralOrder item, OrderDetails orderDetails) {
-    final orderChilds = item.orderDetails;
-
+  Widget buildOrderItem(InverseGeneralOrder item) {
+    List<OrderDetails> orderChilds = item.orderDetails!;
+    final itemQuantity =
+        item.orderDetails!.fold<int>(0, (previousValue, element) {
+      return previousValue + element.quantity;
+    }).toString();
     // double orderItemPrice = item.amount;
     // orderChilds?.forEach((element) {
     //   orderItemPrice += element.amount;
@@ -757,7 +767,8 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
               child: Wrap(
                 children: [
                   Text(
-                    "${orderDetails.quantity} x",
+                    // "${orderChilds.quantity} x",
+                    itemQuantity,
                     style: FineTheme.typograhpy.caption1
                         .copyWith(color: Colors.black),
                     overflow: TextOverflow.ellipsis,
@@ -769,14 +780,14 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                       children: [
                         // item.type != ProductType.MASTER_PRODUCT
                         //     ?
-                        Text(
-                          orderDetails.productName!,
-                          style: FineTheme.typograhpy.caption1
-                              .copyWith(color: Colors.black),
-                          textAlign: TextAlign.start,
-                        ),
+                        // Text(
+                        //   orderDetails.productName!,
+                        //   style: FineTheme.typograhpy.caption1
+                        //       .copyWith(color: Colors.black),
+                        //   textAlign: TextAlign.start,
+                        // ),
                         // : SizedBox.shrink(),
-                        ...orderChilds!
+                        ...orderChilds
                             .map(
                               (child) => Text(child.productName!),
                             )
@@ -828,7 +839,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                       Text(
                         "Đơn hàng",
                         style: FineTheme.typograhpy.subtitle1.copyWith(
-                            fontSize: 14, color: const Color(0xfff17f23)),
+                            fontSize: 14, color: FineTheme.palettes.primary300),
                       ),
                     ],
                   ),

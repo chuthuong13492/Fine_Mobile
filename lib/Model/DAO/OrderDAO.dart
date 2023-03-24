@@ -15,7 +15,26 @@ class OrderDAO extends BaseDAO {
         // "order-status":
         //     filter == OrderFilter.NEW ? ORDER_NEW_STATUS : ORDER_DONE_STATUS,
         "size": size ?? DEFAULT_SIZE,
-        "page": page ?? 1
+        "page": page ?? 1,
+      },
+    );
+    if (res.statusCode == 200) {
+      var listJson = res.data['data'] as List;
+      metaDataDTO = MetaDataDTO.fromJson(res.data["metadata"]);
+      // orderSummaryList = OrderDTO.fromList(res.data['data']);
+      return listJson.map((e) => OrderDTO.fromJson(e)).toList();
+    }
+    return null;
+  }
+
+  Future<List<OrderDTO>?> getMoreOrders({int? page, int? size}) async {
+    final res = await request.get(
+      '/customer/orders?Page=$page',
+      queryParameters: {
+        // "order-status":
+        //     filter == OrderFilter.NEW ? ORDER_NEW_STATUS : ORDER_DONE_STATUS,
+        // "size": size ?? DEFAULT_SIZE,
+        // "page": page ?? 1,
       },
     );
     List<OrderDTO>? orderSummaryList;

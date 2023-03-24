@@ -55,8 +55,8 @@ class AccountViewModel extends BaseModel {
       if (option == 1) {
         await _dao.logOut();
         await removeALL();
-        await FirebaseAuth.instance.signOut();
-        await GoogleSignIn().signOut();
+        // await FirebaseAuth.instance.signOut();
+        // await GoogleSignIn().signOut();
         // Get.testMode = true;
         // if (Get.testMode == false) {
         //   // TestWidgetsFlutterBinding.ensureInitialized();

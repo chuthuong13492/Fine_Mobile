@@ -14,7 +14,7 @@ import 'BaseDAO.dart';
 // TODO: Test Start_up Screen + FCM TOken
 
 class AccountDAO extends BaseDAO {
-  Future<AccountDTO> login(String idToken, String fcmToken) async {
+  Future<AccountDTO?> login(String idToken, String fcmToken) async {
     try {
       Response response = await request.post("customer/login",
           data: {"idToken": idToken, 'fcmToken': fcmToken});
@@ -26,9 +26,8 @@ class AccountDAO extends BaseDAO {
       requestObj.setToken = accessToken;
       setToken(accessToken);
       return userDTO;
-    } catch (e) {
-      throw (e);
-    }
+    } catch (e) {}
+    return null;
   }
 
   Future<bool> isUserLoggedIn() async {

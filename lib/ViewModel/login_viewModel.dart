@@ -48,7 +48,7 @@ class LoginViewModel extends BaseModel {
           idToken: googleAuth?.idToken,
         );
         await _auth.signInWithCredential(credential);
-        showLoadingDialog();
+
         User userToken = FirebaseAuth.instance.currentUser!;
         final idToken = await userToken.getIdToken();
         final fcmToken = await FirebaseMessaging.instance.getToken();
@@ -57,11 +57,12 @@ class LoginViewModel extends BaseModel {
         log('fcmToken: ' + fcmToken.toString());
 
         userInfo = await _dao?.login(idToken, fcmToken!);
-        // AccountViewModel accountViewModel = Get.find<AccountViewModel>();
-        // accountViewModel.currentUser = userInfo;
-
-        await _analyticsService.setUserProperties(userInfo!);
-        if (userInfo != null) {
+        if (userInfo == null) {
+          await showStatusDialog("assets/images/error.png", 'Éc éc ⚠️',
+              'Bạn vui lòng đăng nhập bằng mail trường nhé 🥰');
+        } else {
+          showLoadingDialog();
+          await _analyticsService.setUserProperties(userInfo!);
           await Get.find<RootViewModel>().startUp();
           // Get.rawSnackbar(
           //     message: "Đăng nhập thành công!!",
@@ -72,6 +73,12 @@ class LoginViewModel extends BaseModel {
           hideDialog();
           await Get.offAllNamed(RoutHandler.STORE_SELECT);
         }
+        // AccountViewModel accountViewModel = Get.find<AccountViewModel>();
+        // accountViewModel.currentUser = userInfo;
+
+        // if (userInfo != null) {
+
+        // }
         // await Get.offAllNamed(RoutHandler.NAV);
       }
       await Future.delayed(const Duration(microseconds: 500));

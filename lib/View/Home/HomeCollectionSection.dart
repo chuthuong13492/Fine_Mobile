@@ -67,8 +67,9 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                       //     element.isActive == true ||
                       //     element.products!.isNotEmpty)
                       .where((element) =>
-                          element.products != null &&
-                          element.products!.isNotEmpty &&
+                          element.products!
+                              .where((e) => e.isAvailable == true)
+                              .isNotEmpty &&
                           element.isActive == true)
                       .map(
                         (c) => Container(

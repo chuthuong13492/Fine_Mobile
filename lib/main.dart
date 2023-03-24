@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:fine/Accessories/theme_data.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DTO/index.dart';
+import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/View/home.dart';
 import 'package:fine/View/login.dart';
 import 'package:fine/View/nav_screen.dart';
@@ -26,11 +27,15 @@ import 'package:fine/Utils/request.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  HttpOverrides.global = MyHttpOverrides();
+  if (!GetPlatform.isWeb) {
+    HttpOverrides.global = MyHttpOverrides();
+  }
   await setup();
+  await deleteCart();
   createRouteBindings();
   runApp(MyApp());
 }
@@ -47,7 +52,7 @@ class MyApp extends StatelessWidget {
           case RoutHandler.LOGIN:
             return ScaleRoute(page: const SignIn());
           case RoutHandler.ONBOARD:
-            return ScaleRoute(page: OnBoardScreen());
+            return ScaleRoute(page: const OnBoardScreen());
           // case RoutHandler.LOADING:
           //    return CupertinoPageRoute<bool>(
           //       builder: (context) => LoadingScreen(
@@ -62,12 +67,12 @@ class MyApp extends StatelessWidget {
             return ScaleRoute(page: StoreSelectScreen());
           case RoutHandler.ORDER_HISTORY_DETAIL:
             return SlideBottomRoute(
-              page: OrderHistoryDetail(order: settings.arguments as OrderDTO),
+              page: OrderHistoryDetail(order: settings.arguments as dynamic),
             );
           case RoutHandler.PRODUCT_DETAIL:
             return CupertinoPageRoute<bool>(
                 builder: (context) => ProductDetailScreen(
-                      dto: settings.arguments as ProductDTO,
+                      dto: settings.arguments as dynamic,
                     ),
                 settings: settings);
           case RoutHandler.ORDER:
@@ -81,7 +86,10 @@ class MyApp extends StatelessWidget {
                 settings: settings);
           case RoutHandler.NAV:
             return CupertinoPageRoute(
-                builder: (context) => const RootScreen(), settings: settings);
+                builder: (context) => RootScreen(
+                      initScreenIndex: settings.arguments as int ?? 0,
+                    ),
+                settings: settings);
           case RoutHandler.HOME:
             return CupertinoPageRoute(
                 builder: (context) => const HomeScreen(), settings: settings);

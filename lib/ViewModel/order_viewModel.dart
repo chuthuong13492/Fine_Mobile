@@ -9,8 +9,7 @@ import 'package:fine/Service/analytic_service.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
-import 'package:fine/ViewModel/login_viewModel.dart';
-import 'package:fine/ViewModel/product_viewModel.dart';
+import 'package:fine/ViewModel/orderHistory_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:get/get.dart';
 
@@ -124,11 +123,12 @@ class OrderViewModel extends BaseModel {
         hideDialog();
         await showStatusDialog("assets/images/icon-success.png", 'Success',
             'Bạn đã đặt hàng thành công');
-        // await Get.find<OrderHistoryViewModel>().getNewOrder();
-        Get.offAndToNamed(
-          RoutHandler.ORDER_HISTORY_DETAIL,
-          arguments: result.order,
-        );
+        await Get.find<OrderHistoryViewModel>().getNewOrder();
+        // Get.offAndToNamed(
+        //   RoutHandler.ORDER_HISTORY_DETAIL,
+        //   arguments: result.order,
+        // );
+        Get.offAndToNamed(RoutHandler.NAV);
         // prepareOrder();
         // Get.back(result: true);
       } else {
@@ -140,8 +140,9 @@ class OrderViewModel extends BaseModel {
       bool result = await showErrorDialog();
       if (result) {
         await prepareOrder();
-      } else
+      } else {
         setState(ViewStatus.Error);
+      }
     }
   }
 
@@ -158,7 +159,7 @@ class OrderViewModel extends BaseModel {
     if (result) {
       await AnalyticsService.getInstance()
           ?.logChangeCart(product, item.quantity, false);
-      Get.back(result: false);
+      // Get.back(result: true);
       await prepareOrder();
     } else {
       currentCart = await getCart();
