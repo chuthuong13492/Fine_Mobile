@@ -12,8 +12,8 @@ import 'package:get/get.dart';
 import 'base_model.dart';
 
 class ProductDetailViewModel extends BaseModel {
-  Color minusColor = FineTheme.palettes.primary300;
-  Color addColor = FineTheme.palettes.primary300;
+  Color minusColor = FineTheme.palettes.primary100;
+  Color addColor = FineTheme.palettes.primary100;
   int? affectIndex = 0;
   //List product ảnh hưởng giá
   Map<String, List<String>>? affectPriceContent;
@@ -79,9 +79,9 @@ class ProductDetailViewModel extends BaseModel {
   // }
 
   void addQuantity() {
-    if (addColor == FineTheme.palettes.primary300) {
+    if (addColor == FineTheme.palettes.primary100) {
       if (count == 1) {
-        minusColor = FineTheme.palettes.primary300;
+        minusColor = FineTheme.palettes.primary100;
       }
       count++;
 
@@ -206,7 +206,7 @@ class ProductDetailViewModel extends BaseModel {
     }
 
     if (order!) {
-      addColor = FineTheme.palettes.primary300;
+      addColor = FineTheme.palettes.primary100;
     }
     // setState(ViewStatus.Completed);
   }

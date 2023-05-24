@@ -238,8 +238,9 @@ class RootViewModel extends BaseModel {
     int differentTime = beanTime.difference(currentDate).inMilliseconds;
     if (differentTime <= 0) {
       return false;
-    } else
+    } else {
       return true;
+    }
   }
 
   bool isTimeSlotAvailable(TimeSlotDTO? timeSlot) {
@@ -255,7 +256,8 @@ class RootViewModel extends BaseModel {
     int differentTime = beanTime.difference(currentDate).inMilliseconds;
     if (differentTime <= 0) {
       return false;
-    } else
+    } else {
       return true;
+    }
   }
 }

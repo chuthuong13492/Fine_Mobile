@@ -11,4 +11,5 @@ class RoutHandler {
   static const String ORDER_HISTORY = "/order_history";
   static const String ORDER_HISTORY_DETAIL = "/order_detail";
   static const String PRODUCT_FILTER_LIST = "/product_filter_list";
+  static const String WELCOME_SCREEN = "/welcome_screen";
 }

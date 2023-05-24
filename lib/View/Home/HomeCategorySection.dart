@@ -81,7 +81,7 @@ class _HomeCategorySectionState extends State<HomeCategorySection> {
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                     child: Column(
                       children: [
-                        Container(
+                        SizedBox(
                           child: AspectRatio(
                             aspectRatio: 1.5,
                             child: Image.asset(

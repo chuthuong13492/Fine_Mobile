@@ -23,7 +23,7 @@ class StartUpViewModel extends BaseModel {
       await Get.find<RootViewModel>().startUp();
       Get.offAndToNamed(RoutHandler.STORE_SELECT);
     } else {
-      Get.offAndToNamed(RoutHandler.LOGIN);
+      Get.offAndToNamed(RoutHandler.WELCOME_SCREEN);
     }
   }
 }

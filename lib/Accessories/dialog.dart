@@ -102,9 +102,9 @@ void showLoadingDialog() {
             mainAxisSize: MainAxisSize.min,
             children: const <Widget>[
               Image(
-                width: 72,
-                height: 72,
-                image: AssetImage("assets/images/loading.gif"),
+                width: 120,
+                height: 120,
+                image: AssetImage("assets/images/loading_fine.gif"),
               ),
             ],
           ),

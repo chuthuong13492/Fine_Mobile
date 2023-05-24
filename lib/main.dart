@@ -18,6 +18,7 @@ import 'package:fine/View/profile.dart';
 import 'package:fine/View/sign_in.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/View/store_select_screen.dart';
+import 'package:fine/View/welcome_screen.dart';
 import 'package:fine/ViewModel/startup_viewModel.dart';
 import 'package:fine/setup.dart';
 import 'package:fine/theme/FineTheme/index.dart';
@@ -32,11 +33,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // if (!GetPlatform.isWeb) {
-
+  //   HttpOverrides.global = MyHttpOverrides();
   // }
   HttpOverrides.global = MyHttpOverrides();
+
   await setup();
-  await deleteCart();
   createRouteBindings();
   runApp(MyApp());
 }
@@ -51,15 +52,18 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case RoutHandler.LOGIN:
-            return ScaleRoute(page: const SignIn());
+            return CupertinoPageRoute(
+                builder: (context) => const SignIn(), settings: settings);
+          case RoutHandler.WELCOME_SCREEN:
+            return ScaleRoute(page: const WelcomeScreen());
           case RoutHandler.ONBOARD:
             return ScaleRoute(page: const OnBoardScreen());
-          // case RoutHandler.LOADING:
-          //    return CupertinoPageRoute<bool>(
-          //       builder: (context) => LoadingScreen(
-          //             title: settings.arguments ?? "Đang xử lý...",
-          //           ),
-          //       settings: settings);
+          case RoutHandler.LOADING:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => LoadingScreen(
+                      title: settings.arguments as String ?? "Đang xử lý...",
+                    ),
+                settings: settings);
           case RoutHandler.PROFILE:
             return CupertinoPageRoute(
                 builder: (context) => const ProfileScreen(),

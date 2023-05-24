@@ -9,9 +9,9 @@ class LoadingFine extends StatelessWidget {
       child: Column(
         children: const [
           Image(
-            width: 72,
-            height: 72,
-            image: AssetImage("assets/images/loading.gif"),
+            width: 200,
+            height: 200,
+            image: AssetImage("assets/images/loading_fine.gif"),
           ),
         ],
       ),

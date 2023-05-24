@@ -32,318 +32,309 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModel(
-      model: Get.find<AccountViewModel>(),
-      child: Scaffold(
-        backgroundColor: FineTheme.palettes.shades100,
-        body: SafeArea(
-            child: RefreshIndicator(
-                key: _refreshIndicatorKey,
-                onRefresh: _refresh,
-                child: userInfo())),
-      ),
+    return Scaffold(
+      backgroundColor: FineTheme.palettes.shades100,
+      body: SafeArea(
+          child: RefreshIndicator(
+              key: _refreshIndicatorKey,
+              onRefresh: _refresh,
+              child: userInfo())),
     );
   }
 
   Widget userInfo() {
-    return ScopedModelDescendant<AccountViewModel>(
-      builder: (context, child, model) {
-        final status = model.status;
-        if (status == ViewStatus.Loading) {
-          return const Center(child: LoadingFine());
-        } else if (status == ViewStatus.Error) {
-          return ListView(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(40.0),
-                child: Center(
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        'assets/images/error.png',
-                        fit: BoxFit.contain,
-                        width: 50,
-                        height: 50,
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "Có gì đó sai sai..\n Vui lòng thử lại.",
-                        // style: kTextPrimary,
-                      ),
-                    ],
+    return ScopedModel(
+      model: Get.find<AccountViewModel>(),
+      child: ScopedModelDescendant<AccountViewModel>(
+        builder: (context, child, model) {
+          final status = model.status;
+          if (status == ViewStatus.Loading) {
+            return const Center(child: LoadingFine());
+          } else if (status == ViewStatus.Error || model.currentUser == null) {
+            return ListView(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(40.0),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          'assets/images/error.png',
+                          fit: BoxFit.contain,
+                          width: 50,
+                          height: 50,
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "Có gì đó sai sai..\n Vui lòng thử lại.",
+                          // style: kTextPrimary,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
-          );
-        }
+              ],
+            );
+          }
 
-        return SingleChildScrollView(
-          child: Column(
-            children: [
-              account(),
-              userAccount(model),
-              const SizedBox(
-                height: 4,
-              ),
-              // systemInfo(model)
-            ],
-          ),
-        );
-      },
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                account(model),
+                userAccount(model),
+                const SizedBox(
+                  height: 4,
+                ),
+                // systemInfo(model)
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
-  Widget account() {
-    return ScopedModelDescendant<AccountViewModel>(
-        builder: (context, child, model) {
-      // var vouchers = 0;
-      // if (model.vouchers != null) {
-      //   vouchers = model.vouchers.length;
-      // }
-      return Container(
-        //color: Color(0xFFddf1ed),
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  height: 100,
-                  width: 100,
-                  decoration: BoxDecoration(
-                      color: FineTheme.palettes.primary300,
-                      shape: BoxShape.circle),
-                  child: ClipOval(
-                      child:
-                          CacheImage(imageUrl: model.currentUser!.imageUrl!)),
-                ),
-                const SizedBox(
-                  width: 16,
-                ),
-                Flexible(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        model.currentUser!.name!,
-                        style: FineTheme.typograhpy.h2
-                            .copyWith(color: FineTheme.palettes.primary300),
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      infoDetail("Email: ", color: Colors.grey, list: [
-                        TextSpan(
-                            text: model.currentUser!.email,
-                            style: FineTheme.typograhpy.subtitle2
-                                .copyWith(color: FineTheme.palettes.primary300))
-                      ]),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // infoDetail("Điểm Bean: ", color: Colors.grey, list: [
-                          //   TextSpan(
-                          // text: formatPriceWithoutUnit(
-                          //     model.currentUser.balance),
-                          //       style: Get.theme.textTheme.headline4),
-                          //   WidgetSpan(
-                          //       alignment: PlaceholderAlignment.middle,
-                          //       child: Image(
-                          //         image: AssetImage(
-                          //             "assets/images/icons/bean_coin.png"),
-                          //         width: 20,
-                          //         height: 20,
-                          //       ))
-                          // ]),
-                          infoDetail("Số điện thoại: ",
-                              color: Colors.black,
-                              list: [
-                                TextSpan(
-                                    text: model.currentUser!.phone ?? "-",
-                                    style: FineTheme.typograhpy.subtitle2
-                                        .copyWith(
-                                            color:
-                                                FineTheme.palettes.primary300))
-                              ]),
-                          const SizedBox(
-                            height: 4,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 30),
-                            child: InkWell(
-                              onTap: () async {
-                                showLoadingDialog();
-                                await model.fetchUser(isRefetch: true);
-                                hideDialog();
-                              },
-                              child: Icon(
-                                Icons.replay,
-                                color: FineTheme.palettes.primary300,
-                                size: 26,
-                              ),
+  Widget account(AccountViewModel model) {
+    return Container(
+      //color: Color(0xFFddf1ed),
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Container(
+                height: 100,
+                width: 100,
+                decoration: BoxDecoration(
+                    color: FineTheme.palettes.primary300,
+                    shape: BoxShape.circle),
+                child: ClipOval(
+                    child: CacheImage(imageUrl: model.currentUser!.imageUrl!)),
+              ),
+              const SizedBox(
+                width: 16,
+              ),
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      model.currentUser!.name!,
+                      style: FineTheme.typograhpy.h2
+                          .copyWith(color: FineTheme.palettes.primary300),
+                    ),
+                    const SizedBox(
+                      height: 4,
+                    ),
+                    infoDetail("Email: ", color: Colors.grey, list: [
+                      TextSpan(
+                          text: model.currentUser!.email,
+                          style: FineTheme.typograhpy.subtitle2
+                              .copyWith(color: FineTheme.palettes.primary300))
+                    ]),
+                    const SizedBox(
+                      height: 4,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // infoDetail("Điểm Bean: ", color: Colors.grey, list: [
+                        //   TextSpan(
+                        // text: formatPriceWithoutUnit(
+                        //     model.currentUser.balance),
+                        //       style: Get.theme.textTheme.headline4),
+                        //   WidgetSpan(
+                        //       alignment: PlaceholderAlignment.middle,
+                        //       child: Image(
+                        //         image: AssetImage(
+                        //             "assets/images/icons/bean_coin.png"),
+                        //         width: 20,
+                        //         height: 20,
+                        //       ))
+                        // ]),
+                        infoDetail("Số điện thoại: ",
+                            color: Colors.black,
+                            list: [
+                              TextSpan(
+                                  text: model.currentUser!.phone ?? "-",
+                                  style: FineTheme.typograhpy.subtitle2
+                                      .copyWith(
+                                          color: FineTheme.palettes.primary300))
+                            ]),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 30),
+                          child: InkWell(
+                            onTap: () async {
+                              showLoadingDialog();
+                              await model.fetchUser(isRefetch: true);
+                              hideDialog();
+                            },
+                            child: Icon(
+                              Icons.replay,
+                              color: FineTheme.palettes.primary300,
+                              size: 26,
                             ),
                           ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      // Container(
-                      //   width: 120,
-                      //   padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
-                      //   decoration: BoxDecoration(
-                      //     border: Border.all(color: FineTheme.palettes.primary300),
-                      //     color: Color(0xFFeffff4),
-                      //     borderRadius: BorderRadius.circular(8),
-                      //   ),
-                      //   child: Row(
-                      //     // crossAxisAlignment: CrossAxisAlignment.center,
-                      //     mainAxisAlignment: MainAxisAlignment.center,
-                      //     children: [
-                      //       Image.asset(
-                      //         'assets/images/icon.png',
-                      //         width: 20,
-                      //         height: 20,
-                      //       ),
-                      //       SizedBox(
-                      //         width: 2,
-                      //       ),
-                      //       Text(
-                      //         'Thành viên',
-                      //         style: TextStyle(
-                      //             color: Color(0xFF00ab56),
-                      //             fontSize: 14,
-                      //             fontWeight: FontWeight.bold),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
-                      // infoDetail("Số điện thoại: ", color: Colors.grey, list: [
-                      //   TextSpan(
-                      //       text: model.currentUser!.phone ?? "-",
-                      //       style: FineTheme.typograhpy.subtitle2
-                      //           .copyWith(color: FineTheme.palettes.primary300))
-                      // ]),
-                    ],
-                  ),
-                )
-              ],
-            ),
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 24, right: 24, top: 8),
-            //   child: Container(
-            //     child: Row(
-            //       crossAxisAlignment: CrossAxisAlignment.center,
-            //       mainAxisAlignment: MainAxisAlignment.spaceAround,
-            //       children: [
-            //         // Column(
-            //         //   crossAxisAlignment: CrossAxisAlignment.center,
-            //         //   mainAxisAlignment: MainAxisAlignment.center,
-            //         //   children: [
-            //         //     Row(
-            //         //       crossAxisAlignment: CrossAxisAlignment.center,
-            //         //       mainAxisAlignment: MainAxisAlignment.center,
-            //         //       children: [
-            //         //         Image.asset(
-            //         //           'assets/images/icons/bean_coin.png',
-            //         //           width: 20,
-            //         //           height: 20,
-            //         //         ),
-            //         //         SizedBox(
-            //         //           width: 2,
-            //         //         ),
-            //         //         Text(
-            //         //           'Bean của bạn',
-            //         //           style: TextStyle(
-            //         //               color: Colors.orange,
-            //         //               fontSize: 14,
-            //         //               fontWeight: FontWeight.bold),
-            //         //         ),
-            //         //         // RichText(
-            //         //         //   text: TextSpan(
-            //         //         //       text: 'BEAN: ',
-            //         //         //       style: TextStyle(
-            //         //         //           color: Colors.orange,
-            //         //         //           fontWeight: FontWeight.bold),
-            //         //         //       children: [
-            //         //         //         TextSpan(
-            //         //         //           text: formatPriceWithoutUnit(
-            //         //         //               model.currentUser.balance),
-            //         //         //         ),
-            //         //         //       ]),
-            //         //         // ),
-            //         //       ],
-            //         //     ),
-            //         //     Text(
-            //         //       formatPriceWithoutUnit(model.currentUser.balance),
-            //         //       style: TextStyle(color: Colors.orange),
-            //         //     ),
-            //         //   ],
-            //         // ),
-            //         Container(
-            //           height: 40,
-            //           width: 10,
-            //           child: VerticalDivider(
-            //             color:
-            //                 BeanOiTheme.palettes.neutral400, //color of divider
-            //             width: 10, //width space of divider
-            //             //Spacing at the bottom of divider.
-            //             thickness: 2, //thickness of divier line
-            //             indent: 8, //Spacing at the top of divider.
-            //             endIndent: 8,
-            //           ),
-            //         ),
-            //         InkWell(
-            //           onTap: () {
-            //             Get.toNamed(RouteHandler.VOUCHER_WALLET);
-            //           },
-            //           child: Column(
-            //             crossAxisAlignment: CrossAxisAlignment.center,
-            //             mainAxisAlignment: MainAxisAlignment.center,
-            //             children: [
-            //               Row(
-            //                 mainAxisAlignment: MainAxisAlignment.center,
-            //                 children: [
-            //                   Image.asset(
-            //                     'assets/images/icons/voucher_icon.png',
-            //                     width: 20,
-            //                     height: 20,
-            //                   ),
-            //                   SizedBox(
-            //                     width: 2,
-            //                   ),
-            //                   Text(
-            //                     'Quà và khuyến mãi',
-            //                     style: TextStyle(
-            //                         color: BeanOiTheme.palettes.neutral700,
-            //                         fontSize: 14,
-            //                         fontWeight: FontWeight.bold),
-            //                   ),
-            //                 ],
-            //               ),
-            //               Text(
-            //                 // '$model.vouchers.length',
-            //                 '$vouchers',
-            //                 style: TextStyle(color: kPrimary),
-            //               ),
-            //             ],
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
-          ],
-        ),
-      );
-    });
+                        ),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 4,
+                    ),
+                    // Container(
+                    //   width: 120,
+                    //   padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                    //   decoration: BoxDecoration(
+                    //     border: Border.all(color: FineTheme.palettes.primary300),
+                    //     color: Color(0xFFeffff4),
+                    //     borderRadius: BorderRadius.circular(8),
+                    //   ),
+                    //   child: Row(
+                    //     // crossAxisAlignment: CrossAxisAlignment.center,
+                    //     mainAxisAlignment: MainAxisAlignment.center,
+                    //     children: [
+                    //       Image.asset(
+                    //         'assets/images/icon.png',
+                    //         width: 20,
+                    //         height: 20,
+                    //       ),
+                    //       SizedBox(
+                    //         width: 2,
+                    //       ),
+                    //       Text(
+                    //         'Thành viên',
+                    //         style: TextStyle(
+                    //             color: Color(0xFF00ab56),
+                    //             fontSize: 14,
+                    //             fontWeight: FontWeight.bold),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
+                    // infoDetail("Số điện thoại: ", color: Colors.grey, list: [
+                    //   TextSpan(
+                    //       text: model.currentUser!.phone ?? "-",
+                    //       style: FineTheme.typograhpy.subtitle2
+                    //           .copyWith(color: FineTheme.palettes.primary300))
+                    // ]),
+                  ],
+                ),
+              )
+            ],
+          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(left: 24, right: 24, top: 8),
+          //   child: Container(
+          //     child: Row(
+          //       crossAxisAlignment: CrossAxisAlignment.center,
+          //       mainAxisAlignment: MainAxisAlignment.spaceAround,
+          //       children: [
+          //         // Column(
+          //         //   crossAxisAlignment: CrossAxisAlignment.center,
+          //         //   mainAxisAlignment: MainAxisAlignment.center,
+          //         //   children: [
+          //         //     Row(
+          //         //       crossAxisAlignment: CrossAxisAlignment.center,
+          //         //       mainAxisAlignment: MainAxisAlignment.center,
+          //         //       children: [
+          //         //         Image.asset(
+          //         //           'assets/images/icons/bean_coin.png',
+          //         //           width: 20,
+          //         //           height: 20,
+          //         //         ),
+          //         //         SizedBox(
+          //         //           width: 2,
+          //         //         ),
+          //         //         Text(
+          //         //           'Bean của bạn',
+          //         //           style: TextStyle(
+          //         //               color: Colors.orange,
+          //         //               fontSize: 14,
+          //         //               fontWeight: FontWeight.bold),
+          //         //         ),
+          //         //         // RichText(
+          //         //         //   text: TextSpan(
+          //         //         //       text: 'BEAN: ',
+          //         //         //       style: TextStyle(
+          //         //         //           color: Colors.orange,
+          //         //         //           fontWeight: FontWeight.bold),
+          //         //         //       children: [
+          //         //         //         TextSpan(
+          //         //         //           text: formatPriceWithoutUnit(
+          //         //         //               model.currentUser.balance),
+          //         //         //         ),
+          //         //         //       ]),
+          //         //         // ),
+          //         //       ],
+          //         //     ),
+          //         //     Text(
+          //         //       formatPriceWithoutUnit(model.currentUser.balance),
+          //         //       style: TextStyle(color: Colors.orange),
+          //         //     ),
+          //         //   ],
+          //         // ),
+          //         Container(
+          //           height: 40,
+          //           width: 10,
+          //           child: VerticalDivider(
+          //             color:
+          //                 BeanOiTheme.palettes.neutral400, //color of divider
+          //             width: 10, //width space of divider
+          //             //Spacing at the bottom of divider.
+          //             thickness: 2, //thickness of divier line
+          //             indent: 8, //Spacing at the top of divider.
+          //             endIndent: 8,
+          //           ),
+          //         ),
+          //         InkWell(
+          //           onTap: () {
+          //             Get.toNamed(RouteHandler.VOUCHER_WALLET);
+          //           },
+          //           child: Column(
+          //             crossAxisAlignment: CrossAxisAlignment.center,
+          //             mainAxisAlignment: MainAxisAlignment.center,
+          //             children: [
+          //               Row(
+          //                 mainAxisAlignment: MainAxisAlignment.center,
+          //                 children: [
+          //                   Image.asset(
+          //                     'assets/images/icons/voucher_icon.png',
+          //                     width: 20,
+          //                     height: 20,
+          //                   ),
+          //                   SizedBox(
+          //                     width: 2,
+          //                   ),
+          //                   Text(
+          //                     'Quà và khuyến mãi',
+          //                     style: TextStyle(
+          //                         color: BeanOiTheme.palettes.neutral700,
+          //                         fontSize: 14,
+          //                         fontWeight: FontWeight.bold),
+          //                   ),
+          //                 ],
+          //               ),
+          //               Text(
+          //                 // '$model.vouchers.length',
+          //                 '$vouchers',
+          //                 style: TextStyle(color: kPrimary),
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+        ],
+      ),
+    );
   }
 
   Widget infoDetail(String title,

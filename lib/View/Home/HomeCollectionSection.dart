@@ -47,43 +47,44 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
             if (model.status == ViewStatus.Loading || collections == null) {
               return _buildLoading();
             }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: Text(
+            return Container(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
                     'Bộ Sưu Tập',
                     style:
-                        FineTheme.typograhpy.h2.copyWith(color: Colors.white),
+                        FineTheme.typograhpy.h2.copyWith(color: Colors.black),
                   ),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Column(
-                  children: collections
-                      // .where((element) =>
-                      //     element.isActive == true ||
-                      //     element.products!.isNotEmpty)
-                      .where((element) =>
-                          element.products!
-                              .where((e) => e.isAvailable == true)
-                              .isNotEmpty &&
-                          element.isActive == true)
-                      .map(
-                        (c) => Container(
-                            margin: const EdgeInsets.only(
-                                bottom: 8, left: 12, right: 12),
-                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                            decoration: BoxDecoration(
-                                color: FineTheme.palettes.shades100,
-                                borderRadius: BorderRadius.circular(8)),
-                            child: buildHomeCollection(c)),
-                      )
-                      .toList(),
-                ),
-              ],
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Column(
+                    children: collections
+                        // .where((element) =>
+                        //     element.isActive == true ||
+                        //     element.products!.isNotEmpty)
+                        .where((element) =>
+                            element.products!
+                                .where((e) => e.isAvailable == true)
+                                .isNotEmpty &&
+                            element.isActive == true)
+                        .map(
+                          (c) => Container(
+                              margin: const EdgeInsets.only(
+                                  bottom: 8, left: 12, right: 12),
+                              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                              decoration: BoxDecoration(
+                                  color: FineTheme.palettes.shades100,
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: buildHomeCollection(c)),
+                        )
+                        .toList(),
+                  ),
+                ],
+              ),
             );
           },
         ));
