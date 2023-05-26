@@ -139,9 +139,6 @@ class _HomeStoreSectionState extends State<HomeStoreSection> {
                                         decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10),
-                                          border: Border.all(
-                                              color: FineTheme
-                                                  .palettes.primary100),
                                         ),
                                         width: 112,
                                         height: 112,

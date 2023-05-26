@@ -51,11 +51,11 @@ class MyApp extends StatelessWidget {
       title: 'Fine Delivery',
       onGenerateRoute: (settings) {
         switch (settings.name) {
+          case RoutHandler.WELCOME_SCREEN:
+            return ScaleRoute(page: const WelcomeScreen());
           case RoutHandler.LOGIN:
             return CupertinoPageRoute(
                 builder: (context) => const SignIn(), settings: settings);
-          case RoutHandler.WELCOME_SCREEN:
-            return ScaleRoute(page: const WelcomeScreen());
           case RoutHandler.ONBOARD:
             return ScaleRoute(page: const OnBoardScreen());
           case RoutHandler.LOADING:

@@ -1,8 +1,6 @@
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:get/get.dart';
 
 class WelcomeScreen extends StatelessWidget {

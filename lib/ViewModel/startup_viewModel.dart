@@ -17,10 +17,10 @@ class StartUpViewModel extends BaseModel {
     var hasLoggedInUser = await _accountDAO.isUserLoggedIn();
     bool isFirstOnBoard = await getIsFirstOnboard() ?? true;
     if (isFirstOnBoard) {
-      await Get.find<RootViewModel>().startUp();
+      // await Get.find<RootViewModel>().startUp();
       Get.offAndToNamed(RoutHandler.ONBOARD);
     } else if (hasLoggedInUser) {
-      await Get.find<RootViewModel>().startUp();
+      // await Get.find<RootViewModel>().startUp();
       Get.offAndToNamed(RoutHandler.STORE_SELECT);
     } else {
       Get.offAndToNamed(RoutHandler.WELCOME_SCREEN);
