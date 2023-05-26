@@ -102,9 +102,9 @@ void showLoadingDialog() {
             mainAxisSize: MainAxisSize.min,
             children: const <Widget>[
               Image(
-                width: 72,
-                height: 72,
-                image: AssetImage("assets/images/loading.gif"),
+                width: 120,
+                height: 120,
+                image: AssetImage("assets/images/loading_fine.gif"),
               ),
             ],
           ),
@@ -186,6 +186,148 @@ Future<bool> showErrorDialog(
       ),
       barrierDismissible: true);
   return result;
+}
+
+Future<int> showOptionDialog(String text,
+    {String? firstOption, String? secondOption}) async {
+  // hideDialog();
+  int? option;
+  bool shouldPop = false;
+  await Get.dialog(
+    WillPopScope(
+      onWillPop: () async {
+        return shouldPop;
+      },
+      child: Dialog(
+        backgroundColor: Colors.white,
+        elevation: 8.0,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0))),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: const Icon(
+                      AntDesign.closecircleo,
+                      color: Colors.red,
+                    ),
+                    onPressed: () {
+                      option = 0;
+                      hideDialog();
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 54,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    text,
+                    style: FineTheme.typograhpy.body2
+                        .copyWith(color: FineTheme.palettes.neutral600),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      border: Border(
+                    top: BorderSide(
+                      color: FineTheme.palettes.neutral500,
+                    ),
+                  )),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          // color: Colors.grey,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                              // bottomRight: Radius.circular(16),
+                              bottomLeft: Radius.circular(16),
+                            )),
+                          ),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                            child: Center(
+                              child: Text(
+                                firstOption ?? "Hủy",
+                                style: FineTheme.typograhpy.body2.copyWith(
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            option = 0;
+                            hideDialog();
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: ElevatedButton(
+                          // color: kPrimary,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: FineTheme.palettes.primary200,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                bottomRight: Radius.circular(16),
+                                // bottomLeft: Radius.circular(16),
+                              ),
+                            ),
+                          ),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                            child: Center(
+                              child: Text(
+                                secondOption ?? "Đồng ý",
+                                style: FineTheme.typograhpy.body2.copyWith(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            option = 1;
+                            hideDialog();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const Positioned(
+              top: -30,
+              right: 95,
+              child: Image(
+                image: AssetImage("assets/images/logo.png"),
+                width: 160,
+                height: 160,
+              ),
+            )
+          ],
+        ),
+      ),
+    ),
+    barrierDismissible: true,
+  );
+  return option!;
 }
 
 void hideDialog() {

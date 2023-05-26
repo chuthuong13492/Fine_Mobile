@@ -13,6 +13,8 @@ class HomeViewModel extends BaseModel {
   CollectionDAO? _collectionDAO;
   MenuDAO? _menuDAO;
   ProductDAO? _productDAO;
+  List<SupplierDTO>? supplierList;
+  SupplierDTO? selectedStore;
   // List<CollectionDTO>? homeCollections;
   List<MenuDTO>? homeMenu;
   List<ProductDTO>? productList;
@@ -62,6 +64,30 @@ class HomeViewModel extends BaseModel {
       setState(ViewStatus.Completed);
     } catch (e) {
       homeMenu = null;
+      setState(ViewStatus.Completed);
+    }
+  }
+
+  Future<void> getListSupplier() async {
+    try {
+      setState(ViewStatus.Loading);
+      RootViewModel root = Get.find<RootViewModel>();
+      var currentTimeSlot = root.selectedTimeSlot;
+      // var currentMenu = root.selectedMenu;
+      if (root.status == ViewStatus.Error) {
+        setState(ViewStatus.Error);
+        return;
+      }
+      if (currentTimeSlot == null) {
+        homeMenu = null;
+        setState(ViewStatus.Completed);
+        return;
+      }
+      supplierList = await _storeDAO?.getSuppliers(currentTimeSlot.id!);
+      await Future.delayed(const Duration(microseconds: 500));
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      supplierList = null;
       setState(ViewStatus.Completed);
     }
   }

@@ -1,7 +1,10 @@
 import 'package:fine/ViewModel/startup_viewModel.dart';
+import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
+
+import '../Accessories/index.dart';
 
 class StartUpView extends StatelessWidget {
   const StartUpView({Key? key}) : super(key: key);
@@ -14,40 +17,40 @@ class StartUpView extends StatelessWidget {
           builder: (context, child, model) {
         return Scaffold(
           backgroundColor: Colors.white,
-          body: Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/bgLandingPage.jpg"),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Center(
-              child: Container(
-                width: Get.width,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Image(
-                    //   image: AssetImage("assets/icons/logo.png"),
-                    // ),
-                    // SizedBox(
-                    //   width: 8,
-                    // ),
-                    Text(
-                      "F.i.n.e".toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 34,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'Fira Sans',
-                      ),
-                    )
-                  ],
+          body: Stack(
+            children: [
+              Center(
+                child: Container(
+                  width: 250.0,
+                  color: Colors.white,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const LoadingFine(),
+                        const SizedBox(height: 16),
+                        Text(
+                          "FINE",
+                          style: FineTheme.typograhpy.h1
+                              .copyWith(color: FineTheme.palettes.primary100),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Đặt ngay chờ chi 😎',
+                    style: FineTheme.typograhpy.buttonLg
+                        .copyWith(color: Colors.black),
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       }),
@@ -56,8 +59,8 @@ class StartUpView extends StatelessWidget {
 }
 
 class LoadingScreen extends StatelessWidget {
-  final String title;
-  const LoadingScreen({Key? key, required this.title}) : super(key: key);
+  final String? title;
+  const LoadingScreen({Key? key, this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -69,11 +72,11 @@ class LoadingScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // LoadingBean(),
+              const LoadingFine(),
               const SizedBox(height: 16),
               Text(
-                this.title,
-                style: Get.theme.textTheme.headline1,
+                this.title!,
+                style: FineTheme.typograhpy.h1,
               )
             ],
           ),

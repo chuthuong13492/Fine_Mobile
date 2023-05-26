@@ -8,3 +8,4 @@ export 'CampusDTO.dart';
 export 'OrderDTO.dart';
 export 'SupplierNoteDTO.dart';
 export 'MenuDTO.dart';
+export 'SupplierDTO.dart';

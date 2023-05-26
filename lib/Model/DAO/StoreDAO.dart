@@ -1,5 +1,6 @@
 import 'package:fine/Model/DAO/BaseDAO.dart';
 import 'package:fine/Model/DTO/MetaDataDTO.dart';
+import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/request.dart';
 
 import '../DTO/index.dart';
@@ -30,22 +31,25 @@ class StoreDAO extends BaseDAO {
   //   return null;
   // }
 
-  // Future<List<SupplierDTO>> getSuppliers(int storeId, int menuID,
-  //     {int page, int size}) async {
-  //   final res = await request.get('stores/$storeId/suppliers?menu-id=${menuID}',
-  //       queryParameters: {"size": size ?? DEFAULT_SIZE, "page": page ?? 1});
-  //   var jsonList = res.data["data"] as List;
-  //   //metaDataDTO = MetaDataDTO.fromJson(res.data["metadata"]);
-  //   if (jsonList != null) {
-  //     List<SupplierDTO> list = jsonList
-  //         .map((e) => SupplierDTO.fromJson(e))
-  //         .where((element) => element.available)
-  //         .toList();
-  //     // list.where((element) => element.available == true).toList();
-  //     return list;
-  //   }
-  //   return null;
-  // }
+  Future<List<SupplierDTO>?> getSuppliers(int timeSlotId,
+      {int? page, int? size}) async {
+    final res = await request.get(
+      '/store/timeslot/$timeSlotId',
+      queryParameters: {"size": size ?? DEFAULT_SIZE, "page": page ?? 1},
+    );
+    var jsonList = res.data["data"] as List;
+    //metaDataDTO = MetaDataDTO.fromJson(res.data["metadata"]);
+    if (jsonList != null) {
+      // List<SupplierDTO>? list = jsonList
+      //     .map((e) => SupplierDTO.fromJson(e))
+      //     .where((element) => element.active!)
+      //     .toList();
+      return jsonList.map((e) => SupplierDTO.fromJson(e)).toList();
+      // list.where((element) => element.available == true).toList();
+    }
+    return null;
+  }
+
   Future<List<BlogDTO>?> getBlogs() async {
     final res = await request.get(
       "/blog-post",

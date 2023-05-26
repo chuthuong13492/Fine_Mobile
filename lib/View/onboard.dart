@@ -8,13 +8,14 @@ import 'package:get/get.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
 class OnBoardScreen extends StatefulWidget {
-  OnBoardScreen({Key? key}) : super(key: key);
+  const OnBoardScreen({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _OnBoardScreenState createState() => _OnBoardScreenState();
 }
 
-PageDecoration pageDecoration = PageDecoration(
+PageDecoration pageDecoration = const PageDecoration(
   titleTextStyle: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
   bodyTextStyle: TextStyle(fontSize: 20.0, fontWeight: FontWeight.normal),
   descriptionPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
@@ -60,12 +61,12 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
             Icons.arrow_forward,
             color: primary,
           ),
-          skip: Text(
+          skip: const Text(
             'Bỏ qua',
             style: TextStyle(
                 fontSize: 24.0, fontWeight: FontWeight.bold, color: primary),
           ),
-          done: Text('Xong',
+          done: const Text('Xong',
               style: TextStyle(
                   fontSize: 24.0, fontWeight: FontWeight.bold, color: primary)),
           dotsDecorator: const DotsDecorator(

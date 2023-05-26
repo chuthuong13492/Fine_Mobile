@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:fine/Accessories/dialog.dart';
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/CollectionDTO.dart';
 import 'package:fine/Model/DTO/ProductDTO.dart';
@@ -33,7 +34,7 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
   void initState() {
     super.initState();
     _homeCollectionViewModel = HomeViewModel();
-    _homeCollectionViewModel?.getCollections();
+    Get.find<HomeViewModel>().getCollections();
   }
 
   @override
@@ -43,46 +44,47 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
         child: ScopedModelDescendant<HomeViewModel>(
           builder: (context, child, model) {
             var collections = model.homeMenu;
-            if (model.status == ViewStatus.Loading ||
-                collections == null ||
-                collections?.length == 0) {
+            if (model.status == ViewStatus.Loading || collections == null) {
               return _buildLoading();
             }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: Text(
+            return Container(
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
                     'Bộ Sưu Tập',
                     style:
-                        FineTheme.typograhpy.h2.copyWith(color: Colors.white),
+                        FineTheme.typograhpy.h2.copyWith(color: Colors.black),
                   ),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Column(
-                  children: collections
-                      // .where((element) =>
-                      //     element.isActive == true ||
-                      //     element.products!.isNotEmpty)
-                      .where((element) =>
-                          element.products != null &&
-                          element.products!.isNotEmpty)
-                      .map(
-                        (c) => Container(
-                            margin: const EdgeInsets.only(
-                                bottom: 8, left: 12, right: 12),
-                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
-                            decoration: BoxDecoration(
-                                color: FineTheme.palettes.shades100,
-                                borderRadius: BorderRadius.circular(8)),
-                            child: buildHomeCollection(c)),
-                      )
-                      .toList(),
-                ),
-              ],
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Column(
+                    children: collections
+                        // .where((element) =>
+                        //     element.isActive == true ||
+                        //     element.products!.isNotEmpty)
+                        .where((element) =>
+                            element.products!
+                                .where((e) => e.isAvailable == true)
+                                .isNotEmpty &&
+                            element.isActive == true)
+                        .map(
+                          (c) => Container(
+                              margin: const EdgeInsets.only(
+                                  bottom: 8, left: 12, right: 12),
+                              padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+                              decoration: BoxDecoration(
+                                  color: FineTheme.palettes.shades100,
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: buildHomeCollection(c)),
+                        )
+                        .toList(),
+                  ),
+                ],
+              ),
             );
           },
         ));
@@ -93,14 +95,14 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
     // root.getProductInMenu(collection.id);
     return TouchOpacity(
       onTap: () {
-        // RootViewModel root = Get.find<RootViewModel>();
-        // if (!root.isCurrentMenuAvailable()) {
-        //   showStatusDialog("assets/images/global_error.png", "Opps",
-        //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-        // } else {
-        //   Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
-        //       arguments: {"collection-id": collection.id});
-        // }
+        RootViewModel root = Get.find<RootViewModel>();
+        if (!root.isCurrentTimeSlotAvailable()) {
+          showStatusDialog("assets/images/error.png", "Opps",
+              "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+        } else {
+          Get.toNamed(RoutHandler.PRODUCT_FILTER_LIST,
+              arguments: {'menu': collection.toJson()});
+        }
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -116,7 +118,10 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                     collection.menuName!,
                     style: FineTheme.typograhpy.subtitle1.copyWith(
                         fontFamily: 'Inter',
-                        color: FineTheme.palettes.primary300),
+                        color: Get.find<RootViewModel>()
+                                .isCurrentTimeSlotAvailable()
+                            ? FineTheme.palettes.primary300
+                            : Colors.grey),
                   ),
                   // collection.description != null
                   //     ? Text(
@@ -150,6 +155,9 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                 // model.getProductInMenu(
                 //     collection.id); // root.getProductInMenu(collection.id);
                 // var product = model.productList;
+                var list = collection.products!
+                    .where((element) => element.isAvailable == true)
+                    .toList();
                 return Container(
                   width: Get.width,
                   height: 155,
@@ -158,7 +166,8 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                     separatorBuilder: (context, index) =>
                         SizedBox(width: FineTheme.spacing.xs),
                     itemBuilder: (context, index) {
-                      var product = collection.products![index];
+                      var product = list[index];
+
                       return Material(
                         color: Colors.white,
                         child: TouchOpacity(
@@ -181,7 +190,7 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                       );
                     },
                     // itemCount: collection.products!.length,
-                    itemCount: collection.products!.length,
+                    itemCount: list.length,
                   ),
                 );
               },
@@ -213,9 +222,10 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
                     : Colors.grey,
                 BlendMode.saturation,
               ),
-              child: const CacheImage(
-                imageUrl:
-                    'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908',
+              child: CacheImage(
+                imageUrl: product.imageUrl == null
+                    ? 'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908'
+                    : product.imageUrl!,
               ),
             ),
           ),
@@ -240,8 +250,10 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
               // product.type != ProductType.MASTER_PRODUCT
               //     ? '${formatPriceWithoutUnit(product.price!)} đ'
               //     : 'từ ${formatPriceWithoutUnit(product.minPrice! ?? product.price!)} đ',
-              style: FineTheme.typograhpy.caption1
-                  .copyWith(color: FineTheme.palettes.primary300),
+              style: FineTheme.typograhpy.caption1.copyWith(
+                  color: Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
+                      ? FineTheme.palettes.primary300
+                      : Colors.grey),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -294,30 +306,44 @@ Widget _buildLoading() {
         ),
         const SizedBox(height: 8),
         Container(
+          padding: const EdgeInsets.only(bottom: 8),
           width: Get.width,
-          height: 155,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              ShimmerBlock(
+          height: 120,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) {
+              return const ShimmerBlock(
                 height: 110,
                 width: 110,
                 borderRadius: 16,
-              ),
-              SizedBox(width: 8),
-              ShimmerBlock(
-                height: 110,
-                width: 110,
-                borderRadius: 16,
-              ),
-              SizedBox(width: 8),
-              ShimmerBlock(
-                height: 110,
-                width: 110,
-                borderRadius: 16,
-              ),
-            ],
+              );
+            },
+            separatorBuilder: (context, index) =>
+                SizedBox(width: FineTheme.spacing.xs),
+            itemCount: 4,
           ),
+          // child: Row(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: const [
+          //     ShimmerBlock(
+          //       height: 110,
+          //       width: 110,
+          //       borderRadius: 16,
+          //     ),
+          //     SizedBox(width: 8),
+          //     ShimmerBlock(
+          //       height: 110,
+          //       width: 110,
+          //       borderRadius: 16,
+          //     ),
+          //     SizedBox(width: 8),
+          //     ShimmerBlock(
+          //       height: 110,
+          //       width: 110,
+          //       borderRadius: 16,
+          //     ),
+          //   ],
+          // ),
         ),
       ],
     ),

@@ -2,12 +2,17 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fine/Accessories/draggable_bottom_sheet.dart';
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/View/Home/HomeCategorySection.dart';
 import 'package:fine/View/Home/HomeCollectionSection.dart';
-import 'package:fine/View/Home/HomeTimeSlotsSection.dart';
+import 'package:fine/View/Home/HomeSpecificMenuSection.dart';
+import 'package:fine/View/Home/HomeStoreSection.dart';
+import 'package:fine/View/Home/HomeMenuSection.dart';
+import 'package:fine/View/Home/HomeVoucherSection.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
+import 'package:fine/ViewModel/orderHistory_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/fixed_app_bar.dart';
@@ -41,132 +46,117 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              FineTheme.palettes.primary200,
-              // FineTheme.palettes.primary200.withOpacity(0.7),
-              // FineTheme.palettes.primary200.withOpacity(0.6),
-              // FineTheme.palettes.primary200.withOpacity(0.5),
-              // FineTheme.palettes.primary200.withOpacity(0.4),
-              FineTheme.palettes.primary200.withOpacity(0.1),
-              // FineTheme.palettes.shades100.withOpacity(0.2),
-              // FineTheme.palettes.shades100.withOpacity(0.2),
-
-              // FineTheme.palettes.shades100,
-            ]),
-      ),
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.transparent,
-        body: SafeArea(
-          // ignore: sized_box_for_whitespace
-          child: Container(
-            // color: FineTheme.palettes.primary100,
-            height: Get.height,
-            child: ScopedModel(
-              model: Get.find<HomeViewModel>(),
-              child: Stack(
-                children: [
-                  Column(
-                    children: [
-                      FixedAppBar(
-                        notifier: notifier,
-                        height: HEIGHT,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.only(top: 0),
-                          child: RefreshIndicator(
-                            key: _refreshIndicatorKey,
-                            onRefresh: _refresh,
-                            child: ScopedModelDescendant<HomeViewModel>(
-                                builder: (context, child, model) {
-                              if (model.status == ViewStatus.Error) {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const Center(
-                                      child: Text(
-                                        "Fine đã cố gắng hết sức ..\nNhưng vẫn bị con quỷ Bug đánh bại.",
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontStyle: FontStyle.normal,
-                                            fontFamily: 'Montserrat',
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    // ignore: sized_box_for_whitespace
-                                    Container(
-                                      width: 300,
-                                      height: 300,
-                                      child: Image.asset(
-                                        'assets/images/error.png',
-                                        fit: BoxFit.contain,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    const Center(
-                                      child: Text(
-                                        "Bạn vui lòng thử một số cách sau nhé!",
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    const Center(
-                                      child: Text(
-                                        "1. Tắt ứng dụng và mở lại",
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    const Center(
-                                      child: InkWell(
-                                        child: Text(
-                                          "2. Đặt hàng qua Fanpage ",
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        // onTap: () =>
-                                        //     launch('fb://page/103238875095890'),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              } else {
-                                return Container(
-                                  // color: FineTheme.palettes.neutral200,
-                                  child:
-                                      NotificationListener<ScrollNotification>(
-                                    onNotification: (n) {
-                                      if (n.metrics.pixels <= HEIGHT) {
-                                        notifier.value = n.metrics.pixels;
-                                      }
-                                      return false;
-                                    },
-                                    child: SingleChildScrollView(
-                                      child: Column(
-                                        // addAutomaticKeepAlives: true,
-                                        children: [
-                                          ...renderHomeSections().toList(),
-                                        ],
-                                      ),
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: FineTheme.palettes.shades100,
+      body: SafeArea(
+        // ignore: sized_box_for_whitespace
+        child: Container(
+          // color: FineTheme.palettes.primary100,
+          height: Get.height,
+          child: ScopedModel(
+            model: Get.find<HomeViewModel>(),
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    FixedAppBar(
+                      notifier: notifier,
+                      height: HEIGHT,
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.only(top: 0),
+                        child: RefreshIndicator(
+                          key: _refreshIndicatorKey,
+                          onRefresh: _refresh,
+                          child: ScopedModelDescendant<HomeViewModel>(
+                              builder: (context, child, model) {
+                            if (model.status == ViewStatus.Error) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  const Center(
+                                    child: Text(
+                                      "Fine đã cố gắng hết sức ..\nNhưng vẫn bị con quỷ Bug đánh bại.",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontStyle: FontStyle.normal,
+                                          fontFamily: 'Montserrat',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 14),
                                     ),
                                   ),
-                                );
-                              }
-                            }),
-                          ),
+                                  const SizedBox(height: 8),
+                                  // ignore: sized_box_for_whitespace
+                                  Container(
+                                    width: 300,
+                                    height: 300,
+                                    child: Image.asset(
+                                      'assets/images/error.png',
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Center(
+                                    child: Text(
+                                      "Bạn vui lòng thử một số cách sau nhé!",
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Center(
+                                    child: Text(
+                                      "1. Tắt ứng dụng và mở lại",
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const Center(
+                                    child: InkWell(
+                                      child: Text(
+                                        "2. Đặt hàng qua Fanpage ",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      // onTap: () =>
+                                      //     launch('fb://page/103238875095890'),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            } else {
+                              return Container(
+                                // color: FineTheme.palettes.neutral200,
+                                child: NotificationListener<ScrollNotification>(
+                                  onNotification: (n) {
+                                    if (n.metrics.pixels <= HEIGHT) {
+                                      notifier.value = n.metrics.pixels;
+                                    }
+                                    return false;
+                                  },
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      // addAutomaticKeepAlives: true,
+                                      children: [
+                                        ...renderHomeSections().toList(),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          }),
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+                Positioned(
+                  left: 0,
+                  bottom: 0,
+                  child: buildNewOrder(),
+                ),
+              ],
             ),
           ),
         ),
@@ -177,16 +167,66 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> renderHomeSections() {
     return [
       banner(),
-      const SizedBox(height: 8),
+      const SizedBox(height: 18),
       // ignore: prefer_const_constructors
-      HomeTimeSlotsSection(),
+      HomeMenuSection(),
       // const SizedBox(height: 8),
       // ignore: prefer_const_constructors
-      HomeCategorySection(),
-      HomeCollectionSection(),
+      // HomeCategorySection(),
+      // const SizedBox(height: 8),
+      interalBanner(),
+
+      const SizedBox(height: 16),
+      const HomeSpecifiHomeSection(),
+      const HomeVoucherSection(),
+      const HomeCollectionSection(),
+      Container(
+        height: 14,
+        color: FineTheme.palettes.primary50,
+      ),
+      const HomeStoreSection(),
       // HomeCategory(),
       // timeRecieve(),
     ];
+  }
+
+  Widget interalBanner() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 15, 18, 15),
+      decoration: BoxDecoration(
+          // borderRadius: BorderRadius.circular(20),
+          color: FineTheme.palettes.primary50),
+      child: Container(
+        height: (Get.width) * (700 / 1914),
+        width: (Get.width),
+        child: CachedNetworkImage(
+          imageUrl:
+              'https://st4.depositphotos.com/4590583/30886/i/450/depositphotos_308863366-stock-photo-cooking-banner-food-top-view.jpg',
+          imageBuilder: (context, imageProvider) {
+            return InkWell(
+              onTap: () {
+                // Get.toNamed(RouteHandler.BANNER_DETAIL,
+                //     arguments: model.blogs[index]);
+              },
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: Container(
+                  margin: const EdgeInsets.only(left: 8, right: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(35),
+                    color: Colors.blue,
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
   }
 
   Widget banner() {
@@ -204,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ShimmerBlock(
-                      height: (Get.width) * (747 / 1914),
+                      height: (Get.width) * (817 / 1914),
                       width: (Get.width),
                     ),
                   );
@@ -215,9 +255,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (model.blogs == null || model.blogs!.isEmpty) {
                     return const SizedBox.shrink();
                   }
+                  var listBlog = model.blogs!
+                      .where((element) => element.active == true)
+                      .toList();
                   // ignore: sized_box_for_whitespace
                   return Container(
-                    height: (Get.width) * (747 / 1914),
+                    height: (Get.width) * (817 / 1914),
                     width: (Get.width),
                     // margin: EdgeInsets.only(bottom: 8, top: 8),
                     child: Swiper(
@@ -230,10 +273,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         viewportFraction: 0.9,
                         pagination: const SwiperPagination(
                             alignment: Alignment.bottomCenter),
-                        itemCount: model.blogs!.length,
+                        itemCount: listBlog.length,
                         itemBuilder: (context, index) {
-                          if (model.blogs![index].imageUrl == null ||
-                              model.blogs![index].imageUrl == "")
+                          if (listBlog[index].imageUrl == null ||
+                              listBlog[index].imageUrl == "")
                             // ignore: curly_braces_in_flow_control_structures
                             return Icon(
                               MaterialIcons.broken_image,
@@ -242,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
 
                           return CachedNetworkImage(
-                            imageUrl: model.blogs![index].imageUrl!,
+                            imageUrl: listBlog[index].imageUrl!,
                             imageBuilder: (context, imageProvider) => InkWell(
                               onTap: () {
                                 // Get.toNamed(RouteHandler.BANNER_DETAIL,
@@ -254,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   margin:
                                       const EdgeInsets.only(left: 8, right: 8),
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
+                                    borderRadius: BorderRadius.circular(35),
                                     color: Colors.blue,
                                     image: DecorationImage(
                                       image: imageProvider,
@@ -286,5 +329,102 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
         ));
+  }
+
+  void _onTapOrderHistory(order) async {
+    // get orderDetail
+    await Get.find<OrderHistoryViewModel>().getOrders();
+    await Get.toNamed(RoutHandler.ORDER_HISTORY_DETAIL, arguments: order);
+  }
+
+  Widget buildNewOrder() {
+    RootViewModel root = Get.find<RootViewModel>();
+    final campus = root.currentStore;
+    return ScopedModel<OrderHistoryViewModel>(
+      model: Get.find<OrderHistoryViewModel>(),
+      child: ScopedModelDescendant<OrderHistoryViewModel>(
+          builder: (context, child, model) {
+        if (model.status == ViewStatus.Loading ||
+            model.newTodayOrders == null) {
+          return const SizedBox();
+        }
+        return Container(
+          width: Get.width,
+          height: 80,
+          child: Card(
+            margin: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+            elevation: 3,
+            child: AnimatedContainer(
+              duration: const Duration(seconds: 2),
+              decoration: BoxDecoration(
+                  border: Border(
+                      left: BorderSide(
+                          color: FineTheme.palettes.primary300, width: 3))),
+              width: Get.width * 0.95,
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onTap: () {
+                          _onTapOrderHistory(model.newTodayOrders);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  // Text(
+                                  //   model.newTodayOrders!.id!.toString(),
+                                  //   style: FineTheme.typograhpy.subtitle2,
+                                  // ),
+                                  // const SizedBox(height: 8),
+                                  Text('Đơn hàng mới',
+                                      style: FineTheme.typograhpy.caption1)
+                                ],
+                              ),
+                              const SizedBox(width: 24),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      campus!.name!,
+                                      style: FineTheme.typograhpy.caption1,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text('Nhận đơn tại',
+                                        style: FineTheme.typograhpy.caption1)
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Get.find<OrderHistoryViewModel>()
+                            .closeNewOrder(model.newTodayOrders!.id);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }),
+    );
   }
 }

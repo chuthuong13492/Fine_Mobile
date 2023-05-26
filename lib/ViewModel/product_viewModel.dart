@@ -12,8 +12,8 @@ import 'package:get/get.dart';
 import 'base_model.dart';
 
 class ProductDetailViewModel extends BaseModel {
-  Color minusColor = FineTheme.palettes.primary300;
-  Color addColor = FineTheme.palettes.primary300;
+  Color minusColor = FineTheme.palettes.primary100;
+  Color addColor = FineTheme.palettes.primary100;
   int? affectIndex = 0;
   //List product ảnh hưởng giá
   Map<String, List<String>>? affectPriceContent;
@@ -29,8 +29,9 @@ class ProductDetailViewModel extends BaseModel {
   bool? isExtra;
   //List size
   ProductDTO? master;
+  Cart? currentCart;
 
-  ProductDetailViewModel(ProductDTO? dto) {
+  ProductDetailViewModel({ProductDTO? dto}) {
     master = dto;
     isExtra = false;
 
@@ -65,7 +66,7 @@ class ProductDetailViewModel extends BaseModel {
     // // total = fixTotal + extraTotal;
     total = fixTotal;
 
-    // verifyOrder();
+    verifyOrder();
     notifyListeners();
   }
 
@@ -78,9 +79,9 @@ class ProductDetailViewModel extends BaseModel {
   // }
 
   void addQuantity() {
-    if (addColor == FineTheme.palettes.primary300) {
+    if (addColor == FineTheme.palettes.primary100) {
       if (count == 1) {
-        minusColor = FineTheme.palettes.primary300;
+        minusColor = FineTheme.palettes.primary100;
       }
       count++;
 
@@ -195,20 +196,20 @@ class ProductDetailViewModel extends BaseModel {
     notifyListeners();
   }
 
-  // void verifyOrder() {
-  //   order = true;
+  void verifyOrder() {
+    order = true;
 
-  //   for (int i = 0; i < affectPriceContent.keys.toList().length; i++) {
-  //     if (selectedAttributes[affectPriceContent.keys.elementAt(i)] == null) {
-  //       order = false;
-  //     }
-  //   }
+    for (int i = 0; i < affectPriceContent!.keys.toList().length; i++) {
+      if (selectedAttributes![affectPriceContent!.keys.elementAt(i)] == null) {
+        order = false;
+      }
+    }
 
-  //   if (order) {
-  //     addColor = kPrimary;
-  //   }
-  //   // setState(ViewStatus.Completed);
-  // }
+    if (order!) {
+      addColor = FineTheme.palettes.primary100;
+    }
+    // setState(ViewStatus.Completed);
+  }
 
   // void changExtra(bool value, int i) {
   //   extraTotal = 0;
@@ -226,7 +227,6 @@ class ProductDetailViewModel extends BaseModel {
   Future<void> addProductToCart({bool backToHome = true}) async {
     showLoadingDialog();
     bool showOnHome = Get.find<bool>(tag: "showOnHome");
-    List<ProductDTO> listChoices = [];
     // if (master.type == ProductType.MASTER_PRODUCT) {
     //   Map choice = new Map();
     //   for (int i = 0; i < affectPriceContent.keys.toList().length; i++) {
@@ -248,7 +248,9 @@ class ProductDetailViewModel extends BaseModel {
     // }
 
     String description = "";
-    CartItem item = new CartItem(master, listChoices, description, count);
+    // Cart newCart = Cart(5, '0902915671', 4);
+
+    CartItem item = new CartItem(master!.id, 0, count, null);
 
     // if (master.type == ProductType.GIFT_PRODUCT) {
     //   AccountViewModel account = Get.find<AccountViewModel>();
@@ -258,7 +260,6 @@ class ProductDetailViewModel extends BaseModel {
 
     //   double totalBean = account.currentUser.point;
 
-    //   Cart cart = showOnHome ? await getCart() : await getMart();
     //   if (cart != null) {
     //     cart.items.forEach((element) {
     //       if (element.master.type == ProductType.GIFT_PRODUCT) {
@@ -277,14 +278,16 @@ class ProductDetailViewModel extends BaseModel {
     // print("Item: " + item.master.productInMenuId.toString());
 
     showOnHome ? await addItemToCart(item) : await addItemToMart(item);
+    // Cart? currentCart = await getCart();
+    // cart.addItem(item);
     await AnalyticsService.getInstance()!
-        .logChangeCart(item.master!, item.quantity, true);
+        .logChangeCart(master!, item.quantity, true);
     hideDialog();
     if (backToHome) {
-      // Get.find<OrderViewModel>().prepareOrder();
+      Get.find<OrderViewModel>().prepareOrder();
       // Get.back(result: true);
     } else {
-      // Get.find<OrderViewModel>().prepareOrder();
+      Get.find<OrderViewModel>().prepareOrder();
     }
   }
 }

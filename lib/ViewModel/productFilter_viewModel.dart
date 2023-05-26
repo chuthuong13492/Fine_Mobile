@@ -7,9 +7,9 @@ import '../Model/DTO/index.dart';
 class ProductFilterViewModel extends BaseModel {
   List<ProductDTO>? listProducts;
   ProductDAO? _productDAO;
-  CategoryDAO? _categoryDAO = CategoryDAO();
+  CategoryDAO? _categoryDAO;
   List<CategoryDTO>? categories;
-
+  MenuDTO? menuDTO;
   // PARAM
   // PRODUCT-NAME
   // CATEGORY
@@ -22,7 +22,7 @@ class ProductFilterViewModel extends BaseModel {
   }
 
   Map<String, dynamic> get params => _params;
-  List get categoryParams => _params['category-id'] ?? [];
+  // List get categoryParams => _params['id'] ?? [];
 
   setParam(Map<String, dynamic> param) {
     _params.addAll(param);
@@ -30,12 +30,12 @@ class ProductFilterViewModel extends BaseModel {
     notifyListeners();
   }
 
-  Future getProductsWithFilter() async {
+  Future<void> getProductsWithFilter({int? id}) async {
     // RootViewModel root = Get.find<RootViewModel>();
     // MenuDTO currentMenu = root.selectedMenu;
     try {
-      // print("Filter param");
-      // print(params);
+      print("Filter param");
+      print(params);
       setState(ViewStatus.Loading);
       // CampusDTO currentStore = await getStore();
       // var products = await _productDAO.getAllProductOfStore(
@@ -44,7 +44,22 @@ class ProductFilterViewModel extends BaseModel {
       //   params: this.params,
       // );
       // listProducts = products;
+      if (params["menu"] != null) {
+        var products =
+            await _productDAO?.getProductsByMenuId(params["menu"]["id"]);
+        listProducts =
+            products!.where((element) => element.isAvailable!).toList();
+        params.clear();
+      }
+      if (params["store"] != null) {
+        var products = await _productDAO
+            ?.getProductsInMenuByStoreId(params["store"]["id"]);
+        listProducts =
+            products!.where((element) => element.isAvailable!).toList();
+        params.clear();
+      }
       setState(ViewStatus.Completed);
+      notifyListeners();
     } catch (e) {
       setState(ViewStatus.Error, e.toString());
     }

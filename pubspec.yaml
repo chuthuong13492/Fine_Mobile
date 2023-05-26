@@ -48,6 +48,9 @@ dependencies:
   flutter_neumorphic: ^3.2.0
   smooth_page_indicator: ^1.0.1
   logger: ^1.2.2
+  scroll_to_index: ^3.0.1
+  collection: ^1.17.0
+  # url_launcher: ^6.1.10
 
 dependency_overrides:
   firebase_auth_platform_interface: 6.11.7
@@ -67,26 +70,26 @@ flutter:
   - assets/images/
 
   fonts:
-    - family: Fira Sans
+    - family: Montserrat
       fonts:
-        - asset: assets/fonts/FiraSans-Black.ttf
-        - asset: assets/fonts/FiraSans-BlackItalic.ttf
-        - asset: assets/fonts/FiraSans-Bold.ttf
-        - asset: assets/fonts/FiraSans-BoldItalic.ttf
-        - asset: assets/fonts/FiraSans-ExtraBold.ttf
-        - asset: assets/fonts/FiraSans-ExtraBoldItalic.ttf
-        - asset: assets/fonts/FiraSans-ExtraLight.ttf
-        - asset: assets/fonts/FiraSans-ExtraLightItalic.ttf
-        - asset: assets/fonts/FiraSans-Italic.ttf
-        - asset: assets/fonts/FiraSans-Light.ttf
-        - asset: assets/fonts/FiraSans-LightItalic.ttf
-        - asset: assets/fonts/FiraSans-Medium.ttf
-        - asset: assets/fonts/FiraSans-MediumItalic.ttf
-        - asset: assets/fonts/FiraSans-Regular.ttf
-        - asset: assets/fonts/FiraSans-SemiBold.ttf
-        - asset: assets/fonts/FiraSans-SemiBoldItalic.ttf
-        - asset: assets/fonts/FiraSans-Thin.ttf
-        - asset: assets/fonts/FiraSans-ThinItalic.ttf
+        - asset: assets/fonts/Montserrat-Black.ttf
+        - asset: assets/fonts/Montserrat-BlackItalic.ttf
+        - asset: assets/fonts/Montserrat-Bold.ttf
+        - asset: assets/fonts/Montserrat-BoldItalic.ttf
+        - asset: assets/fonts/Montserrat-ExtraBold.ttf
+        - asset: assets/fonts/Montserrat-ExtraBoldItalic.ttf
+        - asset: assets/fonts/Montserrat-ExtraLight.ttf
+        - asset: assets/fonts/Montserrat-ExtraLightItalic.ttf
+        - asset: assets/fonts/Montserrat-Italic.ttf
+        - asset: assets/fonts/Montserrat-Light.ttf
+        - asset: assets/fonts/Montserrat-LightItalic.ttf
+        - asset: assets/fonts/Montserrat-Medium.ttf
+        - asset: assets/fonts/Montserrat-MediumItalic.ttf
+        - asset: assets/fonts/Montserrat-Regular.ttf
+        - asset: assets/fonts/Montserrat-SemiBold.ttf
+        - asset: assets/fonts/Montserrat-SemiBoldItalic.ttf
+        - asset: assets/fonts/Montserrat-Thin.ttf
+        - asset: assets/fonts/Montserrat-ThinItalic.ttf
 
 
 

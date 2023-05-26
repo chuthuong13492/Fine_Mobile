@@ -5,6 +5,11 @@ class RoutHandler {
   static const String ONBOARD = "/onboard";
   static const String LOADING = "/loading";
   static const String PRODUCT_DETAIL = "/product_detail";
-
+  static const String ORDER = "/order";
+  static const String PROFILE = "/profile";
+  static const String STORE_SELECT = "/store_select";
+  static const String ORDER_HISTORY = "/order_history";
+  static const String ORDER_HISTORY_DETAIL = "/order_detail";
   static const String PRODUCT_FILTER_LIST = "/product_filter_list";
+  static const String WELCOME_SCREEN = "/welcome_screen";
 }

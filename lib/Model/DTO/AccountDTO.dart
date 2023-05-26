@@ -6,10 +6,10 @@ class AccountDTO {
   String? phone;
   DateTime? dateOfBirth;
   String? imageUrl;
-  int? campusId;
-  int? campusInfoId;
-  String? createAt;
-  String? updateAt;
+  int? universityId;
+  int? uniInfoId;
+  DateTime? createAt;
+  DateTime? updateAt;
 
   AccountDTO(
       {this.id,
@@ -19,40 +19,48 @@ class AccountDTO {
       this.phone,
       this.dateOfBirth,
       this.imageUrl,
-      this.campusId,
-      this.campusInfoId,
+      this.universityId,
+      this.uniInfoId,
       this.createAt,
       this.updateAt});
 
   AccountDTO.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    name = json['name'];
-    customerCode = json['customerCode'];
-    email = json['email'];
-    phone = json['phone'];
+    id = json["id"];
+    name = json["name"];
+    customerCode = json["customerCode"];
+    email = json["email"];
+    phone = json["phone"];
     dateOfBirth = json['dateOfBirth'] as String != null
         ? DateTime.parse(json['dateOfBirth'] as String)
         : null;
-    imageUrl = json['imageUrl'];
-    campusId = json['campusId'];
-    campusInfoId = json['campusInfoId'];
-    createAt = json['createAt'];
-    updateAt = json['updateAt'];
+    imageUrl = json["imageUrl"];
+    universityId = json["universityId"];
+    uniInfoId = json["uniInfoId"];
+    createAt = json['createAt'] as String != null
+        ? DateTime.parse(json['createAt'] as String)
+        : null;
+    updateAt = json['updateAt'] as String != null
+        ? DateTime.parse(json['updateAt'] as String)
+        : null;
+  }
+
+  static List<AccountDTO> fromList(List<Map<String, dynamic>> list) {
+    return list.map((map) => AccountDTO.fromJson(map)).toList();
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['name'] = this.name;
-    data['customerCode'] = this.customerCode;
-    data['email'] = this.email;
-    data['phone'] = this.phone;
-    data['dateOfBirth'] = this.dateOfBirth.toString();
-    data['imageUrl'] = this.imageUrl;
-    data['campusId'] = this.campusId;
-    data['campusInfoId'] = this.campusInfoId;
-    data['createAt'] = this.createAt;
-    data['updateAt'] = this.updateAt;
-    return data;
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["name"] = name;
+    _data["customerCode"] = customerCode;
+    _data["email"] = email;
+    _data["phone"] = phone;
+    _data["dateOfBirth"] = dateOfBirth;
+    _data["imageUrl"] = imageUrl;
+    _data["universityId"] = universityId;
+    _data["uniInfoId"] = uniInfoId;
+    _data["createAt"] = createAt;
+    _data["updateAt"] = updateAt;
+    return _data;
   }
 }
