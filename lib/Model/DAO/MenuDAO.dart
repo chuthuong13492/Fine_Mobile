@@ -7,7 +7,7 @@ class MenuDAO extends BaseDAO {
       {Map<String, dynamic> params = const {}}) async {
     final res = await request.get(
       // 'collections?menu-id=${menuId}',
-      '/menu/timeslot/${timeSlotId}/product',
+      '/menu/timeslot/${timeSlotId}',
       queryParameters: params,
     );
     if (res.data["data"] != null) {

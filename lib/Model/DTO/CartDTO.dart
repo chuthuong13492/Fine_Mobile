@@ -224,7 +224,7 @@ class CartItem {
     _data["productInMenuId"] = productInMenuId;
     _data["comboId"] = comboId;
     _data["quantity"] = quantity;
-    _data["note"] = note ?? null;
+    _data["note"] = note ?? "";
     return _data;
   }
 }

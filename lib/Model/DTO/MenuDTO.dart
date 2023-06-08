@@ -4,6 +4,7 @@ class MenuDTO {
   int? id;
   int? timeSlotId;
   String? menuName;
+  String? imgUrl;
   bool? isActive;
   DateTime? createAt;
   DateTime? updateAt;
@@ -13,6 +14,7 @@ class MenuDTO {
       {this.id,
       this.timeSlotId,
       this.menuName,
+      this.imgUrl,
       this.isActive,
       this.createAt,
       this.updateAt,
@@ -22,6 +24,7 @@ class MenuDTO {
     id = json["id"];
     timeSlotId = json["timeSlotId"];
     menuName = json["menuName"];
+    imgUrl = json["imgUrl"];
     isActive = json["isActive"];
     createAt = json['createAt'] as String != null
         ? DateTime.parse(json['createAt'] as String)
@@ -45,6 +48,7 @@ class MenuDTO {
     _data["id"] = id;
     _data["timeSlotId"] = timeSlotId;
     _data["menuName"] = menuName;
+    _data["imgUrl"] = imgUrl;
     _data["isActive"] = isActive;
     _data["createAt"] = createAt;
     _data["updateAt"] = updateAt;

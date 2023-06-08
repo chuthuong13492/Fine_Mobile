@@ -48,7 +48,7 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: DefaultAppBar(
-        title: "Danh sách sản phẩm",
+        title: widget.params["menu"]["menuName"],
       ),
       body: RefreshIndicator(
         key: _refreshIndicatorKey,

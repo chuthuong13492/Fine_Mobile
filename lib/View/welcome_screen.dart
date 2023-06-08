@@ -58,7 +58,7 @@ class WelcomeScreen extends StatelessWidget {
               right: 18,
               child: InkWell(
                 onTap: () {
-                  Get.offAndToNamed(RoutHandler.LOGIN);
+                  Get.toNamed(RoutHandler.LOGIN);
                 },
                 child: Image.asset(
                   "assets/icons/icon_right.png",
