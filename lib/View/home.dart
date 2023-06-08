@@ -168,26 +168,60 @@ class _HomeScreenState extends State<HomeScreen> {
     return [
       banner(),
       const SizedBox(height: 18),
-      // ignore: prefer_const_constructors
-      HomeMenuSection(),
-      // const SizedBox(height: 8),
-      // ignore: prefer_const_constructors
-      // HomeCategorySection(),
-      // const SizedBox(height: 8),
+      const HomeMenuSection(),
       interalBanner(),
-
-      const SizedBox(height: 16),
       const HomeSpecifiHomeSection(),
-      const HomeVoucherSection(),
-      const HomeCollectionSection(),
-      Container(
-        height: 14,
-        color: FineTheme.palettes.primary50,
-      ),
+      buildVoucherSection(),
       const HomeStoreSection(),
-      // HomeCategory(),
-      // timeRecieve(),
     ];
+  }
+
+  Widget buildVoucherSection() {
+    return ScopedModel(
+        model: Get.find<HomeViewModel>(),
+        child: ScopedModelDescendant<HomeViewModel>(
+          builder: (context, child, model) {
+            ViewStatus status = model.status;
+            if (status == ViewStatus.Loading) {
+              return const SizedBox.shrink();
+            }
+            return InkWell(
+              onTap: () {},
+              child: Container(
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                color: FineTheme.palettes.primary50,
+                height: 78,
+                width: Get.width,
+                child: Container(
+                  height: 50,
+                  padding: const EdgeInsets.only(top: 17, bottom: 17),
+                  color: FineTheme.palettes.primary100,
+                  child: Center(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          "assets/icons/voucher.png",
+                          width: 20,
+                          height: 16,
+                        ),
+                        const SizedBox(
+                          width: 24,
+                        ),
+                        Text(
+                          "Bạn ơi mã giảm giá đang vẫy gọi bạn nè !",
+                          style: FineTheme.typograhpy.subtitle2
+                              .copyWith(color: FineTheme.palettes.shades100),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ));
   }
 
   Widget interalBanner() {
@@ -213,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   margin: const EdgeInsets.only(left: 8, right: 8),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(35),
+                    borderRadius: BorderRadius.circular(20),
                     color: Colors.blue,
                     image: DecorationImage(
                       image: imageProvider,

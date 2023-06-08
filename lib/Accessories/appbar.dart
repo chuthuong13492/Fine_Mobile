@@ -40,13 +40,13 @@ class _AppBarSate extends State<DefaultAppBar> {
                     Get.back();
                   },
                   child: Icon(Icons.arrow_back_ios,
-                      size: 20, color: FineTheme.palettes.primary300),
+                      size: 20, color: FineTheme.palettes.primary100),
                 ),
               ),
             ),
       title: Text(widget.title!.toUpperCase(),
           style: FineTheme.typograhpy.h2
-              .copyWith(color: FineTheme.palettes.primary300)),
+              .copyWith(color: FineTheme.palettes.primary100)),
     );
   }
 }

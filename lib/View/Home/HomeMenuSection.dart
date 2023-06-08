@@ -1,5 +1,7 @@
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/ViewModel/category_viewModel.dart';
+import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
@@ -29,7 +31,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
   void initState() {
     super.initState();
     // scrollController.dispose();
-    _rootViewModel = RootViewModel();
+    _rootViewModel = Get.find<RootViewModel>();
     // Get.find<CategoryViewModel>().getCategories();
     Get.find<RootViewModel>().getListTimeSlot();
   }
@@ -43,6 +45,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
           var list = model.listTimeSlot
               ?.where((element) => element.isActive == true)
               .toList();
+          bool isTimeSlotAvaible = model.isCurrentTimeSlotAvailable();
           if (model.currentStore != null) {
             final status = model.status;
             if (status == ViewStatus.Loading) {
@@ -91,7 +94,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                   const SizedBox(
                     height: 16,
                   ),
-                  menuList(),
+                  menuList(isTimeSlotAvaible),
                 ],
               ),
             );
@@ -181,15 +184,15 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
     );
   }
 
-  Widget menuList() {
+  Widget menuList(bool isAvailable) {
     return ScopedModel(
-      model: Get.find<CategoryViewModel>(),
-      child: ScopedModelDescendant<CategoryViewModel>(
+      model: Get.find<HomeViewModel>(),
+      child: ScopedModelDescendant<HomeViewModel>(
         builder: (context, child, model) {
           ViewStatus status = model.status;
           // ViewStatus status = ViewStatus.Completed;
-          var categories = model.categories
-              ?.where((element) => element.showOnHome!)
+          var homeMenu = model.homeMenu
+              ?.where((element) => element.isActive == true)
               .toList();
           switch (status) {
             case ViewStatus.Error:
@@ -222,7 +225,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
             //   ),
             // );
             default:
-              if (categories == null || categories.isEmpty) {
+              if (homeMenu == null || homeMenu.isEmpty) {
                 return Container(
                   color: FineTheme.palettes.shades100,
                   padding: const EdgeInsets.fromLTRB(8, 8, 16, 8),
@@ -251,21 +254,34 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
-                    height: 150,
+                    height: 180,
                     child: GridView.count(
                       physics: const ScrollPhysics(),
                       // padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                       primary: false,
                       childAspectRatio: 1.1,
                       shrinkWrap: true,
-                      crossAxisSpacing: 0,
-                      mainAxisSpacing: 20,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 30,
                       crossAxisCount: 2,
                       controller: scrollController,
                       scrollDirection: Axis.horizontal,
-                      children: List.generate(categories.length, (index) {
+                      children: List.generate(homeMenu.length, (index) {
                         return GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            RootViewModel root = Get.find<RootViewModel>();
+                            if (!root.isCurrentTimeSlotAvailable()) {
+                              showStatusDialog(
+                                  "assets/images/error.png",
+                                  "Opps",
+                                  "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+                            } else {
+                              Get.toNamed(RoutHandler.PRODUCT_FILTER_LIST,
+                                  arguments: {
+                                    'menu': homeMenu[index].toJson()
+                                  });
+                            }
+                          },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
@@ -273,14 +289,19 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                                 height: 42,
                                 width: 42,
                                 child: CacheImage(
-                                    imageUrl: categories[index].imageUrl!),
+                                    imageUrl: homeMenu[index].imgUrl!),
                               ),
                               const SizedBox(
                                 height: 2,
                               ),
-                              Text(
-                                categories[index].categoryName!,
-                                style: FineTheme.typograhpy.caption1,
+                              Expanded(
+                                child: Text(
+                                  homeMenu[index].menuName!,
+                                  style: FineTheme.typograhpy.caption1,
+                                  maxLines: 2,
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               )
                             ],
                           ),
@@ -288,24 +309,32 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                       }),
                     ),
                   ),
-                  const SizedBox(
-                    height: 9,
-                  ),
+                  // const SizedBox(
+                  //   height: 9,
+                  // ),
+
                   ScrollIndicator(
                     scrollController: scrollController,
-                    width: 30,
+                    width: homeMenu.length <= 8 ? 0 : 30,
                     height: 4,
                     indicatorWidth: 18,
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.grey[300]),
+                      borderRadius: BorderRadius.circular(10),
+                      color: homeMenu.length <= 8
+                          ? Colors.transparent
+                          : Colors.grey[300],
+                    ),
                     indicatorDecoration: BoxDecoration(
-                        color: FineTheme.palettes.primary100,
+                        color: homeMenu.length <= 8
+                            ? Colors.transparent
+                            : FineTheme.palettes.primary100,
                         borderRadius: BorderRadius.circular(10)),
                   ),
-                  const SizedBox(
-                    height: 14,
-                  ),
+                  homeMenu.length <= 8
+                      ? const SizedBox.shrink()
+                      : const SizedBox(
+                          height: 14,
+                        ),
                 ],
               );
           }

@@ -41,46 +41,7 @@ class _HomeStoreSectionState extends State<HomeStoreSection> {
             if (suppliers != null) {
               final status = model.status;
               if (status == ViewStatus.Loading) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ignore: sized_box_for_whitespace
-                    Container(
-                      padding: const EdgeInsets.only(left: 12, right: 12),
-                      // alignment: Alignment.center,
-                      margin: const EdgeInsets.only(top: 8),
-                      width: Get.width,
-                      height: 70,
-                      child: ListView.builder(
-                        itemBuilder: (context, index) {
-                          // return const Padding(
-                          //   padding: EdgeInsets.only(right: 8.0),
-                          //   child: ShimmerBlock(
-                          //     width: 80,
-                          //     height: 32,
-                          //     borderRadius: 8,
-                          //   ),
-                          // );
-                          return Container(
-                            width: 120,
-                            margin: const EdgeInsets.only(left: 16),
-                            child: Container(
-                              color: FineTheme.palettes.shades100,
-                              child: ShimmerBlock(
-                                width: Get.width,
-                                height: Get.height,
-                              ),
-                            ),
-                          );
-                        },
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 3,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                );
+                return _buildLoading();
               }
               return Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
@@ -142,7 +103,7 @@ class _HomeStoreSectionState extends State<HomeStoreSection> {
                                         ),
                                         width: 112,
                                         height: 112,
-                                        child: CacheImage(
+                                        child: CacheStoreImage(
                                           imageUrl: imageUrl,
                                         ),
                                       ),
@@ -176,70 +137,78 @@ class _HomeStoreSectionState extends State<HomeStoreSection> {
                                 const SizedBox(
                                   width: 10,
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.only(top: 5),
-                                  height: 113,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          FaIcon(
-                                            Icons.check_circle,
-                                            size: 16,
-                                            color:
-                                                FineTheme.palettes.primary100,
-                                          ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text(
-                                            "${suppliers[index].storeName!} - Đại học FPT",
-                                            style: FineTheme.typograhpy.caption1
-                                                .copyWith(fontSize: 16),
-                                          ),
-                                        ],
-                                      ),
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          FaIcon(
-                                            Icons.star_half,
-                                            size: 16,
-                                            color:
-                                                FineTheme.palettes.primary300,
-                                          ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text(
-                                            '4.3',
-                                            style: TextStyle(
-                                                fontFamily: 'Montserrat',
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 14),
-                                          ),
-                                          const SizedBox(
-                                            width: 4,
-                                          ),
-                                          Text(
-                                            '(500+)',
-                                            style: TextStyle(
-                                                color: FineTheme
-                                                    .palettes.neutral400,
-                                                fontFamily: 'Montserrat',
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 14),
-                                          ),
-                                        ],
-                                      )
-                                    ],
+                                Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.only(top: 5),
+                                    // width: Get.width,
+                                    height: 113,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            FaIcon(
+                                              Icons.check_circle,
+                                              size: 16,
+                                              color:
+                                                  FineTheme.palettes.primary100,
+                                            ),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                "${suppliers[index].storeName!} - Đại học FPT",
+                                                style: FineTheme
+                                                    .typograhpy.caption1
+                                                    .copyWith(fontSize: 16),
+                                                overflow: TextOverflow.ellipsis,
+                                                // maxLines: 1,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            FaIcon(
+                                              Icons.star_half,
+                                              size: 16,
+                                              color:
+                                                  FineTheme.palettes.primary300,
+                                            ),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(
+                                              '4.3',
+                                              style: TextStyle(
+                                                  fontFamily: 'Montserrat',
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14),
+                                            ),
+                                            const SizedBox(
+                                              width: 4,
+                                            ),
+                                            Text(
+                                              '(500+)',
+                                              style: TextStyle(
+                                                  color: FineTheme
+                                                      .palettes.neutral400,
+                                                  fontFamily: 'Montserrat',
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14),
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ],
@@ -255,6 +224,49 @@ class _HomeStoreSectionState extends State<HomeStoreSection> {
             return const SizedBox.shrink();
           },
         ));
+  }
+
+  Widget _buildLoading() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8, left: 12, right: 12),
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
+      decoration: BoxDecoration(
+        color: FineTheme.palettes.shades100,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ShimmerBlock(width: Get.width * 0.4, height: 30),
+              // ShimmerBlock(width: Get.width * 0.2, height: 30),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.only(bottom: 8),
+            width: Get.width,
+            height: 120,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (context, index) {
+                return const ShimmerBlock(
+                  height: 110,
+                  width: 110,
+                  borderRadius: 16,
+                );
+              },
+              separatorBuilder: (context, index) =>
+                  SizedBox(width: FineTheme.spacing.xs),
+              itemCount: 4,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

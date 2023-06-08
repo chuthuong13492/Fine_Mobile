@@ -322,28 +322,6 @@ Widget _buildLoading() {
                 SizedBox(width: FineTheme.spacing.xs),
             itemCount: 4,
           ),
-          // child: Row(
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   children: const [
-          //     ShimmerBlock(
-          //       height: 110,
-          //       width: 110,
-          //       borderRadius: 16,
-          //     ),
-          //     SizedBox(width: 8),
-          //     ShimmerBlock(
-          //       height: 110,
-          //       width: 110,
-          //       borderRadius: 16,
-          //     ),
-          //     SizedBox(width: 8),
-          //     ShimmerBlock(
-          //       height: 110,
-          //       width: 110,
-          //       borderRadius: 16,
-          //     ),
-          //   ],
-          // ),
         ),
       ],
     ),
