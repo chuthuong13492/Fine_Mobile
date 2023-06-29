@@ -43,6 +43,9 @@ class _HomeStoreSectionState extends State<HomeStoreSection> {
               if (status == ViewStatus.Loading) {
                 return _buildLoading();
               }
+              if (status == ViewStatus.Error) {
+                return const SizedBox.shrink();
+              }
               return Padding(
                 padding: const EdgeInsets.only(left: 16, right: 16, top: 16),
                 child: Column(

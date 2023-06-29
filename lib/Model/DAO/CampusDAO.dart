@@ -28,4 +28,14 @@ class CampusDAO extends BaseDAO {
     }
     return null;
   }
+
+  Future<CampusDTO> getUserCampus(int campusId) async {
+    final res = await request.get(
+      "/campus/${campusId}",
+      // queryParameters: {"page": page, "size": size}..addAll(params),
+    );
+    final campus = CampusDTO.fromJson(res.data['data']);
+    // metaDataDTO = MetaDataDTO.fromJson(res.data['metadata']);
+    return campus;
+  }
 }

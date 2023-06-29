@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DAO/AccountDAO.dart';
 import 'package:fine/ViewModel/base_model.dart';
@@ -20,8 +22,8 @@ class StartUpViewModel extends BaseModel {
       // await Get.find<RootViewModel>().startUp();
       Get.offAndToNamed(RoutHandler.ONBOARD);
     } else if (hasLoggedInUser) {
-      // await Get.find<RootViewModel>().startUp();
-      Get.offAndToNamed(RoutHandler.STORE_SELECT);
+      await Get.find<RootViewModel>().startUp();
+      Get.offAndToNamed(RoutHandler.NAV);
     } else {
       Get.offAndToNamed(RoutHandler.WELCOME_SCREEN);
     }

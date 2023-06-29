@@ -39,7 +39,7 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
         model: Get.find<HomeViewModel>(),
         child: ScopedModelDescendant<HomeViewModel>(
           builder: (context, child, model) {
-            var menu = model.homeMenu;
+            final menu = model.homeMenu;
             if (model.status == ViewStatus.Loading || menu == null) {
               return _buildLoading();
             }

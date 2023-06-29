@@ -38,6 +38,30 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
 
   @override
   Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.only(left: 15, right: 15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Menu theo bữa',
+            style: FineTheme.typograhpy.buttonLg.copyWith(color: Colors.black),
+          ),
+          const SizedBox(
+            height: 12,
+          ),
+          timeSlotesSelect(),
+          const SizedBox(
+            height: 16,
+          ),
+          menuList(),
+        ],
+      ),
+    );
+  }
+
+  Widget timeSlotesSelect() {
     return ScopedModel(
       model: Get.find<RootViewModel>(),
       child: ScopedModelDescendant<RootViewModel>(
@@ -46,70 +70,35 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
               ?.where((element) => element.isActive == true)
               .toList();
           bool isTimeSlotAvaible = model.isCurrentTimeSlotAvailable();
-          if (model.currentStore != null) {
-            final status = model.status;
-            if (status == ViewStatus.Loading) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ignore: sized_box_for_whitespace
-                  Container(
-                    height: 32,
-                    width: Get.width,
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        return const Padding(
-                          padding: EdgeInsets.only(right: 8.0),
-                          child: ShimmerBlock(
-                            width: 80,
-                            height: 32,
-                            borderRadius: 8,
-                          ),
-                        );
-                      },
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 5,
-                    ),
+          final status = model.status;
+          if (status == ViewStatus.Loading) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ignore: sized_box_for_whitespace
+                Container(
+                  height: 32,
+                  width: Get.width,
+                  child: ListView.builder(
+                    itemBuilder: (context, index) {
+                      return const Padding(
+                        padding: EdgeInsets.only(right: 8.0),
+                        child: ShimmerBlock(
+                          width: 80,
+                          height: 32,
+                          borderRadius: 8,
+                        ),
+                      );
+                    },
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 5,
                   ),
-                  const SizedBox(height: 8),
-                ],
-              );
-            }
-            return Container(
-              padding: const EdgeInsets.only(left: 15, right: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Menu theo bữa',
-                    style: FineTheme.typograhpy.buttonLg
-                        .copyWith(color: Colors.black),
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                  timeSlotesSelect(list),
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  menuList(isTimeSlotAvaible),
-                ],
-              ),
+                ),
+                const SizedBox(height: 8),
+              ],
             );
           }
-          return const SizedBox.shrink();
-        },
-      ),
-    );
-  }
-
-  Widget timeSlotesSelect(List<TimeSlotDTO>? list) {
-    return ScopedModel(
-      model: Get.find<RootViewModel>(),
-      child: ScopedModelDescendant<RootViewModel>(
-        builder: (context, child, model) {
           return SizedBox(
             // alignment: Alignment.center,
             height: 60,
@@ -184,7 +173,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
     );
   }
 
-  Widget menuList(bool isAvailable) {
+  Widget menuList() {
     return ScopedModel(
       model: Get.find<HomeViewModel>(),
       child: ScopedModelDescendant<HomeViewModel>(
@@ -194,6 +183,18 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
           var homeMenu = model.homeMenu
               ?.where((element) => element.isActive == true)
               .toList();
+          if (homeMenu != null) {
+            homeMenu.insert(
+              homeMenu.length,
+              MenuDTO(
+                id: homeMenu.last.id! + 1,
+                menuName: 'Danh mục',
+                imgUrl: 'assets/icons/cate.png',
+                isActive: true,
+              ),
+            );
+          }
+
           switch (status) {
             case ViewStatus.Error:
               return Column(
@@ -288,11 +289,15 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                               SizedBox(
                                 height: 42,
                                 width: 42,
-                                child: CacheImage(
-                                    imageUrl: homeMenu[index].imgUrl!),
+                                child: homeMenu[index]
+                                        .menuName!
+                                        .contains('Danh mục')
+                                    ? Image.asset(homeMenu[index].imgUrl!)
+                                    : CacheImage(
+                                        imageUrl: homeMenu[index].imgUrl!),
                               ),
                               const SizedBox(
-                                height: 2,
+                                height: 4,
                               ),
                               Expanded(
                                 child: Text(

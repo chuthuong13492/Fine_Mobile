@@ -26,7 +26,7 @@ class HomeViewModel extends BaseModel {
     // _productDAO = ProductDAO();
   }
 
-  Future<void> getCollections() async {
+  Future<void> getMenus() async {
     try {
       setState(ViewStatus.Loading);
       RootViewModel root = Get.find<RootViewModel>();
@@ -58,8 +58,10 @@ class HomeViewModel extends BaseModel {
       // }
       // homeCollections = await _collectionDAO!
       //     .getCollections(currentMenu.menuId, params: {"show-on-home": true});
-      homeMenu = await _menuDAO?.getCollections(currentTimeSlot.id);
-
+      homeMenu = await _menuDAO?.getMenus(currentTimeSlot.id);
+      // if (homeMenu == null || homeMenu!.isEmpty) {
+      //   setState(ViewStatus.Error);
+      // }
       await Future.delayed(const Duration(microseconds: 500));
       setState(ViewStatus.Completed);
     } catch (e) {
@@ -88,7 +90,7 @@ class HomeViewModel extends BaseModel {
       setState(ViewStatus.Completed);
     } catch (e) {
       supplierList = null;
-      setState(ViewStatus.Completed);
+      // setState(ViewStatus.Error);
     }
   }
 

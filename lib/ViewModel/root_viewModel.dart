@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/route_constraint.dart';
@@ -15,36 +18,51 @@ import 'package:fine/ViewModel/category_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class RootViewModel extends BaseModel {
+  Position? currentPosition;
+  String? currentLocation;
+  String? lat;
+  String? long;
   AccountDTO? user;
   CampusDTO? currentStore;
   List<CampusDTO>? campusList;
   TimeSlotDTO? selectedTimeSlot;
   List<TimeSlotDTO>? listTimeSlot;
   ProductDAO? _productDAO;
+  CampusDAO? _campusDAO;
   bool changeAddress = false;
 
   RootViewModel() {
     _productDAO = ProductDAO();
+    _campusDAO = CampusDAO();
     selectedTimeSlot = null;
   }
   Future refreshMenu() async {
     // fetchStore();
     await Get.find<HomeViewModel>().getListSupplier();
-    await Get.find<HomeViewModel>().getCollections();
+    await Get.find<HomeViewModel>().getMenus();
     // await Get.find<OrderViewModel>().getUpSellCollections();
     // await Get.find<GiftViewModel>().getGifts();
   }
 
   Future startUp() async {
+    // await Get.find<RootViewModel>().getCurrentLocation();
+    // liveLocation();
+    await Get.find<RootViewModel>().liveLocation();
+
     await Get.find<AccountViewModel>().fetchUser();
+    await Get.find<RootViewModel>().getUserCampus();
     await Get.find<RootViewModel>().getListTimeSlot();
-    await Get.find<HomeViewModel>().getCollections();
+    await Get.find<HomeViewModel>().getMenus();
     await Get.find<HomeViewModel>().getListSupplier();
-    await Get.find<CategoryViewModel>().getCategories();
+    // await Get.find<CategoryViewModel>().getCategories();
     await Get.find<BlogsViewModel>().getBlogs();
   }
 
@@ -75,6 +93,104 @@ class RootViewModel extends BaseModel {
     }
   }
 
+  Future<Position?> getCurrentLocation() async {
+    bool isServicEnabked = await Geolocator.isLocationServiceEnabled();
+    if (!isServicEnabked) {
+      return Future.error('Location service are disabled');
+    }
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permission are denied');
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permission are permanently denied, we cannot request permission');
+    }
+    // return await Geolocator.getCurrentPosition();
+  }
+
+  Future<void> liveLocation() async {
+    late LocationSettings locationSettings;
+    await getCurrentLocation();
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      locationSettings = AndroidSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 100,
+          forceLocationManager: true,
+          intervalDuration: const Duration(seconds: 10),
+          //(Optional) Set foreground notification config to keep the app alive
+          //when going to the background
+          foregroundNotificationConfig: const ForegroundNotificationConfig(
+            notificationText:
+                "Example app will continue to receive your location even when you aren't using it",
+            notificationTitle: "Running in Background",
+            enableWakeLock: true,
+          ));
+    } else if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
+      locationSettings = AppleSettings(
+        accuracy: LocationAccuracy.high,
+        activityType: ActivityType.fitness,
+        distanceFilter: 100,
+        pauseLocationUpdatesAutomatically: true,
+        // Only set to true if our app will be started up in the background.
+        showBackgroundLocationIndicator: false,
+      );
+    } else {
+      locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 100,
+      );
+    }
+
+    Geolocator.getPositionStream(locationSettings: locationSettings)
+        .listen((Position position) {
+      currentPosition = position;
+      // lat = position.latitude.toString();
+      // long = position.longitude.toString();
+      getAddressFromLatLng(position.longitude, position.latitude);
+    });
+    print("$currentPosition");
+  }
+
+  Future<void> getAddressFromLatLng(long, lat) async {
+    try {
+      List<Placemark> placemark = await placemarkFromCoordinates(lat, long);
+
+      Placemark place = placemark[0];
+
+      currentLocation =
+          "${place.locality}, ${place.street}, ${place.subLocality}, ${place.administrativeArea}, ${place.country}";
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> getLocation() async {
+    try {
+      currentPosition = await getCurrentLocation();
+      getAddressFromLatLng(
+          currentPosition!.longitude, currentPosition!.latitude);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  // Future<void> liveLocation() async {
+  //   try {
+  //     if (currentPosition == null) {
+
+  //     }
+  //     print("Lat: $lat, Long: $long");
+  //   } catch (e) {
+  //     currentPosition = null;
+  //   }
+  // }
+
   Future<void> getListCampus() async {
     try {
       setState(ViewStatus.Loading);
@@ -83,6 +199,20 @@ class RootViewModel extends BaseModel {
       setState(ViewStatus.Completed);
     } catch (e) {
       campusList = null;
+      setState(ViewStatus.Error);
+    }
+  }
+
+  Future<void> getUserCampus() async {
+    try {
+      setState(ViewStatus.Loading);
+      AccountViewModel accountViewModel = Get.find<AccountViewModel>();
+      final userCampus = await _campusDAO!
+          .getUserCampus(accountViewModel.currentUser!.universityId!);
+      currentStore = userCampus;
+      await setStore(currentStore!);
+      setState(ViewStatus.Completed);
+    } catch (e) {
       setState(ViewStatus.Error);
     }
   }

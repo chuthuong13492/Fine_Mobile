@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:fine/Accessories/theme_data.dart';
@@ -19,6 +20,7 @@ import 'package:fine/View/sign_in.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/View/store_select_screen.dart';
 import 'package:fine/View/welcome_screen.dart';
+import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/ViewModel/startup_viewModel.dart';
 import 'package:fine/setup.dart';
 import 'package:fine/theme/FineTheme/index.dart';
@@ -39,6 +41,9 @@ Future<void> main() async {
 
   await setup();
   createRouteBindings();
+  Timer.periodic(const Duration(milliseconds: 500), (_) {
+    Get.find<RootViewModel>().liveLocation();
+  });
   runApp(MyApp());
 }
 

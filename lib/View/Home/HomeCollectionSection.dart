@@ -34,7 +34,7 @@ class _HomeCollectionSectionState extends State<HomeCollectionSection> {
   void initState() {
     super.initState();
     _homeCollectionViewModel = HomeViewModel();
-    Get.find<HomeViewModel>().getCollections();
+    Get.find<HomeViewModel>().getMenus();
   }
 
   @override

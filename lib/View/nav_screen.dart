@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:fine/Accessories/cart_button.dart';
@@ -7,12 +8,14 @@ import 'package:fine/View/home.dart';
 import 'package:fine/View/order_history.dart';
 import 'package:fine/View/profile.dart';
 import 'package:fine/Utils/constrant.dart';
+import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/theme/color.dart';
 import 'package:fine/widgets/bottom_bar_item.dart';
 import 'package:fine/widgets/cruved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 
 class RootScreen extends StatefulWidget {
   final int initScreenIndex;
@@ -23,6 +26,7 @@ class RootScreen extends StatefulWidget {
 }
 
 class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
+  RootViewModel? _rootViewModel;
   final navigationKey = GlobalKey<CurvedNavigationBarState>();
   int activeTab = 0;
   List barItems = [
@@ -89,6 +93,10 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    // _rootViewModel = Get.find<RootViewModel>();
+    // Timer.periodic(const Duration(milliseconds: 500), (_) {
+    //   _rootViewModel!.liveLocation();
+    // });
     activeTab = widget.initScreenIndex;
     _controller.forward();
   }
