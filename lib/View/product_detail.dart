@@ -750,7 +750,8 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                 width: Get.width,
                 decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: CachedNetworkImageProvider(defaultImage),
+                        image: CachedNetworkImageProvider(
+                            dto.imageUrl ?? defaultImage),
                         fit: BoxFit.cover)),
               ),
               Positioned(
@@ -775,8 +776,9 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withOpacity(0.20),
-                                  border: Border.all(color: Colors.black),
+                                  // color: Colors.white.withOpacity(0.20),
+                                  color: FineTheme.palettes.primary100,
+                                  border: Border.all(color: Colors.white),
                                 ),
                                 child: Center(
                                   child: IconButton(
@@ -786,7 +788,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                                     },
                                     icon: const Icon(
                                       Icons.chevron_left_outlined,
-                                      color: Colors.black,
+                                      color: Colors.white,
                                       size: 30,
                                     ),
                                   ),
@@ -811,14 +813,15 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.white.withOpacity(0.20),
-                                    border: Border.all(color: Colors.black),
+                                    // color: Colors.white.withOpacity(0.20),
+                                    color: FineTheme.palettes.primary100,
+                                    border: Border.all(color: Colors.white),
                                   ),
                                   child: SvgPicture.asset(
                                     'assets/icons/Search-product.svg',
                                     width: 20,
                                     height: 20,
-                                    color: Colors.black,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
@@ -837,13 +840,16 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.white.withOpacity(0.20),
-                                    border: Border.all(color: Colors.black),
+                                    // color: Colors.white.withOpacity(0.20),
+                                    color: FineTheme.palettes.primary100,
+
+                                    border: Border.all(color: Colors.white),
                                   ),
                                   child: SvgPicture.asset(
                                     'assets/icons/Heart.svg',
                                     width: 20,
                                     height: 20,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),
@@ -862,14 +868,16 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Colors.white.withOpacity(0.20),
-                                    border: Border.all(color: Colors.black),
+                                    // color: Colors.white.withOpacity(0.20),
+                                    color: FineTheme.palettes.primary100,
+
+                                    border: Border.all(color: Colors.white),
                                   ),
                                   child: SvgPicture.asset(
                                     'assets/icons/Share.svg',
                                     width: 20,
                                     height: 20,
-                                    color: Colors.black,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),

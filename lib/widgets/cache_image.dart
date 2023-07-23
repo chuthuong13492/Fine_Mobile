@@ -48,7 +48,10 @@ class CacheImage extends StatelessWidget {
         child: Container(
           width: MediaQuery.of(context).size.width,
           // height: 100,
-          color: Colors.grey,
+          decoration: BoxDecoration(
+            color: Colors.grey,
+            borderRadius: BorderRadius.circular(100),
+          ),
         ),
       ),
       errorWidget: (context, url, error) => Container(
