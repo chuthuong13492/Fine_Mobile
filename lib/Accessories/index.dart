@@ -7,3 +7,4 @@ export 'slide_fade_animation.dart';
 export 'scroll_indicator.dart';
 export 'nav_button.dart';
 export 'nav_custom_painter.dart';
+export 'custom_picker.dart';

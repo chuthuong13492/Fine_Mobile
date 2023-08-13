@@ -151,11 +151,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-                Positioned(
-                  left: 0,
-                  bottom: 0,
-                  child: buildNewOrder(),
-                ),
+                // Positioned(
+                //   left: 0,
+                //   bottom: 0,
+                //   child: buildNewOrder(),
+                // ),
               ],
             ),
           ),
@@ -166,13 +166,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> renderHomeSections() {
     return [
-      banner(),
+      // banner(),
       const SizedBox(height: 18),
       const HomeMenuSection(),
       interalBanner(),
       const HomeSpecifiHomeSection(),
       buildVoucherSection(),
-      const HomeStoreSection(),
+      // const HomeStoreSection(),
     ];
   }
 
@@ -448,8 +448,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () {
-                        Get.find<OrderHistoryViewModel>()
-                            .closeNewOrder(model.newTodayOrders!.id);
+                        // Get.find<OrderHistoryViewModel>()
+                        //     .closeNewOrder(model.newTodayOrders!.id);
                       },
                     ),
                   ],

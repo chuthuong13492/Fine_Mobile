@@ -5,6 +5,8 @@ import 'package:fine/Accessories/theme_data.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/shared_pref.dart';
+import 'package:fine/View/coOrder_screen.dart';
+import 'package:fine/View/confirm_party_screen.dart';
 import 'package:fine/View/home.dart';
 import 'package:fine/View/login.dart';
 import 'package:fine/View/nav_screen.dart';
@@ -18,6 +20,7 @@ import 'package:fine/View/product_filter_list.dart';
 import 'package:fine/View/profile.dart';
 import 'package:fine/View/sign_in.dart';
 import 'package:fine/View/start_up.dart';
+import 'package:fine/View/station_picker_screen.dart';
 import 'package:fine/View/store_select_screen.dart';
 import 'package:fine/View/welcome_screen.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
@@ -41,9 +44,9 @@ Future<void> main() async {
 
   await setup();
   createRouteBindings();
-  Timer.periodic(const Duration(milliseconds: 500), (_) {
-    Get.find<RootViewModel>().liveLocation();
-  });
+  // Timer.periodic(const Duration(milliseconds: 500), (_) {
+  //   Get.find<RootViewModel>().liveLocation();
+  // });
   runApp(MyApp());
 }
 
@@ -88,6 +91,19 @@ class MyApp extends StatelessWidget {
           case RoutHandler.ORDER:
             return CupertinoPageRoute<bool>(
                 builder: (context) => OrderScreen(), settings: settings);
+          case RoutHandler.STATION_PICKER_SCREEN:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => StationPickerScreen(),
+                settings: settings);
+          case RoutHandler.PARTY_ORDER_SCREEN:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => PartyOrderScreen(
+                      dto: settings.arguments as dynamic,
+                    ),
+                settings: settings);
+          case RoutHandler.CONFIRM_ORDER_SCREEN:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => PartyConfirmScreen(), settings: settings);
           case RoutHandler.PRODUCT_FILTER_LIST:
             return CupertinoPageRoute<bool>(
                 builder: (context) => ProductsFilterPage(

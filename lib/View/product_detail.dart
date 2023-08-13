@@ -1,9 +1,12 @@
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:fine/Accessories/dialog.dart';
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DTO/ProductDTO.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/format_price.dart';
+import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/productFilter_viewModel.dart';
 import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
@@ -50,22 +53,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: FineTheme.palettes.shades100,
-      // bottomNavigationBar: bottomBar(),
-      body: CustomScrollView(
-        slivers: [
-          SliverPersistentHeader(
-            delegate: CustomSliverAppBarDelegate(
-                expandedHeight: 510, dto: widget.dto),
-            pinned: true,
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate(<Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width,
-                child: ScopedModel(
-                  model: ProductDetailViewModel(dto: widget.dto),
+    return ScopedModel(
+      model: ProductDetailViewModel(dto: widget.dto),
+      child: Scaffold(
+        backgroundColor: FineTheme.palettes.shades100,
+        // bottomNavigationBar: bottomBar(),
+        body: CustomScrollView(
+          slivers: [
+            SliverPersistentHeader(
+              delegate: CustomSliverAppBarDelegate(
+                  expandedHeight: 510, dto: widget.dto),
+              pinned: true,
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate(<Widget>[
+                Container(
+                  width: MediaQuery.of(context).size.width,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -75,10 +78,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     ],
                   ),
                 ),
-              ),
-            ]),
-          ),
-        ],
+              ]),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -102,7 +105,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               Row(
                 children: [
                   SvgPicture.asset(
-                    "assets/icons/Shipper.svg",
+                    "assets/icons/box_icon.svg",
                     width: 20,
                     height: 20,
                   ),
@@ -110,7 +113,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     width: 10,
                   ),
                   Text(
-                    "Giao ở",
+                    "Giao tại box",
                     style: FineTheme.typograhpy.body1,
                   ),
                 ],
@@ -164,9 +167,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  PartyOrderViewModel model = Get.find<PartyOrderViewModel>();
+                  showPartyDialog(model.partyCode);
+                },
                 child: Text(
-                  "Tạo đơn",
+                  "Tạo phòng",
                   style: FineTheme.typograhpy.body2
                       .copyWith(color: FineTheme.palettes.primary100),
                 ),
@@ -526,44 +532,45 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   //   );
   // }
 
-  Widget bottomBar() {
-    return Container(
-      padding: const EdgeInsets.only(left: 10, right: 10),
-      decoration: BoxDecoration(
-        color: FineTheme.palettes.neutral100,
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.grey,
-            offset: Offset(0.0, 1.0), //(x,y)
-            blurRadius: 6.0,
-          ),
-        ],
-      ),
-      child: ScopedModel(
-        model: ProductDetailViewModel(dto: widget.dto),
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            const SizedBox(
-              height: 8,
-            ),
-            Center(child: selectQuantity()),
-            // const SizedBox(
-            //   height: 8,
-            // ),
-            orderButton(),
-            const SizedBox(
-              height: 8,
-            )
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget bottomBar() {
+  //   return Container(
+  //     padding: const EdgeInsets.only(left: 10, right: 10),
+  //     decoration: BoxDecoration(
+  //       color: FineTheme.palettes.neutral100,
+  //       boxShadow: const [
+  //         BoxShadow(
+  //           color: Colors.grey,
+  //           offset: Offset(0.0, 1.0), //(x,y)
+  //           blurRadius: 6.0,
+  //         ),
+  //       ],
+  //     ),
+  //     child: ScopedModel(
+  //       model: ProductDetailViewModel(dto: widget.dto),
+  //       child: ListView(
+  //         shrinkWrap: true,
+  //         children: [
+  //           const SizedBox(
+  //             height: 8,
+  //           ),
+  //           Center(child: selectQuantity()),
+  //           // const SizedBox(
+  //           //   height: 8,
+  //           // ),
+  //           orderButton(),
+  //           const SizedBox(
+  //             height: 8,
+  //           )
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget orderButton() {
     return ScopedModelDescendant<ProductDetailViewModel>(
       builder: (context, child, model) {
+        final quantity = model.count;
         return Container(
           height: 40,
           width: Get.width,
@@ -962,76 +969,73 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                 // const SizedBox(
                 //   height: 8,
                 // ),
-                ScopedModel(
-                  model: ProductDetailViewModel(dto: dto),
-                  child: ScopedModelDescendant<ProductDetailViewModel>(
-                    builder: (context, child, model) {
-                      return Container(
-                        height: 48,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Center(
-                              child: Text(
-                                formatPrice(model.total!),
-                                style: const TextStyle(
-                                  fontFamily: "Montserrat",
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 24,
-                                  color: Colors.red,
-                                ),
+                ScopedModelDescendant<ProductDetailViewModel>(
+                  builder: (context, child, model) {
+                    return Container(
+                      height: 48,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Center(
+                            child: Text(
+                              formatPrice(model.total!),
+                              style: const TextStyle(
+                                fontFamily: "Montserrat",
+                                fontWeight: FontWeight.w600,
+                                fontSize: 24,
+                                color: Colors.red,
                               ),
                             ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.remove_circle_outline,
-                                    size: 30,
-                                    color: model.minusColor,
-                                  ),
-                                  onPressed: () {
-                                    model.minusQuantity();
-                                  },
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.remove_circle_outline,
+                                  size: 30,
+                                  color: model.minusColor,
                                 ),
-                                // SizedBox(
-                                //   width: 8,
-                                // ),
-                                Container(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(12, 5, 12, 5),
-                                  decoration: BoxDecoration(
-                                      // border: Border.all(color: Colors.grey),
-                                      borderRadius: BorderRadius.circular(8)),
-                                  child: Text(
-                                    model.count.toString(),
-                                    style: FineTheme.typograhpy.h2.copyWith(
-                                      color: Colors.black,
-                                    ),
+                                onPressed: () {
+                                  model.minusQuantity();
+                                },
+                              ),
+                              // SizedBox(
+                              //   width: 8,
+                              // ),
+                              Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(12, 5, 12, 5),
+                                decoration: BoxDecoration(
+                                    // border: Border.all(color: Colors.grey),
+                                    borderRadius: BorderRadius.circular(8)),
+                                child: Text(
+                                  model.count.toString(),
+                                  style: FineTheme.typograhpy.h2.copyWith(
+                                    color: Colors.black,
                                   ),
                                 ),
-                                // SizedBox(
-                                //   width: 1,
-                                // ),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.add_circle_outline,
-                                    size: 30,
-                                    color: model.addColor,
-                                  ),
-                                  onPressed: () {
-                                    model.addQuantity();
-                                  },
-                                )
-                              ],
-                            )
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                              ),
+                              // SizedBox(
+                              //   width: 1,
+                              // ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.add_circle_outline,
+                                  size: 30,
+                                  color: model.addColor,
+                                ),
+                                onPressed: () {
+                                  model.addQuantity();
+                                },
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    );
+                  },
                 ),
 
                 Container(
@@ -1054,7 +1058,8 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                         height: 5,
                       ),
                       Text(
-                        dto.storeName!,
+                        // dto.storeName!,
+                        "Đại học FPT",
                         style: FineTheme.typograhpy.subtitle1,
                       ),
                     ],

@@ -1,13 +1,13 @@
 class AccountDTO {
-  int? id;
+  String? id;
   String? name;
   String? customerCode;
   String? email;
   String? phone;
   DateTime? dateOfBirth;
   String? imageUrl;
-  int? universityId;
-  int? uniInfoId;
+  // int? universityId;
+  // int? uniInfoId;
   DateTime? createAt;
   DateTime? updateAt;
 
@@ -19,23 +19,23 @@ class AccountDTO {
       this.phone,
       this.dateOfBirth,
       this.imageUrl,
-      this.universityId,
-      this.uniInfoId,
+      // this.universityId,
+      // this.uniInfoId,
       this.createAt,
       this.updateAt});
 
   AccountDTO.fromJson(Map<String, dynamic> json) {
-    id = json["id"];
+    id = json["id"] as String;
     name = json["name"];
     customerCode = json["customerCode"];
     email = json["email"];
-    phone = json["phone"];
+    phone = json["phone"] ?? null;
     dateOfBirth = json['dateOfBirth'] as String != null
         ? DateTime.parse(json['dateOfBirth'] as String)
         : null;
     imageUrl = json["imageUrl"];
-    universityId = json["universityId"];
-    uniInfoId = json["uniInfoId"];
+    // universityId = json["universityId"];
+    // uniInfoId = json["uniInfoId"];
     createAt = json['createAt'] as String != null
         ? DateTime.parse(json['createAt'] as String)
         : null;
@@ -57,8 +57,8 @@ class AccountDTO {
     _data["phone"] = phone;
     _data["dateOfBirth"] = dateOfBirth;
     _data["imageUrl"] = imageUrl;
-    _data["universityId"] = universityId;
-    _data["uniInfoId"] = uniInfoId;
+    // _data["universityId"] = universityId;
+    // _data["uniInfoId"] = uniInfoId;
     _data["createAt"] = createAt;
     _data["updateAt"] = updateAt;
     return _data;

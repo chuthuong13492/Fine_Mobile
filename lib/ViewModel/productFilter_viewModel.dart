@@ -47,15 +47,13 @@ class ProductFilterViewModel extends BaseModel {
       if (params["menu"] != null) {
         var products =
             await _productDAO?.getProductsByMenuId(params["menu"]["id"]);
-        listProducts =
-            products!.where((element) => element.isAvailable!).toList();
+        listProducts = products!.where((element) => element.isActive!).toList();
         params.clear();
       }
       if (params["store"] != null) {
         var products = await _productDAO
             ?.getProductsInMenuByStoreId(params["store"]["id"]);
-        listProducts =
-            products!.where((element) => element.isAvailable!).toList();
+        listProducts = products!.where((element) => element.isActive!).toList();
         params.clear();
       }
       setState(ViewStatus.Completed);

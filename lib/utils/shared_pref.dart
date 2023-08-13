@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:fine/Model/DTO/CampusDTO.dart';
+import 'package:fine/Model/DTO/DestinationDTO.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/setup.dart';
 import 'package:get/get.dart';
@@ -16,7 +16,7 @@ Future<bool?> getIsFirstOnboard() async {
   return prefs.getBool('isFirstOnBoard');
 }
 
-Future<void> setStore(CampusDTO dto) async {
+Future<void> setStore(DestinationDTO dto) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   if (dto != null) {
     print(dto.toJson().toString());
@@ -24,11 +24,11 @@ Future<void> setStore(CampusDTO dto) async {
   }
 }
 
-Future<CampusDTO?> getStore() async {
+Future<DestinationDTO?> getStore() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   String? encodedCart = prefs.getString('STORE');
   if (encodedCart != null) {
-    return CampusDTO.fromJson(jsonDecode(encodedCart));
+    return DestinationDTO.fromJson(jsonDecode(encodedCart));
   }
   return null;
 }

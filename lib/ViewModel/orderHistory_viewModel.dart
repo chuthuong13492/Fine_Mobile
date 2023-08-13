@@ -13,13 +13,13 @@ class OrderHistoryViewModel extends BaseModel {
   List<OrderDTO> orderThumbnail = [];
   OrderDAO? _orderDAO;
   dynamic error;
-  OrderDTO? orderDetail;
+  OrderDTO? orderDTO;
   ScrollController? scrollController;
   List<bool> selections = [true, false];
   OrderDTO? newTodayOrders;
 
-  OrderHistoryViewModel({OrderDTO? dto}) {
-    orderDetail = dto;
+  OrderHistoryViewModel() {
+    // orderDTO = dto;
     _orderDAO = OrderDAO();
     scrollController = ScrollController();
     scrollController!.addListener(() async {
@@ -64,31 +64,44 @@ class OrderHistoryViewModel extends BaseModel {
     } finally {}
   }
 
-  Future<void> getNewOrder() async {
+  Future<void> getOrderByOrderId({String? id}) async {
     try {
       setState(ViewStatus.Loading);
-      final data = await _orderDAO?.getOrders();
-      final currentDateData = data?.firstWhere(
-          (orderSummary) =>
-              DateTime.parse(orderSummary.checkInDate!)
-                  .difference(DateTime.now())
-                  .inDays ==
-              0,
-          orElse: () => null as dynamic);
-      if (currentDateData != null) {
-        orderThumbnail.add(currentDateData);
-        newTodayOrders = currentDateData;
-      }
+
+      orderDTO = await _orderDAO?.getOrderById(id);
+
       setState(ViewStatus.Completed);
+      notifyListeners();
     } catch (e) {
-      bool result = await showErrorDialog();
-      if (result) {
-        await getNewOrder();
-      } else {
-        setState(ViewStatus.Error);
-      }
-    } finally {}
+      setState(ViewStatus.Error, e.toString());
+    }
   }
+
+  // Future<void> getNewOrder() async {
+  //   try {
+  //     setState(ViewStatus.Loading);
+  //     final data = await _orderDAO?.getOrders();
+  //     final currentDateData = data?.firstWhere(
+  //         (orderSummary) =>
+  //             DateTime.parse(orderSummary.checkInDate!)
+  //                 .difference(DateTime.now())
+  //                 .inDays ==
+  //             0,
+  //         orElse: () => null as dynamic);
+  //     if (currentDateData != null) {
+  //       orderThumbnail.add(currentDateData);
+  //       newTodayOrders = currentDateData;
+  //     }
+  //     setState(ViewStatus.Completed);
+  //   } catch (e) {
+  //     bool result = await showErrorDialog();
+  //     if (result) {
+  //       await getNewOrder();
+  //     } else {
+  //       setState(ViewStatus.Error);
+  //     }
+  //   } finally {}
+  // }
 
   Future<void> cancelOrder(int orderId) async {
     try {

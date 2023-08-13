@@ -5,7 +5,7 @@ import 'package:fine/Utils/request.dart';
 
 class ProductDAO extends BaseDAO {
   Future<ProductDTO?> getProductDetail(
-    int? productInMenuId, {
+    String? productId, {
     int page = 1,
     int size = 10,
     int? total,
@@ -13,7 +13,7 @@ class ProductDAO extends BaseDAO {
   }) async {
     final res = await request.get(
       // 'collections?menu-id=${menuId}',
-      '/product-in-menu/${productInMenuId}',
+      '/product/${productId}',
       queryParameters: {"page": page, "size": size}..addAll(params),
     );
     if (res.data["data"] != null) {
@@ -25,7 +25,7 @@ class ProductDAO extends BaseDAO {
   }
 
   Future<List<ProductDTO>?> getProductsByMenuId(
-    int menuId, {
+    String menuId, {
     int? page,
     int? size,
     int? type,

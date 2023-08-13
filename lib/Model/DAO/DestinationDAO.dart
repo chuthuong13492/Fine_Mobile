@@ -2,11 +2,12 @@ import 'package:fine/Model/DAO/index.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/request.dart';
 
-class CampusDAO extends BaseDAO {
-  Future<List<TimeSlotDTO>?> getTimeSlot() async {
+class DestinationDAO extends BaseDAO {
+  Future<List<TimeSlotDTO>?> getTimeSlot(String destinationId,
+      {int? page, int? size}) async {
     final res = await request.get(
-      "/timeslot",
-      // queryParameters: {"page": page, "size": size}..addAll(params),
+      "/timeslot/destination/$destinationId?PageSize=${size ?? 20}",
+      // queryParameters: {"page": page, "size": size ?? 20},
     );
     if (res.data['data'] != null) {
       var listJson = res.data['data'] as List;
@@ -16,26 +17,26 @@ class CampusDAO extends BaseDAO {
     return null;
   }
 
-  Future<List<CampusDTO>?> getCampusList() async {
+  Future<List<DestinationDTO>?> getDestinationIdList() async {
     final res = await request.get(
-      "/campus",
+      "/destination",
       // queryParameters: {"page": page, "size": size}..addAll(params),
     );
     if (res.data['data'] != null) {
       var listJson = res.data['data'] as List;
       // metaDataDTO = MetaDataDTO.fromJson(res.data['metadata']);
-      return listJson.map((e) => CampusDTO.fromJson(e)).toList();
+      return listJson.map((e) => DestinationDTO.fromJson(e)).toList();
     }
     return null;
   }
 
-  Future<CampusDTO> getUserCampus(int campusId) async {
+  Future<DestinationDTO> getUserDestination(String destinationId) async {
     final res = await request.get(
-      "/campus/${campusId}",
+      "/destination/${destinationId}",
       // queryParameters: {"page": page, "size": size}..addAll(params),
     );
-    final campus = CampusDTO.fromJson(res.data['data']);
+    final destination = DestinationDTO.fromJson(res.data['data']);
     // metaDataDTO = MetaDataDTO.fromJson(res.data['metadata']);
-    return campus;
+    return destination;
   }
 }

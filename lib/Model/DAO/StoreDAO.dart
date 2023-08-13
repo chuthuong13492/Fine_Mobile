@@ -31,7 +31,7 @@ class StoreDAO extends BaseDAO {
   //   return null;
   // }
 
-  Future<List<SupplierDTO>?> getSuppliers(int timeSlotId,
+  Future<List<SupplierDTO>?> getSuppliers(String timeSlotId,
       {int? page, int? size}) async {
     final res = await request.get(
       '/store/timeslot/$timeSlotId',

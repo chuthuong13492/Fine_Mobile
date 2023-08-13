@@ -183,17 +183,6 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
           var homeMenu = model.homeMenu
               ?.where((element) => element.isActive == true)
               .toList();
-          if (homeMenu != null) {
-            homeMenu.insert(
-              homeMenu.length,
-              MenuDTO(
-                id: homeMenu.last.id! + 1,
-                menuName: 'Danh mục',
-                imgUrl: 'assets/icons/cate.png',
-                isActive: true,
-              ),
-            );
-          }
 
           switch (status) {
             case ViewStatus.Error:

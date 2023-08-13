@@ -8,7 +8,7 @@ import 'package:fine/ViewModel/productFilter_viewModel.dart';
 import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+
 import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -62,10 +62,10 @@ class _CartButtonState extends State<CartButton> {
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Icon(
-                      AntDesign.shoppingcart,
-                      color: FineTheme.palettes.primary300,
-                    ),
+                    // child: Icon(
+                    //   AntDesign.shoppingcart,
+                    //   color: FineTheme.palettes.primary300,
+                    // ),
                   ),
                   Positioned(
                     top: -10,

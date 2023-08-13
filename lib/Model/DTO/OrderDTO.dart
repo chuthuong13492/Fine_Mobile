@@ -1,5 +1,7 @@
 import 'package:logger/logger.dart';
 
+import 'index.dart';
+
 final logger = Logger(
     printer: PrettyPrinter(
   methodCount: 0,
@@ -11,72 +13,73 @@ final logger = Logger(
 ));
 
 class OrderDTO {
-  int? id;
+  String? id;
   String? orderCode;
   Customer? customer;
-  String? deliveryPhone;
-  String? checkInDate;
   double? totalAmount;
-  double? discount;
   double? finalAmount;
-  double? shippingFee;
+  double? totalOtherAmount;
+  List<OtherAmounts>? otherAmounts;
   int? orderStatus;
   int? orderType;
   TimeSlot? timeSlot;
-  Room? room;
+  StationDTO? stationDTO;
+  int? point;
   bool? isConfirm;
   bool? isPartyMode;
-  int? shipperId;
   int? itemQuantity;
   String? note;
-  List<InverseGeneralOrder>? inverseGeneralOrder;
+  List<OrderDetails>? orderDetails;
 
-  OrderDTO(
-      {this.id,
-      this.orderCode,
-      this.customer,
-      this.deliveryPhone,
-      this.checkInDate,
-      this.totalAmount,
-      this.discount,
-      this.finalAmount,
-      this.shippingFee,
-      this.orderStatus,
-      this.orderType,
-      this.timeSlot,
-      this.room,
-      this.isConfirm,
-      this.isPartyMode,
-      this.shipperId,
-      this.itemQuantity,
-      this.note,
-      this.inverseGeneralOrder});
+  OrderDTO({
+    this.id,
+    this.orderCode,
+    this.customer,
+    this.totalAmount,
+    this.finalAmount,
+    this.totalOtherAmount,
+    this.otherAmounts,
+    this.orderStatus,
+    this.orderType,
+    this.timeSlot,
+    this.stationDTO,
+    this.point,
+    this.isConfirm,
+    this.isPartyMode,
+    this.itemQuantity,
+    this.note,
+    this.orderDetails,
+  });
 
   OrderDTO.fromJson(Map<String, dynamic> json) {
-    id = json["id"];
+    id = json["id"] as String;
     orderCode = json["orderCode"];
     customer =
         json["customer"] == null ? null : Customer.fromJson(json["customer"]);
-    deliveryPhone = json["deliveryPhone"];
-    checkInDate = json["checkInDate"];
     totalAmount = json["totalAmount"];
-    discount = json["discount"];
     finalAmount = json["finalAmount"];
-    shippingFee = json["shippingFee"];
+    totalOtherAmount = json["totalOtherAmount"];
+    otherAmounts = json["otherAmounts"] == null
+        ? null
+        : (json["otherAmounts"] as List)
+            .map((e) => OtherAmounts.fromJson(e))
+            .toList();
     orderStatus = json["orderStatus"];
     orderType = json["orderType"];
     timeSlot =
         json["timeSlot"] == null ? null : TimeSlot.fromJson(json["timeSlot"]);
-    room = json["room"] == null ? null : Room.fromJson(json["room"]);
+    stationDTO = json["stationOrder"] == null
+        ? null
+        : StationDTO.fromJson(json["stationOrder"]);
+    point = json["point"];
     isConfirm = json["isConfirm"];
     isPartyMode = json["isPartyMode"];
-    shipperId = json["shipperId"] ?? null;
     itemQuantity = json["itemQuantity"];
     note = json["note"];
-    inverseGeneralOrder = json["inverseGeneralOrder"] == null
+    orderDetails = json["orderDetails"] == null
         ? null
-        : (json["inverseGeneralOrder"] as List)
-            .map((e) => InverseGeneralOrder.fromJson(e))
+        : (json["orderDetails"] as List)
+            .map((e) => OrderDetails.fromJson(e))
             .toList();
   }
 
@@ -86,62 +89,60 @@ class OrderDTO {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
     _data["orderCode"] = orderCode;
     if (customer != null) {
       _data["customer"] = customer?.toJson();
     }
-    _data["deliveryPhone"] = deliveryPhone;
-    _data["checkInDate"] = checkInDate;
     _data["totalAmount"] = totalAmount;
-    _data["discount"] = discount;
     _data["finalAmount"] = finalAmount;
-    _data["shippingFee"] = shippingFee;
+    _data["totalOtherAmount"] = totalOtherAmount;
+    if (otherAmounts != null) {
+      _data["otherAmounts"] = otherAmounts?.map((e) => e.toJson()).toList();
+    }
     _data["orderStatus"] = orderStatus;
     _data["orderType"] = orderType;
     if (timeSlot != null) {
       _data["timeSlot"] = timeSlot?.toJson();
     }
-    if (room != null) {
-      _data["room"] = room?.toJson();
-    }
+    // if (stationDTO != null) {
+    //   _data["stationOrder"] =
+    // }
+    _data["point"] = point;
     _data["isConfirm"] = isConfirm;
     _data["isPartyMode"] = isPartyMode;
-    _data["shipperId"] = shipperId;
     _data["itemQuantity"] = itemQuantity;
     _data["note"] = note;
-    if (inverseGeneralOrder != null) {
-      _data["inverseGeneralOrder"] =
-          inverseGeneralOrder?.map((e) => e.toJson()).toList();
+    if (orderDetails != null) {
+      _data["orderDetails"] = orderDetails?.map((e) => e.toJson()).toList();
     }
     return _data;
   }
 
   Map<String, dynamic> toJsonAPi() {
     List<Map<String, dynamic>> listItem = [];
-    inverseGeneralOrder!.forEach((element) {
+    orderDetails!.forEach((element) {
       listItem.add(element.toJson());
+    });
+    List<Map<String, dynamic>> listOtherAmount = [];
+    otherAmounts!.forEach((element) {
+      listOtherAmount.add(element.toJson());
     });
 
     Map<String, dynamic> map = {
+      "id": id,
       "orderCode": orderCode,
-      "deliveryPhone": deliveryPhone,
-      // "checkInDate": checkInDate,
       "totalAmount": totalAmount,
-      "discount": discount ?? 0,
       "finalAmount": finalAmount,
-      "shippingFee": shippingFee,
-      // "orderStatus": orderStatus,
+      "totalOtherAmount": totalOtherAmount,
       "orderType": orderType,
-      // "customerId": customer!.id,
       "timeSlotId": timeSlot!.id,
-      "roomId": room!.id,
-      // "note": note ?? '',
-      "isConfirm": isConfirm,
+      "stationId": stationDTO!.id,
+      "paymentType": 1,
       "isPartyMode": isPartyMode,
-      // "shipperId": shipperId,
       "itemQuantity": itemQuantity,
-      "inverseGeneralOrder": listItem
+      "point": point,
+      "orderDetails": listItem,
+      "otherAmounts": listOtherAmount,
       // "supplier_notes":
       //     note != null ? note!.map((e) => e.toJson()).toList() : [],
       // "vouchers": vouchers != null
@@ -153,79 +154,48 @@ class OrderDTO {
   }
 }
 
-class InverseGeneralOrder {
-  int? id;
-  int? generalOrderId;
-  String? orderCode;
-  double? totalAmount;
-  double? discount;
-  double? finalAmount;
-  int? orderStatus;
-  int? storeId;
-  String? storeName;
-  String? note;
-  List<OrderDetails>? orderDetails;
+class OtherAmounts {
+  String? id;
+  String? orderId;
+  double? amount;
+  int? amountType;
 
-  InverseGeneralOrder(
-      {this.id,
-      this.generalOrderId,
-      this.orderCode,
-      this.totalAmount,
-      this.discount,
-      this.finalAmount,
-      this.orderStatus,
-      this.storeId,
-      this.storeName,
-      this.note,
-      this.orderDetails});
+  OtherAmounts({
+    this.id,
+    this.orderId,
+    this.amount,
+    this.amountType,
+  });
 
-  InverseGeneralOrder.fromJson(Map<String, dynamic> json) {
-    id = json["id"];
-    generalOrderId = json["generalOrderId"];
-    orderCode = json["orderCode"];
-    totalAmount = json["totalAmount"];
-    discount = json["discount"];
-    finalAmount = json["finalAmount"];
-    orderStatus = json["orderStatus"];
-    storeId = json["storeId"];
-    storeName = json["storeName"] ?? null;
-    orderDetails = json["orderDetails"] == null
-        ? null
-        : (json["orderDetails"] as List)
-            .map((e) => OrderDetails.fromJson(e))
-            .toList();
+  OtherAmounts.fromJson(Map<String, dynamic> json) {
+    id = json["id"] as String;
+    orderId = json["orderId"] as String;
+    amount = json["amount"];
+    amountType = json["amountType"];
   }
 
-  static List<InverseGeneralOrder> fromList(List<Map<String, dynamic>> list) {
-    return list.map((map) => InverseGeneralOrder.fromJson(map)).toList();
+  static List<OtherAmounts> fromList(List<Map<String, dynamic>> list) {
+    return list.map((map) => OtherAmounts.fromJson(map)).toList();
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
-    // _data["id"] = id;
-    // _data["generalOrderId"] = generalOrderId;
-    _data["orderCode"] = orderCode;
-    _data["totalAmount"] = totalAmount;
-    _data["discount"] = discount ?? 0;
-    _data["finalAmount"] = finalAmount;
-    // _data["orderStatus"] = orderStatus;
-    _data["storeId"] = storeId;
-    _data["note"] = note;
-    // _data["storeName"] = storeName;
-    if (orderDetails != null) {
-      _data["orderDetails"] = orderDetails?.map((e) => e.toJson()).toList();
-    }
+    _data["id"] = id;
+    _data["orderId"] = orderId;
+    _data["amount"] = amount;
+    _data["amountType"] = amountType;
     return _data;
   }
 }
 
 class OrderDetails {
-  int? id;
-  int? orderId;
-  int? productInMenuId;
+  String? id;
+  String? orderId;
+  String? productInMenuId;
+  String? productId;
+  String? storeId;
   String? productCode;
   String? productName;
-  int? comboId;
   double? unitPrice;
   int quantity;
   double? totalAmount;
@@ -237,9 +207,10 @@ class OrderDetails {
       this.id,
       this.orderId,
       this.productInMenuId,
+      this.productId,
+      this.storeId,
       this.productCode,
       this.productName,
-      this.comboId,
       this.unitPrice,
       this.quantity,
       this.totalAmount,
@@ -249,30 +220,19 @@ class OrderDetails {
 
   factory OrderDetails.fromJson(Map<String, dynamic> json) {
     return OrderDetails(
-        json["id"] as int,
-        json["orderId"] as int,
-        json["productInMenuId"] as int,
-        json["productCode"] as String,
+        json["id"] as String ?? null,
+        json["orderId"] as String ?? null,
+        json["productInMenuId"] as String,
+        json["productId"] as String,
+        json["storeId"] as String ?? null,
+        json["productCode"] as String ?? null,
         json["productName"] as String,
-        json["comboId"] as int ?? null,
         json["unitPrice"] as double,
         json["quantity"] as int,
         json["totalAmount"] as double,
         json["discount"] as double ?? 0,
-        json["finalAmount"] as double,
+        json["finalAmount"] as double ?? 0,
         json["note"] as String ?? '');
-    // id = json["id"];
-    // orderId = json["orderId"];
-    // productInMenuId = json["productInMenuId"];
-    // productCode = json["productCode"];
-    // productName = json["productName"];
-    // comboId = json["comboId"];
-    // unitPrice = json["unitPrice"];
-    // quantity = json["quantity"];
-    // totalAmount = json["totalAmount"];
-    // discount = json["discount"];
-    // finalAmount = json["finalAmount"];
-    // note = json["note"];
   }
 
   static List<OrderDetails> fromList(List<Map<String, dynamic>> list) {
@@ -281,102 +241,18 @@ class OrderDetails {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
-    // _data["id"] = id;
-    // _data["orderId"] = orderId;
+    _data["id"] = id;
+    _data["orderId"] = orderId;
     _data["productInMenuId"] = productInMenuId;
+    // _data["productId"] = productId;
+    _data["storeId"] = storeId;
     _data["productCode"] = productCode;
     _data["productName"] = productName;
-    _data["comboId"] = null;
     _data["unitPrice"] = unitPrice;
     _data["quantity"] = quantity;
     _data["totalAmount"] = totalAmount;
-    // _data["discount"] = discount ?? 0;
     _data["finalAmount"] = finalAmount;
     _data["note"] = note ?? '';
-    return _data;
-  }
-}
-
-class Room {
-  int? id;
-  int? roomNumber;
-  int? floorNumber;
-  String? areaName;
-
-  Room({this.id, this.roomNumber, this.floorNumber, this.areaName});
-
-  Room.fromJson(Map<String, dynamic> json) {
-    id = json["id"];
-    roomNumber = json["roomNumber"];
-    floorNumber = json["floorNumber"];
-    areaName = json["areaName"];
-  }
-
-  static List<Room> fromList(List<Map<String, dynamic>> list) {
-    return list.map((map) => Room.fromJson(map)).toList();
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["roomNumber"] = roomNumber;
-    _data["floorNumber"] = floorNumber;
-    _data["areaName"] = areaName;
-    return _data;
-  }
-}
-
-class TimeSlot {
-  int? id;
-  String? arriveTime;
-  String? checkoutTime;
-
-  TimeSlot({this.id, this.arriveTime, this.checkoutTime});
-
-  TimeSlot.fromJson(Map<String, dynamic> json) {
-    id = json["id"];
-    arriveTime = json["arriveTime"];
-    checkoutTime = json["checkoutTime"];
-  }
-
-  static List<TimeSlot> fromList(List<Map<String, dynamic>> list) {
-    return list.map((map) => TimeSlot.fromJson(map)).toList();
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["arriveTime"] = arriveTime;
-    _data["checkoutTime"] = checkoutTime;
-    return _data;
-  }
-}
-
-class Customer {
-  int? id;
-  String? name;
-  String? customerCode;
-  String? email;
-
-  Customer({this.id, this.name, this.customerCode, this.email});
-
-  Customer.fromJson(Map<String, dynamic> json) {
-    id = json["id"];
-    name = json["name"];
-    customerCode = json["customerCode"];
-    email = json["email"];
-  }
-
-  static List<Customer> fromList(List<Map<String, dynamic>> list) {
-    return list.map((map) => Customer.fromJson(map)).toList();
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["name"] = name;
-    _data["customerCode"] = customerCode;
-    _data["email"] = email;
     return _data;
   }
 }

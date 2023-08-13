@@ -1,10 +1,11 @@
 import 'index.dart';
 
 class MenuDTO {
-  int? id;
-  int? timeSlotId;
+  String? id;
+  String? timeSlotId;
   String? menuName;
   String? imgUrl;
+  int? position;
   bool? isActive;
   DateTime? createAt;
   DateTime? updateAt;
@@ -15,16 +16,18 @@ class MenuDTO {
       this.timeSlotId,
       this.menuName,
       this.imgUrl,
+      this.position,
       this.isActive,
       this.createAt,
       this.updateAt,
       this.products});
 
   MenuDTO.fromJson(Map<String, dynamic> json) {
-    id = json["id"];
-    timeSlotId = json["timeSlotId"];
+    id = json["id"] as String;
+    timeSlotId = json["timeSlotId"] as String;
     menuName = json["menuName"];
     imgUrl = json["imgUrl"];
+    position = json["position"];
     isActive = json["isActive"];
     createAt = json['createAt'] as String != null
         ? DateTime.parse(json['createAt'] as String)
@@ -49,6 +52,7 @@ class MenuDTO {
     _data["timeSlotId"] = timeSlotId;
     _data["menuName"] = menuName;
     _data["imgUrl"] = imgUrl;
+    _data["position"] = position;
     _data["isActive"] = isActive;
     _data["createAt"] = createAt;
     _data["updateAt"] = updateAt;

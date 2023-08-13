@@ -12,4 +12,7 @@ class RoutHandler {
   static const String ORDER_HISTORY_DETAIL = "/order_detail";
   static const String PRODUCT_FILTER_LIST = "/product_filter_list";
   static const String WELCOME_SCREEN = "/welcome_screen";
+  static const String STATION_PICKER_SCREEN = "/station_picker_screen";
+  static const String PARTY_ORDER_SCREEN = "/party_order_screen";
+  static const String CONFIRM_ORDER_SCREEN = "/confirm_order_screen";
 }

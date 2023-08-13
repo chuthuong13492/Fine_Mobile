@@ -5,6 +5,7 @@ import 'package:fine/Service/analytic_service.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
+import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -20,7 +21,7 @@ class ProductDetailViewModel extends BaseModel {
 
   Map<String, String>? selectedAttributes;
   int count = 1;
-
+  int? quantity;
   double? total, fixTotal = 0, extraTotal = 0;
   bool? order = false;
   //List choice option
@@ -62,7 +63,7 @@ class ProductDetailViewModel extends BaseModel {
     //   }
     //   fixTotal = master.price * count;
     // }
-    fixTotal = (master?.price ?? 0) * count;
+    fixTotal = (master?.attributes![0].price ?? 0) * count;
     // // total = fixTotal + extraTotal;
     total = fixTotal;
 
@@ -84,7 +85,6 @@ class ProductDetailViewModel extends BaseModel {
         minusColor = FineTheme.palettes.primary100;
       }
       count++;
-
       // if (master.type == ProductType.MASTER_PRODUCT) {
       //   Map choice = new Map();
       //   for (int i = 0; i < affectPriceContent!.keys.toList().length; i++) {
@@ -109,7 +109,7 @@ class ProductDetailViewModel extends BaseModel {
       // }
 
       // total = fixTotal + extraTotal;
-      fixTotal = (master?.price ?? 0) * count;
+      fixTotal = (master?.attributes![0].price ?? 0) * count;
 
       total = fixTotal;
       notifyListeners();
@@ -124,7 +124,6 @@ class ProductDetailViewModel extends BaseModel {
       if (count == 1) {
         minusColor = FineTheme.palettes.neutral700;
       }
-
       // if (master.type == ProductType.MASTER_PRODUCT) {
       //   Map choice = new Map();
       //   for (int i = 0; i < affectPriceContent.keys.toList().length; i++) {
@@ -147,7 +146,7 @@ class ProductDetailViewModel extends BaseModel {
       //     }
       //   }
       // }
-      fixTotal = (master?.price ?? 0) * count;
+      fixTotal = (master?.attributes![0].price ?? 0) * count;
 
       // // total = fixTotal + extraTotal;
       total = fixTotal;
@@ -246,11 +245,14 @@ class ProductDetailViewModel extends BaseModel {
     //     }
     //   }
     // }
-
+    bool isPartyMode = false;
+    PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+    if (party.partyOrderDTO != null) {
+      isPartyMode = true;
+    }
     String description = "";
     // Cart newCart = Cart(5, '0902915671', 4);
-
-    CartItem item = new CartItem(master!.id, 0, count, null);
+    CartItem item = new CartItem(master!.attributes![0].id, count, null);
 
     // if (master.type == ProductType.GIFT_PRODUCT) {
     //   AccountViewModel account = Get.find<AccountViewModel>();
@@ -284,10 +286,19 @@ class ProductDetailViewModel extends BaseModel {
         .logChangeCart(master!, item.quantity, true);
     hideDialog();
     if (backToHome) {
-      Get.find<OrderViewModel>().prepareOrder();
+      if (isPartyMode) {
+        Get.find<PartyOrderViewModel>().addProductToPartyOrder();
+      } else {
+        Get.find<OrderViewModel>().prepareOrder();
+      }
+
       // Get.back(result: true);
     } else {
-      Get.find<OrderViewModel>().prepareOrder();
+      if (isPartyMode) {
+        Get.find<PartyOrderViewModel>().addProductToPartyOrder();
+      } else {
+        Get.find<OrderViewModel>().prepareOrder();
+      }
     }
   }
 }

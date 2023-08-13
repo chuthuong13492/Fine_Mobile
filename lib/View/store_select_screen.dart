@@ -1,5 +1,5 @@
 import 'package:fine/Constant/view_status.dart';
-import 'package:fine/Model/DTO/CampusDTO.dart';
+import 'package:fine/Model/DTO/DestinationDTO.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,7 +16,7 @@ class StoreSelectScreen extends StatefulWidget {
 class _StoreSelectScreenState extends State<StoreSelectScreen> {
   @override
   void initState() {
-    Get.find<RootViewModel>().getListCampus();
+    Get.find<RootViewModel>().getListDestination();
     super.initState();
     // _refresh();
   }
@@ -163,12 +163,12 @@ class _StoreSelectScreenState extends State<StoreSelectScreen> {
     );
   }
 
-  Widget buildStoreSelect(CampusDTO area) {
+  Widget buildStoreSelect(DestinationDTO area) {
     return Padding(
       padding: const EdgeInsets.all(8),
       child: InkWell(
         onTap: () {
-          Get.find<RootViewModel>().setCurrentCampus(area);
+          Get.find<RootViewModel>().setCurrentDestination(area);
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -17,36 +17,19 @@ final logger = Logger(
 
 class Cart {
   List<CartItem>? orderDetails;
-  // int? payment;
   int? orderType;
-  // int? customerId;
-  String? deliveryPhone;
-  int? roomId;
-  int? timeSlotId;
-  // List<SupplierNoteDTO>? notes;
-  String? note;
-  // User info
-
-  // _vouchers
-  // List<VoucherDTO> vouchers;
+  String? timeSlotId;
 
   Cart.get({
-    // this.customerId,
-    this.deliveryPhone,
     this.orderType,
     this.timeSlotId,
-    this.roomId,
-    this.note,
     this.orderDetails,
   });
 
   Cart({
-    // this.customerId,
-    this.deliveryPhone,
     this.timeSlotId,
   }) {
     orderDetails = [];
-    // vouchers = [];
   }
 
   // List<VoucherDTO> get vouchers {
@@ -63,28 +46,14 @@ class Cart {
       list = itemJson.map((e) => CartItem.fromJson(e)).toList();
     }
     return Cart.get(
-      // customerId: json['customerID'],
-      deliveryPhone: json['deliveryPhone'] as String,
-      orderType: 2,
+      orderType: 1,
       timeSlotId: json['timeSlotId'],
-      roomId: 2,
-      // notes: (json['supplier_notes'] as List)
-      //     .map((e) => SupplierNoteDTO.fromJson(e))
-      //     .toList(),
-      note: json["note"] ?? '',
       orderDetails: list,
-      // vouchers: (json['vouchers'] as List)
-      //     ?.map((e) => VoucherDTO.fromJson(e))
-      //     ?.toList()
     );
   }
 
-  void addProperties(String phone, int timeSlot) {
-    // if (customerId == null) {
-    //   customerId = Id;
-    deliveryPhone = phone;
+  void addProperties(String timeSlot) {
     timeSlotId = timeSlot;
-    // }
   }
 
   // void addVoucher(VoucherDTO voucher) {
@@ -105,13 +74,13 @@ class Cart {
     List listCartItem = orderDetails!.map((e) => e.toJson()).toList();
     return {
       // "customerId": customerId,
-      "deliveryPhone": deliveryPhone,
+      // "deliveryPhone": deliveryPhone,
       "orderType": orderType,
       "timeSlotId": timeSlotId,
-      "roomId": roomId,
+      // "roomId": roomId,
       // "supplier_notes":
       //     note != null ? note!.map((e) => e.toJson())?.toList() : [],
-      "note": note ?? null,
+      // "note": note ?? null,
       // "vouchers": vouchers != null
       //     ? vouchers?.map((voucher) => voucher.toJson())?.toList()
       //     : null,
@@ -121,18 +90,20 @@ class Cart {
 
   Map<String, dynamic> toJsonAPi() {
     List<Map<String, dynamic>> listCartItem = [];
-    orderDetails!.forEach((element) {
-      listCartItem.add(element.toJson());
-    });
+    if (orderDetails != null) {
+      orderDetails!.forEach((element) {
+        listCartItem.add(element.toJson());
+      });
+    }
 
     Map<String, dynamic> map = {
       // "customerId": customerId,
-      "deliveryPhone": deliveryPhone,
+      // "deliveryPhone": deliveryPhone,
       "orderType": orderType,
       "timeSlotId": timeSlotId,
-      "roomId": roomId,
-      "note": note ?? null,
-      "orderDetails": listCartItem,
+      // "roomId": roomId,
+      // "note": note ?? null,
+      "orderDetails": listCartItem ?? null,
       // "supplier_notes":
       //     note != null ? note!.map((e) => e.toJson()).toList() : [],
       // "vouchers": vouchers != null
@@ -180,22 +151,21 @@ class Cart {
 }
 
 class CartItem {
-  int? productInMenuId;
-  int? comboId;
+  String? productId;
   int quantity;
   String? note;
 
-  CartItem(this.productInMenuId, this.comboId, this.quantity, this.note);
+  CartItem(this.productId, this.quantity, this.note);
 
   bool findCartItem(CartItem item) {
     bool found = true;
 
-    if (this.productInMenuId != item.productInMenuId) {
+    if (this.productId != item.productId) {
       return false;
     }
-    if (this.comboId != item.comboId) {
-      return false;
-    }
+    // if (this.comboId != item.comboId) {
+    //   return false;
+    // }
     return found;
   }
 
@@ -208,10 +178,10 @@ class CartItem {
   // }
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
-      json['productInMenuId'] as int,
-      json['comboId'] as int,
+      json['productId'] as String,
+      // json['comboId'] as int,
       json['quantity'] as int,
-      json['String'] as String,
+      json['note'] as String,
     );
   }
 
@@ -221,8 +191,8 @@ class CartItem {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["productInMenuId"] = productInMenuId;
-    _data["comboId"] = comboId;
+    _data["productId"] = productId;
+    // _data["comboId"] = comboId;
     _data["quantity"] = quantity;
     _data["note"] = note ?? "";
     return _data;

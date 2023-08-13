@@ -1,20 +1,25 @@
 import 'dart:convert';
 
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/format_price.dart';
+import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
+import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
@@ -61,7 +66,7 @@ class _OrderScreenState extends State<OrderScreen> {
       model: Get.find<OrderViewModel>(),
       child: Scaffold(
           backgroundColor: FineTheme.palettes.shades100,
-          appBar: DefaultAppBar(title: "Đơn hàng của bạn"),
+          appBar: DefaultAppBar(title: "Trang thanh toán"),
           bottomNavigationBar: bottomBar(),
           body: onInit
               ? const Center(
@@ -96,19 +101,39 @@ class _OrderScreenState extends State<OrderScreen> {
                                   child: Container(
                                     color: FineTheme.palettes.neutral200,
                                   )),
-                              Hero(
-                                tag: CART_TAG,
-                                child: Container(
-                                    margin: const EdgeInsets.only(top: 8),
-                                    child: layoutAddress()),
-                              ),
+                              // Hero(
+                              //   tag: CART_TAG,
+                              //   child: Container(
+                              //       margin: const EdgeInsets.only(top: 8),
+                              //       child: layoutAddress()),
+                              // ),
 
+                              Container(
+                                padding: const EdgeInsets.only(
+                                    right: 16, left: 16, top: 10, bottom: 10),
+                                child: layoutStaionPickup(model),
+                              ),
+                              SizedBox(
+                                  height: 8,
+                                  child: Container(
+                                    color: FineTheme.palettes.neutral200,
+                                  )),
                               AutoScrollTag(
                                 index: 1,
                                 key: const ValueKey(1),
                                 controller: controller!,
                                 highlightColor: Colors.black.withOpacity(0.1),
                                 child: timeRecieve(),
+                              ),
+                              SizedBox(
+                                  height: 8,
+                                  child: Container(
+                                    color: FineTheme.palettes.neutral200,
+                                  )),
+                              Container(
+                                padding: const EdgeInsets.only(
+                                    right: 16, left: 16, top: 10, bottom: 10),
+                                child: layoutPartyCode(),
                               ),
                               // Container(child: buildBeanReward()),
                               SizedBox(
@@ -118,7 +143,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                   )),
                               Container(
                                   child: layoutOrder(
-                                      model.orderDTO!.inverseGeneralOrder!)),
+                                      model.orderDTO!.orderDetails!)),
                               SizedBox(
                                   height: 8,
                                   child: Container(
@@ -144,6 +169,145 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
+  Widget layoutStaionPickup(OrderViewModel model) {
+    String text = "Đợi tý đang load...";
+    final status = model.status;
+    // if (model.changeAddress) {
+    //   text = "Đang thay đổi...";
+    // } else if (location != null) {
+    //   // text = destinationDTO.name + " - " + location.address;
+    //   text = model.currentStore!.name!;
+    // } else {
+    //   text = "Chưa chọn";
+    // }
+    if (model.orderDTO!.stationDTO != null) {
+      text = model.orderDTO!.stationDTO!.name!;
+    } else {
+      text = 'Vui lòng chọn nơi nhận nha 😘';
+    }
+
+    if (status == ViewStatus.Error) {
+      text = "Có lỗi xảy ra...";
+    }
+    return InkWell(
+      onTap: () {
+        Get.toNamed(RoutHandler.STATION_PICKER_SCREEN);
+      },
+      child: Container(
+        height: 50,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Center(
+              child: SvgPicture.asset(
+                "assets/icons/box_icon.svg",
+                height: 30,
+                width: 30,
+              ),
+            ),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.only(left: 16),
+                    width: Get.width,
+                    child: Text(
+                      'Giao đến',
+                      style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 15,
+                          fontStyle: FontStyle.normal,
+                          color: FineTheme.palettes.neutral600),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.only(left: 16),
+                    width: Get.width,
+                    child: Text(
+                      text,
+                      style: FineTheme.typograhpy.subtitle2,
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  'Thay đổi',
+                  style: FineTheme.typograhpy.caption1,
+                ),
+                const Icon(
+                  Icons.keyboard_arrow_right,
+                  size: 25,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget layoutPartyCode() {
+    PartyOrderViewModel model = Get.find<PartyOrderViewModel>();
+
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              SvgPicture.asset(
+                "assets/icons/Party.svg",
+                width: 20,
+                height: 20,
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Text(
+                "Vào Party",
+                style: FineTheme.typograhpy.body1,
+              ),
+              const SizedBox(
+                width: 10,
+              ),
+              Container(
+                width: 30,
+                height: 16,
+                color: Colors.red,
+                child: Center(
+                  child: Text(
+                    "Mới",
+                    style: FineTheme.typograhpy.caption1.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          InkWell(
+            onTap: () {
+              showPartyDialog(model.partyCode);
+            },
+            child: Text(
+              "Tạo đơn",
+              style: FineTheme.typograhpy.body2
+                  .copyWith(color: FineTheme.palettes.primary100),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget layoutAddress() {
     // LocationDTO location = store.locations.firstWhere(
     //   (element) => element.isSelected,
@@ -159,7 +323,7 @@ class _OrderScreenState extends State<OrderScreen> {
     RootViewModel root = Get.find<RootViewModel>();
     final destination = root.currentStore!.name;
     // String destination = "Trường Đại Học FPT - Khu công nghệ";
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: InkWell(
         onTap: () async {
@@ -242,7 +406,6 @@ class _OrderScreenState extends State<OrderScreen> {
     //     (element) => element.id == orderViewModel.currentCart.timeSlotId);
     // String currentTimeSlot = currentTime.arriveTime.replaceAll(';', ' - ');
     return Container(
-      padding: const EdgeInsets.only(bottom: 4),
       width: MediaQuery.of(context).size.width,
       child: InkWell(
         onTap: () {
@@ -261,31 +424,41 @@ class _OrderScreenState extends State<OrderScreen> {
           children: [
             Container(
                 width: MediaQuery.of(context).size.width * 0.7,
-                padding: const EdgeInsets.fromLTRB(16, 4, 0, 0),
+                padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        const Image(
-                          image: AssetImage("assets/icons/clock_icon.png"),
-                          width: 24,
-                          height: 24,
-                        ),
+                        // const Image(
+                        //   image: AssetImage("assets/icons/clock_icon.png"),
+                        //   width: 24,
+                        //   height: 24,
+                        // ),
                         Container(
-                          padding: const EdgeInsets.only(left: 5),
-                          width: 120,
+                          // padding: const EdgeInsets.only(left: 5),
+                          // width: 100,
                           child: Text(
-                            "Thời gian nhận:",
-                            style: FineTheme.typograhpy.subtitle2,
+                            "Giờ giao:",
+                            style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 15,
+                                fontStyle: FontStyle.normal,
+                                color: FineTheme.palettes.neutral600),
                           ),
                         ),
                         Container(
-                          // padding: const EdgeInsets.only(left: 10),
+                          padding: const EdgeInsets.only(left: 16),
                           child: Text(
                             "${currentTimeSlot.checkoutTime.toString()}",
-                            style: FineTheme.typograhpy.caption1,
+                            style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                fontStyle: FontStyle.normal,
+                                color: FineTheme.palettes.shades200),
                           ),
                         ),
                       ],
@@ -298,7 +471,7 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  Widget layoutOrder(List<InverseGeneralOrder> list) {
+  Widget layoutOrder(List<OrderDetails> list) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -311,8 +484,13 @@ class _OrderScreenState extends State<OrderScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                "Các món trong giỏ",
-                style: FineTheme.typograhpy.subtitle1,
+                "Đơn hàng của bạn",
+                style: TextStyle(
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
+                    fontStyle: FontStyle.normal,
+                    color: FineTheme.palettes.neutral600),
               ),
             ],
           ),
@@ -321,7 +499,10 @@ class _OrderScreenState extends State<OrderScreen> {
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemBuilder: (context, index) {
-            return layoutStore(list[index]);
+            return Padding(
+              padding: const EdgeInsets.only(right: 16, left: 16),
+              child: productCard(list[index]),
+            );
           },
           itemCount: list.length,
           separatorBuilder: (context, index) => Divider(
@@ -332,115 +513,115 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  Widget layoutStore(InverseGeneralOrder inverseGeneralOrder) {
-    // SupplierNoteDTO supplierNote = orderViewModel.currentCart.notes?.firstWhere(
-    //   (element) => element.supplierId == list[0].master.supplierId,
-    //   orElse: () => null,
-    // );
+  // Widget layoutStore(OrderDetails inverseGeneralOrder) {
+  //   // SupplierNoteDTO supplierNote = orderViewModel.currentCart.notes?.firstWhere(
+  //   //   (element) => element.supplierId == list[0].master.supplierId,
+  //   //   orElse: () => null,
+  //   // );
 
-    List<Widget> card = [];
-    List<OrderDetails> orderDetailList = inverseGeneralOrder.orderDetails!;
+  //   List<Widget> card = [];
+  //   List<OrderDetails> orderDetailList = inverseGeneralOrder.orderDetails!;
 
-    for (OrderDetails item in orderDetailList) {
-      card.add(productCard(item));
-    }
+  //   for (OrderDetails item in orderDetailList) {
+  //     card.add(productCard(item));
+  //   }
 
-    for (int i = 0; i < orderDetailList.length; i++) {
-      if (i % 2 != 0) {
-        card.insert(
-            i,
-            Container(
-                color: FineTheme.palettes.shades100,
-                child: MySeparator(
-                  color: FineTheme.palettes.neutral500,
-                )));
-      }
-    }
+  //   for (int i = 0; i < orderDetailList.length; i++) {
+  //     if (i % 2 != 0) {
+  //       card.insert(
+  //           i,
+  //           Container(
+  //               color: FineTheme.palettes.shades100,
+  //               child: MySeparator(
+  //                 color: FineTheme.palettes.neutral500,
+  //               )));
+  //     }
+  //   }
 
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 0, right: 4),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    inverseGeneralOrder.storeName!,
-                    style: FineTheme.typograhpy.subtitle2
-                        .copyWith(color: FineTheme.palettes.primary300),
-                  ),
-                  Text(
-                    // ignore: prefer_interpolation_to_compose_strings
-                    inverseGeneralOrder.orderDetails!.fold<int>(0,
-                            (previousValue, element) {
-                          return previousValue + element.quantity;
-                        }).toString() +
-                        " món",
-                    style: FineTheme.typograhpy.subtitle2
-                        .copyWith(color: FineTheme.palettes.primary300),
-                  )
-                ],
-              ),
-            ),
-            // Container(
-            //     padding: const EdgeInsets.fromLTRB(0, 4, 8, 0),
-            //     width: Get.width,
-            //     child: Column(
-            //       children: [
-            //         Divider(
-            //           height: 4,
-            //           color: FineTheme.palettes.neutral600,
-            //         ),
-            //         Padding(
-            //           padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-            //           child: Row(
-            //             children: [
-            //               const Icon(
-            //                 Icons.note_alt_outlined,
-            //                 color: Colors.black,
-            //                 size: 18,
-            //               ),
-            //               Flexible(
-            //                 child: Material(
-            //                   color: Colors.transparent,
-            //                   child: InkWell(
-            //                       onTap: () {
-            //                         orderViewModel.addSupplierNote(
-            //                             list[0].master.supplierId);
-            //                       },
-            //                       child: Padding(
-            //                         padding: EdgeInsets.only(left: 8, right: 8),
-            //                         child: Text(
-            //                             (supplierNote == null)
-            //                                 ? "Ghi chú cho nhà hàng"
-            //                                 : supplierNote.content,
-            //                             overflow: TextOverflow.ellipsis,
-            //                             style: BeanOiTheme.typography.caption1
-            //                                 .copyWith(
-            //                                     color: BeanOiTheme
-            //                                         .palettes.neutral700)),
-            //                       )),
-            //                 ),
-            //               ),
-            //             ],
-            //           ),
-            //         ),
-            //         Divider(
-            //           height: 4,
-            //           color: BeanOiTheme.palettes.neutral600,
-            //         ),
-            //       ],
-            //     ))
-          ]),
-          ...card
-        ],
-      ),
-    );
-  }
+  //   return Container(
+  //     margin: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+  //           Padding(
+  //             padding: const EdgeInsets.only(left: 0, right: 4),
+  //             child: Row(
+  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //               children: [
+  //                 Text(
+  //                   inverseGeneralOrder.storeName!,
+  //                   style: FineTheme.typograhpy.subtitle2
+  //                       .copyWith(color: FineTheme.palettes.primary300),
+  //                 ),
+  //                 Text(
+  //                   // ignore: prefer_interpolation_to_compose_strings
+  //                   inverseGeneralOrder.orderDetails!.fold<int>(0,
+  //                           (previousValue, element) {
+  //                         return previousValue + element.quantity;
+  //                       }).toString() +
+  //                       " món",
+  //                   style: FineTheme.typograhpy.subtitle2
+  //                       .copyWith(color: FineTheme.palettes.primary300),
+  //                 )
+  //               ],
+  //             ),
+  //           ),
+  //           // Container(
+  //           //     padding: const EdgeInsets.fromLTRB(0, 4, 8, 0),
+  //           //     width: Get.width,
+  //           //     child: Column(
+  //           //       children: [
+  //           //         Divider(
+  //           //           height: 4,
+  //           //           color: FineTheme.palettes.neutral600,
+  //           //         ),
+  //           //         Padding(
+  //           //           padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
+  //           //           child: Row(
+  //           //             children: [
+  //           //               const Icon(
+  //           //                 Icons.note_alt_outlined,
+  //           //                 color: Colors.black,
+  //           //                 size: 18,
+  //           //               ),
+  //           //               Flexible(
+  //           //                 child: Material(
+  //           //                   color: Colors.transparent,
+  //           //                   child: InkWell(
+  //           //                       onTap: () {
+  //           //                         orderViewModel.addSupplierNote(
+  //           //                             list[0].master.supplierId);
+  //           //                       },
+  //           //                       child: Padding(
+  //           //                         padding: EdgeInsets.only(left: 8, right: 8),
+  //           //                         child: Text(
+  //           //                             (supplierNote == null)
+  //           //                                 ? "Ghi chú cho nhà hàng"
+  //           //                                 : supplierNote.content,
+  //           //                             overflow: TextOverflow.ellipsis,
+  //           //                             style: BeanOiTheme.typography.caption1
+  //           //                                 .copyWith(
+  //           //                                     color: BeanOiTheme
+  //           //                                         .palettes.neutral700)),
+  //           //                       )),
+  //           //                 ),
+  //           //               ),
+  //           //             ],
+  //           //           ),
+  //           //         ),
+  //           //         Divider(
+  //           //           height: 4,
+  //           //           color: BeanOiTheme.palettes.neutral600,
+  //           //         ),
+  //           //       ],
+  //           //     ))
+  //         ]),
+  //         ...card
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget productCard(OrderDetails orderDetails) {
     List<Widget> list = [];
@@ -453,7 +634,7 @@ class _OrderScreenState extends State<OrderScreen> {
     //   price = item.master.price * item.quantity;
     //   startProduct = 0;
     // }
-    if (orderDetails.id != null) {
+    if (orderDetails.orderId != null) {
       price = orderDetails.unitPrice! * orderDetails.quantity;
       startProduct = 1;
     }
@@ -634,6 +815,12 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Widget layoutSubtotal() {
+    final otherAmounts = _orderViewModel!.orderDTO!.otherAmounts
+        ?.where((element) => element.amountType == 1)
+        .map((e) => e.amount)
+        .toString()
+        .replaceAll('(', '')
+        .replaceAll(')', '');
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
       child: Container(
@@ -704,7 +891,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                   children: <TextSpan>[
                                     TextSpan(
                                       text:
-                                          "${_orderViewModel!.orderDTO!.discount ?? 0}",
+                                          // "${_orderViewModel!.orderDTO!.discount ?? 0}",
+                                          "0",
                                       style: FineTheme.typograhpy.subtitle2
                                           .copyWith(color: Colors.black),
                                     ),
@@ -722,8 +910,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                   text: '',
                                   children: <TextSpan>[
                                     TextSpan(
-                                      text:
-                                          "${_orderViewModel!.orderDTO!.shippingFee ?? 0}",
+                                      text: "${otherAmounts ?? 0}",
                                       style: FineTheme.typograhpy.subtitle2
                                           .copyWith(color: Colors.black),
                                     ),
@@ -770,14 +957,20 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Widget bottomBar() {
-    var isMenuAvailable =
+    final otherAmounts = _orderViewModel!.orderDTO!.otherAmounts
+        ?.where((element) => element.amountType == 1)
+        .map((e) => e.amount)
+        .toString()
+        .replaceAll('(', '')
+        .replaceAll(')', '');
+    var isCurrentTimeSlotAvailable =
         Get.find<RootViewModel>().isCurrentTimeSlotAvailable();
     return ScopedModel(
       model: Get.find<OrderViewModel>(),
       child: ScopedModelDescendant<OrderViewModel>(
         builder: (context, child, model) {
           return Container(
-            padding: const EdgeInsets.only(left: 8, right: 8, top: 8),
+            padding: const EdgeInsets.only(left: 8, right: 8, top: 12),
             decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [
@@ -787,93 +980,249 @@ class _OrderScreenState extends State<OrderScreen> {
                   blurRadius: 6.0,
                 ),
               ],
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(40), topLeft: Radius.circular(40)),
             ),
             child: ListView(
               shrinkWrap: true,
               children: [
                 Container(
-                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        flex: 4,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 0, 0, 8),
-                          child: Container(
-                            alignment: Alignment.centerLeft,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              onTap: () {},
+                              child: Row(
+                                children: const [
+                                  Text(
+                                    'Thêm Voucher',
+                                    style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        fontStyle: FontStyle.normal),
+                                  ),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  Icon(
+                                    Icons.keyboard_arrow_up,
+                                    size: 24,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 102,
+                            child: InkWell(
+                              onTap: () {},
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: const [
+                                  Text(
+                                    'Tiền mặt',
+                                    style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        fontStyle: FontStyle.normal),
+                                  ),
+                                  SizedBox(
+                                    width: 20,
+                                  ),
+                                  Icon(
+                                    Icons.keyboard_arrow_up,
+                                    size: 24,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Phí giao hàng',
+                                  style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      fontStyle: FontStyle.normal),
+                                ),
+                                Text(
+                                  "${otherAmounts ?? 0}",
+                                  style: const TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w400,
+                                      fontStyle: FontStyle.normal),
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: 102,
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Tổng cộng",
-                                  style: FineTheme.typograhpy.caption1.copyWith(
-                                      color: FineTheme.palettes.neutral600),
+                                  '',
+                                  style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      fontStyle: FontStyle.normal),
                                 ),
-                                const SizedBox(height: 6),
                                 Text(
                                   _orderViewModel!.status == ViewStatus.Loading
                                       ? "..."
                                       : formatPrice(_orderViewModel!
                                           .orderDTO!.finalAmount!),
-                                  style: FineTheme.typograhpy.subtitle1
-                                      .copyWith(fontWeight: FontWeight.bold),
-                                ),
+                                  style: const TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      fontStyle: FontStyle.normal),
+                                )
                               ],
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                      Expanded(
-                        flex: 7,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(0, 0, 8, 8),
-                          child: InkWell(
-                            onTap: () async {
+                      const SizedBox(height: 18),
+                      Center(
+                        child: InkWell(
+                          onTap: () async {
+                            if (isCurrentTimeSlotAvailable) {
                               await model.orderCart();
-                            },
-                            child: Container(
-                              height: 41,
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: FineTheme.palettes.primary200,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: FineTheme.palettes.primary200,
-                                  width: 1,
-                                  style: BorderStyle.solid,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: FineTheme.palettes.primary300,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                      isMenuAvailable
-                                          ? "Đặt đơn"
-                                          : "Khung giờ đã kết thúc",
-                                      style: FineTheme.typograhpy.subtitle1
-                                          .copyWith(
-                                              color: isMenuAvailable
-                                                  ? Colors.white
-                                                  : FineTheme
-                                                      .palettes.neutral800)),
-                                ],
-                              ),
+                            } else {
+                              await deleteCart();
+                              await deleteMart();
+                              showStatusDialog(
+                                  "assets/images/error.png",
+                                  "Opps",
+                                  "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+                              Get.back();
+                            }
+                          },
+                          child: Container(
+                            width: 190,
+                            height: 40,
+                            decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20)),
+                                color: Color(0xFF238E9C)),
+                            child: Center(
+                              child: Text(
+                                  isCurrentTimeSlotAvailable
+                                      ? "Đặt ngay"
+                                      : "Khung giờ đã kết thúc",
+                                  style: const TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      fontStyle: FontStyle.normal,
+                                      color: Colors.white)),
                             ),
                           ),
                         ),
                       ),
                     ],
                   ),
+                  // child: Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   crossAxisAlignment: CrossAxisAlignment.center,
+                  //   children: [
+                  //     Expanded(
+                  //       flex: 4,
+                  //       child: Padding(
+                  //         padding: const EdgeInsets.fromLTRB(8, 0, 0, 8),
+                  //         child: Container(
+                  //           alignment: Alignment.centerLeft,
+                  //           child: Column(
+                  //             mainAxisAlignment: MainAxisAlignment.start,
+                  //             crossAxisAlignment: CrossAxisAlignment.start,
+                  //             children: [
+                  //               Text(
+                  //                 "Tổng cộng",
+                  //                 style: FineTheme.typograhpy.caption1.copyWith(
+                  //                     color: FineTheme.palettes.neutral600),
+                  //               ),
+                  //               const SizedBox(height: 6),
+                  //               Text(
+                  //                 _orderViewModel!.status == ViewStatus.Loading
+                  //                     ? "..."
+                  //                     : formatPrice(_orderViewModel!
+                  //                         .orderDTO!.finalAmount!),
+                  //                 style: FineTheme.typograhpy.subtitle1
+                  //                     .copyWith(fontWeight: FontWeight.bold),
+                  //               ),
+                  //             ],
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //     Expanded(
+                  //       flex: 7,
+                  //       child: Padding(
+                  //         padding: const EdgeInsets.fromLTRB(0, 0, 8, 8),
+                  //         child: InkWell(
+                  //           onTap: () async {
+                  //             await model.orderCart();
+                  //           },
+                  //           child: Container(
+                  //             height: 41,
+                  //             padding: const EdgeInsets.all(6),
+                  //             decoration: BoxDecoration(
+                  //               color: FineTheme.palettes.primary200,
+                  //               borderRadius: BorderRadius.circular(8),
+                  //               border: Border.all(
+                  //                 color: FineTheme.palettes.primary200,
+                  //                 width: 1,
+                  //                 style: BorderStyle.solid,
+                  //               ),
+                  //               boxShadow: [
+                  //                 BoxShadow(
+                  //                   color: FineTheme.palettes.primary300,
+                  //                   offset: const Offset(0, 4),
+                  //                 ),
+                  //               ],
+                  //             ),
+                  //             child: Row(
+                  //               mainAxisAlignment: MainAxisAlignment.center,
+                  //               crossAxisAlignment: CrossAxisAlignment.center,
+                  //               children: [
+                  //                 Text(
+                  //                     isMenuAvailable
+                  //                         ? "Đặt đơn"
+                  //                         : "Khung giờ đã kết thúc",
+                  //                     style: FineTheme.typograhpy.subtitle1
+                  //                         .copyWith(
+                  //                             color: isMenuAvailable
+                  //                                 ? Colors.white
+                  //                                 : FineTheme
+                  //                                     .palettes.neutral800)),
+                  //               ],
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
                 ),
               ],
             ),

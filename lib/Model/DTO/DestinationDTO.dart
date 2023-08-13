@@ -49,35 +49,35 @@ import 'index.dart';
 //     };
 //   }
 // }
-class CampusDTO {
-  int? id;
-  int? universityId;
+class DestinationDTO {
+  String? id;
+  // int? universityId;
   String? name;
-  String? address;
+  // String? address;
   String? code;
   bool? isActive;
   DateTime? createAt;
   DateTime? updateAt;
-  String? emailRoot;
+  // String? emailRoot;
 
-  CampusDTO({
+  DestinationDTO({
     this.id,
-    this.universityId,
+    // this.universityId,
     this.name,
-    this.address,
+    // this.address,
     this.code,
     this.isActive,
     this.createAt,
     this.updateAt,
-    this.emailRoot,
+    // this.emailRoot,
   });
 
-  factory CampusDTO.fromJson(Map<String, dynamic> json) {
-    return CampusDTO(
-      id: json['id'],
-      universityId: json['universityId'],
+  factory DestinationDTO.fromJson(Map<String, dynamic> json) {
+    return DestinationDTO(
+      id: json['id'] as String,
+      // universityId: json['universityId'],
       name: json['name'],
-      address: json['address'],
+      // address: json['address'],
       code: json['code'],
       isActive: json['isActive'],
       createAt: json['createAt'] != null
@@ -86,91 +86,91 @@ class CampusDTO {
       updateAt: json['updateAt'] != null
           ? DateTime.parse(json['updateAt'] as String)
           : null,
-      emailRoot: json['emailRoot'],
+      // emailRoot: json['emailRoot'],
     );
   }
 
   Map<String, dynamic> toJson() => {
         'id': id,
-        'universityId': universityId,
+        // 'universityId': universityId,
         'name': name,
-        'address': address,
+        // 'address': address,
         'code': code,
         'isActive': isActive,
         // 'createAt': createAt,
         // 'updateAt': updateAt,
-        'emailRoot': emailRoot,
+        // 'emailRoot': emailRoot,
       };
 }
 
-class LocationDTO {
-  int? id;
-  String? address;
-  String? lat;
-  String? long;
-  bool? isSelected;
-  List<DestinationDTO>? destinations;
+// class LocationDTO {
+//   int? id;
+//   String? address;
+//   String? lat;
+//   String? long;
+//   bool? isSelected;
+//   List<DestinationDTO>? destinations;
 
-  LocationDTO(
-      {this.id,
-      this.address,
-      this.lat,
-      this.long,
-      this.isSelected,
-      this.destinations});
+//   LocationDTO(
+//       {this.id,
+//       this.address,
+//       this.lat,
+//       this.long,
+//       this.isSelected,
+//       this.destinations});
 
-  factory LocationDTO.fromJson(dynamic json) {
-    return LocationDTO(
-        id: json['location_id'] ?? json['destination_id'],
-        address: json['address'],
-        lat: json['lat'],
-        long: json['long'],
-        isSelected: json['isSelected'] ?? false,
-        destinations: (json['locations'] as List)
-            .map((e) => DestinationDTO.fromJson(e))
-            .toList());
-  }
+//   factory LocationDTO.fromJson(dynamic json) {
+//     return LocationDTO(
+//         id: json['location_id'] ?? json['destination_id'],
+//         address: json['address'],
+//         lat: json['lat'],
+//         long: json['long'],
+//         isSelected: json['isSelected'] ?? false,
+//         destinations: (json['locations'] as List)
+//             .map((e) => DestinationDTO.fromJson(e))
+//             .toList());
+//   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      "location_id": id,
-      "address": address,
-      "lat": lat,
-      "long": long,
-      "isSelected": isSelected,
-      "locations": destinations?.map((e) => e.toJson()).toList()
-    };
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     return {
+//       "location_id": id,
+//       "address": address,
+//       "lat": lat,
+//       "long": long,
+//       "isSelected": isSelected,
+//       "locations": destinations?.map((e) => e.toJson()).toList()
+//     };
+//   }
+// }
 
-class DestinationDTO {
-  int? id;
-  String? name;
-  String? description;
-  bool? isSelected;
+// class DestinationDTO {
+//   int? id;
+//   String? name;
+//   String? description;
+//   bool? isSelected;
 
-  DestinationDTO({this.id, this.name, this.description, this.isSelected});
+//   DestinationDTO({this.id, this.name, this.description, this.isSelected});
 
-  factory DestinationDTO.fromJson(dynamic json) {
-    return DestinationDTO(
-        id: json['destination_location_id'],
-        name: json['name'],
-        description: json['description'],
-        isSelected: json['isSelected'] ?? false);
-  }
+//   factory DestinationDTO.fromJson(dynamic json) {
+//     return DestinationDTO(
+//         id: json['destination_location_id'],
+//         name: json['name'],
+//         description: json['description'],
+//         isSelected: json['isSelected'] ?? false);
+//   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      "destination_location_id": id,
-      "name": name,
-      "description": description,
-      "isSelected": isSelected
-    };
-  }
-}
+//   Map<String, dynamic> toJson() {
+//     return {
+//       "destination_location_id": id,
+//       "name": name,
+//       "description": description,
+//       "isSelected": isSelected
+//     };
+//   }
+// }
 
 class TimeSlotDTO {
-  int? id;
+  String? id;
   int? campusId;
   String? arriveTime;
   String? checkoutTime;
@@ -188,7 +188,7 @@ class TimeSlotDTO {
       this.updateAt});
 
   TimeSlotDTO.fromJson(Map<String, dynamic> json) {
-    id = json["id"];
+    id = json["id"] as String;
     campusId = json["campusId"];
     arriveTime = json["arriveTime"];
     checkoutTime = json["checkoutTime"];

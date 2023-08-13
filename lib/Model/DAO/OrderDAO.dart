@@ -8,6 +8,15 @@ import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/request.dart';
 
 class OrderDAO extends BaseDAO {
+  Future<OrderDTO?> getOrderById(String? orderId) async {
+    // data["destination_location_id"] = destinationId;
+    final res = await request.get('/order/$orderId');
+    if (res.data['data'] != null) {
+      return OrderDTO.fromJson(res.data['data']);
+    }
+    return null;
+  }
+
   Future<List<OrderDTO>?> getOrders({int? page, int? size}) async {
     final res = await request.get(
       '/customer/orders',

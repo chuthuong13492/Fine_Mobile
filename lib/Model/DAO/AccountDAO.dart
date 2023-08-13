@@ -16,7 +16,7 @@ import 'BaseDAO.dart';
 class AccountDAO extends BaseDAO {
   Future<AccountDTO?> login(String idToken, String fcmToken) async {
     try {
-      Response response = await request.post("customer/login",
+      Response response = await request.post("customer/loginByMail",
           data: {"idToken": idToken, 'fcmToken': fcmToken});
       final user = response.data['data'];
       final userDTO = AccountDTO.fromJson(user['customer']);
@@ -39,7 +39,7 @@ class AccountDAO extends BaseDAO {
   }
 
   Future<AccountDTO> getUser() async {
-    Response response = await request.get("/customer/Authorization");
+    Response response = await request.get("/customer/authorization");
     // set access token
     final user = response.data['data'];
     return AccountDTO.fromJson(user);

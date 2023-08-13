@@ -3,7 +3,7 @@ import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/request.dart';
 
 class MenuDAO extends BaseDAO {
-  Future<List<MenuDTO>?> getMenus(int? timeSlotId,
+  Future<List<MenuDTO>?> getMenus(String? timeSlotId,
       {Map<String, dynamic> params = const {}}) async {
     final res = await request.get(
       // 'collections?menu-id=${menuId}',

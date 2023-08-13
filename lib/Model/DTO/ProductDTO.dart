@@ -160,61 +160,76 @@ import 'package:flutter/foundation.dart';
 // }
 
 class ProductDTO {
-  int? id;
-  int? productId;
-  int? generalProductId;
+  String? id;
+  // int? generalProductId;
   String? productCode;
   String? productName;
-  int? categoryId;
-  String? categoryName;
-  int? storeId;
-  String? storeName;
+  String? categoryId;
+  // String? categoryName;
+  String? storeId;
+  // String? storeName;
+  int? productType;
   String? imageUrl;
-  double? price;
-  bool? isAvailable;
-  int? status;
-  DateTime? createdAt;
-  DateTime? updatedAt;
+  // double? price;
+  // bool? isAvailable;
+  // int? status;
+  // DateTime? createdAt;
+  // DateTime? updatedAt;
 
-  ProductDTO(
-      {this.id,
-      this.productId,
-      this.generalProductId,
-      this.productCode,
-      this.productName,
-      this.categoryId,
-      this.categoryName,
-      this.storeId,
-      this.storeName,
-      this.imageUrl,
-      this.price,
-      this.isAvailable,
-      this.status,
-      this.createdAt,
-      this.updatedAt});
+  bool? isActive;
+  DateTime? createAt;
+  DateTime? updateAt;
+  List<ProductAttributes>? attributes;
+
+  ProductDTO({
+    this.id,
+    this.productName,
+    this.productCode,
+    // this.generalProductId,
+    this.categoryId,
+    // this.categoryName,
+    this.storeId,
+    // this.storeName,
+    this.productType,
+    this.imageUrl,
+    this.isActive,
+    // this.isAvailable,
+    // this.status,
+    this.createAt,
+    this.updateAt,
+    this.attributes,
+  });
 
   ProductDTO.fromJson(Map<String, dynamic> json) {
-    id = json["id"];
-    productId = json["productId"];
-    generalProductId = json["generalProductId"];
-    productCode = json["productCode"];
+    id = json["id"] as String;
     productName = json["productName"];
+    productCode = json["code"];
+    // generalProductId = json["generalProductId"];
+    // productCode = json["productCode"];
+    // productName = json["productName"];
     categoryId = json["categoryId"];
-    categoryName = json["categoryName"];
+    // categoryName = json["categoryName"];
     storeId = json["storeId"];
-    storeName = json["storeName"];
+    productType = json["productType"];
+    // storeName = json["storeName"];
     imageUrl = json["imageUrl"];
-    price = json["price"] ?? '';
-    isAvailable = json["isAvailable"];
-    status = json["status"];
+    isActive = json["isActive"];
+    // isAvailable = json["isAvailable"];
+    // status = json["status"];
     // createdAt = json['createdAt'] as String != null
     //     ? DateTime.parse(json['createdAt'] as String)
     //     : null;
-    createdAt:
-    json['createdAt'] == null;
-    updatedAt = json['updatedAt'] as String != null
-        ? DateTime.parse(json['updatedAt'] as String)
+    createAt = json['createAt'] as String != null
+        ? DateTime.parse(json['createAt'] as String)
         : null;
+    updateAt = json['updateAt'] as String != null
+        ? DateTime.parse(json['updateAt'] as String)
+        : null;
+    attributes = json["productAttributes"] == null
+        ? null
+        : (json["productAttributes"] as List)
+            .map((e) => ProductAttributes.fromJson(e))
+            .toList();
   }
 
   static List<ProductDTO> fromList(List<Map<String, dynamic>> list) {
@@ -224,20 +239,82 @@ class ProductDTO {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
     _data["id"] = id;
-    _data["productId"] = productId;
-    _data["generalProductId"] = generalProductId;
-    _data["productCode"] = productCode;
     _data["productName"] = productName;
+    _data["productCode"] = productCode;
+    // _data["generalProductId"] = generalProductId;
+
     _data["categoryId"] = categoryId;
-    _data["categoryName"] = categoryName;
+    // _data["categoryName"] = categoryName;
     _data["storeId"] = storeId;
-    _data["storeName"] = storeName;
+    _data["productType"] = productType;
+    // _data["storeName"] = storeName;
     _data["imageUrl"] = imageUrl;
-    _data["price"] = price ?? '';
-    _data["isAvailable"] = isAvailable;
-    _data["status"] = status;
-    _data["createdAt"] = createdAt;
-    _data["updatedAt"] = updatedAt;
+    _data["isActive"] = isActive;
+    // _data["isAvailable"] = isAvailable;
+    // _data["status"] = status;
+    _data["createAt"] = createAt;
+    _data["updateAt"] = updateAt;
+    if (attributes != null) {
+      _data["products"] = attributes?.map((e) => e.toJson()).toList();
+    }
+    return _data;
+  }
+}
+
+class ProductAttributes {
+  String? id;
+  String? productId;
+  String? name;
+  String? code;
+  String? size;
+  double? price;
+  bool? isActive;
+  DateTime? createAt;
+  DateTime? updateAt;
+
+  ProductAttributes({
+    this.id,
+    this.productId,
+    this.name,
+    this.code,
+    this.size,
+    this.price,
+    this.isActive,
+    this.createAt,
+    this.updateAt,
+  });
+
+  ProductAttributes.fromJson(Map<String, dynamic> json) {
+    id = json["id"] as String;
+    productId = json["productId"] as String;
+    name = json["name"];
+    code = json["code"];
+    size = json["size"] ?? null;
+    price = json["price"];
+    isActive = json["isActive"];
+    createAt = json['createAt'] as String != null
+        ? DateTime.parse(json['createAt'] as String)
+        : null;
+    updateAt = json['updateAt'] as String != null
+        ? DateTime.parse(json['updateAt'] as String)
+        : null;
+  }
+
+  static List<ProductAttributes> fromList(List<Map<String, dynamic>> list) {
+    return list.map((map) => ProductAttributes.fromJson(map)).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["productId"] = productId;
+    _data["name"] = name;
+    _data["code"] = code;
+    _data["size"] = size;
+    _data["price"] == price;
+    _data["isActive"] = isActive;
+    _data["createAt"] = createAt;
+    _data["updateAt"] = updateAt;
     return _data;
   }
 }

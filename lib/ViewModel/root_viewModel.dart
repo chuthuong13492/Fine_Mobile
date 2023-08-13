@@ -5,11 +5,12 @@ import 'package:collection/collection.dart';
 import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
-import 'package:fine/Model/DAO/CampusDAO.dart';
+import 'package:fine/Model/DAO/DestinationDAO.dart';
 import 'package:fine/Model/DAO/ProductDAO.dart';
 import 'package:fine/Model/DAO/StoreDAO.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
+import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
@@ -31,17 +32,17 @@ class RootViewModel extends BaseModel {
   String? lat;
   String? long;
   AccountDTO? user;
-  CampusDTO? currentStore;
-  List<CampusDTO>? campusList;
+  DestinationDTO? currentStore;
+  List<DestinationDTO>? campusList;
   TimeSlotDTO? selectedTimeSlot;
   List<TimeSlotDTO>? listTimeSlot;
   ProductDAO? _productDAO;
-  CampusDAO? _campusDAO;
+  DestinationDAO? _destinationDAO;
   bool changeAddress = false;
 
   RootViewModel() {
     _productDAO = ProductDAO();
-    _campusDAO = CampusDAO();
+    _destinationDAO = DestinationDAO();
     selectedTimeSlot = null;
   }
   Future refreshMenu() async {
@@ -55,13 +56,13 @@ class RootViewModel extends BaseModel {
   Future startUp() async {
     // await Get.find<RootViewModel>().getCurrentLocation();
     // liveLocation();
-    await Get.find<RootViewModel>().liveLocation();
+    // await Get.find<RootViewModel>().liveLocation();
 
     await Get.find<AccountViewModel>().fetchUser();
-    await Get.find<RootViewModel>().getUserCampus();
+    await Get.find<RootViewModel>().getUserDestination();
     await Get.find<RootViewModel>().getListTimeSlot();
     await Get.find<HomeViewModel>().getMenus();
-    await Get.find<HomeViewModel>().getListSupplier();
+    // await Get.find<HomeViewModel>().getListSupplier();
     // await Get.find<CategoryViewModel>().getCategories();
     await Get.find<BlogsViewModel>().getBlogs();
   }
@@ -191,11 +192,11 @@ class RootViewModel extends BaseModel {
   //   }
   // }
 
-  Future<void> getListCampus() async {
+  Future<void> getListDestination() async {
     try {
       setState(ViewStatus.Loading);
-      CampusDAO campusDAO = CampusDAO();
-      campusList = await campusDAO.getCampusList();
+      DestinationDAO campusDAO = DestinationDAO();
+      campusList = await campusDAO.getDestinationIdList();
       setState(ViewStatus.Completed);
     } catch (e) {
       campusList = null;
@@ -203,13 +204,13 @@ class RootViewModel extends BaseModel {
     }
   }
 
-  Future<void> getUserCampus() async {
+  Future<void> getUserDestination() async {
     try {
       setState(ViewStatus.Loading);
       AccountViewModel accountViewModel = Get.find<AccountViewModel>();
-      final userCampus = await _campusDAO!
-          .getUserCampus(accountViewModel.currentUser!.universityId!);
-      currentStore = userCampus;
+      final userDestination =
+          await _destinationDAO!.getUserDestination(DESTINATIONID);
+      currentStore = userDestination;
       await setStore(currentStore!);
       setState(ViewStatus.Completed);
     } catch (e) {
@@ -217,11 +218,11 @@ class RootViewModel extends BaseModel {
     }
   }
 
-  Future<void> setCurrentCampus(CampusDTO campus) async {
+  Future<void> setCurrentDestination(DestinationDTO destinationDTO) async {
     showLoadingDialog();
     // Function eq = const ListEquality().equals;
     // StoreDAO _storeDAO = new StoreDAO();
-    currentStore = campus;
+    currentStore = destinationDTO;
     // List<LocationDTO> locations = await _storeDAO.getLocations(currentStore.id);
     // if (!eq(locations, currentStore.locations)) {
     //   currentStore.locations.forEach((location) {
@@ -253,8 +254,8 @@ class RootViewModel extends BaseModel {
   }
 
   Future<void> getListTimeSlot() async {
-    CampusDAO campusDAO = CampusDAO();
-    listTimeSlot = await campusDAO.getTimeSlot();
+    DestinationDAO campusDAO = DestinationDAO();
+    listTimeSlot = await campusDAO.getTimeSlot(DESTINATIONID);
     bool found = false;
     if (selectedTimeSlot == null) {
       selectedTimeSlot = listTimeSlot![0];
@@ -337,7 +338,7 @@ class RootViewModel extends BaseModel {
         return;
       }
       int option = 1;
-      Cart? cart = Get.find<OrderViewModel>().currentCart;
+      Cart? cart = await getCart();
       if (cart != null) {
         option = await showOptionDialog(
             "Bạn có chắc không? Đổi khung giờ rồi là giỏ hàng bị xóa đó!!");

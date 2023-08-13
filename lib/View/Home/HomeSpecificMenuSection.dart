@@ -54,7 +54,7 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                 children: menu
                     .where((element) =>
                         element.products!
-                            .where((e) => e.isAvailable == true)
+                            .where((e) => e.isActive == true)
                             .isNotEmpty &&
                         element.isActive == true)
                     .map((c) => Container(
@@ -104,7 +104,7 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
             child: ScopedModelDescendant<HomeViewModel>(
               builder: (context, child, model) {
                 var list = menu.products!
-                    .where((element) => element.isAvailable == true)
+                    .where((element) => element.isActive == true)
                     .toList();
                 return Container(
                   color: FineTheme.palettes.shades100,
@@ -265,7 +265,7 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                       width: Get.width,
                       height: 14,
                       child: Text(
-                        formatPrice(product.price!),
+                        formatPrice(product.attributes![0].price!),
                         style: const TextStyle(
                             fontFamily: "Montserrat",
                             fontSize: 14,

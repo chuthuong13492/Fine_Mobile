@@ -89,7 +89,7 @@ class ProductSearchItem extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.fromLTRB(0, 6, 8, 4),
                                 child: Text(
-                                  formatPrice(product!.price!),
+                                  formatPrice(product!.attributes![0].price!),
                                   style: FineTheme.typograhpy.subtitle2
                                       .copyWith(
                                           color: FineTheme.palettes.primary300),

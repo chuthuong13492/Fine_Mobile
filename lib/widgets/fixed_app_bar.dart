@@ -1,8 +1,11 @@
+import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
+import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
+import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +53,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
       // ),
       child: Container(
         color: Colors.transparent,
-        padding: const EdgeInsets.only(left: 17, right: 17, bottom: 20),
+        padding: const EdgeInsets.only(left: 17, right: 17, bottom: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           // mainAxisAlignment: MainAxisAlignment.center,
@@ -141,7 +144,32 @@ class _FixedAppBarState extends State<FixedAppBar> {
               ),
               InkWell(
                 onTap: () async {
-                  await Get.toNamed(RoutHandler.ORDER);
+                  OrderViewModel orderViewModel = Get.find<OrderViewModel>();
+                  RootViewModel root = Get.find<RootViewModel>();
+                  PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+
+                  if (root.isCurrentTimeSlotAvailable()) {
+                    if (party.partyOrderDTO != null) {
+                      Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
+                    } else {
+                      if (orderViewModel.currentCart != null) {
+                        await Get.toNamed(RoutHandler.ORDER);
+                      } else {
+                        showStatusDialog(
+                            "assets/images/error.png",
+                            "Giỏ hàng đang trống kìaaa",
+                            "Hiện tại giỏ của bạn đang trống , bạn hãy thêm sản phẩm vào nhé 😃.");
+                      }
+                    }
+                  } else {
+                    showStatusDialog(
+                        "assets/images/error.png",
+                        "Khung giờ đã qua rồi",
+                        "Hiện tại khung giờ này đã đóng vào lúc ${root.selectedTimeSlot!.checkoutTime}, bạn hãy xem khung giờ khác nhé 😃.");
+
+                    deleteCart();
+                    deleteMart();
+                  }
                 },
                 child: Container(
                   width: 54,
@@ -227,9 +255,10 @@ class _FixedAppBarState extends State<FixedAppBar> {
                 Expanded(
                   child: InkWell(
                     onTap: () async {
+                      Get.offAllNamed(RoutHandler.STORE_SELECT);
+
                       // AccountViewModel root = Get.find<AccountViewModel>();
                       // root.processSignout();
-                      Get.offAllNamed(RoutHandler.STORE_SELECT);
                     },
                     child: Container(
                       // color: Colors.transparent,
