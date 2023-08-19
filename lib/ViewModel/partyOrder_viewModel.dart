@@ -11,13 +11,16 @@ import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class PartyOrderViewModel extends BaseModel {
-  RootViewModel root = Get.find<RootViewModel>();
+  final root = Get.find<RootViewModel>();
+  final _orderViewModel = Get.find<OrderViewModel>();
   PartyOrderDTO? partyOrderDTO;
   PartyOrderDAO? _partyDAO;
-  Cart? currentCart;
+  // Cart? currentCart;
   String? errorMessage;
   List<OrderDetails>? listOrderDetail;
   List<String> listError = <String>[];
@@ -25,7 +28,8 @@ class PartyOrderViewModel extends BaseModel {
 
   PartyOrderViewModel() {
     _partyDAO = PartyOrderDAO();
-    currentCart = null;
+    partyCode = null;
+    // currentCart = null;
   }
 
   Future<void> coOrder() async {
@@ -33,12 +37,15 @@ class PartyOrderViewModel extends BaseModel {
       if (Get.isDialogOpen!) {
         setState(ViewStatus.Loading);
       }
-      currentCart = await getCart();
-      currentCart?.addProperties(root.selectedTimeSlot!.id!);
       listError.clear();
-      if (currentCart != null) {
-        partyOrderDTO = await _partyDAO?.coOrder(currentCart!);
-        partyCode = partyOrderDTO!.partyCode;
+      _orderViewModel.currentCart = await getCart();
+      // _orderViewModel.currentCart!.addProperties(root.selectedTimeSlot!.id!);
+      if (_orderViewModel.currentCart != null) {
+        _orderViewModel.currentCart!.addProperties(root.selectedTimeSlot!.id!);
+
+        partyOrderDTO = await _partyDAO?.coOrder(_orderViewModel.currentCart!);
+        // partyCode = partyOrderDTO!.partyCode;
+        await setPartyCode(partyOrderDTO!.partyCode!);
         // Get.back();
       } else {
         Cart cart = Cart.get(
@@ -46,10 +53,8 @@ class PartyOrderViewModel extends BaseModel {
             timeSlotId: root.selectedTimeSlot!.id!,
             orderDetails: null);
         partyOrderDTO = await _partyDAO?.coOrder(cart);
-        partyCode = partyOrderDTO!.partyCode;
-        // await deleteCart();
-        // await deleteMart();
-        // Get.back();
+        // partyCode = partyOrderDTO!.partyCode;
+        await setPartyCode(partyOrderDTO!.partyCode!);
       }
 
       errorMessage = null;
@@ -65,7 +70,7 @@ class PartyOrderViewModel extends BaseModel {
         setState(ViewStatus.Completed);
       } else if (e.response?.statusCode == 404) {
         if (e.response?.data["error"] != null) {
-          setCart(currentCart!);
+          // setCart(currentCart!);
           setState(ViewStatus.Completed);
         }
       } else {
@@ -81,12 +86,43 @@ class PartyOrderViewModel extends BaseModel {
 
   Future<void> getPartyOrder() async {
     try {
-      setState(ViewStatus.Loading);
+      // setState(ViewStatus.Loading);
+      if (partyCode == null) {
+        partyCode = await getPartyCode();
+      }
       partyOrderDTO = await _partyDAO?.getPartyOrder(partyCode);
+      if (root.isTimeSlotAvailable(partyOrderDTO!.timeSlotDTO)) {
+        AccountViewModel acc = Get.find<AccountViewModel>();
+        final list = partyOrderDTO!.partyOrder!
+            .where((element) => element.customer!.id == acc.currentUser!.id)
+            .toList();
+        if (partyOrderDTO != null) {
+          await deleteCart();
+          for (var item in list) {
+            if (item.orderDetails != null) {
+              for (var item in item.orderDetails!) {
+                CartItem cartItem =
+                    new CartItem(item.productId, item.quantity, null);
+                await addItemToCart(cartItem);
+              }
+            }
+          }
+          _orderViewModel.currentCart = await getCart();
+          _orderViewModel.currentCart
+              ?.addProperties(root.selectedTimeSlot!.id!);
+        }
+      } else {
+        partyOrderDTO = null;
+        // Get.offAllNamed(RoutHandler.NAV);
+      }
+
       setState(ViewStatus.Completed);
+      notifyListeners();
     } catch (e) {
       partyOrderDTO = null;
-      setState(ViewStatus.Error);
+      setState(ViewStatus.Completed);
+
+      // setState(ViewStatus.Error);
     }
   }
 
@@ -94,32 +130,61 @@ class PartyOrderViewModel extends BaseModel {
     AccountViewModel acc = Get.find<AccountViewModel>();
     try {
       setState(ViewStatus.Loading);
-
+      partyCode = code;
       await getPartyOrder();
       bool isMatchingCustomerId = false;
-      if (partyOrderDTO == null) {
-        partyOrderDTO = await _partyDAO?.joinPartyOrder(code);
-        partyCode = code;
-        hideDialog();
-        Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
+      // if (partyOrderDTO == null) {
+      //   partyOrderDTO = await _partyDAO?.joinPartyOrder(code);
+      //   partyCode = code;
+      //   hideDialog();
+      //   Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
+      // }
+      int option = 1;
+      DateFormat inputFormat = DateFormat('HH:mm:ss');
+      DateTime arrive =
+          inputFormat.parse(partyOrderDTO!.timeSlotDTO!.arriveTime!);
+      DateTime checkout =
+          inputFormat.parse(partyOrderDTO!.timeSlotDTO!.checkoutTime!);
+      DateFormat outputFormat = DateFormat('HH:mm');
+      String arriveTime = outputFormat.format(arrive);
+      String checkoutTime = outputFormat.format(checkout);
+      if (!root.isTimeSlotAvailable(partyOrderDTO!.timeSlotDTO)) {
+        showStatusDialog(
+            "assets/images/error.png",
+            "Đơn nhóm đã lố khung giờ đặt rùi",
+            "Hiện tại đơn nhóm này đã đóng vào lúc ${partyOrderDTO!.timeSlotDTO!.arriveTime}, bạn hãy đặt ở khung giờ khác nhé 😃.");
+        return;
       }
-      for (var partyOrder in partyOrderDTO!.partyOrder!) {
-        String customerId = partyOrder.customer!.id!;
-        if (customerId == acc.currentUser!.id) {
-          isMatchingCustomerId = true;
-          break;
+      if (root.selectedTimeSlot!.id == partyOrderDTO!.timeSlotDTO!.id) {
+        option = await showOptionDialog(
+            "Chủ phòng đang ở khung giờ (${arriveTime} - ${checkoutTime}) 😚 Bạn hãy chuyển sang khung giờ này để tham gia đơn nhóm nhé!");
+      }
+
+      if (option == 1) {
+        partyCode = await getPartyCode();
+        if (partyCode == null) {
+          await setPartyCode(code!);
+          partyCode = await getPartyCode();
         }
-      }
-      if (!isMatchingCustomerId) {
-        partyOrderDTO = await _partyDAO?.joinPartyOrder(code);
-        partyCode = code;
-        hideDialog();
-        Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
-      } else {
-        if (code != null) {
-          await getPartyOrder();
+        await getPartyOrder();
+        for (var partyOrder in partyOrderDTO!.partyOrder!) {
+          String customerId = partyOrder.customer!.id!;
+          if (customerId == acc.currentUser!.id) {
+            isMatchingCustomerId = true;
+            break;
+          }
+        }
+        if (!isMatchingCustomerId) {
+          partyOrderDTO = await _partyDAO?.joinPartyOrder(partyCode);
+          // partyCode = code;
           hideDialog();
           Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
+        } else {
+          if (partyCode != null) {
+            await getPartyOrder();
+            hideDialog();
+            Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
+          }
         }
       }
 
@@ -133,11 +198,25 @@ class PartyOrderViewModel extends BaseModel {
   Future<void> addProductToPartyOrder() async {
     try {
       setState(ViewStatus.Loading);
-      currentCart = await getCart();
-      currentCart?.addProperties(root.selectedTimeSlot!.id!);
-      partyOrderDTO =
-          await _partyDAO?.addProductToParty(partyCode, cart: currentCart);
+      partyCode = await getPartyCode();
+      _orderViewModel.currentCart = await getCart();
+      _orderViewModel.currentCart?.addProperties(root.selectedTimeSlot!.id!);
+      if (_orderViewModel.currentCart != null) {
+        partyOrderDTO = await _partyDAO?.addProductToParty(partyCode,
+            cart: _orderViewModel.currentCart);
+      } else {
+        Cart cart = Cart.get(
+            orderType: 1,
+            timeSlotId: root.selectedTimeSlot!.id!,
+            orderDetails: null);
+        partyOrderDTO =
+            await _partyDAO?.addProductToParty(partyCode, cart: cart);
+        await getPartyOrder();
 
+        _orderViewModel.removeCart();
+        _orderViewModel.getCurrentCart();
+        // Get.back();
+      }
       await getPartyOrder();
       setState(ViewStatus.Completed);
     } catch (e) {
@@ -156,7 +235,8 @@ class PartyOrderViewModel extends BaseModel {
       if (option != 1) {
         return;
       }
-      currentCart = await getCart();
+      partyCode = await getPartyCode();
+      _orderViewModel.currentCart = await getCart();
       final order = await _partyDAO?.preparePartyOrder(
           root.selectedTimeSlot!.id!, partyCode);
       for (var item in order!.orderDetails!) {
@@ -212,7 +292,7 @@ class PartyOrderViewModel extends BaseModel {
       // Get.back(result: true);
       await addProductToPartyOrder();
     } else {
-      currentCart = await getCart();
+      _orderViewModel.currentCart = await getCart();
       await addProductToPartyOrder();
     }
   }

@@ -1,6 +1,7 @@
 import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
+import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
@@ -26,13 +27,16 @@ class FixedAppBar extends StatefulWidget {
 }
 
 class _FixedAppBarState extends State<FixedAppBar> {
-  // OrderViewModel? _orderViewModel;
+  PartyOrderViewModel? _partyOrderViewModel = Get.find<PartyOrderViewModel>();
+  OrderViewModel? _orderViewModel = Get.find<OrderViewModel>();
   final TextEditingController searchController = TextEditingController();
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _orderViewModel = Get.find<OrderViewModel>();
-  // }
+
+  @override
+  void initState() {
+    super.initState();
+    _orderViewModel!.getCurrentCart();
+    _partyOrderViewModel!.getPartyOrder();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,16 +74,32 @@ class _FixedAppBarState extends State<FixedAppBar> {
   }
 
   Widget search() {
+    bool hasQuantity = false;
     int quantity = 0;
     return ScopedModel(
       model: Get.find<OrderViewModel>(),
       child: ScopedModelDescendant<OrderViewModel>(
         builder: (context, child, model) {
-          if (model.currentCart == null) {
-            quantity;
-          } else {
+          // PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+          // if (party.partyOrderDTO != null) {
+          //   quantity = party.currentCart!.itemQuantity();
+          // } else {
+          //   if (model.currentCart == null) {
+          //     quantity;
+          //   } else {
+          //     quantity = model.currentCart!.itemQuantity();
+          //   }
+          // }
+          if (model.currentCart != null) {
             quantity = model.currentCart!.itemQuantity();
           }
+
+          if (model.currentCart != null) {
+            hasQuantity = true;
+          }
+          // if (party.currentCart != null) {
+          //   hasQuantity = true;
+          // }
           // int quantiy = model.currentCart!.itemQuantity();
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,32 +164,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
               ),
               InkWell(
                 onTap: () async {
-                  OrderViewModel orderViewModel = Get.find<OrderViewModel>();
-                  RootViewModel root = Get.find<RootViewModel>();
-                  PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
-
-                  if (root.isCurrentTimeSlotAvailable()) {
-                    if (party.partyOrderDTO != null) {
-                      Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
-                    } else {
-                      if (orderViewModel.currentCart != null) {
-                        await Get.toNamed(RoutHandler.ORDER);
-                      } else {
-                        showStatusDialog(
-                            "assets/images/error.png",
-                            "Giỏ hàng đang trống kìaaa",
-                            "Hiện tại giỏ của bạn đang trống , bạn hãy thêm sản phẩm vào nhé 😃.");
-                      }
-                    }
-                  } else {
-                    showStatusDialog(
-                        "assets/images/error.png",
-                        "Khung giờ đã qua rồi",
-                        "Hiện tại khung giờ này đã đóng vào lúc ${root.selectedTimeSlot!.checkoutTime}, bạn hãy xem khung giờ khác nhé 😃.");
-
-                    deleteCart();
-                    deleteMart();
-                  }
+                  await model.navOrder();
                 },
                 child: Container(
                   width: 54,
@@ -191,7 +186,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
                           ),
                         ),
                       ),
-                      model.currentCart != null
+                      hasQuantity
                           ? Positioned(
                               top: -2,
                               left: 30,

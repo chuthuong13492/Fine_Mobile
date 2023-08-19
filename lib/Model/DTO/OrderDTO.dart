@@ -22,7 +22,7 @@ class OrderDTO {
   List<OtherAmounts>? otherAmounts;
   int? orderStatus;
   int? orderType;
-  TimeSlot? timeSlot;
+  TimeSlotDTO? timeSlot;
   StationDTO? stationDTO;
   int? point;
   bool? isConfirm;
@@ -66,8 +66,9 @@ class OrderDTO {
             .toList();
     orderStatus = json["orderStatus"];
     orderType = json["orderType"];
-    timeSlot =
-        json["timeSlot"] == null ? null : TimeSlot.fromJson(json["timeSlot"]);
+    timeSlot = json["timeSlot"] == null
+        ? null
+        : TimeSlotDTO.fromJson(json["timeSlot"]);
     stationDTO = json["stationOrder"] == null
         ? null
         : StationDTO.fromJson(json["stationOrder"]);

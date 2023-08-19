@@ -19,6 +19,7 @@ import 'package:fine/ViewModel/category_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
+import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -47,6 +48,7 @@ class RootViewModel extends BaseModel {
   }
   Future refreshMenu() async {
     // fetchStore();
+
     await Get.find<HomeViewModel>().getListSupplier();
     await Get.find<HomeViewModel>().getMenus();
     // await Get.find<OrderViewModel>().getUpSellCollections();
@@ -334,12 +336,15 @@ class RootViewModel extends BaseModel {
     if (timeSlot?.id != selectedTimeSlot?.id) {
       if (!isTimeSlotAvailable(timeSlot)) {
         showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
-            "Hiện tại khung giờ này đã đóng vào lúc ${timeSlot?.checkoutTime}, bạn hãy xem khung giờ khác nhé 😃.");
+            "Hiện tại khung giờ này đã đóng vào lúc ${timeSlot?.arriveTime}, bạn hãy xem khung giờ khác nhé 😃.");
         return;
       }
       int option = 1;
-      Cart? cart = await getCart();
-      if (cart != null) {
+      OrderViewModel orderViewModel = Get.find<OrderViewModel>();
+      orderViewModel.currentCart = await getCart();
+      PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+
+      if (orderViewModel.currentCart != null || party.partyOrderDTO != null) {
         option = await showOptionDialog(
             "Bạn có chắc không? Đổi khung giờ rồi là giỏ hàng bị xóa đó!!");
       }
@@ -348,6 +353,8 @@ class RootViewModel extends BaseModel {
         // showLoadingDialog();
         selectedTimeSlot = timeSlot;
         await Get.find<OrderViewModel>().removeCart();
+
+        party.partyOrderDTO = null;
         // await setStore(currentStore);
         await refreshMenu();
         // hideDialog();

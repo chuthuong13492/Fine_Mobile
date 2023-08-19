@@ -78,8 +78,7 @@ class OrderViewModel extends BaseModel {
 
         // Get.back();
       } else {
-        await deleteCart();
-        await deleteMart();
+        await removeCart();
         Get.back();
       }
 
@@ -112,6 +111,18 @@ class OrderViewModel extends BaseModel {
           setState(ViewStatus.Error);
         }
       }
+    }
+  }
+
+  Future<void> getCurrentCart() async {
+    try {
+      currentCart = await getCart();
+      currentCart?.addProperties(root.selectedTimeSlot!.id!);
+      setState(ViewStatus.Completed);
+
+      notifyListeners();
+    } catch (e) {
+      currentCart = null;
     }
   }
 
@@ -158,6 +169,7 @@ class OrderViewModel extends BaseModel {
         // await Get.find<AccountViewModel>().fetchUser();
         if (result!.statusCode == 200) {
           await removeCart();
+          await deletePartyCode();
           hideDialog();
           await showStatusDialog("assets/images/icon-success.png", 'Success',
               'Bạn đã đặt hàng thành công');
@@ -189,6 +201,46 @@ class OrderViewModel extends BaseModel {
       } else {
         setState(ViewStatus.Error);
       }
+    }
+  }
+
+  Future<void> navOrder() async {
+    RootViewModel root = Get.find<RootViewModel>();
+    PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+    await party.getPartyOrder();
+    if (root.isCurrentTimeSlotAvailable()) {
+      if (party.partyOrderDTO != null &&
+          root.isTimeSlotAvailable(party.partyOrderDTO!.timeSlotDTO) &&
+          party.partyOrderDTO!.timeSlotDTO!.id == root.selectedTimeSlot!.id) {
+        Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
+      } else if (party.partyOrderDTO!.timeSlotDTO!.id !=
+          root.selectedTimeSlot!.id) {
+        int option = await showOptionDialog(
+            "Đơn nhóm của bạn đang ở khung giờ ${party.partyOrderDTO!.timeSlotDTO!.checkoutTime} Bạn vui lòng đổi sang khung giờ này để tham gia đơn nhóm nhé");
+
+        if (option != 1) {
+          return;
+        }
+        root.selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
+        await root.refreshMenu();
+        notifyListeners();
+      } else {
+        if (currentCart != null) {
+          await Get.toNamed(RoutHandler.ORDER);
+        } else {
+          await getCurrentCart();
+          showStatusDialog(
+              "assets/images/error.png",
+              "Giỏ hàng đang trống kìaaa",
+              "Hiện tại giỏ của bạn đang trống , bạn hãy thêm sản phẩm vào nhé 😃.");
+        }
+      }
+    } else {
+      party.partyOrderDTO == null;
+      await removeCart();
+      await getCurrentCart();
+      showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
+          "Hiện tại khung giờ này đã đóng vào lúc ${root.selectedTimeSlot!.checkoutTime}, bạn hãy xem khung giờ khác nhé 😃.");
     }
   }
 
@@ -247,7 +299,7 @@ class OrderViewModel extends BaseModel {
     // notifyListeners();
   }
 
-  Future<void> removeCart() async {
+  Future removeCart() async {
     await deleteCart();
     await deleteMart();
     currentCart = null;

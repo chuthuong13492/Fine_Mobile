@@ -169,43 +169,4 @@ class DestinationDTO {
 //   }
 // }
 
-class TimeSlotDTO {
-  String? id;
-  int? campusId;
-  String? arriveTime;
-  String? checkoutTime;
-  bool? isActive;
-  String? createAt;
-  String? updateAt;
 
-  TimeSlotDTO(
-      {this.id,
-      this.campusId,
-      this.arriveTime,
-      this.checkoutTime,
-      this.isActive,
-      this.createAt,
-      this.updateAt});
-
-  TimeSlotDTO.fromJson(Map<String, dynamic> json) {
-    id = json["id"] as String;
-    campusId = json["campusId"];
-    arriveTime = json["arriveTime"];
-    checkoutTime = json["checkoutTime"];
-    isActive = json["isActive"];
-    createAt = json["createAt"];
-    updateAt = json["updateAt"];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["id"] = id;
-    _data["campusId"] = campusId;
-    _data["arriveTime"] = arriveTime;
-    _data["checkoutTime"] = checkoutTime;
-    _data["isActive"] = isActive;
-    _data["createAt"] = createAt;
-    _data["updateAt"] = updateAt;
-    return _data;
-  }
-}

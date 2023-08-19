@@ -3,17 +3,22 @@ import 'index.dart';
 class PartyOrderDTO {
   String? id;
   String? partyCode;
+  TimeSlotDTO? timeSlotDTO;
   List<Party>? partyOrder;
 
   PartyOrderDTO({
     this.id,
     this.partyCode,
+    this.timeSlotDTO,
     this.partyOrder,
   });
 
   PartyOrderDTO.fromJson(Map<String, dynamic> json) {
     id = json["id"] as String;
     partyCode = json["partyCode"] as String;
+    timeSlotDTO = json["timeSlot"] == null
+        ? null
+        : TimeSlotDTO.fromJson(json["timeSlot"]);
     partyOrder = json["partyOrder"] == null
         ? null
         : (json["partyOrder"] as List).map((e) => Party.fromJson(e)).toList();
@@ -27,6 +32,9 @@ class PartyOrderDTO {
     final Map<String, dynamic> _data = <String, dynamic>{};
     _data["id"] = id;
     _data["partyCode"] = partyCode;
+    if (timeSlotDTO != null) {
+      _data["timeSlot"] = timeSlotDTO?.toJson();
+    }
     if (partyOrder != null) {
       _data["partyOrder"] = partyOrder?.map((e) => e.toJson()).toList();
     }

@@ -1,4 +1,5 @@
 import 'package:fine/Constant/route_constraint.dart';
+import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
@@ -502,6 +503,7 @@ Future<int> showPartyDialog(String? partyCode) async {
                         child: Center(
                           child: InkWell(
                             onTap: () async {
+                              model.partyCode = await getPartyCode();
                               if (model.partyCode == null) {
                                 await model.coOrder();
                                 option = 1;

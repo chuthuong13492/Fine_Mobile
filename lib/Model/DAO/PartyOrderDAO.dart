@@ -44,16 +44,15 @@ class PartyOrderDAO extends BaseDAO {
   }
 
   Future<PartyOrderDTO?> addProductToParty(String? code, {Cart? cart}) async {
-    if (cart != null) {
-      // print("Request Note: " + note);
-      final res = await request.post(
-        '/order/coOrder/card?partyCode=$code',
-        data: cart.toJsonAPi(),
-      );
-      if (res.statusCode == 200) {
+    // print("Request Note: " + note);
+    final res = await request.post(
+      '/order/coOrder/card?partyCode=$code',
+      data: cart!.toJsonAPi(),
+    );
+    if (res.statusCode == 200) {
+      if (res.data["data"] != null) {
         return PartyOrderDTO.fromJson(res.data['data']);
       }
-      return null;
     }
     return null;
   }

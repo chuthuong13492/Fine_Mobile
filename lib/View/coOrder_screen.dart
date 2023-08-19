@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:fine/Accessories/index.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
+import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/format_price.dart';
+import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
@@ -34,7 +36,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 2),
+    _timer = Timer.periodic(const Duration(seconds: 1),
         (timer) => _partyViewModel!.getPartyOrder());
   }
 
@@ -44,13 +46,25 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    List<Party> list = _partyViewModel!.partyOrderDTO!.partyOrder!;
+    AccountViewModel acc = Get.find<AccountViewModel>();
+    final user = list
+        .where((element) => element.customer!.id == acc.currentUser!.id)
+        .toList();
+    bool? isAdmin = false;
+
+    for (var item in user) {
+      if (item.customer!.isAdmin == true) {
+        isAdmin = true;
+      }
+    }
     return ScopedModel(
       model: Get.find<PartyOrderViewModel>(),
       child: Scaffold(
         backgroundColor: FineTheme.palettes.neutral200,
         bottomNavigationBar: bottomBar(),
         appBar: DefaultAppBar(
-          title: "Đơn nhóm của bạn",
+          title: "Đơn nhóm",
           backButton: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(32),
@@ -67,6 +81,21 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
               ),
             ),
           ),
+          actionButton: [
+            Center(
+              child: InkWell(
+                onTap: () async {},
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16, right: 16),
+                  child: Text(
+                    isAdmin! ? 'XÓA' : 'THOÁT',
+                    style: FineTheme.typograhpy.subtitle1
+                        .copyWith(color: Colors.red),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
         body: SafeArea(
           child: ListView(
@@ -81,19 +110,29 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                 child: ScopedModelDescendant<PartyOrderViewModel>(
                   builder: (context, child, model) {
                     List<Widget> card = [];
-                    List<Party> list = model.partyOrderDTO!.partyOrder!;
-                    for (var item in list) {
-                      card.add(_buildPartyList(item));
-                    }
-                    for (int i = 0; i < list.length; i++) {
-                      if (i % 2 != 0) {
-                        card.insert(
-                          i,
-                          Container(
-                            height: 24,
-                            color: FineTheme.palettes.neutral200,
-                          ),
-                        );
+
+                    for (var item in user) {
+                      if (item.customer!.isAdmin == true) {
+                        list;
+                        for (var item in list) {
+                          card.add(_buildPartyList(item));
+                        }
+                        for (int i = 0; i < list.length; i++) {
+                          if (i % 2 != 0) {
+                            card.insert(
+                              i,
+                              Container(
+                                height: 24,
+                                color: FineTheme.palettes.neutral200,
+                              ),
+                            );
+                          }
+                        }
+                      } else {
+                        user;
+                        for (var item in user) {
+                          card.add(_buildPartyList(item));
+                        }
                       }
                     }
                     if (list == null || list.isEmpty) {
@@ -146,14 +185,18 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
           children: [
             Row(
               children: [
-                Text(
-                  party.customer!.name!,
-                  style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13,
-                      fontStyle: FontStyle.normal,
-                      color: FineTheme.palettes.neutral600),
+                Container(
+                  width: 140,
+                  child: Text(
+                    party.customer!.name!,
+                    style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
+                        fontStyle: FontStyle.normal,
+                        color: FineTheme.palettes.neutral600),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Text(
@@ -170,26 +213,28 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                       color: FineTheme.palettes.neutral500),
                 ),
                 const SizedBox(width: 8),
-                isConfirm
-                    ? Container(
-                        height: 20,
-                        width: 90,
-                        decoration: BoxDecoration(
-                            color: FineTheme.palettes.primary100,
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10))),
-                        child: Center(
-                          child: Text(
-                            'Đã xác nhận',
-                            style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontWeight: FontWeight.w700,
-                                fontSize: 12,
-                                fontStyle: FontStyle.normal,
-                                color: FineTheme.palettes.shades100),
-                          ),
-                        ),
-                      )
+                !isAdmin
+                    ? isConfirm
+                        ? Container(
+                            height: 20,
+                            width: 90,
+                            decoration: BoxDecoration(
+                                color: FineTheme.palettes.primary100,
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(10))),
+                            child: Center(
+                              child: Text(
+                                'Đã xác nhận',
+                                style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 12,
+                                    fontStyle: FontStyle.normal,
+                                    color: FineTheme.palettes.shades100),
+                              ),
+                            ),
+                          )
+                        : const SizedBox.shrink()
                     : const SizedBox.shrink(),
               ],
             ),
@@ -207,7 +252,41 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                         color: FineTheme.palettes.neutral700),
                   )
                 : Column(
-                    children: listProduct!.map((e) => productCard(e)).toList(),
+                    children: [
+                      Column(
+                        children: listProduct!
+                            .map((e) => productCard(e, isYou))
+                            .toList(),
+                      ),
+                      const SizedBox(height: 8),
+                      MySeparator(color: FineTheme.palettes.neutral500),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Tạm tính',
+                              style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  fontStyle: FontStyle.normal,
+                                  color: FineTheme.palettes.shades200),
+                            ),
+                          ),
+                          Text(
+                            formatPrice(party.totalAmount!),
+                            style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                fontStyle: FontStyle.normal,
+                                color: FineTheme.palettes.shades200),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
           ],
         ),
@@ -215,7 +294,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     );
   }
 
-  Widget productCard(OrderDetails orderDetails) {
+  Widget productCard(OrderDetails orderDetails, bool? isYou) {
     List<Widget> list = [];
     double price = 0;
     int startProduct = 0;
@@ -327,7 +406,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                     children: [
                       ...list,
                       const SizedBox(width: 8),
-                      selectQuantity(orderDetails),
+                      selectQuantity(orderDetails, isYou!),
                     ],
                   )
                 ],
@@ -339,14 +418,16 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     );
   }
 
-  Widget selectQuantity(
-    OrderDetails item,
-  ) {
+  Widget selectQuantity(OrderDetails item, bool isYou) {
     Color minusColor = FineTheme.palettes.neutral500;
     if (item.quantity >= 1) {
       minusColor = FineTheme.palettes.primary300;
     }
     Color plusColor = FineTheme.palettes.primary300;
+    if (!isYou) {
+      minusColor = FineTheme.palettes.neutral700;
+      plusColor = FineTheme.palettes.neutral700;
+    }
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
       child: Container(
@@ -366,12 +447,14 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                   color: minusColor,
                 ),
                 onPressed: () async {
-                  if (item.quantity >= 1) {
-                    if (item.quantity == 1) {
-                      await _partyViewModel?.deleteItem(item);
-                    } else {
-                      item.quantity--;
-                      await _partyViewModel?.updateQuantity(item);
+                  if (isYou) {
+                    if (item.quantity >= 1) {
+                      if (item.quantity == 1) {
+                        await _partyViewModel?.deleteItem(item);
+                      } else {
+                        item.quantity--;
+                        await _partyViewModel?.updateQuantity(item);
+                      }
                     }
                   }
                 },
@@ -395,8 +478,10 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                   color: plusColor,
                 ),
                 onPressed: () async {
-                  item.quantity++;
-                  await _partyViewModel?.updateQuantity(item);
+                  if (isYou) {
+                    item.quantity++;
+                    await _partyViewModel?.updateQuantity(item);
+                  }
                 },
               ),
             ),
@@ -411,6 +496,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
         model: Get.find<PartyOrderViewModel>(),
         child: ScopedModelDescendant<PartyOrderViewModel>(
           builder: (context, child, model) {
+            final acc = Get.find<AccountViewModel>();
             int customer = model.partyOrderDTO!.partyOrder!.length;
             final userConfirm = model.partyOrderDTO!.partyOrder!
                 .where((element) => element.customer!.isConfirm == true)
@@ -419,6 +505,23 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
             if (userConfirm.length == customer) {
               isAllConfirm = true;
             }
+            bool? isAdmin = false;
+            bool? isUserConfirm = false;
+            final listUser = model.partyOrderDTO!.partyOrder!
+                .where((element) => element.customer!.id == acc.currentUser!.id)
+                .toList();
+
+            for (var item in listUser) {
+              if (item.customer!.isConfirm == false) {
+                isUserConfirm = false;
+              } else {
+                isUserConfirm = true;
+              }
+              if (item.customer!.isAdmin == true) {
+                isAdmin = true;
+              }
+            }
+
             return Container(
               height: 150,
               padding: const EdgeInsets.only(
@@ -442,16 +545,30 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                         if (!isAllConfirm!) {
                           await model.confirmationParty();
                           _stopTimer();
-                          Get.offAllNamed(RoutHandler.CONFIRM_ORDER_SCREEN);
+                          Get.toNamed(RoutHandler.CONFIRM_ORDER_SCREEN);
                         } else {
-                          await model.preCoOrder();
-                          _stopTimer();
-                          Get.offAllNamed(RoutHandler.ORDER);
+                          Cart? cart = await getCart();
+                          if (cart != null) {
+                            await model.preCoOrder();
+                            _stopTimer();
+                            Get.toNamed(RoutHandler.ORDER);
+                          } else {
+                            showStatusDialog(
+                                "assets/images/error.png",
+                                "Giỏ hàng đang trống kìaa",
+                                "Bạn chọn thêm đồ ăn vào giỏ hàng nhe 😃.");
+                          }
                         }
                       },
                       child: Center(
                           child: Text(
-                        isAllConfirm ? 'Thanh toán' : 'Xác nhận món',
+                        isAdmin == true
+                            ? isAllConfirm
+                                ? 'Thanh toán'
+                                : 'Chưa đủ người xác nhận'
+                            : isUserConfirm! == false
+                                ? 'Xác nhận đơn hàng'
+                                : 'Đã xác nhận',
                         style: TextStyle(
                             fontFamily: 'Montserrat',
                             fontWeight: FontWeight.w500,

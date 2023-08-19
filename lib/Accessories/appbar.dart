@@ -6,7 +6,9 @@ import 'package:get/get.dart';
 class DefaultAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String? title;
   Widget? backButton;
-  DefaultAppBar({Key? key, @required this.title, this.backButton})
+  List<Widget>? actionButton;
+  DefaultAppBar(
+      {Key? key, @required this.title, this.backButton, this.actionButton})
       : super(key: key);
 
   @override
@@ -48,6 +50,7 @@ class _AppBarSate extends State<DefaultAppBar> {
       title: Text(widget.title!.toUpperCase(),
           style: FineTheme.typograhpy.h2
               .copyWith(color: FineTheme.palettes.primary100)),
+      actions: widget.actionButton ?? [],
     );
   }
 }

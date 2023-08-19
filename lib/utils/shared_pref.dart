@@ -43,6 +43,11 @@ Future<void> setMart(Cart cart) async {
   await prefs.setString('MART', jsonEncode(cart.toJson()));
 }
 
+Future<bool> setPartyCode(String code) async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.setString('PARTY_CODE', code);
+}
+
 Future<Cart?> getCart() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   String? encodedCart = prefs.getString('CART');
@@ -61,6 +66,11 @@ Future<Cart?> getMart() async {
     return cart;
   }
   return null;
+}
+
+Future<String?> getPartyCode() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  return prefs.getString('PARTY_CODE');
 }
 
 Future<void> addItemToCart(CartItem item) async {
@@ -122,6 +132,11 @@ Future<void> deleteCart() async {
 Future<void> deleteMart() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.remove("MART");
+}
+
+Future<void> deletePartyCode() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove("PARTY_CODE");
 }
 
 Future<void> updateItemFromCart(CartItem item) async {

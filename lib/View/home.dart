@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fine/Accessories/draggable_bottom_sheet.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
+import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/View/Home/HomeCategorySection.dart';
 import 'package:fine/View/Home/HomeCollectionSection.dart';
 import 'package:fine/View/Home/HomeSpecificMenuSection.dart';
@@ -13,6 +14,7 @@ import 'package:fine/View/Home/HomeVoucherSection.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/orderHistory_viewModel.dart';
+import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/fixed_app_bar.dart';
@@ -42,6 +44,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final PageController controller = PageController();
   Future<void> _refresh() async {
     await Get.find<RootViewModel>().startUp();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
