@@ -15,6 +15,7 @@ final logger = Logger(
 class OrderDTO {
   String? id;
   String? orderCode;
+  String? partyCode;
   Customer? customer;
   double? totalAmount;
   double? finalAmount;
@@ -34,6 +35,7 @@ class OrderDTO {
   OrderDTO({
     this.id,
     this.orderCode,
+    this.partyCode,
     this.customer,
     this.totalAmount,
     this.finalAmount,
@@ -88,6 +90,10 @@ class OrderDTO {
     return list.map((map) => OrderDTO.fromJson(map)).toList();
   }
 
+  void addProperties(String code) {
+    partyCode = code;
+  }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
     _data["orderCode"] = orderCode;
@@ -132,6 +138,7 @@ class OrderDTO {
     Map<String, dynamic> map = {
       "id": id,
       "orderCode": orderCode,
+      "partyCode": partyCode ?? null,
       "totalAmount": totalAmount,
       "finalAmount": finalAmount,
       "totalOtherAmount": totalOtherAmount,

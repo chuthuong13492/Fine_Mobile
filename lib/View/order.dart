@@ -258,50 +258,102 @@ class _OrderScreenState extends State<OrderScreen> {
 
     return SizedBox(
       width: MediaQuery.of(context).size.width,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
+          // Row(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     Row(
+          //       children: [
+          //         SvgPicture.asset(
+          //           "assets/icons/Party.svg",
+          //           width: 20,
+          //           height: 20,
+          //         ),
+          //         const SizedBox(
+          //           width: 10,
+          //         ),
+          //         Text(
+          //           "Đơn liên kết",
+          //           style: FineTheme.typograhpy.body1,
+          //         ),
+          //         const SizedBox(
+          //           width: 10,
+          //         ),
+          //         Container(
+          //           width: 30,
+          //           height: 16,
+          //           color: Colors.red,
+          //           child: Center(
+          //             child: Text(
+          //               "Mới",
+          //               style: FineTheme.typograhpy.caption1.copyWith(
+          //                   color: Colors.white, fontWeight: FontWeight.w600),
+          //             ),
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     CustomCupertinoSwitch(
+          //       value: model.isLinked!,
+          //       onChanged: (value) {
+          //         model.isLinkedParty(value);
+          //       },
+          //     )
+          //   ],
+          // ),
+          // const SizedBox(
+          //   height: 8,
+          // ),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SvgPicture.asset(
-                "assets/icons/Party.svg",
-                width: 20,
-                height: 20,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Text(
-                "Vào Party",
-                style: FineTheme.typograhpy.body1,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Container(
-                width: 30,
-                height: 16,
-                color: Colors.red,
-                child: Center(
-                  child: Text(
-                    "Mới",
-                    style: FineTheme.typograhpy.caption1.copyWith(
-                        color: Colors.white, fontWeight: FontWeight.w600),
+              Row(
+                children: [
+                  SvgPicture.asset(
+                    "assets/icons/Party.svg",
+                    width: 20,
+                    height: 20,
                   ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    "Vào Party",
+                    style: FineTheme.typograhpy.body1,
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Container(
+                    width: 30,
+                    height: 16,
+                    color: Colors.red,
+                    child: Center(
+                      child: Text(
+                        "Mới",
+                        style: FineTheme.typograhpy.caption1.copyWith(
+                            color: Colors.white, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              InkWell(
+                onTap: () {
+                  // await deletePartyCode();
+                  // model.partyCode = await getPartyCode();
+                  showPartyDialog(model.partyCode);
+                },
+                child: Text(
+                  "Tạo đơn",
+                  style: FineTheme.typograhpy.body2
+                      .copyWith(color: FineTheme.palettes.primary100),
                 ),
               ),
             ],
-          ),
-          InkWell(
-            onTap: () {
-              showPartyDialog(model.partyCode);
-            },
-            child: Text(
-              "Tạo đơn",
-              style: FineTheme.typograhpy.body2
-                  .copyWith(color: FineTheme.palettes.primary100),
-            ),
           ),
         ],
       ),

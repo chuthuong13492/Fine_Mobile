@@ -18,15 +18,18 @@ final logger = Logger(
 class Cart {
   List<CartItem>? orderDetails;
   int? orderType;
+  int? partyType;
   String? timeSlotId;
 
   Cart.get({
     this.orderType,
+    this.partyType,
     this.timeSlotId,
     this.orderDetails,
   });
 
   Cart({
+    this.partyType,
     this.timeSlotId,
   }) {
     orderDetails = [];
@@ -47,13 +50,15 @@ class Cart {
     }
     return Cart.get(
       orderType: 1,
+      partyType: json["partyType"],
       timeSlotId: json['timeSlotId'],
       orderDetails: list,
     );
   }
 
-  void addProperties(String timeSlot) {
+  void addProperties(String timeSlot, {int? type}) {
     timeSlotId = timeSlot;
+    partyType = type;
   }
 
   // void addVoucher(VoucherDTO voucher) {
@@ -100,6 +105,7 @@ class Cart {
       // "customerId": customerId,
       // "deliveryPhone": deliveryPhone,
       "orderType": orderType,
+      "partyType": partyType ?? null,
       "timeSlotId": timeSlotId,
       // "roomId": roomId,
       // "note": note ?? null,

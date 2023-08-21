@@ -1,3 +1,6 @@
+import 'package:dio/dio.dart';
+import 'package:fine/Constant/order_status.dart';
+import 'package:fine/Constant/partyOrder_status.dart';
 import 'package:fine/Model/DAO/index.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
@@ -19,22 +22,31 @@ class PartyOrderDAO extends BaseDAO {
     return null;
   }
 
-  Future<PartyOrderDTO?> getPartyOrder(String? code) async {
-    if (code != null) {
-      // print("Request Note: " + note);
+  Future<PartyOrderStatus?> getPartyOrder(String? code) async {
+    try {
       final res = await request.get(
         '/order/coOrder/$code',
       );
-      if (res.statusCode == 200) {
-        return PartyOrderDTO.fromJson(res.data['data']);
-      }
-      return null;
+      return PartyOrderStatus(
+        statusCode: res.statusCode,
+        code: res.data['code'],
+        message: res.data['message'],
+        partyOrderDTO: PartyOrderDTO.fromJson(res.data['data']),
+      );
+    } on DioError catch (e) {
+      return PartyOrderStatus(
+          statusCode: e.response!.statusCode,
+          code: e.response!.data['code'],
+          message: e.response!.data['message']);
+    } catch (e) {
+      throw e;
     }
     return null;
+    // print("Request Note: " + note);
   }
 
   Future<PartyOrderDTO?> joinPartyOrder(String? code) async {
-    final res = await request.post(
+    final res = await request.put(
       '/order/coOrder/party?partyCode=$code',
     );
     if (res.statusCode == 200) {
@@ -78,5 +90,13 @@ class PartyOrderDAO extends BaseDAO {
     }
 
     return null;
+  }
+
+  Future<bool> logoutCoOrder(String code) async {
+    final res = await request.put(
+      '/order/coOrder/out?partyCode=$code',
+      // data: ORDER_CANCEL_STATUS,
+    );
+    return res.statusCode == 200;
   }
 }

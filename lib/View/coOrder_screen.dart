@@ -36,6 +36,10 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   @override
   void initState() {
     super.initState();
+    fetchPartyOrder();
+  }
+
+  void fetchPartyOrder() {
     _timer = Timer.periodic(const Duration(seconds: 1),
         (timer) => _partyViewModel!.getPartyOrder());
   }
@@ -82,9 +86,16 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
             ),
           ),
           actionButton: [
-            Center(
-              child: InkWell(
-                onTap: () async {},
+            InkWell(
+              onTap: () async {
+                _partyViewModel!.partyCode = await getPartyCode();
+                await _partyViewModel!
+                    .cancelCoOrder(_partyViewModel!.partyCode!);
+                if (_partyViewModel!.partyOrderDTO == null) {
+                  _stopTimer();
+                }
+              },
+              child: Center(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 16, right: 16),
                   child: Text(
@@ -160,9 +171,13 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   Widget _buildPartyList(Party party) {
     final listProduct = party.orderDetails;
     AccountViewModel acc = Get.find<AccountViewModel>();
-    bool hasProduct = false;
+    bool hasProduct = true;
+    // final order = Get.find<OrderViewModel>();
+    // if(order.currentCart == null){
+    //   hasProduct = true;
+    // }
     if (party.orderDetails == null || party.orderDetails!.isEmpty) {
-      hasProduct = true;
+      hasProduct = false;
     }
     bool isYou = false;
     if (acc.currentUser!.id == party.customer!.id) {
@@ -241,7 +256,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
             const SizedBox(height: 8),
             MySeparator(color: FineTheme.palettes.neutral500),
             const SizedBox(height: 8),
-            hasProduct
+            !hasProduct
                 ? Text(
                     'Đang chọn món... ',
                     style: TextStyle(

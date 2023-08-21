@@ -1,8 +1,10 @@
+import 'package:fine/Accessories/custom_button_switch.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
@@ -341,6 +343,7 @@ Future<int> showPartyDialog(String? partyCode) async {
   // hideDialog();
   int? option;
   bool shouldPop = false;
+
   await Get.dialog(
     WillPopScope(
       onWillPop: () async {
@@ -352,7 +355,7 @@ Future<int> showPartyDialog(String? partyCode) async {
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(16.0))),
         child: SizedBox(
-          height: 380,
+          height: Get.height * 0.50,
           child: Column(
             children: [
               Stack(
@@ -360,7 +363,7 @@ Future<int> showPartyDialog(String? partyCode) async {
                 children: [
                   Expanded(
                     child: Container(
-                      height: 120,
+                      height: Get.height * 0.12,
                       decoration: const BoxDecoration(
                           image: DecorationImage(
                               image: AssetImage('assets/images/party_img.png'),
@@ -386,152 +389,185 @@ Future<int> showPartyDialog(String? partyCode) async {
                   ),
                 ],
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 27),
-                  child: Column(
-                    children: [
-                      const Text(
-                        'Mời tham gia đơn nhóm',
+              Container(
+                height: Get.height * 0.35,
+                padding: const EdgeInsets.fromLTRB(16, 20, 16, 27),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Mời tham gia đơn nhóm',
+                      style: TextStyle(
+                        fontFamily: 'Montserrat',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 24,
+                        fontStyle: FontStyle.normal,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      width: Get.width,
+                      padding: const EdgeInsets.only(left: 16, right: 16),
+                      child: Text(
+                        'Chia sẻ link tham gia đơn nhóm đến người bạn muốn mời nhé',
                         style: TextStyle(
                           fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 24,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 16,
                           fontStyle: FontStyle.normal,
+                          color: FineTheme.palettes.neutral500,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 12),
-                      Container(
-                        width: Get.width,
-                        padding: const EdgeInsets.only(left: 16, right: 16),
-                        child: Text(
-                          'Chia sẻ link tham gia đơn nhóm đến người bạn muốn mời nhé',
-                          style: TextStyle(
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w400,
-                            fontSize: 16,
-                            fontStyle: FontStyle.normal,
-                            color: FineTheme.palettes.neutral500,
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Đơn liên kết',
+                            style: FineTheme.typograhpy.subtitle1,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Flexible(
-                            flex: 7,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(8)),
-                                  border: Border.all(
-                                      color: FineTheme.palettes.primary100)),
-                              child: Padding(
-                                padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                child: TextField(
-                                  onChanged: (input) {},
-                                  controller: controller,
-                                  decoration: InputDecoration(
-                                      hintText: 'Nhập code party',
-                                      border: InputBorder.none,
-                                      suffixIcon: IconButton(
-                                        icon: const Icon(
-                                          Icons.clear,
-                                          size: 16,
-                                          color: Colors.grey,
-                                        ),
-                                        onPressed: () {
-                                          controller.clear();
-                                        },
-                                      )),
-                                  style: TextStyle(
-                                    fontFamily: 'Montserrat',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16,
-                                    fontStyle: FontStyle.normal,
-                                    color: FineTheme.palettes.neutral500,
-                                  ),
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: 1,
-                                  autofocus: true,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Flexible(
-                            flex: 3,
-                            fit: FlexFit.tight,
-                            child: Padding(
-                              padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                        CustomCupertinoSwitch(
+                          value: model.isLinked!,
+                          onChanged: (value) {
+                            model.isLinkedParty(value);
+                          },
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Expanded(
+                        child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
+                              flex: 7,
                               child: Container(
                                 decoration: BoxDecoration(
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(8)),
-                                    color: FineTheme.palettes.primary100,
                                     border: Border.all(
-                                      color: FineTheme.palettes.primary100,
-                                    )),
-                                child: TextButton(
-                                    onPressed: () async {
-                                      PartyOrderViewModel party =
-                                          Get.find<PartyOrderViewModel>();
-                                      option = 1;
-                                      await party.joinPartyOrder(
-                                          code: controller.text);
-                                    },
-                                    child: const Text('Tham gia',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 15))),
+                                        color: FineTheme.palettes.primary100)),
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                                  child: TextField(
+                                    onChanged: (input) {},
+                                    controller: controller,
+                                    decoration: InputDecoration(
+                                        hintText: 'Nhập code party',
+                                        border: InputBorder.none,
+                                        suffixIcon: IconButton(
+                                          icon: const Icon(
+                                            Icons.clear,
+                                            size: 16,
+                                            color: Colors.grey,
+                                          ),
+                                          onPressed: () {
+                                            controller.clear();
+                                          },
+                                        )),
+                                    style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      fontStyle: FontStyle.normal,
+                                      color: FineTheme.palettes.neutral500,
+                                    ),
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: 1,
+                                    autofocus: true,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        height: 56,
-                        width: Get.width,
-                        decoration: BoxDecoration(
-                          color: FineTheme.palettes.primary100,
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(5),
-                          ),
+                            Flexible(
+                              flex: 3,
+                              fit: FlexFit.tight,
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(8)),
+                                      color: FineTheme.palettes.primary100,
+                                      border: Border.all(
+                                        color: FineTheme.palettes.primary100,
+                                      )),
+                                  child: TextButton(
+                                      onPressed: () async {
+                                        PartyOrderViewModel party =
+                                            Get.find<PartyOrderViewModel>();
+                                        option = 1;
+                                        await party.joinPartyOrder(
+                                            code: controller.text);
+                                      },
+                                      child: const Text('Tham gia',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15))),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        child: Center(
-                          child: InkWell(
-                            onTap: () async {
-                              model.partyCode = await getPartyCode();
-                              if (model.partyCode == null) {
-                                await model.coOrder();
+                        const SizedBox(height: 12),
+                        InkWell(
+                          onTap: () async {
+                            model.partyCode = await getPartyCode();
+                            if (model.partyCode == null) {
+                              await model.coOrder();
+                              if (model.partyOrderDTO!.partyOrder != null) {
                                 option = 1;
                                 hideDialog();
                                 Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
                               } else {
+                                option = 1;
+                                hideDialog();
+                              }
+                            } else {
+                              if (model.partyOrderDTO!.partyOrder != null) {
                                 await model.getPartyOrder();
                                 option = 1;
                                 hideDialog();
                                 Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
+                              } else {
+                                option = 1;
+                                hideDialog();
                               }
-                            },
-                            child: Text(
-                              partyCode ?? "Tạo phòng Party",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                                fontStyle: FontStyle.normal,
-                                color: FineTheme.palettes.shades100,
+                            }
+                          },
+                          child: Container(
+                            height: 55,
+                            width: Get.width,
+                            decoration: BoxDecoration(
+                              color: FineTheme.palettes.primary100,
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(5),
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                partyCode ?? "Tạo phòng Party",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  fontStyle: FontStyle.normal,
+                                  color: FineTheme.palettes.shades100,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    )),
+                  ],
                 ),
               ),
             ],

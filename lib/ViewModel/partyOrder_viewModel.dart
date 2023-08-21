@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:fine/Accessories/index.dart';
+import 'package:fine/Constant/partyOrder_status.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DAO/index.dart';
@@ -25,6 +26,7 @@ class PartyOrderViewModel extends BaseModel {
   List<OrderDetails>? listOrderDetail;
   List<String> listError = <String>[];
   String? partyCode;
+  bool? isLinked = false;
 
   PartyOrderViewModel() {
     _partyDAO = PartyOrderDAO();
@@ -41,15 +43,17 @@ class PartyOrderViewModel extends BaseModel {
       _orderViewModel.currentCart = await getCart();
       // _orderViewModel.currentCart!.addProperties(root.selectedTimeSlot!.id!);
       if (_orderViewModel.currentCart != null) {
-        _orderViewModel.currentCart!.addProperties(root.selectedTimeSlot!.id!);
-
+        _orderViewModel.currentCart!.addProperties(root.selectedTimeSlot!.id!,
+            type: isLinked == true ? 2 : 1);
         partyOrderDTO = await _partyDAO?.coOrder(_orderViewModel.currentCart!);
         // partyCode = partyOrderDTO!.partyCode;
         await setPartyCode(partyOrderDTO!.partyCode!);
+
         // Get.back();
       } else {
         Cart cart = Cart.get(
             orderType: 1,
+            partyType: isLinked == true ? 2 : 1,
             timeSlotId: root.selectedTimeSlot!.id!,
             orderDetails: null);
         partyOrderDTO = await _partyDAO?.coOrder(cart);
@@ -84,36 +88,32 @@ class PartyOrderViewModel extends BaseModel {
     }
   }
 
-  Future<void> getPartyOrder() async {
+  Future getPartyOrder() async {
+    AccountViewModel acc = Get.find<AccountViewModel>();
     try {
-      // setState(ViewStatus.Loading);
-      if (partyCode == null) {
-        partyCode = await getPartyCode();
-      }
-      partyOrderDTO = await _partyDAO?.getPartyOrder(partyCode);
-      if (root.isTimeSlotAvailable(partyOrderDTO!.timeSlotDTO)) {
-        AccountViewModel acc = Get.find<AccountViewModel>();
+      partyCode = await getPartyCode();
+      PartyOrderStatus? result = await _partyDAO?.getPartyOrder(partyCode);
+      if (result!.statusCode == 200) {
+        partyOrderDTO = result.partyOrderDTO;
         final list = partyOrderDTO!.partyOrder!
             .where((element) => element.customer!.id == acc.currentUser!.id)
             .toList();
-        if (partyOrderDTO != null) {
-          await deleteCart();
-          for (var item in list) {
-            if (item.orderDetails != null) {
-              for (var item in item.orderDetails!) {
-                CartItem cartItem =
-                    new CartItem(item.productId, item.quantity, null);
-                await addItemToCart(cartItem);
-              }
+        await deleteCart();
+        for (var item in list) {
+          if (item.orderDetails != null) {
+            for (var item in item.orderDetails!) {
+              CartItem cartItem =
+                  new CartItem(item.productId, item.quantity, null);
+              await addItemToCart(cartItem);
             }
           }
-          _orderViewModel.currentCart = await getCart();
-          _orderViewModel.currentCart
-              ?.addProperties(root.selectedTimeSlot!.id!);
         }
+        _orderViewModel.currentCart = await getCart();
+        _orderViewModel.currentCart
+            ?.addProperties(root.selectedTimeSlot!.id!, type: 1);
       } else {
-        partyOrderDTO = null;
-        // Get.offAllNamed(RoutHandler.NAV);
+        await showStatusDialog(
+            "assets/images/error.png", result.code!, result.message!);
       }
 
       setState(ViewStatus.Completed);
@@ -130,7 +130,10 @@ class PartyOrderViewModel extends BaseModel {
     AccountViewModel acc = Get.find<AccountViewModel>();
     try {
       setState(ViewStatus.Loading);
-      partyCode = code;
+      partyCode = await getPartyCode();
+      if (partyCode == null) {
+        await setPartyCode(code!);
+      }
       await getPartyOrder();
       bool isMatchingCustomerId = false;
       // if (partyOrderDTO == null) {
@@ -140,24 +143,28 @@ class PartyOrderViewModel extends BaseModel {
       //   Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
       // }
       int option = 1;
-      DateFormat inputFormat = DateFormat('HH:mm:ss');
-      DateTime arrive =
-          inputFormat.parse(partyOrderDTO!.timeSlotDTO!.arriveTime!);
-      DateTime checkout =
-          inputFormat.parse(partyOrderDTO!.timeSlotDTO!.checkoutTime!);
-      DateFormat outputFormat = DateFormat('HH:mm');
-      String arriveTime = outputFormat.format(arrive);
-      String checkoutTime = outputFormat.format(checkout);
-      if (!root.isTimeSlotAvailable(partyOrderDTO!.timeSlotDTO)) {
-        showStatusDialog(
-            "assets/images/error.png",
-            "Đơn nhóm đã lố khung giờ đặt rùi",
-            "Hiện tại đơn nhóm này đã đóng vào lúc ${partyOrderDTO!.timeSlotDTO!.arriveTime}, bạn hãy đặt ở khung giờ khác nhé 😃.");
-        return;
-      }
-      if (root.selectedTimeSlot!.id == partyOrderDTO!.timeSlotDTO!.id) {
-        option = await showOptionDialog(
-            "Chủ phòng đang ở khung giờ (${arriveTime} - ${checkoutTime}) 😚 Bạn hãy chuyển sang khung giờ này để tham gia đơn nhóm nhé!");
+      if (partyOrderDTO != null) {
+        DateFormat inputFormat = DateFormat('HH:mm:ss');
+        DateTime arrive =
+            inputFormat.parse(partyOrderDTO!.timeSlotDTO!.arriveTime!);
+        DateTime checkout =
+            inputFormat.parse(partyOrderDTO!.timeSlotDTO!.checkoutTime!);
+        DateFormat outputFormat = DateFormat('HH:mm');
+        String arriveTime = outputFormat.format(arrive);
+        String checkoutTime = outputFormat.format(checkout);
+        if (!root.isTimeSlotAvailable(partyOrderDTO!.timeSlotDTO)) {
+          showStatusDialog(
+              "assets/images/error.png",
+              "Đơn nhóm đã lố khung giờ đặt rùi",
+              "Hiện tại đơn nhóm này đã đóng vào lúc ${partyOrderDTO!.timeSlotDTO!.arriveTime}, bạn hãy đặt ở khung giờ khác nhé 😃.");
+          return;
+        }
+        if (root.selectedTimeSlot!.id == partyOrderDTO!.timeSlotDTO!.id) {
+          option = await showOptionDialog(
+              "Chủ phòng đang ở khung giờ (${arriveTime} - ${checkoutTime}) 😚 Bạn hãy chuyển sang khung giờ này để tham gia đơn nhóm nhé!");
+        }
+      } else {
+        option = 1;
       }
 
       if (option == 1) {
@@ -176,9 +183,13 @@ class PartyOrderViewModel extends BaseModel {
         }
         if (!isMatchingCustomerId) {
           partyOrderDTO = await _partyDAO?.joinPartyOrder(partyCode);
-          // partyCode = code;
-          hideDialog();
-          Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
+          if (partyOrderDTO != null) {
+            await getPartyOrder();
+            hideDialog();
+            Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
+          } else {
+            await _orderViewModel.prepareOrder();
+          }
         } else {
           if (partyCode != null) {
             await getPartyOrder();
@@ -200,7 +211,8 @@ class PartyOrderViewModel extends BaseModel {
       setState(ViewStatus.Loading);
       partyCode = await getPartyCode();
       _orderViewModel.currentCart = await getCart();
-      _orderViewModel.currentCart?.addProperties(root.selectedTimeSlot!.id!);
+      _orderViewModel.currentCart
+          ?.addProperties(root.selectedTimeSlot!.id!, type: 1);
       if (_orderViewModel.currentCart != null) {
         partyOrderDTO = await _partyDAO?.addProductToParty(partyCode,
             cart: _orderViewModel.currentCart);
@@ -213,12 +225,13 @@ class PartyOrderViewModel extends BaseModel {
             await _partyDAO?.addProductToParty(partyCode, cart: cart);
         await getPartyOrder();
 
-        _orderViewModel.removeCart();
+        // _orderViewModel.removeCart();
         _orderViewModel.getCurrentCart();
         // Get.back();
       }
       await getPartyOrder();
       setState(ViewStatus.Completed);
+      notifyListeners();
     } catch (e) {
       await deleteCart();
       // partyOrderDTO = null;
@@ -302,4 +315,55 @@ class PartyOrderViewModel extends BaseModel {
     await updateItemFromCart(cartItem);
     await addProductToPartyOrder();
   }
+
+  Future<void> cancelCoOrder(String code) async {
+    try {
+      int option = await showOptionDialog("Hãy thử những món khác bạn nhé 😥.");
+      if (option == 1) {
+        showLoadingDialog();
+        // CampusDTO storeDTO = await getStore();
+        final success = await _partyDAO?.logoutCoOrder(code);
+        if (success!) {
+          Get.back();
+          await deletePartyCode();
+          await _orderViewModel.removeCart();
+          partyCode = await getPartyCode();
+          partyOrderDTO = null;
+          // clearNewOrder(orderId);
+          await showStatusDialog("assets/images/icon-success.png", "Thành công",
+              "Hãy xem thử các món khác bạn nhé 😓");
+          // Get.back();
+          // await getPartyOrder();
+        } else {
+          await showStatusDialog(
+            "assets/images/error.png",
+            "Thất bại",
+            "Chưa hủy đươc đơn bạn vui lòng thử lại nhé 😓",
+          );
+        }
+      }
+    } catch (e) {
+      await showStatusDialog(
+        "assets/images/error.png",
+        "Thất bại",
+        "Chưa hủy đươc đơn bạn vui lòng thử lại nhé 😓",
+      );
+    }
+  }
+
+  Future<void> isLinkedParty(bool? checkLinked) async {
+    isLinked = checkLinked;
+    // if (isLinked == true) {
+    //   await coOrder();
+    // }
+
+    setState(ViewStatus.Completed);
+    notifyListeners();
+  }
+
+  // bool isLinkedParty(bool? checkLinked) {
+  //   isLinked = checkLinked;
+  //   return isLinked!;
+  //   setState(ViewStatus.Completed);
+  // }
 }

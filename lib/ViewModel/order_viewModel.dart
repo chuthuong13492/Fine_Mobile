@@ -160,6 +160,10 @@ class OrderViewModel extends BaseModel {
           return;
         }
         showLoadingDialog();
+        final code = await getPartyCode();
+        if (code != null) {
+          orderDTO!.addProperties(code);
+        }
         // LocationDTO location =
         //     campusDTO.locations.firstWhere((element) => element.isSelected);
 
@@ -170,6 +174,8 @@ class OrderViewModel extends BaseModel {
         if (result!.statusCode == 200) {
           await removeCart();
           await deletePartyCode();
+          final partyModel = Get.find<PartyOrderViewModel>();
+          await partyModel.isLinkedParty(false);
           hideDialog();
           await showStatusDialog("assets/images/icon-success.png", 'Success',
               'Bạn đã đặt hàng thành công');
@@ -213,17 +219,18 @@ class OrderViewModel extends BaseModel {
           root.isTimeSlotAvailable(party.partyOrderDTO!.timeSlotDTO) &&
           party.partyOrderDTO!.timeSlotDTO!.id == root.selectedTimeSlot!.id) {
         Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
-      } else if (party.partyOrderDTO!.timeSlotDTO!.id !=
-          root.selectedTimeSlot!.id) {
-        int option = await showOptionDialog(
-            "Đơn nhóm của bạn đang ở khung giờ ${party.partyOrderDTO!.timeSlotDTO!.checkoutTime} Bạn vui lòng đổi sang khung giờ này để tham gia đơn nhóm nhé");
+      } else if (party.partyOrderDTO != null) {
+        if (party.partyOrderDTO!.timeSlotDTO!.id != root.selectedTimeSlot!.id) {
+          int option = await showOptionDialog(
+              "Đơn nhóm của bạn đang ở khung giờ ${party.partyOrderDTO!.timeSlotDTO!.checkoutTime} Bạn vui lòng đổi sang khung giờ này để tham gia đơn nhóm nhé");
 
-        if (option != 1) {
-          return;
+          if (option != 1) {
+            return;
+          }
+          root.selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
+          await root.refreshMenu();
+          notifyListeners();
         }
-        root.selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
-        await root.refreshMenu();
-        notifyListeners();
       } else {
         if (currentCart != null) {
           await Get.toNamed(RoutHandler.ORDER);
