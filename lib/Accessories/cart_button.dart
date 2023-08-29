@@ -50,7 +50,7 @@ class _CartButtonState extends State<CartButton> {
                 // side: BorderSide(color: Colors.red),
               ),
               onPressed: () async {
-                await Get.toNamed(RoutHandler.ORDER);
+                await Get.toNamed(RouteHandler.ORDER);
               },
               child: Stack(
                 clipBehavior: Clip.none,

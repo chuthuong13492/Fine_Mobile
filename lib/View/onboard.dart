@@ -90,9 +90,9 @@ class _OnBoardScreenState extends State<OnBoardScreen> {
     await setIsFirstOnboard(false);
     if (hasLoggedInUser) {
       await Get.find<RootViewModel>().startUp();
-      Get.offAndToNamed(RoutHandler.NAV);
+      Get.offAndToNamed(RouteHandler.NAV);
     } else {
-      Get.offAndToNamed(RoutHandler.WELCOME_SCREEN);
+      Get.offAndToNamed(RouteHandler.WELCOME_SCREEN);
     }
   }
 

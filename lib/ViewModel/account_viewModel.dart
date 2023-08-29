@@ -67,7 +67,7 @@ class AccountViewModel extends BaseModel {
         // }
         // await Get.find<RootViewModel>().startUp();
         hideDialog();
-        Get.toNamed(RoutHandler.LOGIN);
+        Get.toNamed(RouteHandler.LOGIN);
       }
     } catch (e) {
       print(e);

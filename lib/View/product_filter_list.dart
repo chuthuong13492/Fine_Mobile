@@ -31,7 +31,7 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<RefreshIndicatorState>();
 
-  ProductFilterViewModel? _prodFilterModel;
+  ProductFilterViewModel? _prodFilterModel = Get.find<ProductFilterViewModel>();
 
   Future<void> _refreshHandler() async {
     await Get.find<ProductFilterViewModel>().getProductsWithFilter();
@@ -40,12 +40,12 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
   @override
   void initState() {
     super.initState();
-    _prodFilterModel = ProductFilterViewModel();
-    Get.find<ProductFilterViewModel>().setParam(this.widget.params);
+    // _prodFilterModel = ProductFilterViewModel();
+    _prodFilterModel!.setParam(this.widget.params);
     // Timer.periodic(const Duration(seconds: 5), (_) {
     //   Get.find<ProductFilterViewModel>().getProductsWithFilter();
     // });
-    Get.find<ProductFilterViewModel>().getProductsWithFilter();
+    _prodFilterModel!.getProductsWithFilter();
   }
 
   @override
@@ -54,18 +54,37 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
       appBar: DefaultAppBar(
         title: widget.params["menu"]["menuName"],
       ),
-      body: RefreshIndicator(
-        key: _refreshIndicatorKey,
-        onRefresh: _refreshHandler,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // _buildFilter(),
-            _buildListProduct(),
-          ],
+      body: Container(
+        height: Get.height,
+        child: RefreshIndicator(
+          key: _refreshIndicatorKey,
+          onRefresh: _refreshHandler,
+          child: Stack(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.only(top: 0),
+                  child: Column(
+                    // crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // _buildFilter(),
+                      ...renderProductFilterSection().toList(),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  List<Widget> renderProductFilterSection() {
+    return [
+      // const SizedBox(height: 18),
+      _buildListProduct(),
+    ];
   }
 
   Widget _buildListProduct() {
@@ -78,7 +97,8 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
               .toList();
 
           if (model.status == ViewStatus.Loading) {
-            return _buildLoading();
+            // return _buildLoading();
+            return const SizedBox.shrink();
           }
 
           if (model.status == ViewStatus.Error) {
@@ -115,7 +135,7 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
                     mainAxisExtent: 280),
                 itemCount: list.length,
                 itemBuilder: (context, index) {
-                  final product = model.listProducts!.elementAt(index);
+                  final product = list.elementAt(index);
                   return InkWell(
                     onTap: () {
                       RootViewModel root = Get.find<RootViewModel>();

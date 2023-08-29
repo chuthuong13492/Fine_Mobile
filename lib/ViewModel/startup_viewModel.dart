@@ -20,12 +20,12 @@ class StartUpViewModel extends BaseModel {
     bool isFirstOnBoard = await getIsFirstOnboard() ?? true;
     if (isFirstOnBoard) {
       // await Get.find<RootViewModel>().startUp();
-      Get.offAndToNamed(RoutHandler.ONBOARD);
+      Get.offAndToNamed(RouteHandler.ONBOARD);
     } else if (hasLoggedInUser) {
       await Get.find<RootViewModel>().startUp();
-      Get.offAndToNamed(RoutHandler.NAV);
+      Get.offAndToNamed(RouteHandler.NAV);
     } else {
-      Get.offAndToNamed(RoutHandler.WELCOME_SCREEN);
+      Get.offAndToNamed(RouteHandler.WELCOME_SCREEN);
     }
   }
 }

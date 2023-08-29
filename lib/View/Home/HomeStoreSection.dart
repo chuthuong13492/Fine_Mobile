@@ -86,7 +86,7 @@ class _HomeStoreSectionState extends State<HomeStoreSection> {
                                     "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
                               } else {
                                 // if (product.type == ProductType.MASTER_PRODUCT) {}
-                                Get.toNamed(RoutHandler.PRODUCT_FILTER_LIST,
+                                Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
                                     arguments: {
                                       'store': suppliers[index].toJson()
                                     });

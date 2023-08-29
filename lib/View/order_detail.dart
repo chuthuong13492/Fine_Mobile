@@ -1,4 +1,5 @@
 import 'package:fine/Constant/route_constraint.dart';
+import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/ViewModel/orderHistory_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
@@ -37,27 +38,30 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
       backgroundColor: FineTheme.palettes.shades100,
       appBar: DefaultAppBar(
         title: "Đơn hàng của bạn",
-        backButton: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-          ),
-          child: Material(
-            color: Colors.white,
-            child: InkWell(
-              onTap: () {
-                Get.offAllNamed(RoutHandler.NAV);
-              },
-              child: Icon(Icons.arrow_back_ios,
-                  size: 20, color: FineTheme.palettes.primary100),
-            ),
-          ),
-        ),
+        // backButton: Container(
+        //   decoration: BoxDecoration(
+        //     borderRadius: BorderRadius.circular(32),
+        //   ),
+        //   child: Material(
+        //     color: Colors.white,
+        //     child: InkWell(
+        //       onTap: () {
+        //         Get.back();
+        //       },
+        //       child: Icon(Icons.arrow_back_ios,
+        //           size: 20, color: FineTheme.palettes.primary100),
+        //     ),
+        //   ),
+        // ),
       ),
       body: ScopedModel(
           model: Get.find<OrderHistoryViewModel>(),
           child: ScopedModelDescendant<OrderHistoryViewModel>(
             builder: (context, child, model) {
               final orderDTO = model.orderDTO;
+              if (model.status == ViewStatus.Loading) {
+                return const SizedBox.shrink();
+              }
               return ListView(
                 children: [
                   SizedBox(
@@ -102,6 +106,20 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                                   ),
                                 )
                               ],
+                            ),
+                          ),
+                          Center(
+                            child: IconButton(
+                              padding: const EdgeInsets.all(0),
+                              onPressed: () async {
+                                Get.toNamed(RouteHandler.QRCODE_SCREEN,
+                                    arguments: orderDTO);
+                              },
+                              icon: const Icon(
+                                Icons.chevron_right_outlined,
+                                color: Colors.black,
+                                size: 30,
+                              ),
                             ),
                           ),
                         ],
@@ -149,7 +167,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                                     Container(
                                       padding: const EdgeInsets.only(left: 16),
                                       child: Text(
-                                        "${orderDTO!.timeSlot!.checkoutTime}",
+                                        "${orderDTO.timeSlot!.checkoutTime}",
                                         style: TextStyle(
                                             fontFamily: 'Montserrat',
                                             fontWeight: FontWeight.w600,
@@ -270,6 +288,12 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
   }
 
   Widget layoutOrderAmount(OrderDTO? order) {
+    double? shippingFee;
+    for (var item in order!.otherAmounts!) {
+      if (item.type == 1) {
+        shippingFee = item.amount;
+      }
+    }
     return Column(
       children: [
         Row(
@@ -277,7 +301,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
           children: [
             Expanded(
               child: Text(
-                'Tạm tính (${order!.itemQuantity} món)',
+                'Tạm tính (${order.itemQuantity} món)',
                 style: const TextStyle(
                     fontFamily: 'Montserrat',
                     fontSize: 16,
@@ -319,12 +343,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                 child: Container(
               alignment: Alignment.centerRight,
               child: Text(
-                order.otherAmounts!
-                    .where((element) => element.amountType == 0)
-                    .map((e) => e.amount)
-                    .toString()
-                    .replaceAll('(', '')
-                    .replaceAll(')', ''),
+                formatPrice(shippingFee!),
                 style: const TextStyle(
                     fontFamily: 'Montserrat',
                     fontSize: 16,

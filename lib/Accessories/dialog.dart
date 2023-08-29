@@ -61,7 +61,7 @@ Future<void> showStatusDialog(
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: FineTheme.palettes.primary300,
+                  backgroundColor: FineTheme.palettes.primary100,
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(
                           bottomRight: Radius.circular(16),
@@ -167,7 +167,7 @@ Future<bool> showErrorDialog(
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: FineTheme.palettes.primary300,
+                  backgroundColor: FineTheme.palettes.primary100,
                   shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(
                           bottomRight: Radius.circular(16),
@@ -524,7 +524,7 @@ Future<int> showPartyDialog(String? partyCode) async {
                               if (model.partyOrderDTO!.partyOrder != null) {
                                 option = 1;
                                 hideDialog();
-                                Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
+                                Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
                               } else {
                                 option = 1;
                                 hideDialog();
@@ -534,7 +534,7 @@ Future<int> showPartyDialog(String? partyCode) async {
                                 await model.getPartyOrder();
                                 option = 1;
                                 hideDialog();
-                                Get.toNamed(RoutHandler.PARTY_ORDER_SCREEN);
+                                Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
                               } else {
                                 option = 1;
                                 hideDialog();

@@ -67,7 +67,8 @@ class _OrderScreenState extends State<OrderScreen> {
       child: Scaffold(
           backgroundColor: FineTheme.palettes.shades100,
           appBar: DefaultAppBar(title: "Trang thanh toán"),
-          bottomNavigationBar: bottomBar(),
+          bottomNavigationBar:
+              bottomBar(_orderViewModel!.orderDTO!.otherAmounts!),
           body: onInit
               ? const Center(
                   child: Text('Không có giỏ hàng'),
@@ -93,6 +94,7 @@ class _OrderScreenState extends State<OrderScreen> {
                             ],
                           );
                         case ViewStatus.Loading:
+
                         case ViewStatus.Completed:
                           return ListView(
                             children: [
@@ -151,7 +153,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                   )),
                               // UpSellCollection(),
 
-                              layoutSubtotal(),
+                              layoutSubtotal(model.orderDTO!.otherAmounts!),
                             ],
                           );
 
@@ -191,7 +193,7 @@ class _OrderScreenState extends State<OrderScreen> {
     }
     return InkWell(
       onTap: () {
-        Get.toNamed(RoutHandler.STATION_PICKER_SCREEN);
+        Get.toNamed(RouteHandler.STATION_PICKER_SCREEN);
       },
       child: Container(
         height: 50,
@@ -866,13 +868,13 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  Widget layoutSubtotal() {
-    final otherAmounts = _orderViewModel!.orderDTO!.otherAmounts
-        ?.where((element) => element.amountType == 1)
-        .map((e) => e.amount)
-        .toString()
-        .replaceAll('(', '')
-        .replaceAll(')', '');
+  Widget layoutSubtotal(List<OtherAmounts> otherAmounts) {
+    double? shippingFee;
+    for (var item in otherAmounts) {
+      if (item.type == 1) {
+        shippingFee = item.amount!;
+      }
+    }
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
       child: Container(
@@ -962,7 +964,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                   text: '',
                                   children: <TextSpan>[
                                     TextSpan(
-                                      text: "${otherAmounts ?? 0}",
+                                      text: formatPrice(shippingFee!),
                                       style: FineTheme.typograhpy.subtitle2
                                           .copyWith(color: Colors.black),
                                     ),
@@ -1008,13 +1010,13 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  Widget bottomBar() {
-    final otherAmounts = _orderViewModel!.orderDTO!.otherAmounts
-        ?.where((element) => element.amountType == 1)
-        .map((e) => e.amount)
-        .toString()
-        .replaceAll('(', '')
-        .replaceAll(')', '');
+  Widget bottomBar(List<OtherAmounts> otherAmounts) {
+    double? shippingFee;
+    for (var item in otherAmounts) {
+      if (item.type == 1) {
+        shippingFee = item.amount!;
+      }
+    }
     var isCurrentTimeSlotAvailable =
         Get.find<RootViewModel>().isCurrentTimeSlotAvailable();
     return ScopedModel(
@@ -1115,7 +1117,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                       fontStyle: FontStyle.normal),
                                 ),
                                 Text(
-                                  "${otherAmounts ?? 0}",
+                                  formatPrice(shippingFee!),
                                   style: const TextStyle(
                                       fontFamily: 'Montserrat',
                                       fontSize: 18,
@@ -1161,8 +1163,7 @@ class _OrderScreenState extends State<OrderScreen> {
                             if (isCurrentTimeSlotAvailable) {
                               await model.orderCart();
                             } else {
-                              await deleteCart();
-                              await deleteMart();
+                              await model.removeCart();
                               showStatusDialog(
                                   "assets/images/error.png",
                                   "Opps",

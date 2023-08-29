@@ -54,6 +54,7 @@ dependencies:
   geocoding: ^2.1.0
   expandable: ^5.0.1
   animator: ^3.3.0
+  im_stepper: ^1.0.1+1
   # url_launcher: ^6.1.10
 
 dependency_overrides:

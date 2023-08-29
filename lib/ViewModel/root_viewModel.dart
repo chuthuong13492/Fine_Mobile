@@ -8,6 +8,7 @@ import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DAO/DestinationDAO.dart';
 import 'package:fine/Model/DAO/ProductDAO.dart';
 import 'package:fine/Model/DAO/StoreDAO.dart';
+import 'package:fine/Model/DAO/index.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/constrant.dart';
@@ -20,6 +21,7 @@ import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
+import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -38,17 +40,20 @@ class RootViewModel extends BaseModel {
   TimeSlotDTO? selectedTimeSlot;
   List<TimeSlotDTO>? listTimeSlot;
   ProductDAO? _productDAO;
+  StationDAO? _stationDAO;
   DestinationDAO? _destinationDAO;
   bool changeAddress = false;
+  Uint8List? imageBytes;
 
   RootViewModel() {
     _productDAO = ProductDAO();
     _destinationDAO = DestinationDAO();
+    _stationDAO = StationDAO();
     selectedTimeSlot = null;
   }
   Future refreshMenu() async {
     // fetchStore();
-
+    await getCart();
     await Get.find<HomeViewModel>().getListSupplier();
     await Get.find<HomeViewModel>().getMenus();
     // await Get.find<OrderViewModel>().getUpSellCollections();
@@ -67,6 +72,7 @@ class RootViewModel extends BaseModel {
     // await Get.find<HomeViewModel>().getListSupplier();
     // await Get.find<CategoryViewModel>().getCategories();
     await Get.find<BlogsViewModel>().getBlogs();
+    await Get.find<OrderViewModel>().getCurrentCart();
   }
 
   Future<void> openProductDetail(ProductDTO? product,
@@ -83,12 +89,38 @@ class RootViewModel extends BaseModel {
         //     product.id, store.id, selectedMenu.menuId);
         product = await _productDAO?.getProductDetail(product?.id);
       }
-      await Get.toNamed(RoutHandler.PRODUCT_DETAIL, arguments: product);
+      bool result =
+          await Get.toNamed(RouteHandler.PRODUCT_DETAIL, arguments: product);
       //
       hideDialog();
       await Get.delete<bool>(
         tag: "showOnHome",
       );
+      // if (result != null) {
+      //   if (result) {
+      //     Get.rawSnackbar(
+      //       duration: Duration(seconds: 3),
+      //       snackPosition: SnackPosition.BOTTOM,
+      //       backgroundColor: Colors.white,
+      //       messageText: Text("Thêm món thành công ",
+      //           style: FineTheme.typograhpy.subtitle2),
+      //       icon: Icon(
+      //         Icons.check,
+      //         color: FineTheme.palettes.primary100,
+      //       ),
+      //       mainButton: InkWell(
+      //         onTap: () async {
+      //           await navOrder();
+      //         },
+      //         child: Text(
+      //           "Xem 🛒",
+      //           style: FineTheme.typograhpy.subtitle2,
+      //           textAlign: TextAlign.center,
+      //         ),
+      //       ),
+      //     );
+      //   }
+      // }
       notifyListeners();
     } catch (e) {
       await showErrorDialog(errorTitle: "Không tìm thấy sản phẩm");
@@ -252,7 +284,99 @@ class RootViewModel extends BaseModel {
     // await getListTimeSlot();
     await startUp();
     hideDialog();
-    Get.toNamed(RoutHandler.NAV);
+    Get.toNamed(RouteHandler.NAV);
+  }
+
+  Future<void> navOrder() async {
+    // RootViewModel root = Get.find<RootViewModel>();
+    OrderViewModel orderViewModel = Get.find<OrderViewModel>();
+    PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+    await party.getPartyOrder();
+    if (isCurrentTimeSlotAvailable()) {
+      if (party.partyOrderDTO != null &&
+          isTimeSlotAvailable(party.partyOrderDTO!.timeSlotDTO) &&
+          party.partyOrderDTO!.timeSlotDTO!.id == selectedTimeSlot!.id) {
+        await party.getPartyOrder();
+        Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+      } else if (party.partyOrderDTO != null) {
+        if (party.partyOrderDTO!.timeSlotDTO!.id != selectedTimeSlot!.id) {
+          // selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
+          if (isTimeSlotAvailable(party.partyOrderDTO!.timeSlotDTO)) {
+            int option = await showOptionDialog(
+                "Đơn nhóm của bạn đang ở khung giờ ${party.partyOrderDTO!.timeSlotDTO!.checkoutTime} Bạn vui lòng đổi sang khung giờ này để tham gia đơn nhóm nhé");
+
+            if (option != 1) {
+              return;
+            }
+            selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
+            await refreshMenu();
+            notifyListeners();
+          } else {
+            await orderViewModel.removeCart();
+            party.partyOrderDTO = null;
+            await deletePartyCode();
+            party.partyCode = await getPartyCode();
+            return;
+          }
+        }
+      } else {
+        await orderViewModel.getCurrentCart();
+
+        if (orderViewModel.currentCart != null) {
+          if (orderViewModel.currentCart!.timeSlotId != selectedTimeSlot!.id) {
+            final cartTimeSlot = listTimeSlot!
+                .where((element) =>
+                    element.id == orderViewModel.currentCart!.timeSlotId)
+                .toList();
+            if (isTimeSlotAvailable(cartTimeSlot[0])) {
+              int option = await showOptionDialog(
+                  "Giỏ hàng của bạn đang ở khung giờ ${cartTimeSlot[0].arriveTime} Bạn vui lòng đổi sang khung giờ này để đặt hàng nhé");
+
+              if (option != 1) {
+                return;
+              }
+              selectedTimeSlot = cartTimeSlot[0];
+              await refreshMenu();
+              notifyListeners();
+              // await prepareOrder();
+              // if (orderDTO != null) {
+              await Get.toNamed(RouteHandler.ORDER);
+            } else {
+              await orderViewModel.removeCart();
+            }
+
+            // }
+          } else {
+            await Get.toNamed(RouteHandler.ORDER);
+          }
+        } else {
+          await orderViewModel.getCurrentCart();
+          showStatusDialog(
+              "assets/images/error.png",
+              "Giỏ hàng đang trống kìaaa",
+              "Hiện tại giỏ của bạn đang trống , bạn hãy thêm sản phẩm vào nhé 😃.");
+        }
+      }
+    } else {
+      party.partyOrderDTO == null;
+      await orderViewModel.removeCart();
+      await orderViewModel.getCurrentCart();
+      showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
+          "Hiện tại khung giờ này đã đóng vào lúc ${selectedTimeSlot!.checkoutTime}, bạn hãy xem khung giờ khác nhé 😃.");
+      notifyListeners();
+    }
+  }
+
+  Future<void> getBoxQrCode(String boxId) async {
+    try {
+      setState(ViewStatus.Loading);
+      final qrcode = await _stationDAO!.getBoxById(boxId);
+      imageBytes = qrcode;
+      await Future.delayed(const Duration(milliseconds: 200));
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   Future<void> getListTimeSlot() async {
@@ -319,7 +443,7 @@ class RootViewModel extends BaseModel {
         productDTO =
             await _productDAO?.getProductsInMenuByStoreId(supplierDTO?.id);
       }
-      await Get.toNamed(RoutHandler.PRODUCT_DETAIL, arguments: supplierDTO);
+      await Get.toNamed(RouteHandler.PRODUCT_DETAIL, arguments: supplierDTO);
       //
       hideDialog();
       await Get.delete<bool>(
@@ -353,6 +477,7 @@ class RootViewModel extends BaseModel {
         // showLoadingDialog();
         selectedTimeSlot = timeSlot;
         await Get.find<OrderViewModel>().removeCart();
+        // await Get.find<OrderViewModel>().getCurrentCart();
 
         party.partyOrderDTO = null;
         // await setStore(currentStore);
@@ -365,6 +490,7 @@ class RootViewModel extends BaseModel {
 
   bool isCurrentTimeSlotAvailable() {
     final currentDate = DateTime.now();
+
     String currentTimeSlot = selectedTimeSlot!.checkoutTime!;
     var beanTime = DateTime(
       currentDate.year,

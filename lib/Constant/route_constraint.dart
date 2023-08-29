@@ -1,4 +1,4 @@
-class RoutHandler {
+class RouteHandler {
   static const String LOGIN = "/login";
   static const String HOME = "/home";
   static const String NAV = "/nav_screen";
@@ -15,4 +15,6 @@ class RoutHandler {
   static const String STATION_PICKER_SCREEN = "/station_picker_screen";
   static const String PARTY_ORDER_SCREEN = "/party_order_screen";
   static const String CONFIRM_ORDER_SCREEN = "/confirm_order_screen";
+  static const String QRCODE_SCREEN = "/qrcode_screen";
+  static const String CHECKING_ORDER_SCREEN = "/checking_order_screen";
 }

@@ -102,7 +102,7 @@ class MyRequest {
           );
           // await showStatusDialog("assets/images/global_error.png", "Lỗi",
           //     "Vui lòng đăng nhập lại");
-          Get.Get.offAllNamed(RoutHandler.LOGIN);
+          Get.Get.offAllNamed(RouteHandler.LOGIN);
         } else {
           handler.next(e);
         }

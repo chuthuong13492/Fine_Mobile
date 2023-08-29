@@ -5,6 +5,7 @@ import 'package:fine/Accessories/theme_data.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/shared_pref.dart';
+import 'package:fine/View/checkingOrder_screen.dart';
 import 'package:fine/View/coOrder_screen.dart';
 import 'package:fine/View/confirm_party_screen.dart';
 import 'package:fine/View/home.dart';
@@ -18,6 +19,7 @@ import 'package:fine/View/order_history.dart';
 import 'package:fine/View/product_detail.dart';
 import 'package:fine/View/product_filter_list.dart';
 import 'package:fine/View/profile.dart';
+import 'package:fine/View/qrcode_screen.dart';
 import 'package:fine/View/sign_in.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/View/station_picker_screen.dart';
@@ -59,64 +61,74 @@ class MyApp extends StatelessWidget {
       title: 'Fine Delivery',
       onGenerateRoute: (settings) {
         switch (settings.name) {
-          case RoutHandler.WELCOME_SCREEN:
+          case RouteHandler.WELCOME_SCREEN:
             return ScaleRoute(page: const WelcomeScreen());
-          case RoutHandler.LOGIN:
+          case RouteHandler.LOGIN:
             return CupertinoPageRoute(
                 builder: (context) => const SignIn(), settings: settings);
-          case RoutHandler.ONBOARD:
+          case RouteHandler.ONBOARD:
             return ScaleRoute(page: const OnBoardScreen());
-          case RoutHandler.LOADING:
+          case RouteHandler.LOADING:
             return CupertinoPageRoute<bool>(
                 builder: (context) => LoadingScreen(
                       title: settings.arguments as String ?? "Đang xử lý...",
                     ),
                 settings: settings);
-          case RoutHandler.PROFILE:
+          case RouteHandler.PROFILE:
             return CupertinoPageRoute(
                 builder: (context) => const ProfileScreen(),
                 settings: settings);
-          case RoutHandler.STORE_SELECT:
+          case RouteHandler.STORE_SELECT:
             return ScaleRoute(page: StoreSelectScreen());
-          case RoutHandler.ORDER_HISTORY_DETAIL:
+          case RouteHandler.ORDER_HISTORY_DETAIL:
             return SlideBottomRoute(
               page: OrderHistoryDetail(order: settings.arguments as dynamic),
             );
-          case RoutHandler.PRODUCT_DETAIL:
+          case RouteHandler.QRCODE_SCREEN:
+            return CupertinoPageRoute<bool>(
+                builder: (context) =>
+                    QRCodeScreen(order: settings.arguments as dynamic),
+                settings: settings);
+          case RouteHandler.CHECKING_ORDER_SCREEN:
+            return CupertinoPageRoute<bool>(
+                builder: (context) =>
+                    CheckingOrderScreen(order: settings.arguments as dynamic),
+                settings: settings);
+          case RouteHandler.PRODUCT_DETAIL:
             return CupertinoPageRoute<bool>(
                 builder: (context) => ProductDetailScreen(
                       dto: settings.arguments as dynamic,
                     ),
                 settings: settings);
-          case RoutHandler.ORDER:
+          case RouteHandler.ORDER:
             return CupertinoPageRoute<bool>(
                 builder: (context) => OrderScreen(), settings: settings);
-          case RoutHandler.STATION_PICKER_SCREEN:
+          case RouteHandler.STATION_PICKER_SCREEN:
             return CupertinoPageRoute<bool>(
                 builder: (context) => StationPickerScreen(),
                 settings: settings);
-          case RoutHandler.PARTY_ORDER_SCREEN:
+          case RouteHandler.PARTY_ORDER_SCREEN:
             return CupertinoPageRoute<bool>(
                 builder: (context) => PartyOrderScreen(
                       dto: settings.arguments as dynamic,
                     ),
                 settings: settings);
-          case RoutHandler.CONFIRM_ORDER_SCREEN:
+          case RouteHandler.CONFIRM_ORDER_SCREEN:
             return CupertinoPageRoute<bool>(
                 builder: (context) => PartyConfirmScreen(), settings: settings);
-          case RoutHandler.PRODUCT_FILTER_LIST:
+          case RouteHandler.PRODUCT_FILTER_LIST:
             return CupertinoPageRoute<bool>(
                 builder: (context) => ProductsFilterPage(
                       params: settings.arguments as Map<String, dynamic>,
                     ),
                 settings: settings);
-          case RoutHandler.NAV:
+          case RouteHandler.NAV:
             return CupertinoPageRoute(
                 builder: (context) => RootScreen(
                       initScreenIndex: settings.arguments as int ?? 0,
                     ),
                 settings: settings);
-          case RoutHandler.HOME:
+          case RouteHandler.HOME:
             return CupertinoPageRoute(
                 builder: (context) => const HomeScreen(), settings: settings);
           default:

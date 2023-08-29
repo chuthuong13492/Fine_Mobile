@@ -56,8 +56,8 @@ class Cart {
     );
   }
 
-  void addProperties(String timeSlot, {int? type}) {
-    timeSlotId = timeSlot;
+  void addProperties({int? type}) {
+    // timeSlotId = timeSlot;
     partyType = type;
   }
 

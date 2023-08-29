@@ -41,18 +41,28 @@ class PartyOrderDAO extends BaseDAO {
     } catch (e) {
       throw e;
     }
-    return null;
     // print("Request Note: " + note);
   }
 
-  Future<PartyOrderDTO?> joinPartyOrder(String? code) async {
-    final res = await request.put(
-      '/order/coOrder/party?partyCode=$code',
-    );
-    if (res.statusCode == 200) {
-      return PartyOrderDTO.fromJson(res.data['data']);
+  Future<PartyOrderStatus?> joinPartyOrder(String? code) async {
+    try {
+      final res = await request.put(
+        '/order/coOrder/party?partyCode=$code',
+      );
+      return PartyOrderStatus(
+        statusCode: res.statusCode,
+        code: res.data['code'],
+        message: res.data['message'],
+        partyOrderDTO: PartyOrderDTO.fromJson(res.data['data']),
+      );
+    } on DioError catch (e) {
+      return PartyOrderStatus(
+          statusCode: e.response!.statusCode,
+          code: e.response!.data['code'],
+          message: e.response!.data['message']);
+    } catch (e) {
+      throw e;
     }
-    return null;
   }
 
   Future<PartyOrderDTO?> addProductToParty(String? code, {Cart? cart}) async {

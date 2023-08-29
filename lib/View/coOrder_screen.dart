@@ -36,23 +36,25 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   @override
   void initState() {
     super.initState();
-    fetchPartyOrder();
-  }
-
-  void fetchPartyOrder() {
     _timer = Timer.periodic(const Duration(seconds: 1),
         (timer) => _partyViewModel!.getPartyOrder());
   }
 
-  void _stopTimer() {
+  @override
+  void dispose() {
+    super.dispose();
     _timer?.cancel();
   }
 
+  // void _stopTimer() {
+  //   _timer?.cancel();
+  // }
+
   @override
   Widget build(BuildContext context) {
-    List<Party> list = _partyViewModel!.partyOrderDTO!.partyOrder!;
+    List<Party> listParty = _partyViewModel!.partyOrderDTO!.partyOrder!;
     AccountViewModel acc = Get.find<AccountViewModel>();
-    final user = list
+    final user = listParty
         .where((element) => element.customer!.id == acc.currentUser!.id)
         .toList();
     bool? isAdmin = false;
@@ -77,8 +79,10 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
               color: Colors.white,
               child: InkWell(
                 onTap: () {
-                  _stopTimer();
-                  Get.offAllNamed(RoutHandler.NAV);
+                  // _stopTimer();
+                  // Get.offAndToNamed(RoutHandler.NAV);
+
+                  Get.back();
                 },
                 child: Icon(Icons.arrow_back_ios,
                     size: 20, color: FineTheme.palettes.primary100),
@@ -92,7 +96,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                 await _partyViewModel!
                     .cancelCoOrder(_partyViewModel!.partyCode!);
                 if (_partyViewModel!.partyOrderDTO == null) {
-                  _stopTimer();
+                  // _stopTimer();
                 }
               },
               child: Center(
@@ -121,6 +125,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                 child: ScopedModelDescendant<PartyOrderViewModel>(
                   builder: (context, child, model) {
                     List<Widget> card = [];
+                    List<Party> list = model.partyOrderDTO!.partyOrder!;
 
                     for (var item in user) {
                       if (item.customer!.isAdmin == true) {
@@ -559,14 +564,14 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                       onTap: () async {
                         if (!isAllConfirm!) {
                           await model.confirmationParty();
-                          _stopTimer();
-                          Get.toNamed(RoutHandler.CONFIRM_ORDER_SCREEN);
+                          // _stopTimer();
+                          Get.toNamed(RouteHandler.CONFIRM_ORDER_SCREEN);
                         } else {
                           Cart? cart = await getCart();
                           if (cart != null) {
                             await model.preCoOrder();
-                            _stopTimer();
-                            Get.toNamed(RoutHandler.ORDER);
+                            // _stopTimer();
+                            Get.toNamed(RouteHandler.ORDER);
                           } else {
                             showStatusDialog(
                                 "assets/images/error.png",

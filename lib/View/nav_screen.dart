@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:fine/Accessories/cart_button.dart';
-import 'package:fine/View/barcode_screen.dart';
+import 'package:fine/View/qrcode_screen.dart';
 import 'package:fine/View/box_screen.dart';
 import 'package:fine/View/home.dart';
 import 'package:fine/View/order_history.dart';
@@ -49,8 +49,8 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   final screens = [
     const HomeScreen(),
     const OrderHistoryScreen(),
-    const BarcodeScreen(),
-    const BoxScreen(),
+    // const BarcodeScreen(),
+    // const BoxScreen(),
     const ProfileScreen()
   ];
   final items = <Widget>[
@@ -64,16 +64,16 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
       width: 32,
       height: 32,
     ),
-    SvgPicture.asset(
-      "assets/icons/Scan.svg",
-      width: 32,
-      height: 32,
-    ),
-    SvgPicture.asset(
-      "assets/icons/Box.svg",
-      width: 32,
-      height: 32,
-    ),
+    // SvgPicture.asset(
+    //   "assets/icons/Scan.svg",
+    //   width: 32,
+    //   height: 32,
+    // ),
+    // SvgPicture.asset(
+    //   "assets/icons/Box.svg",
+    //   width: 32,
+    //   height: 32,
+    // ),
     SvgPicture.asset(
       "assets/icons/Profile.svg",
       width: 32,

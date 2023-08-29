@@ -49,27 +49,37 @@ class AnalyticsService {
     await _analytics.logSignUp(signUpMethod: method);
   }
 
-  Future logChangeCart(ProductDTO product, int quantity, bool isAdd) async {
+  Future logChangeCart(ProductDTO? product, int quantity, bool isAdd,
+      {ProductInCart? productInCart}) async {
     if (isAdd) {
-      await _analytics.logAddToCart(
-        items: [
-          AnalyticsEventItem(
-            itemId: product.id.toString(),
-            itemName: product.productName,
-            itemCategory: product.categoryId.toString(),
-            quantity: quantity,
-          )
-        ],
-        // itemId: product.id.toString(),
-        // itemName: product.name,
-        // itemCategory: product.catergoryId.toString(),
-        // quantity: quantity,
-      );
+      if (productInCart != null) {
+        await _analytics.logAddToCart(
+          items: [
+            AnalyticsEventItem(
+              itemId: productInCart.id.toString(),
+              itemName: productInCart.name,
+              // itemCategory: product.categoryId.toString(),
+              quantity: quantity,
+            )
+          ],
+        );
+      } else {
+        await _analytics.logAddToCart(
+          items: [
+            AnalyticsEventItem(
+              itemId: product!.id.toString(),
+              itemName: product.productName,
+              itemCategory: product.categoryId.toString(),
+              quantity: quantity,
+            )
+          ],
+        );
+      }
     } else {
       await _analytics.logRemoveFromCart(
         items: [
           AnalyticsEventItem(
-            itemId: product.id.toString(),
+            itemId: product!.id.toString(),
             itemName: product.productName,
             itemCategory: product.categoryId.toString(),
             quantity: quantity,

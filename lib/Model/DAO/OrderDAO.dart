@@ -72,6 +72,16 @@ class OrderDAO extends BaseDAO {
     return null;
   }
 
+  Future<OrderStatusDTO?> fetchOrderStatus(String orderId) async {
+    final res = await request.get(
+      'order/status/$orderId',
+    );
+    if (res.statusCode == 200) {
+      return OrderStatusDTO.fromJson(res.data['data']);
+    }
+    return null;
+  }
+
   Future<bool> cancelOrder(int orderId) async {
     final res = await request.put(
       '/order/usercancel?orderId=$orderId',

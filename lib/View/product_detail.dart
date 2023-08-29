@@ -57,7 +57,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       model: ProductDetailViewModel(dto: widget.dto),
       child: Scaffold(
         backgroundColor: FineTheme.palettes.shades100,
-        // bottomNavigationBar: bottomBar(),
+        bottomNavigationBar: bottomBar(),
         body: CustomScrollView(
           slivers: [
             SliverPersistentHeader(
@@ -278,7 +278,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           const SizedBox(
             height: 16,
           ),
-          orderButton(),
+          // orderButton(),
         ],
       ),
     );
@@ -532,40 +532,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   //   );
   // }
 
-  // Widget bottomBar() {
-  //   return Container(
-  //     padding: const EdgeInsets.only(left: 10, right: 10),
-  //     decoration: BoxDecoration(
-  //       color: FineTheme.palettes.neutral100,
-  //       boxShadow: const [
-  //         BoxShadow(
-  //           color: Colors.grey,
-  //           offset: Offset(0.0, 1.0), //(x,y)
-  //           blurRadius: 6.0,
-  //         ),
-  //       ],
-  //     ),
-  //     child: ScopedModel(
-  //       model: ProductDetailViewModel(dto: widget.dto),
-  //       child: ListView(
-  //         shrinkWrap: true,
-  //         children: [
-  //           const SizedBox(
-  //             height: 8,
-  //           ),
-  //           Center(child: selectQuantity()),
-  //           // const SizedBox(
-  //           //   height: 8,
-  //           // ),
-  //           orderButton(),
-  //           const SizedBox(
-  //             height: 8,
-  //           )
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget bottomBar() {
+    return Container(
+      padding: const EdgeInsets.only(left: 10, right: 10),
+      decoration: BoxDecoration(
+        color: FineTheme.palettes.shades100,
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.grey,
+            offset: Offset(0.0, 1.0), //(x,y)
+            blurRadius: 6.0,
+          ),
+        ],
+      ),
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          const SizedBox(
+            height: 16,
+          ),
+          // Center(child: selectQuantity()),
+          // const SizedBox(
+          //   height: 8,
+          // ),
+          orderButton(),
+          const SizedBox(
+            height: 8,
+          )
+        ],
+      ),
+    );
+  }
 
   Widget orderButton() {
     return ScopedModelDescendant<ProductDetailViewModel>(

@@ -23,7 +23,7 @@ class PartyConfirmScreen extends StatelessWidget {
             color: Colors.white,
             child: InkWell(
               onTap: () {
-                Get.offAllNamed(RoutHandler.NAV);
+                Get.offAllNamed(RouteHandler.NAV);
               },
               child: Icon(Icons.arrow_back_ios,
                   size: 20, color: FineTheme.palettes.primary100),

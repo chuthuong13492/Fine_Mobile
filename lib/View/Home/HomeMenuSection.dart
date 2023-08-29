@@ -266,7 +266,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                                   "Opps",
                                   "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
                             } else {
-                              Get.toNamed(RoutHandler.PRODUCT_FILTER_LIST,
+                              Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
                                   arguments: {
                                     'menu': homeMenu[index].toJson()
                                   });

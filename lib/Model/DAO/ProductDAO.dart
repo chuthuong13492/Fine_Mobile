@@ -1,4 +1,7 @@
+import 'package:dio/dio.dart';
+import 'package:fine/Constant/addProdcutToCart_status.dart';
 import 'package:fine/Model/DAO/index.dart';
+import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/request.dart';
@@ -63,6 +66,41 @@ class ProductDAO extends BaseDAO {
       var listJson = res.data as List;
       // metaDataDTO = MetaDataDTO.fromJson(res.data["metadata"]);
       return listJson.map((e) => ProductDTO.fromJson(e)).toList();
+    }
+    return null;
+  }
+
+  Future<AddProductToCartResponse?> checkProductToCart(Cart cart) async {
+    // try {
+    //   final res = await request.post(
+    //     '/order/card',
+    //     data: cart.toJsonAPi(),
+    //   );
+    //   return AddProductToCartStatus(
+    //     statusCode: res.statusCode,
+    //     code: res.data['code'],
+    //     message: res.data['message'],
+    //     product: AddProductToCartResponse.fromList(res.data['data']),
+    //   );
+    // } on DioError catch (e) {
+    //   return AddProductToCartStatus(
+    //       statusCode: e.response!.statusCode,
+    //       code: e.response!.data['code'],
+    //       message: e.response!.data['message']);
+    // } catch (e) {
+    //   throw e;
+    // }
+    if (cart != null) {
+      // print("Request Note: " + note);
+      final res = await request.post(
+        '/order/card',
+        data: cart.toJsonAPi(),
+      );
+      if (res.statusCode == 200) {
+        return AddProductToCartResponse.fromJson(res.data['data']);
+      }
+
+      return null;
     }
     return null;
   }

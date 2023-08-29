@@ -71,7 +71,7 @@ class LoginViewModel extends BaseModel {
           //     margin: EdgeInsets.only(left: 8, right: 8, bottom: 32),
           //     borderRadius: 8);
           hideDialog();
-          await Get.offAllNamed(RoutHandler.NAV);
+          await Get.offAllNamed(RouteHandler.NAV);
         }
         // AccountViewModel accountViewModel = Get.find<AccountViewModel>();
         // accountViewModel.currentUser = userInfo;
@@ -93,6 +93,6 @@ class LoginViewModel extends BaseModel {
   Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
     await GoogleSignIn().signOut();
-    Get.offAllNamed(RoutHandler.LOGIN);
+    Get.offAllNamed(RouteHandler.LOGIN);
   }
 }

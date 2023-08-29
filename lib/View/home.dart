@@ -68,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Column(
                   children: [
                     FixedAppBar(
-                      notifier: notifier,
+                      // notifier: notifier,
                       height: HEIGHT,
                     ),
                     Expanded(
@@ -375,7 +375,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onTapOrderHistory(order) async {
     // get orderDetail
     await Get.find<OrderHistoryViewModel>().getOrders();
-    await Get.toNamed(RoutHandler.ORDER_HISTORY_DETAIL, arguments: order);
+    await Get.toNamed(RouteHandler.ORDER_HISTORY_DETAIL, arguments: order);
   }
 
   Widget buildNewOrder() {

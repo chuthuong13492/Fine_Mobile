@@ -19,8 +19,8 @@ import 'package:scoped_model/scoped_model.dart';
 
 class FixedAppBar extends StatefulWidget {
   final double height;
-  final ValueNotifier<double> notifier;
-  const FixedAppBar({super.key, required this.height, required this.notifier});
+
+  const FixedAppBar({super.key, required this.height});
 
   @override
   State<FixedAppBar> createState() => _FixedAppBarState();
@@ -35,7 +35,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
   void initState() {
     super.initState();
     // deletePartyCode();
-    _orderViewModel!.getCurrentCart();
+    // _orderViewModel!.getCurrentCart();
     _partyOrderViewModel!.getPartyOrder();
   }
 
@@ -97,6 +97,9 @@ class _FixedAppBarState extends State<FixedAppBar> {
 
           if (model.currentCart != null) {
             hasQuantity = true;
+          }
+          if (model.notifier.value == 0) {
+            hasQuantity = false;
           }
           // if (party.currentCart != null) {
           //   hasQuantity = true;
@@ -163,57 +166,63 @@ class _FixedAppBarState extends State<FixedAppBar> {
               const SizedBox(
                 width: 25,
               ),
-              InkWell(
-                onTap: () async {
-                  await model.navOrder();
-                },
-                child: Container(
-                  width: 54,
-                  padding: const EdgeInsets.all(7),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                            color: FineTheme.palettes.primary100,
-                            borderRadius: BorderRadius.circular(50)),
-                        child: Center(
-                          child: Image.asset(
-                            "assets/icons/shopping-bag-02.png",
-                            height: 24,
-                            width: 24,
-                          ),
-                        ),
-                      ),
-                      hasQuantity
-                          ? Positioned(
-                              top: -2,
-                              left: 30,
-                              child: AnimatedContainer(
-                                duration: const Duration(microseconds: 300),
-                                width: 18,
-                                height: 18,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(16),
-                                  color: Colors.red,
-                                  //border: Border.all(color: Colors.grey),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    quantity.toString(),
-                                    style: FineTheme.typograhpy.subtitle1
-                                        .copyWith(color: Colors.white),
-                                  ),
-                                ),
+              ValueListenableBuilder(
+                valueListenable: model.notifier,
+                builder: (context, value, child) {
+                  return InkWell(
+                    onTap: () async {
+                      final root = Get.find<RootViewModel>();
+                      await root.navOrder();
+                    },
+                    child: Container(
+                      width: 54,
+                      padding: const EdgeInsets.all(7),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                color: FineTheme.palettes.primary100,
+                                borderRadius: BorderRadius.circular(50)),
+                            child: Center(
+                              child: Image.asset(
+                                "assets/icons/shopping-bag-02.png",
+                                height: 24,
+                                width: 24,
                               ),
-                            )
-                          : const SizedBox.shrink(),
-                    ],
-                  ),
-                ),
-              ),
+                            ),
+                          ),
+                          hasQuantity
+                              ? Positioned(
+                                  top: -2,
+                                  left: 30,
+                                  child: AnimatedContainer(
+                                    duration: const Duration(microseconds: 300),
+                                    width: 18,
+                                    height: 18,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(16),
+                                      color: Colors.red,
+                                      //border: Border.all(color: Colors.grey),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        value.toString(),
+                                        style: FineTheme.typograhpy.subtitle1
+                                            .copyWith(color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox.shrink(),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              )
             ],
           );
         },
@@ -251,7 +260,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
                 Expanded(
                   child: InkWell(
                     onTap: () async {
-                      Get.offAllNamed(RoutHandler.STORE_SELECT);
+                      Get.offAllNamed(RouteHandler.STORE_SELECT);
 
                       // AccountViewModel root = Get.find<AccountViewModel>();
                       // root.processSignout();

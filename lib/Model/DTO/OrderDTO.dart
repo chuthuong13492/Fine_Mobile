@@ -166,20 +166,20 @@ class OtherAmounts {
   String? id;
   String? orderId;
   double? amount;
-  int? amountType;
+  int? type;
 
   OtherAmounts({
     this.id,
     this.orderId,
     this.amount,
-    this.amountType,
+    this.type,
   });
 
   OtherAmounts.fromJson(Map<String, dynamic> json) {
     id = json["id"] as String;
     orderId = json["orderId"] as String;
     amount = json["amount"];
-    amountType = json["amountType"];
+    type = json["type"];
   }
 
   static List<OtherAmounts> fromList(List<Map<String, dynamic>> list) {
@@ -191,7 +191,7 @@ class OtherAmounts {
     _data["id"] = id;
     _data["orderId"] = orderId;
     _data["amount"] = amount;
-    _data["amountType"] = amountType;
+    _data["type"] = type;
     return _data;
   }
 }
@@ -261,6 +261,36 @@ class OrderDetails {
     _data["totalAmount"] = totalAmount;
     _data["finalAmount"] = finalAmount;
     _data["note"] = note ?? '';
+    return _data;
+  }
+}
+
+class OrderStatusDTO {
+  int? orderStatus;
+  String? boxId;
+  String? stationName;
+
+  OrderStatusDTO({
+    this.orderStatus,
+    this.boxId,
+    this.stationName,
+  });
+
+  OrderStatusDTO.fromJson(Map<String, dynamic> json) {
+    orderStatus = json["orderStatus"] as int;
+    boxId = json["boxId"] as String;
+    stationName = json["stationName"] as String ?? null;
+  }
+
+  static List<OrderStatusDTO> fromList(List<Map<String, dynamic>> list) {
+    return list.map((map) => OrderStatusDTO.fromJson(map)).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["orderStatus"] = orderStatus;
+    _data["boxId"] = boxId;
+    _data["stationName"] = stationName;
     return _data;
   }
 }

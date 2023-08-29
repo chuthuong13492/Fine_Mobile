@@ -73,19 +73,19 @@ Future<String?> getPartyCode() async {
   return prefs.getString('PARTY_CODE');
 }
 
-Future<void> addItemToCart(CartItem item) async {
+Future<void> addItemToCart(CartItem item, String timeSlotId) async {
   Cart? cart = await getCart();
   if (cart == null) {
-    cart = new Cart();
+    cart = new Cart(timeSlotId: timeSlotId);
   }
   cart.addItem(item);
   await setCart(cart);
 }
 
-Future<void> addItemToMart(CartItem item) async {
+Future<void> addItemToMart(CartItem item, String timeSlotId) async {
   Cart? cart = await getMart();
   if (cart == null) {
-    cart = new Cart();
+    cart = new Cart(timeSlotId: timeSlotId);
   }
   cart.addItem(item);
   await setMart(cart);

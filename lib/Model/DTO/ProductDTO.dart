@@ -311,10 +311,115 @@ class ProductAttributes {
     _data["name"] = name;
     _data["code"] = code;
     _data["size"] = size;
-    _data["price"] == price;
+    _data["price"] = price;
     _data["isActive"] = isActive;
     _data["createAt"] = createAt;
     _data["updateAt"] = updateAt;
+    return _data;
+  }
+}
+
+class AddProductToCartResponse {
+  List<ProductInCart>? products;
+  List<ProductInCart>? productsRecommend;
+
+  AddProductToCartResponse({
+    this.products,
+    this.productsRecommend,
+  });
+
+  AddProductToCartResponse.fromJson(Map<String, dynamic> json) {
+    products = json["products"] == null
+        ? null
+        : (json["products"] as List)
+            .map((e) => ProductInCart.fromJson(e))
+            .toList();
+    productsRecommend = json["productsRecommend"] == null
+        ? null
+        : (json["productsRecommend"] as List)
+            .map((e) => ProductInCart.fromJson(e))
+            .toList();
+  }
+
+  static List<AddProductToCartResponse> fromList(
+      List<Map<String, dynamic>> list) {
+    return list.map((map) => AddProductToCartResponse.fromJson(map)).toList();
+  }
+}
+
+class ProductInCart {
+  StatusProductInCart? status;
+  String? id;
+  String? name;
+  String? code;
+  String? size;
+  double? price;
+  int? quantity;
+
+  ProductInCart({
+    this.status,
+    this.id,
+    this.name,
+    this.code,
+    this.size,
+    this.price,
+    this.quantity,
+  });
+
+  ProductInCart.fromJson(Map<String, dynamic> json) {
+    status = json["status"] == null
+        ? null
+        : StatusProductInCart.fromJson(json["status"]);
+    id = json["id"] as String;
+    name = json["name"];
+    code = json["code"];
+    size = json["size"] ?? null;
+    price = json["price"];
+    quantity = json["quantity"];
+  }
+
+  static List<ProductInCart> fromList(List<Map<String, dynamic>> list) {
+    return list.map((map) => ProductInCart.fromJson(map)).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = id;
+    _data["name"] = name;
+    _data["code"] = code;
+    _data["size"] = size;
+    _data["price"] = price;
+    _data["quantity"] = quantity;
+    return _data;
+  }
+}
+
+class StatusProductInCart {
+  bool? success;
+  String? message;
+  String? errorCode;
+
+  StatusProductInCart({
+    this.success,
+    this.message,
+    this.errorCode,
+  });
+
+  StatusProductInCart.fromJson(Map<String, dynamic> json) {
+    success = json["success"];
+    message = json["message"];
+    errorCode = json["errorCode"].toString();
+  }
+
+  static List<StatusProductInCart> fromList(List<Map<String, dynamic>> list) {
+    return list.map((map) => StatusProductInCart.fromJson(map)).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["success"] = success;
+    _data["message"] = message;
+    _data["errorCode"] = errorCode;
     return _data;
   }
 }
