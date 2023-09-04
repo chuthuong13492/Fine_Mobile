@@ -27,7 +27,7 @@ class AnalyticsService {
     await _analytics.setUserId(id: user.id.toString());
     await _analytics.setUserProperty(
       name: 'name',
-      value: user.name,
+      value: user.name ?? "",
     );
     // await _analytics.setUserProperty(
     //   name: 'gender',
@@ -35,7 +35,7 @@ class AnalyticsService {
     // );
     await _analytics.setUserProperty(
       name: 'dayOfBirth',
-      value: user.dateOfBirth.toString(),
+      value: user.dateOfBirth.toString() ?? "",
     );
     // property to indicate if it's a pro paying member
     // property that might tell us it's a regular poster, etc

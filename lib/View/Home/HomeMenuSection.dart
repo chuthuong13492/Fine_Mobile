@@ -44,10 +44,23 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            'Menu theo bữa',
-            style: FineTheme.typograhpy.buttonLg.copyWith(color: Colors.black),
-          ),
+          ScopedModel(
+              model: Get.find<RootViewModel>(),
+              child: ScopedModelDescendant<RootViewModel>(
+                builder: (context, child, model) {
+                  String text = '';
+                  if (model.isNextDay) {
+                    text = 'HÔM SAU';
+                  } else {
+                    text = 'HÔM NAY';
+                  }
+                  return Text(
+                    'Menu theo bữa ' + text,
+                    style: FineTheme.typograhpy.buttonLg
+                        .copyWith(color: Colors.black),
+                  );
+                },
+              )),
           const SizedBox(
             height: 12,
           ),
@@ -69,7 +82,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
           var list = model.listTimeSlot
               ?.where((element) => element.isActive == true)
               .toList();
-          bool isTimeSlotAvaible = model.isCurrentTimeSlotAvailable();
+          // bool isTimeSlotAvaible = model.isCurrentTimeSlotAvailable();
           final status = model.status;
           if (status == ViewStatus.Loading) {
             return Column(
@@ -260,17 +273,16 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                         return GestureDetector(
                           onTap: () {
                             RootViewModel root = Get.find<RootViewModel>();
-                            if (!root.isCurrentTimeSlotAvailable()) {
-                              showStatusDialog(
-                                  "assets/images/error.png",
-                                  "Opps",
-                                  "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-                            } else {
-                              Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
-                                  arguments: {
-                                    'menu': homeMenu[index].toJson()
-                                  });
-                            }
+                            Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
+                                arguments: {'menu': homeMenu[index].toJson()});
+                            // if (!root.isCurrentTimeSlotAvailable()) {
+                            //   showStatusDialog(
+                            //       "assets/images/error.png",
+                            //       "Opps",
+                            //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+                            // } else {
+
+                            // }
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,

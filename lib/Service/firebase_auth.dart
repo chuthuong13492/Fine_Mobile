@@ -9,6 +9,18 @@ class AuthService {
     await auth.signOut();
   }
 
+  Future<UserCredential> signIn(AuthCredential authCredential) async {
+    UserCredential userCredential =
+        await auth.signInWithCredential(authCredential);
+    return userCredential;
+  }
+
+  Future<AuthCredential> signInWithOTP(String smsCode, String verId) async {
+    AuthCredential authCredential =
+        PhoneAuthProvider.credential(verificationId: verId, smsCode: smsCode);
+    return authCredential;
+  }
+
   Future<UserCredential> signInWithGoogle() async {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();

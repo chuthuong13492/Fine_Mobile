@@ -1,5 +1,6 @@
 import 'package:fine/Accessories/index.dart';
 import 'package:fine/Constant/view_status.dart';
+import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
@@ -17,9 +18,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  AccountViewModel _accountViewModel = Get.find<AccountViewModel>();
+
   @override
   void initState() {
     super.initState();
+    _accountViewModel.fetchUser();
   }
 
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
@@ -43,9 +47,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget userInfo() {
     return ScopedModel(
-      model: Get.find<AccountViewModel>(),
+      model: _accountViewModel,
       child: ScopedModelDescendant<AccountViewModel>(
         builder: (context, child, model) {
+          final userDTO = model.currentUser;
           final status = model.status;
           if (status == ViewStatus.Loading) {
             return const Center(child: LoadingFine());
@@ -79,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return SingleChildScrollView(
             child: Column(
               children: [
-                account(model),
+                account(userDTO!),
                 userAccount(model),
                 const SizedBox(
                   height: 4,
@@ -93,7 +98,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget account(AccountViewModel model) {
+  Widget account(AccountDTO user) {
+    String img = "";
+    if (user.imageUrl == null) {
+      img = "https://randomuser.me/api/portraits/thumb/men/75.jpg";
+    } else {
+      img = user.imageUrl!;
+    }
     return Container(
       //color: Color(0xFFddf1ed),
       padding: const EdgeInsets.all(8.0),
@@ -111,7 +122,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: FineTheme.palettes.primary300,
                     shape: BoxShape.circle),
                 child: ClipOval(
-                    child: CacheImage(imageUrl: model.currentUser!.imageUrl!)),
+                  child: CacheImage(
+                    imageUrl: img,
+                  ),
+                ),
               ),
               const SizedBox(
                 width: 16,
@@ -121,7 +135,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      model.currentUser!.name!,
+                      user.name! == null ? "" : user.name!,
                       style: FineTheme.typograhpy.h2
                           .copyWith(color: FineTheme.palettes.primary300),
                     ),
@@ -130,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     infoDetail("Email: ", color: Colors.grey, list: [
                       TextSpan(
-                          text: model.currentUser!.email,
+                          text: user.email ?? "...",
                           style: FineTheme.typograhpy.subtitle2
                               .copyWith(color: FineTheme.palettes.primary300))
                     ]),
@@ -158,7 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             color: Colors.black,
                             list: [
                               TextSpan(
-                                  text: model.currentUser!.phone ?? "-",
+                                  text: user.phone ?? "-",
                                   style: FineTheme.typograhpy.subtitle2
                                       .copyWith(
                                           color: FineTheme.palettes.primary300))
@@ -171,7 +185,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           child: InkWell(
                             onTap: () async {
                               showLoadingDialog();
-                              await model.fetchUser(isRefetch: true);
+                              AccountViewModel accountViewModel =
+                                  Get.find<AccountViewModel>();
+                              await accountViewModel.fetchUser(isRefetch: true);
                               hideDialog();
                             },
                             child: Icon(

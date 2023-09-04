@@ -6,6 +6,7 @@ class AccountDTO {
   String? phone;
   DateTime? dateOfBirth;
   String? imageUrl;
+  // bool? isFirstLogin;
   // int? universityId;
   // int? uniInfoId;
   DateTime? createAt;
@@ -19,6 +20,7 @@ class AccountDTO {
       this.phone,
       this.dateOfBirth,
       this.imageUrl,
+      // this.isFirstLogin = true,
       // this.universityId,
       // this.uniInfoId,
       this.createAt,
@@ -34,6 +36,8 @@ class AccountDTO {
         ? DateTime.parse(json['dateOfBirth'] as String)
         : null;
     imageUrl = json["imageUrl"];
+    // isFirstLogin:
+    // (json['isFirstLogin'] as bool) ?? false;
     // universityId = json["universityId"];
     // uniInfoId = json["uniInfoId"];
     createAt = json['createAt'] as String != null

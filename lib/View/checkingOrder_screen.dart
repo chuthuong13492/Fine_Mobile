@@ -130,12 +130,12 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
   }
 
   Widget _buildCheckingOrder() {
-    DateFormat inputFormat = DateFormat('HH:mm:ss');
-    DateTime arrive = inputFormat.parse(widget.order.timeSlot!.arriveTime!);
-    DateTime checkout = inputFormat.parse(widget.order.timeSlot!.checkoutTime!);
-    DateFormat outputFormat = DateFormat('HH:mm');
-    String arriveTime = outputFormat.format(arrive);
-    String checkoutTime = outputFormat.format(checkout);
+    final inputFormat = DateFormat('HH:mm:ss');
+    final outputFormat = DateFormat('HH:mm');
+    final arriveTime = outputFormat
+        .format(inputFormat.parse(widget.order.timeSlot!.arriveTime!));
+    final checkoutTime = outputFormat
+        .format(inputFormat.parse(widget.order.timeSlot!.checkoutTime!));
     int _curStep = 2;
     final List<String> titles = [
       'Xác nhận đơn hàng',
@@ -143,11 +143,17 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
       'Đơn hàng đang đến station',
       'Bạn có thể lấy đơn hàng từ station rồi!!! '
     ];
+
     return ScopedModel(
       model: Get.find<OrderViewModel>(),
       child: ScopedModelDescendant<OrderViewModel>(
         builder: (context, child, model) {
           final status = model.orderStatusDTO!.orderStatus;
+          bool hasBox = false;
+          if (model.orderStatusDTO!.boxId !=
+              '00000000-0000-0000-0000-000000000000') {
+            hasBox = true;
+          }
           switch (status) {
             case 5:
               _curStep = 2;
@@ -298,8 +304,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                         Expanded(
                           child: InkWell(
                             onTap: () async {
-                              if (model.orderStatusDTO!.boxId !=
-                                  "00000000-0000-0000-0000-000000000000") {
+                              if (hasBox) {
                                 Get.toNamed(
                                   RouteHandler.QRCODE_SCREEN,
                                   arguments: widget.order,
@@ -312,10 +317,15 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/Home.svg',
-                                    height: 20,
-                                    width: 20,
+                                  // SvgPicture.asset(
+                                  //   'assets/icons/Home.svg',
+                                  //   height: 20,
+                                  //   width: 20,
+                                  // ),
+                                  Icon(
+                                    Icons.qr_code,
+                                    size: 20,
+                                    color: FineTheme.palettes.shades100,
                                   ),
                                   const SizedBox(width: 4),
                                   Column(
@@ -325,7 +335,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Station giao hàng',
+                                        'QR Code của bạn',
                                         style: TextStyle(
                                             fontFamily: 'Montserrat',
                                             fontWeight: FontWeight.w700,
@@ -337,7 +347,9 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                                       Container(
                                         width: 150,
                                         child: Text(
-                                          this.widget.order.stationDTO!.name!,
+                                          hasBox
+                                              ? 'Chi tiết QR Code'
+                                              : 'Đang xử lý...',
                                           style: TextStyle(
                                               fontFamily: 'Montserrat',
                                               fontWeight: FontWeight.w500,

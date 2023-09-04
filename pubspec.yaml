@@ -55,6 +55,8 @@ dependencies:
   expandable: ^5.0.1
   animator: ^3.3.0
   im_stepper: ^1.0.1+1
+  country_picker: ^2.0.20
+  pin_code_fields: ^8.0.1
   # url_launcher: ^6.1.10
 
 dependency_overrides:

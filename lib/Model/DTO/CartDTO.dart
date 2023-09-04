@@ -29,6 +29,7 @@ class Cart {
   });
 
   Cart({
+    this.orderType,
     this.partyType,
     this.timeSlotId,
   }) {
@@ -49,16 +50,17 @@ class Cart {
       list = itemJson.map((e) => CartItem.fromJson(e)).toList();
     }
     return Cart.get(
-      orderType: 1,
+      orderType: json["partyType"] ?? 1,
       partyType: json["partyType"],
       timeSlotId: json['timeSlotId'],
       orderDetails: list,
     );
   }
 
-  void addProperties({int? type}) {
+  void addProperties(int? typeOrder, {int? typeParty}) {
+    orderType = typeOrder;
     // timeSlotId = timeSlot;
-    partyType = type;
+    partyType = typeParty;
   }
 
   // void addVoucher(VoucherDTO voucher) {

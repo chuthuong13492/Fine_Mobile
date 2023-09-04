@@ -5,11 +5,12 @@ import 'package:fine/Accessories/theme_data.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/shared_pref.dart';
+import 'package:fine/View/LoginScreen/login_byPhone.dart';
+import 'package:fine/View/LoginScreen/login_byPhoneOTP.dart';
 import 'package:fine/View/checkingOrder_screen.dart';
 import 'package:fine/View/coOrder_screen.dart';
 import 'package:fine/View/confirm_party_screen.dart';
-import 'package:fine/View/home.dart';
-import 'package:fine/View/login.dart';
+import 'package:fine/View/Home/home.dart';
 import 'package:fine/View/nav_screen.dart';
 import 'package:fine/View/notFoundScreen.dart';
 import 'package:fine/View/onboard.dart';
@@ -20,7 +21,8 @@ import 'package:fine/View/product_detail.dart';
 import 'package:fine/View/product_filter_list.dart';
 import 'package:fine/View/profile.dart';
 import 'package:fine/View/qrcode_screen.dart';
-import 'package:fine/View/sign_in.dart';
+import 'package:fine/View/LoginScreen/sign_in.dart';
+import 'package:fine/View/sign_up.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/View/station_picker_screen.dart';
 import 'package:fine/View/store_select_screen.dart';
@@ -63,6 +65,19 @@ class MyApp extends StatelessWidget {
         switch (settings.name) {
           case RouteHandler.WELCOME_SCREEN:
             return ScaleRoute(page: const WelcomeScreen());
+          case RouteHandler.LOGIN_PHONE:
+            return CupertinoPageRoute(
+                builder: (context) =>
+                    LoginByPhoneScreen(isLoginMail: settings.arguments as bool),
+                settings: settings);
+          case RouteHandler.LOGIN_OTP:
+            Map map = settings.arguments as Map;
+            return CupertinoPageRoute(
+                builder: (context) => LoginWithPhoneOtpScreen(
+                      verificationId: map["verId"],
+                      isLoginGmail: map["isLoginGmail"],
+                    ),
+                settings: settings);
           case RouteHandler.LOGIN:
             return CupertinoPageRoute(
                 builder: (context) => const SignIn(), settings: settings);
@@ -77,6 +92,12 @@ class MyApp extends StatelessWidget {
           case RouteHandler.PROFILE:
             return CupertinoPageRoute(
                 builder: (context) => const ProfileScreen(),
+                settings: settings);
+          case RouteHandler.SIGN_UP:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => SignUp(
+                      user: settings.arguments as dynamic,
+                    ),
                 settings: settings);
           case RouteHandler.STORE_SELECT:
             return ScaleRoute(page: StoreSelectScreen());

@@ -118,17 +118,17 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                         child: TouchOpacity(
                           onTap: () {
                             RootViewModel root = Get.find<RootViewModel>();
-                            // // var firstTimeSlot = root.currentStore.timeSlots?.first;
-                            if (!root.isCurrentTimeSlotAvailable()) {
-                              showStatusDialog(
-                                  "assets/images/error.png",
-                                  "Opps",
-                                  "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-                            } else {
-                              // if (product.type == ProductType.MASTER_PRODUCT) {}
-                              root.openProductDetail(product,
-                                  fetchDetail: true);
-                            }
+                            root.openProductDetail(product, fetchDetail: true);
+                            // if (!root.isCurrentTimeSlotAvailable()) {
+                            //   showStatusDialog(
+                            //       "assets/images/error.png",
+                            //       "Opps",
+                            //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+                            // } else {
+                            //   // if (product.type == ProductType.MASTER_PRODUCT) {}
+                            //   root.openProductDetail(product,
+                            //       fetchDetail: true);
+                            // }
                           },
                           child: buildProductInMenu(product),
                         ),
@@ -356,18 +356,22 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                   //     image: CachedNetworkImageProvider(
                   //         "https://static.tuoitre.vn/tto/i/s626/2011/10/05/AoGOfe8y.jpg")),
                 ),
-                child: ColorFiltered(
-                  colorFilter: ColorFilter.mode(
-                    Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
-                        ? Colors.transparent
-                        : Colors.grey,
-                    BlendMode.saturation,
-                  ),
-                  child: CacheImage(
-                      imageUrl: product.imageUrl == null
-                          ? 'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908'
-                          : product.imageUrl!),
-                ),
+                child: CacheImage(
+                    imageUrl: product.imageUrl == null
+                        ? 'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908'
+                        : product.imageUrl!),
+                // child: ColorFiltered(
+                //   colorFilter: ColorFilter.mode(
+                //     Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
+                //         ? Colors.transparent
+                //         : Colors.grey,
+                //     BlendMode.saturation,
+                //   ),
+                //   child: CacheImage(
+                //       imageUrl: product.imageUrl == null
+                //           ? 'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908'
+                //           : product.imageUrl!),
+                // ),
               ),
             ),
           ],

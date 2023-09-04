@@ -78,19 +78,22 @@ class _HomeStoreSectionState extends State<HomeStoreSection> {
                           return InkWell(
                             onTap: () {
                               RootViewModel root = Get.find<RootViewModel>();
-                              // // var firstTimeSlot = root.currentStore.timeSlots?.first;
-                              if (!root.isCurrentTimeSlotAvailable()) {
-                                showStatusDialog(
-                                    "assets/images/error.png",
-                                    "Opps",
-                                    "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-                              } else {
-                                // if (product.type == ProductType.MASTER_PRODUCT) {}
-                                Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
-                                    arguments: {
-                                      'store': suppliers[index].toJson()
-                                    });
-                              }
+                              Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
+                                  arguments: {
+                                    'store': suppliers[index].toJson()
+                                  });
+                              // if (!root.isCurrentTimeSlotAvailable()) {
+                              //   showStatusDialog(
+                              //       "assets/images/error.png",
+                              //       "Opps",
+                              //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+                              // } else {
+                              //   // if (product.type == ProductType.MASTER_PRODUCT) {}
+                              //   Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
+                              //       arguments: {
+                              //         'store': suppliers[index].toJson()
+                              //       });
+                              // }
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,

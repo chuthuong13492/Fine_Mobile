@@ -133,54 +133,52 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                       )),
                   Container(
                     width: MediaQuery.of(context).size.width,
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                            width: MediaQuery.of(context).size.width * 0.7,
-                            padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                            // width: MediaQuery.of(context).size.width * 0.7,
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                Row(
-                                  children: [
-                                    // const Image(
-                                    //   image: AssetImage("assets/icons/clock_icon.png"),
-                                    //   width: 24,
-                                    //   height: 24,
-                                    // ),
-                                    Container(
-                                      // padding: const EdgeInsets.only(left: 5),
-                                      // width: 100,
-                                      child: Text(
-                                        "Giờ giao:",
-                                        style: TextStyle(
-                                            fontFamily: 'Montserrat',
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 15,
-                                            fontStyle: FontStyle.normal,
-                                            color:
-                                                FineTheme.palettes.neutral600),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.only(left: 16),
-                                      child: Text(
-                                        "${orderDTO.timeSlot!.checkoutTime}",
-                                        style: TextStyle(
-                                            fontFamily: 'Montserrat',
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 15,
-                                            fontStyle: FontStyle.normal,
-                                            color:
-                                                FineTheme.palettes.shades200),
-                                      ),
-                                    ),
-                                  ],
+                                Container(
+                                  child: Text(
+                                    "Giờ giao:",
+                                    style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 15,
+                                        fontStyle: FontStyle.normal,
+                                        color: FineTheme.palettes.neutral600),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(left: 16),
+                                  child: Text(
+                                    "${orderDTO.timeSlot!.checkoutTime}",
+                                    style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 15,
+                                        fontStyle: FontStyle.normal,
+                                        color: FineTheme.palettes.shades200),
+                                  ),
                                 ),
                               ],
-                            )),
+                            ),
+                          ],
+                        )),
+                        Text(
+                          orderDTO.orderType == 2
+                              ? 'Ngày hôm sau'.toUpperCase()
+                              : 'Ngày hôm nay'.toUpperCase(),
+                          style: FineTheme.typograhpy.subtitle2
+                              .copyWith(color: FineTheme.palettes.primary100),
+                        ),
                       ],
                     ),
                   ),

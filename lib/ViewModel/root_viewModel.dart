@@ -43,6 +43,7 @@ class RootViewModel extends BaseModel {
   StationDAO? _stationDAO;
   DestinationDAO? _destinationDAO;
   bool changeAddress = false;
+  bool isNextDay = false;
   Uint8List? imageBytes;
 
   RootViewModel() {
@@ -292,78 +293,58 @@ class RootViewModel extends BaseModel {
     OrderViewModel orderViewModel = Get.find<OrderViewModel>();
     PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
     await party.getPartyOrder();
-    if (isCurrentTimeSlotAvailable()) {
-      if (party.partyOrderDTO != null &&
-          isTimeSlotAvailable(party.partyOrderDTO!.timeSlotDTO) &&
-          party.partyOrderDTO!.timeSlotDTO!.id == selectedTimeSlot!.id) {
-        await party.getPartyOrder();
-        Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
-      } else if (party.partyOrderDTO != null) {
-        if (party.partyOrderDTO!.timeSlotDTO!.id != selectedTimeSlot!.id) {
-          // selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
-          if (isTimeSlotAvailable(party.partyOrderDTO!.timeSlotDTO)) {
-            int option = await showOptionDialog(
-                "Đơn nhóm của bạn đang ở khung giờ ${party.partyOrderDTO!.timeSlotDTO!.checkoutTime} Bạn vui lòng đổi sang khung giờ này để tham gia đơn nhóm nhé");
 
-            if (option != 1) {
-              return;
-            }
-            selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
-            await refreshMenu();
-            notifyListeners();
-          } else {
-            await orderViewModel.removeCart();
-            party.partyOrderDTO = null;
-            await deletePartyCode();
-            party.partyCode = await getPartyCode();
+    if (party.partyOrderDTO != null &&
+        party.partyOrderDTO!.timeSlotDTO!.id == selectedTimeSlot!.id) {
+      await party.getPartyOrder();
+      Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+    } else if (party.partyOrderDTO != null) {
+      if (party.partyOrderDTO!.timeSlotDTO!.id != selectedTimeSlot!.id) {
+        // selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
+
+        int option = await showOptionDialog(
+            "Đơn nhóm của bạn đang ở khung giờ ${party.partyOrderDTO!.timeSlotDTO!.arriveTime} Bạn vui lòng đổi sang khung giờ này để tham gia đơn nhóm nhé");
+
+        if (option != 1) {
+          return;
+        }
+        selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
+        await refreshMenu();
+        notifyListeners();
+      }
+    } else {
+      await orderViewModel.getCurrentCart();
+
+      if (orderViewModel.currentCart != null) {
+        if (orderViewModel.currentCart!.timeSlotId != selectedTimeSlot!.id) {
+          final cartTimeSlot = listTimeSlot!
+              .where((element) =>
+                  element.id == orderViewModel.currentCart!.timeSlotId)
+              .toList();
+          TimeSlotOptionResult result = await checkTimeSlotOption(
+              cartTimeSlot[0],
+              selectedTimeSlot,
+              "Giỏ hàng của bạn đang ở khung giờ ${cartTimeSlot[0].arriveTime} Bạn vui lòng đổi sang khung giờ này để đặt hàng nhé");
+          int option = result.option;
+          isNextDay = result.isNextDay;
+
+          if (option != 1) {
             return;
           }
+          // await confirmTimeSlot(cartTimeSlot[0]);
+          selectedTimeSlot = cartTimeSlot[0];
+          await refreshMenu();
+          notifyListeners();
+          await orderViewModel.prepareOrder();
+          await Get.toNamed(RouteHandler.ORDER);
+        } else {
+          await Get.toNamed(RouteHandler.ORDER);
         }
       } else {
         await orderViewModel.getCurrentCart();
-
-        if (orderViewModel.currentCart != null) {
-          if (orderViewModel.currentCart!.timeSlotId != selectedTimeSlot!.id) {
-            final cartTimeSlot = listTimeSlot!
-                .where((element) =>
-                    element.id == orderViewModel.currentCart!.timeSlotId)
-                .toList();
-            if (isTimeSlotAvailable(cartTimeSlot[0])) {
-              int option = await showOptionDialog(
-                  "Giỏ hàng của bạn đang ở khung giờ ${cartTimeSlot[0].arriveTime} Bạn vui lòng đổi sang khung giờ này để đặt hàng nhé");
-
-              if (option != 1) {
-                return;
-              }
-              selectedTimeSlot = cartTimeSlot[0];
-              await refreshMenu();
-              notifyListeners();
-              // await prepareOrder();
-              // if (orderDTO != null) {
-              await Get.toNamed(RouteHandler.ORDER);
-            } else {
-              await orderViewModel.removeCart();
-            }
-
-            // }
-          } else {
-            await Get.toNamed(RouteHandler.ORDER);
-          }
-        } else {
-          await orderViewModel.getCurrentCart();
-          showStatusDialog(
-              "assets/images/error.png",
-              "Giỏ hàng đang trống kìaaa",
-              "Hiện tại giỏ của bạn đang trống , bạn hãy thêm sản phẩm vào nhé 😃.");
-        }
+        showStatusDialog("assets/images/error.png", "Giỏ hàng đang trống kìaaa",
+            "Hiện tại giỏ của bạn đang trống , bạn hãy thêm sản phẩm vào nhé 😃.");
       }
-    } else {
-      party.partyOrderDTO == null;
-      await orderViewModel.removeCart();
-      await orderViewModel.getCurrentCart();
-      showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
-          "Hiện tại khung giờ này đã đóng vào lúc ${selectedTimeSlot!.checkoutTime}, bạn hãy xem khung giờ khác nhé 😃.");
-      notifyListeners();
     }
   }
 
@@ -457,13 +438,15 @@ class RootViewModel extends BaseModel {
   }
 
   Future<void> confirmTimeSlot(TimeSlotDTO? timeSlot) async {
+    int option = 1;
     if (timeSlot?.id != selectedTimeSlot?.id) {
-      if (!isTimeSlotAvailable(timeSlot)) {
-        showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
-            "Hiện tại khung giờ này đã đóng vào lúc ${timeSlot?.arriveTime}, bạn hãy xem khung giờ khác nhé 😃.");
-        return;
-      }
-      int option = 1;
+      TimeSlotOptionResult result = await checkTimeSlotOption(
+          timeSlot,
+          selectedTimeSlot,
+          "Hiện tại khung giờ này đã đóng vào lúc ${timeSlot?.arriveTime} trong ngày hôm nay, bạn có muốn chuyển sang khung giờ này vào ngày hôm sau hong ^^.");
+      isNextDay = result.isNextDay;
+      option = result.option;
+
       OrderViewModel orderViewModel = Get.find<OrderViewModel>();
       orderViewModel.currentCart = await getCart();
       PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
@@ -488,28 +471,60 @@ class RootViewModel extends BaseModel {
     }
   }
 
-  bool isCurrentTimeSlotAvailable() {
-    final currentDate = DateTime.now();
+  Future<TimeSlotOptionResult> checkTimeSlotOption(TimeSlotDTO? timeSlot,
+      TimeSlotDTO? selectedTimeSlot, String? text) async {
+    int option;
+    bool isNextDay;
 
-    String currentTimeSlot = selectedTimeSlot!.checkoutTime!;
-    var beanTime = DateTime(
-      currentDate.year,
-      currentDate.month,
-      currentDate.day,
-      double.parse(currentTimeSlot.split(':')[0]).round(),
-      double.parse(currentTimeSlot.split(':')[1]).round(),
-    );
-    int differentTime = beanTime.difference(currentDate).inMilliseconds;
-    if (differentTime <= 0) {
-      return false;
+    bool isAvailableForNextDay =
+        isTimeSlotAvailableForNextDay(timeSlot, selectedTimeSlot);
+    bool isAvailableForCurrentDay = isTimeSlotAvailable(timeSlot);
+
+    if (!isAvailableForNextDay) {
+      if (isAvailableForCurrentDay) {
+        option = 1;
+        isNextDay = false;
+      } else {
+        option = await showOptionDialog(text!);
+        isNextDay = true;
+      }
     } else {
-      return true;
+      if (!isAvailableForCurrentDay) {
+        isNextDay = true;
+        option = 1;
+      } else {
+        isNextDay = false;
+        option = 1;
+      }
     }
+
+    return TimeSlotOptionResult(isNextDay, option);
   }
+
+  // bool isCurrentTimeSlotAvailable() {
+  //   final currentDate = DateTime.now();
+
+  //   String currentTimeSlot = selectedTimeSlot!.closeTime!;
+  //   var beanTime = DateTime(
+  //     currentDate.year,
+  //     currentDate.month,
+  //     currentDate.day,
+  //     double.parse(currentTimeSlot.split(':')[0]).round(),
+  //     double.parse(currentTimeSlot.split(':')[1]).round(),
+  //   );
+  //   return beanTime.isAfter(currentDate) ||
+  //       beanTime.isAtSameMomentAs(currentDate);
+  //   // int differentTime = beanTime.difference(currentDate).inMilliseconds;
+  //   // if (differentTime <= 0) {
+  //   //   return false;
+  //   // } else {
+  //   //   return true;
+  //   // }
+  // }
 
   bool isTimeSlotAvailable(TimeSlotDTO? timeSlot) {
     final currentDate = DateTime.now();
-    String currentTimeSlot = timeSlot!.checkoutTime!;
+    String currentTimeSlot = timeSlot!.closeTime!;
     var beanTime = DateTime(
       currentDate.year,
       currentDate.month,
@@ -517,11 +532,37 @@ class RootViewModel extends BaseModel {
       double.parse(currentTimeSlot.split(':')[0]).round(),
       double.parse(currentTimeSlot.split(':')[1]).round(),
     );
-    int differentTime = beanTime.difference(currentDate).inMilliseconds;
-    if (differentTime <= 0) {
-      return false;
-    } else {
-      return true;
-    }
+    return beanTime.isAfter(currentDate) ||
+        beanTime.isAtSameMomentAs(currentDate);
   }
+
+  bool isTimeSlotAvailableForNextDay(
+      TimeSlotDTO? timeSlot, TimeSlotDTO? selected) {
+    final currentDate = DateTime.now();
+    String currentTimeSlot = timeSlot!.closeTime!;
+    String selectedTime = selected!.closeTime!;
+    var selectedTimeSlot = DateTime(
+      currentDate.year,
+      currentDate.month,
+      currentDate.day,
+      double.parse(selectedTime.split(':')[0]).round(),
+      double.parse(selectedTime.split(':')[1]).round(),
+    );
+    var beanTime = DateTime(
+      currentDate.year,
+      currentDate.month,
+      currentDate.day,
+      double.parse(currentTimeSlot.split(':')[0]).round(),
+      double.parse(currentTimeSlot.split(':')[1]).round(),
+    );
+    return beanTime.isAfter(selectedTimeSlot) ||
+        beanTime.isAtSameMomentAs(selectedTimeSlot);
+  }
+}
+
+class TimeSlotOptionResult {
+  final bool isNextDay;
+  final int option;
+
+  TimeSlotOptionResult(this.isNextDay, this.option);
 }

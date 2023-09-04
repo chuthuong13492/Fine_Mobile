@@ -262,52 +262,6 @@ class _OrderScreenState extends State<OrderScreen> {
       width: MediaQuery.of(context).size.width,
       child: Column(
         children: [
-          // Row(
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   children: [
-          //     Row(
-          //       children: [
-          //         SvgPicture.asset(
-          //           "assets/icons/Party.svg",
-          //           width: 20,
-          //           height: 20,
-          //         ),
-          //         const SizedBox(
-          //           width: 10,
-          //         ),
-          //         Text(
-          //           "Đơn liên kết",
-          //           style: FineTheme.typograhpy.body1,
-          //         ),
-          //         const SizedBox(
-          //           width: 10,
-          //         ),
-          //         Container(
-          //           width: 30,
-          //           height: 16,
-          //           color: Colors.red,
-          //           child: Center(
-          //             child: Text(
-          //               "Mới",
-          //               style: FineTheme.typograhpy.caption1.copyWith(
-          //                   color: Colors.white, fontWeight: FontWeight.w600),
-          //             ),
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //     CustomCupertinoSwitch(
-          //       value: model.isLinked!,
-          //       onChanged: (value) {
-          //         model.isLinkedParty(value);
-          //       },
-          //     )
-          //   ],
-          // ),
-          // const SizedBox(
-          //   height: 8,
-          // ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -453,14 +407,21 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Widget timeRecieve() {
+    String text = '';
     RootViewModel root = Get.find<RootViewModel>();
     TimeSlotDTO currentTimeSlot = root.selectedTimeSlot!;
+    if (root.isNextDay == true) {
+      text = 'Ngày Hôm Sau'.toUpperCase();
+    } else {
+      text = 'Ngày Hôm Nay'.toUpperCase();
+    }
     // List<TimeSlots> listTimeSlotAvailable = root.listAvailableTimeSlots;
     // TimeSlots currentTime = listTimeSlotAvailable.firstWhere(
     //     (element) => element.id == orderViewModel.currentCart.timeSlotId);
     // String currentTimeSlot = currentTime.arriveTime.replaceAll(';', ' - ');
     return Container(
       width: MediaQuery.of(context).size.width,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       child: InkWell(
         onTap: () {
           // Utils.showSheet(
@@ -477,48 +438,52 @@ class _OrderScreenState extends State<OrderScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-                width: MediaQuery.of(context).size.width * 0.7,
-                padding: const EdgeInsets.fromLTRB(16, 8, 0, 8),
+                // width: MediaQuery.of(context).size.width * 0.7,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        // const Image(
-                        //   image: AssetImage("assets/icons/clock_icon.png"),
-                        //   width: 24,
-                        //   height: 24,
-                        // ),
-                        Container(
-                          // padding: const EdgeInsets.only(left: 5),
-                          // width: 100,
-                          child: Text(
-                            "Giờ giao:",
-                            style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15,
-                                fontStyle: FontStyle.normal,
-                                color: FineTheme.palettes.neutral600),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.only(left: 16),
-                          child: Text(
-                            "${currentTimeSlot.checkoutTime.toString()}",
-                            style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                                fontStyle: FontStyle.normal,
-                                color: FineTheme.palettes.shades200),
-                          ),
-                        ),
-                      ],
+                    // const Image(
+                    //   image: AssetImage("assets/icons/clock_icon.png"),
+                    //   width: 24,
+                    //   height: 24,
+                    // ),
+                    Container(
+                      // padding: const EdgeInsets.only(left: 5),
+                      // width: 100,
+                      child: Text(
+                        "Giờ giao:",
+                        style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 15,
+                            fontStyle: FontStyle.normal,
+                            color: FineTheme.palettes.neutral600),
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: Text(
+                        "${currentTimeSlot.checkoutTime.toString()}",
+                        style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                            fontStyle: FontStyle.normal,
+                            color: FineTheme.palettes.shades200),
+                      ),
                     ),
                   ],
-                )),
+                ),
+              ],
+            )),
+            Text(
+              text,
+              style: FineTheme.typograhpy.subtitle2
+                  .copyWith(color: FineTheme.palettes.primary100),
+            ),
           ],
         ),
       ),
@@ -1017,8 +982,8 @@ class _OrderScreenState extends State<OrderScreen> {
         shippingFee = item.amount!;
       }
     }
-    var isCurrentTimeSlotAvailable =
-        Get.find<RootViewModel>().isCurrentTimeSlotAvailable();
+    // var isCurrentTimeSlotAvailable =
+    //     Get.find<RootViewModel>().isCurrentTimeSlotAvailable();
     return ScopedModel(
       model: Get.find<OrderViewModel>(),
       child: ScopedModelDescendant<OrderViewModel>(
@@ -1160,16 +1125,17 @@ class _OrderScreenState extends State<OrderScreen> {
                       Center(
                         child: InkWell(
                           onTap: () async {
-                            if (isCurrentTimeSlotAvailable) {
-                              await model.orderCart();
-                            } else {
-                              await model.removeCart();
-                              showStatusDialog(
-                                  "assets/images/error.png",
-                                  "Opps",
-                                  "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-                              Get.back();
-                            }
+                            await model.orderCart();
+                            // if (isCurrentTimeSlotAvailable) {
+                            //   await model.orderCart();
+                            // } else {
+                            //   await model.removeCart();
+                            //   showStatusDialog(
+                            //       "assets/images/error.png",
+                            //       "Opps",
+                            //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+                            //   Get.back();
+                            // }
                           },
                           child: Container(
                             width: 190,
@@ -1178,12 +1144,12 @@ class _OrderScreenState extends State<OrderScreen> {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(20)),
                                 color: Color(0xFF238E9C)),
-                            child: Center(
-                              child: Text(
-                                  isCurrentTimeSlotAvailable
-                                      ? "Đặt ngay"
-                                      : "Khung giờ đã kết thúc",
-                                  style: const TextStyle(
+                            child: const Center(
+                              child: Text("Đặt ngay",
+                                  // isCurrentTimeSlotAvailable
+                                  //     ? "Đặt ngay"
+                                  //     : "Khung giờ đã kết thúc",
+                                  style: TextStyle(
                                       fontFamily: 'Montserrat',
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700,

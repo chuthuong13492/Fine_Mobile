@@ -17,4 +17,7 @@ class RouteHandler {
   static const String CONFIRM_ORDER_SCREEN = "/confirm_order_screen";
   static const String QRCODE_SCREEN = "/qrcode_screen";
   static const String CHECKING_ORDER_SCREEN = "/checking_order_screen";
+  static const String LOGIN_PHONE = "/login_phone";
+  static const String LOGIN_OTP = "/login_otp";
+  static const String SIGN_UP = "/signup";
 }

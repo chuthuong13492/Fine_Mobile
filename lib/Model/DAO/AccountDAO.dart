@@ -16,7 +16,7 @@ import 'BaseDAO.dart';
 class AccountDAO extends BaseDAO {
   Future<AccountDTO?> login(String idToken, String fcmToken) async {
     try {
-      Response response = await request.post("customer/loginByMail",
+      Response response = await request.post("customer/login",
           data: {"idToken": idToken, 'fcmToken': fcmToken});
       final user = response.data['data'];
       final userDTO = AccountDTO.fromJson(user['customer']);
@@ -77,10 +77,18 @@ class AccountDAO extends BaseDAO {
     await request.post("/customer/logout", data: {"fcmToken": fcmToken});
   }
 
-  Future<AccountDTO> updateUser(AccountDTO updateUser) async {
-    var dataJson = updateUser.toJson();
-    Response res = await request.put("users/me", data: dataJson);
-    return AccountDTO.fromJson(res.data);
+  Future<AccountDTO?> updateUser(AccountDTO updateUser) async {
+    Response? res;
+    if (updateUser.phone != null) {
+      res = await request.put("/customer?Phone=${updateUser.phone}");
+      return AccountDTO.fromJson(res.data);
+    }
+    if (updateUser.name != null) {
+      res = await request.put("/customer?Name=${updateUser.name}");
+      return AccountDTO.fromJson(res.data);
+    }
+    // var dataJson = updateUser.toJson();
+    return null;
   }
 
   // Future<UserWallet> linkAccountToWallet(String phone) async {

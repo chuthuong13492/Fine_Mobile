@@ -31,7 +31,7 @@ class OrderViewModel extends BaseModel {
   bool? loadingUpsell;
   String? errorMessage;
   List<String> listError = <String>[];
-  RootViewModel root = Get.find<RootViewModel>();
+
   final ValueNotifier<int> notifier = ValueNotifier(0);
 
   OrderViewModel() {
@@ -91,6 +91,7 @@ class OrderViewModel extends BaseModel {
       hideDialog();
       setState(ViewStatus.Completed);
     } on DioError catch (e, stacktra) {
+      RootViewModel root = Get.find<RootViewModel>();
       print(stacktra.toString());
       if (e.response?.statusCode == 400) {
         String errorMsg = e.response?.data["message"];
@@ -273,9 +274,11 @@ class OrderViewModel extends BaseModel {
   Future<void> getCurrentCart() async {
     try {
       setState(ViewStatus.Loading);
+      RootViewModel root = Get.find<RootViewModel>();
       currentCart = await getCart();
+      currentCart?.addProperties(root.isNextDay == true ? 2 : 1);
       notifier.value = currentCart!.itemQuantity();
-      // currentCart?.addProperties(root.selectedTimeSlot!.id!);s
+
       setState(ViewStatus.Completed);
 
       notifyListeners();

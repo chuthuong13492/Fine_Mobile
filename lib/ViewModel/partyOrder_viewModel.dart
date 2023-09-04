@@ -43,8 +43,14 @@ class PartyOrderViewModel extends BaseModel {
       _orderViewModel.currentCart = await getCart();
       // _orderViewModel.currentCart!.addProperties(root.selectedTimeSlot!.id!);
       if (_orderViewModel.currentCart != null) {
-        _orderViewModel.currentCart!
-            .addProperties(type: isLinked == true ? 2 : 1);
+        if (root.isNextDay == true) {
+          _orderViewModel.currentCart!
+              .addProperties(2, typeParty: isLinked == true ? 2 : 1);
+        } else {
+          _orderViewModel.currentCart!
+              .addProperties(1, typeParty: isLinked == true ? 2 : 1);
+        }
+
         partyOrderDTO = await _partyDAO?.coOrder(_orderViewModel.currentCart!);
         // partyCode = partyOrderDTO!.partyCode;
         await setPartyCode(partyOrderDTO!.partyCode!);
@@ -109,7 +115,8 @@ class PartyOrderViewModel extends BaseModel {
           }
         }
         _orderViewModel.getCurrentCart();
-        _orderViewModel.currentCart?.addProperties(type: 1);
+        _orderViewModel.currentCart
+            ?.addProperties(root.isNextDay == true ? 2 : 1, typeParty: 1);
       } else {
         await showStatusDialog(
             "assets/images/error.png", result.code!, result.message!);
@@ -224,7 +231,8 @@ class PartyOrderViewModel extends BaseModel {
       setState(ViewStatus.Loading);
       partyCode = await getPartyCode();
       _orderViewModel.currentCart = await getCart();
-      _orderViewModel.currentCart?.addProperties(type: 1);
+      _orderViewModel.currentCart
+          ?.addProperties(root.isNextDay == true ? 2 : 1, typeParty: 1);
       if (_orderViewModel.currentCart != null) {
         partyOrderDTO = await _partyDAO?.addProductToParty(partyCode,
             cart: _orderViewModel.currentCart);
