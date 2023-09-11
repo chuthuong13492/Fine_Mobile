@@ -11,8 +11,10 @@ import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
+import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/orderHistory_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
+import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,12 +24,14 @@ import '../Model/DAO/index.dart';
 class OrderViewModel extends BaseModel {
   Cart? currentCart;
   OrderDAO? _dao;
+  ProductDAO? _productDAO;
   StationDAO? _stationDAO;
   OrderDTO? orderDTO;
   OrderStatusDTO? orderStatusDTO;
   PartyOrderDTO? partyOrderDTO;
   PartyOrderDAO? _partyDAO;
   List<StationDTO>? stationList;
+  List<ProductInCart>? productRecomend;
   bool? loadingUpsell;
   String? errorMessage;
   List<String> listError = <String>[];
@@ -38,6 +42,7 @@ class OrderViewModel extends BaseModel {
     _dao = OrderDAO();
     _stationDAO = StationDAO();
     _partyDAO = PartyOrderDAO();
+    _productDAO = ProductDAO();
     // promoDao = new PromotionDAO();
     // _collectionDAO = CollectionDAO();
     loadingUpsell = false;
@@ -56,6 +61,10 @@ class OrderViewModel extends BaseModel {
 
       // currentCart = await getCart();
       await getCurrentCart();
+      if (currentCart!.orderDetails!.length == 0) {
+        Get.back();
+        await removeCart();
+      }
 
       // currentCart?.addProperties(root.selectedTimeSlot!.id!);
       // currentCart?.addProperties(5, '0902915671', root.selectedTimeSlot!.id!);
@@ -146,13 +155,18 @@ class OrderViewModel extends BaseModel {
         showStatusDialog("assets/icons/box_icon.png", "Opps",
             "Bạn chưa chọn nơi nhận kìa 🥹");
       } else {
-        int option = await showOptionDialog(
-            "Bạn vui lòng xác nhận lại giỏ hàng nha 😊.");
+        final otherAmounts =
+            orderDTO!.otherAmounts!.firstWhere((element) => element.type == 1);
+        int option = await showConfirmOrderDialog(
+            orderDTO!.itemQuantity!,
+            orderDTO!.totalAmount!,
+            otherAmounts.amount!,
+            orderDTO!.finalAmount!);
 
         if (option != 1) {
           return;
         }
-        showLoadingDialog();
+        // showLoadingDialog();
         final code = await getPartyCode();
         if (code != null) {
           orderDTO!.addProperties(code);
@@ -166,26 +180,27 @@ class OrderViewModel extends BaseModel {
         // await Get.find<AccountViewModel>().fetchUser();
         if (result!.statusCode == 200) {
           await fetchStatus(result.order!.id!);
+          Get.offAndToNamed(
+            RouteHandler.CHECKING_ORDER_SCREEN,
+            arguments: result.order,
+          );
           await removeCart();
           await deletePartyCode();
           final partyModel = Get.find<PartyOrderViewModel>();
           await partyModel.isLinkedParty(false);
-          hideDialog();
-          await showStatusDialog("assets/images/icon-success.png", 'Success',
-              'Bạn đã đặt hàng thành công');
-          // await Get.find<OrderHistoryViewModel>().getOrders();
+          // hideDialog();
+          // await showStatusDialog("assets/images/icon-success.png", 'Success',
+          //     'Bạn đã đặt hàng thành công');
+          await Get.find<OrderHistoryViewModel>().getOrders();
           //////////
           // await Get.find<OrderHistoryViewModel>().getNewOrder();
           //////////
           PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+          productRecomend = null;
           orderDTO = null;
           party.partyOrderDTO = null;
           party.partyCode = null;
 
-          Get.offNamed(
-            RouteHandler.CHECKING_ORDER_SCREEN,
-            arguments: result.order,
-          );
           // Get.offAndToNamed(RoutHandler.NAV);
           // prepareOrder();
           // Get.back(result: true);
@@ -217,6 +232,10 @@ class OrderViewModel extends BaseModel {
   }
 
   Future<void> deleteItem(OrderDetails item) async {
+    HomeViewModel? home = Get.find<HomeViewModel>();
+    ProductDetailViewModel? productViewModel =
+        Get.find<ProductDetailViewModel>();
+    RootViewModel? root = Get.find<RootViewModel>();
     // showLoadingDialog();
     print("Delete item...");
     bool result;
@@ -224,10 +243,20 @@ class OrderViewModel extends BaseModel {
         new ProductDTO(id: item.productId, productName: item.productName);
     CartItem cartItem = new CartItem(item.productId, item.quantity, null);
     result = await removeItemFromCart(cartItem);
+    await removeItemFromMart(cartItem);
     print("Result: $result");
     if (result) {
       await AnalyticsService.getInstance()
           ?.logChangeCart(product, item.quantity, false);
+      currentCart = await getCart();
+      CartItem itemInCart = new CartItem(
+          currentCart!.orderDetails![0].productId,
+          currentCart!.orderDetails![0].quantity - 1,
+          null);
+      await productViewModel.processCart(
+          currentCart!.orderDetails![0].productId,
+          1,
+          root.selectedTimeSlot!.id);
       // Get.back(result: true);
       await prepareOrder();
     } else {
@@ -238,6 +267,9 @@ class OrderViewModel extends BaseModel {
   }
 
   Future<void> updateQuantity(OrderDetails item) async {
+    final home = Get.find<HomeViewModel>();
+    final productViewModel = Get.find<ProductDetailViewModel>();
+    final root = Get.find<RootViewModel>();
     // showLoadingDialog();
     // if (item.master.type == ProductType.GIFT_PRODUCT) {
     //   int originalQuantity = 0;
@@ -265,8 +297,21 @@ class OrderViewModel extends BaseModel {
     //     return;
     //   }
     // }
-    CartItem cartItem = new CartItem(item.productId, item.quantity, null);
-    await updateItemFromCart(cartItem);
+    final itemInCart = currentCart!.orderDetails!
+        .firstWhere((element) => element.productId == item.productId);
+    if (itemInCart.quantity > item.quantity) {
+      CartItem cartItem = new CartItem(item.productId, item.quantity - 1, null);
+
+      await updateItemFromMart(cartItem);
+      await updateItemFromCart(cartItem);
+      await productViewModel.processCart(
+          item.productId, 1, root.selectedTimeSlot!.id);
+    } else {
+      await productViewModel.processCart(
+          item.productId, 1, root.selectedTimeSlot!.id);
+    }
+
+    // await updateItemFromCart(cartItem);
     await prepareOrder();
     // notifyListeners();
   }
@@ -277,6 +322,8 @@ class OrderViewModel extends BaseModel {
       RootViewModel root = Get.find<RootViewModel>();
       currentCart = await getCart();
       currentCart?.addProperties(root.isNextDay == true ? 2 : 1);
+      // currentCart?.addProperties(2);
+
       notifier.value = currentCart!.itemQuantity();
 
       setState(ViewStatus.Completed);

@@ -25,6 +25,8 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../Accessories/index.dart';
+import '../ViewModel/home_viewModel.dart';
+import '../widgets/touchopacity.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key});
@@ -75,6 +77,10 @@ class _OrderScreenState extends State<OrderScreen> {
                 )
               : ScopedModelDescendant<OrderViewModel>(
                   builder: (context, child, model) {
+                    bool hasProductRecomend = false;
+                    if (model.productRecomend!.length != 0) {
+                      hasProductRecomend = true;
+                    }
                     if (model.currentCart != null) {
                       ViewStatus status = model.status;
                       switch (status) {
@@ -152,6 +158,23 @@ class _OrderScreenState extends State<OrderScreen> {
                                     color: FineTheme.palettes.neutral200,
                                   )),
                               // UpSellCollection(),
+                              hasProductRecomend
+                                  ? Column(
+                                      children: [
+                                        Container(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 10, 0, 10),
+                                            child: _buidProductRecomend(
+                                                model.productRecomend)),
+                                        SizedBox(
+                                            height: 8,
+                                            child: Container(
+                                              color:
+                                                  FineTheme.palettes.neutral200,
+                                            )),
+                                      ],
+                                    )
+                                  : const SizedBox.shrink(),
 
                               layoutSubtotal(model.orderDTO!.otherAmounts!),
                             ],
@@ -251,6 +274,171 @@ class _OrderScreenState extends State<OrderScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buidProductRecomend(List<ProductInCart>? list) {
+    return Container(
+      color: FineTheme.palettes.shades100,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 16, right: 16),
+            child: Text(
+              'Món ăn đề xuất',
+              style:
+                  FineTheme.typograhpy.buttonLg.copyWith(color: Colors.black),
+            ),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(left: 16, right: 16),
+          //   child: Text(
+          //     "Áp dụng từ 2 voucher mỗi đơn",
+          //     style: FineTheme.typograhpy.caption2,
+          //   ),
+          // ),
+          // const SizedBox(
+          //   height: 16,
+          // ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            child: Container(
+              color: FineTheme.palettes.shades100,
+              width: Get.width,
+              height: 155,
+              child: ListView.separated(
+                itemBuilder: (context, index) {
+                  var product = list![index];
+                  return Material(
+                    color: Colors.white,
+                    child: TouchOpacity(
+                      onTap: () {
+                        Utils.showSheet(
+                          context,
+                          child: buidProductPicker(),
+                        );
+                      },
+                      child: _buildProduct(product),
+                    ),
+                  );
+                },
+                separatorBuilder: (context, index) =>
+                    SizedBox(width: FineTheme.spacing.xs),
+                itemCount: list!.length,
+                scrollDirection: Axis.horizontal,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProduct(ProductInCart product) {
+    return Container(
+      width: 110,
+      height: 200,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  width: 110,
+                  height: 110,
+                  child: CacheStoreImage(
+                    imageUrl: product.imageUrl ?? defaultImage,
+                  ),
+                ),
+              ),
+              Positioned(
+                  top: 0,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(8, 2, 8, 2),
+                    width: 46,
+                    height: 13,
+                    decoration: BoxDecoration(
+                      color: FineTheme.palettes.primary300,
+                      borderRadius: const BorderRadius.only(
+                          bottomRight: Radius.circular(10)),
+                    ),
+                    child: Text(
+                      "PROMO".toUpperCase(),
+                      style: const TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 7,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white),
+                    ),
+                  )),
+            ],
+          ),
+          SizedBox(height: FineTheme.spacing.xxs),
+          Text(
+            product.name!,
+            style: FineTheme.typograhpy.subtitle2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Container(
+            // height: 40,
+            child: Text(
+              formatPrice(15000),
+              style: FineTheme.typograhpy.caption1
+                  .copyWith(color: FineTheme.palettes.primary100),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buidProductPicker() {
+    return Container(
+      height: 240,
+      decoration: BoxDecoration(
+        color: FineTheme.palettes.shades100,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+        ),
+      ),
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            child: Text(
+              'Chọn khung giờ giao hàng',
+              style: FineTheme.typograhpy.h2.copyWith(
+                color: FineTheme.palettes.primary100,
+                // fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              color: Colors.white,
+              child: SizedBox(
+                height: 180,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -868,7 +1056,7 @@ class _OrderScreenState extends State<OrderScreen> {
               margin: const EdgeInsets.fromLTRB(8, 0, 16, 0),
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                  border: Border.all(color: FineTheme.palettes.primary300),
+                  border: Border.all(color: FineTheme.palettes.primary100),
                   borderRadius: const BorderRadius.all(Radius.circular(8))),
               child: Column(
                 children: [
@@ -889,7 +1077,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     ),
                   ),
                   MySeparator(
-                    color: FineTheme.palettes.primary300,
+                    color: FineTheme.palettes.primary100,
                   ),
                   // ..._buildOtherAmount(_orderViewModel.orderAmount.others),
                   SlideFadeTransition(

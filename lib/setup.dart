@@ -34,4 +34,5 @@ void createRouteBindings() async {
   Get.put(OrderViewModel());
   Get.put(PartyOrderViewModel());
   Get.put(ProductFilterViewModel());
+  Get.put(ProductDetailViewModel());
 }

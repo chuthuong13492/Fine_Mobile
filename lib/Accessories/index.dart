@@ -12,3 +12,4 @@ export 'custom_button_switch.dart';
 export 'step_preccessing_view.dart';
 export 'form_item.dart';
 export 'clip_path.dart';
+export 'custom_invite_party.dart';

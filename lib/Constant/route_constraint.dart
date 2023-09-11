@@ -20,4 +20,6 @@ class RouteHandler {
   static const String LOGIN_PHONE = "/login_phone";
   static const String LOGIN_OTP = "/login_otp";
   static const String SIGN_UP = "/signup";
+  static const String WEBVIEW = "/webview";
+  static const String INVITE_SCREEN = "/invite_screen";
 }

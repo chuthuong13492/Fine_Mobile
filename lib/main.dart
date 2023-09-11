@@ -11,6 +11,7 @@ import 'package:fine/View/checkingOrder_screen.dart';
 import 'package:fine/View/coOrder_screen.dart';
 import 'package:fine/View/confirm_party_screen.dart';
 import 'package:fine/View/Home/home.dart';
+import 'package:fine/View/invite_coOrder_screen.dart';
 import 'package:fine/View/nav_screen.dart';
 import 'package:fine/View/notFoundScreen.dart';
 import 'package:fine/View/onboard.dart';
@@ -38,6 +39,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'View/webview.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -89,6 +92,10 @@ class MyApp extends StatelessWidget {
                       title: settings.arguments as String ?? "Đang xử lý...",
                     ),
                 settings: settings);
+          case RouteHandler.WEBVIEW:
+            return FadeRoute(
+              page: WebViewScreen(url: settings.arguments as String),
+            );
           case RouteHandler.PROFILE:
             return CupertinoPageRoute(
                 builder: (context) => const ProfileScreen(),
@@ -109,6 +116,11 @@ class MyApp extends StatelessWidget {
             return CupertinoPageRoute<bool>(
                 builder: (context) =>
                     QRCodeScreen(order: settings.arguments as dynamic),
+                settings: settings);
+          case RouteHandler.INVITE_SCREEN:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => InviteCoOrderScreen(
+                    durationInSeconds: settings.arguments as int),
                 settings: settings);
           case RouteHandler.CHECKING_ORDER_SCREEN:
             return CupertinoPageRoute<bool>(
@@ -140,7 +152,7 @@ class MyApp extends StatelessWidget {
           case RouteHandler.PRODUCT_FILTER_LIST:
             return CupertinoPageRoute<bool>(
                 builder: (context) => ProductsFilterPage(
-                      params: settings.arguments as Map<String, dynamic>,
+                      menu: settings.arguments as dynamic,
                     ),
                 settings: settings);
           case RouteHandler.NAV:

@@ -22,13 +22,12 @@ class QRCodeScreen extends StatefulWidget {
 }
 
 class _QRCodeScreenState extends State<QRCodeScreen> {
-  RootViewModel root = Get.find<RootViewModel>();
+  OrderHistoryViewModel order = Get.find<OrderHistoryViewModel>();
   OrderViewModel _orderViewModel = Get.find<OrderViewModel>();
   @override
   void initState() {
     super.initState();
-    Get.find<RootViewModel>()
-        .getBoxQrCode(_orderViewModel.orderStatusDTO!.boxId!);
+    order.getBoxQrCode(_orderViewModel.orderStatusDTO!.boxId!);
   }
 
   @override
@@ -36,23 +35,17 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
     return Scaffold(
       backgroundColor: FineTheme.palettes.primary100,
       appBar: DefaultAppBar(title: "Box QR Code"),
-      body: ScopedModel(
-          model: Get.find<OrderHistoryViewModel>(),
-          child: ScopedModelDescendant<OrderHistoryViewModel>(
-            builder: (context, child, model) {
-              return Padding(
-                padding: const EdgeInsets.only(right: 16, left: 16),
-                child: ListView(
-                  children: [
-                    const SizedBox(height: 16),
-                    _buildOrderInfo(),
-                    const SizedBox(height: 16),
-                    _buildQrCodeSection(),
-                  ],
-                ),
-              );
-            },
-          )),
+      body: Padding(
+        padding: const EdgeInsets.only(right: 16, left: 16),
+        child: ListView(
+          children: [
+            const SizedBox(height: 16),
+            _buildOrderInfo(),
+            const SizedBox(height: 16),
+            _buildQrCodeSection(),
+          ],
+        ),
+      ),
     );
   }
 
@@ -142,7 +135,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
               SizedBox(
                 width: 250,
                 child: Text(
-                  widget.order.stationDTO!.name!,
+                  'widget.order.stationDTO!.name!',
                   style: const TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 16,
@@ -190,10 +183,10 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
 
   Widget _buildQrCodeSection() {
     return ScopedModel(
-        model: Get.find<RootViewModel>(),
-        child: ScopedModelDescendant<RootViewModel>(
+        model: Get.find<OrderHistoryViewModel>(),
+        child: ScopedModelDescendant<OrderHistoryViewModel>(
           builder: (context, child, model) {
-            if (model.status == ViewStatus.Loading) {
+            if (model.imageBytes == null) {
               return Container(
                 padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
                 width: Get.width,

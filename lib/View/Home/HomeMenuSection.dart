@@ -2,6 +2,7 @@ import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/ViewModel/category_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
+import 'package:fine/ViewModel/productFilter_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
@@ -54,10 +55,19 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                   } else {
                     text = 'HÔM NAY';
                   }
-                  return Text(
-                    'Menu theo bữa ' + text,
-                    style: FineTheme.typograhpy.buttonLg
-                        .copyWith(color: Colors.black),
+                  return Row(
+                    children: [
+                      Text(
+                        'Menu theo bữa ',
+                        style: FineTheme.typograhpy.buttonLg
+                            .copyWith(color: Colors.black),
+                      ),
+                      Text(
+                        text,
+                        style: FineTheme.typograhpy.buttonLg
+                            .copyWith(color: FineTheme.palettes.primary300),
+                      ),
+                    ],
                   );
                 },
               )),
@@ -82,6 +92,17 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
           var list = model.listTimeSlot
               ?.where((element) => element.isActive == true)
               .toList();
+
+          var firstTimeSlot = model.listTimeSlot!.firstWhere((element) =>
+              element.id == '7d2b363a-18fa-45e5-bfc9-0f52ef705524');
+          bool isAvailable(List<TimeSlotDTO> timeSlots,
+              bool Function(TimeSlotDTO) condition) {
+            return timeSlots.every((timeSlot) => condition(timeSlot));
+          }
+
+          bool areAllSlotsAvailable =
+              isAvailable(list!, model.isListTimeSlotAvailable);
+
           // bool isTimeSlotAvaible = model.isCurrentTimeSlotAvailable();
           final status = model.status;
           if (status == ViewStatus.Loading) {
@@ -121,7 +142,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
               scrollDirection: Axis.horizontal,
               separatorBuilder: (context, index) =>
                   SizedBox(width: FineTheme.spacing.xs),
-              itemCount: list!.length,
+              itemCount: list.length,
               itemBuilder: (context, index) {
                 DateFormat inputFormat = DateFormat('HH:mm:ss');
                 DateTime arrive = inputFormat.parse(list[index].arriveTime!);
@@ -132,6 +153,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                 String checkoutTime = outputFormat.format(checkout);
 
                 bool isSelect = model.selectedTimeSlot?.id == list[index].id;
+                bool isFirstTimeSlot = list[index].id == firstTimeSlot.id;
                 // bool isSelect = false;
                 return Container(
                   // height: 30,
@@ -153,8 +175,11 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                             // ignore: dead_code
                             ? FineTheme.palettes.primary200
                             : Colors.white,
-                        border:
-                            Border.all(color: FineTheme.palettes.primary100),
+                        border: Border.all(
+                          color: isSelect
+                              ? FineTheme.palettes.primary100
+                              : FineTheme.palettes.primary100,
+                        ),
                         // boxShadow: [
                         //   BoxShadow(
                         //     color: Colors.black.withOpacity(0.4),
@@ -165,16 +190,19 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                       ),
                       alignment: Alignment.center,
                       // padding: const EdgeInsets.only(top: 4, bottom: 4),
-                      child: Text('$arriveTime - $checkoutTime',
-                          style: isSelect
-                              // ignore: dead_code
-                              ? FineTheme.typograhpy.subtitle2.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500)
-                              // ignore: dead_code
-                              : FineTheme.typograhpy.subtitle2.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  color: FineTheme.palettes.primary100)),
+                      child: Text(
+                        '$arriveTime - $checkoutTime',
+                        style: isSelect
+                            // ignore: dead_code
+                            ? FineTheme.typograhpy.subtitle2.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500)
+                            // ignore: dead_code
+                            : FineTheme.typograhpy.subtitle2.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: FineTheme.palettes.primary100,
+                              ),
+                      ),
                     ),
                   ),
                 );
@@ -272,30 +300,40 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                       children: List.generate(homeMenu.length, (index) {
                         return GestureDetector(
                           onTap: () {
-                            RootViewModel root = Get.find<RootViewModel>();
-                            Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
-                                arguments: {'menu': homeMenu[index].toJson()});
-                            // if (!root.isCurrentTimeSlotAvailable()) {
-                            //   showStatusDialog(
-                            //       "assets/images/error.png",
-                            //       "Opps",
-                            //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-                            // } else {
+                            // Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
+                            //     arguments: {'menu': homeMenu[index].toJson()});
+                            final root = Get.find<RootViewModel>();
 
-                            // }
+                            if (!root.isCurrentTimeSlotAvailable()) {
+                              showStatusDialog(
+                                  "assets/images/error.png",
+                                  "Opps",
+                                  "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+                            } else {
+                              Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
+                                  arguments: homeMenu[index]);
+                            }
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              SizedBox(
-                                height: 42,
-                                width: 42,
-                                child: homeMenu[index]
-                                        .menuName!
-                                        .contains('Danh mục')
-                                    ? Image.asset(homeMenu[index].imgUrl!)
-                                    : CacheImage(
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(100),
+                                child: SizedBox(
+                                  height: 42,
+                                  width: 42,
+                                  child: ColorFiltered(
+                                    colorFilter: ColorFilter.mode(
+                                      Get.find<RootViewModel>()
+                                              .isCurrentTimeSlotAvailable()
+                                          ? Colors.transparent
+                                          : Colors.grey,
+                                      BlendMode.saturation,
+                                    ),
+                                    child: CacheImage(
                                         imageUrl: homeMenu[index].imgUrl!),
+                                  ),
+                                ),
                               ),
                               const SizedBox(
                                 height: 4,

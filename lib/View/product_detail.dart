@@ -6,11 +6,14 @@ import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DTO/ProductDTO.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/format_price.dart';
+import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/productFilter_viewModel.dart';
 import 'package:fine/ViewModel/product_viewModel.dart';
+import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
+import 'package:fine/widgets/touchopacity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +43,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   void initState() {
     super.initState();
     _productDetailViewModel = ProductDetailViewModel(dto: widget.dto);
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    _productDetailViewModel = Get.find<ProductDetailViewModel>();
     // if (widget.dto.type == ProductType.MASTER_PRODUCT ||
     //     widget.dto.type == ProductType.COMPLEX_PRODUCT) {
     //   affectPriceTabs = new List<String>();
@@ -74,6 +77,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     children: [
                       // Container(),
                       productTitle(),
+
+                      // _buidProductRecomend(),
                       // tabCompination()
                     ],
                   ),
@@ -278,6 +283,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           const SizedBox(
             height: 16,
           ),
+
           // orderButton(),
         ],
       ),

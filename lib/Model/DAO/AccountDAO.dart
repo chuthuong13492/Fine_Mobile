@@ -78,17 +78,18 @@ class AccountDAO extends BaseDAO {
   }
 
   Future<AccountDTO?> updateUser(AccountDTO updateUser) async {
+    AccountDTO? acc;
     Response? res;
     if (updateUser.phone != null) {
       res = await request.put("/customer?Phone=${updateUser.phone}");
-      return AccountDTO.fromJson(res.data);
+      acc = AccountDTO.fromJson(res.data);
     }
     if (updateUser.name != null) {
       res = await request.put("/customer?Name=${updateUser.name}");
-      return AccountDTO.fromJson(res.data);
+      acc = AccountDTO.fromJson(res.data);
     }
     // var dataJson = updateUser.toJson();
-    return null;
+    return acc;
   }
 
   // Future<UserWallet> linkAccountToWallet(String phone) async {

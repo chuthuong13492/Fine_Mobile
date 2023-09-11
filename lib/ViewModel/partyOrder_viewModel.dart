@@ -21,6 +21,7 @@ class PartyOrderViewModel extends BaseModel {
   final _orderViewModel = Get.find<OrderViewModel>();
   PartyOrderDTO? partyOrderDTO;
   PartyOrderDAO? _partyDAO;
+  AccountDTO? acc;
   // Cart? currentCart;
   String? errorMessage;
   List<OrderDetails>? listOrderDetail;
@@ -272,6 +273,7 @@ class PartyOrderViewModel extends BaseModel {
       _orderViewModel.currentCart = await getCart();
       final order = await _partyDAO?.preparePartyOrder(
           root.selectedTimeSlot!.id!, partyCode);
+      await _orderViewModel.removeCart();
       for (var item in order!.orderDetails!) {
         CartItem cartItem = new CartItem(item.productId, item.quantity, null);
         await addItemToCart(cartItem, root.selectedTimeSlot!.id!);
@@ -307,6 +309,30 @@ class PartyOrderViewModel extends BaseModel {
     } catch (e) {
       // partyOrderDTO = null;
       setState(ViewStatus.Error);
+    }
+  }
+
+  Future<void> getCustomByPhone(String phone) async {
+    try {
+      setState(ViewStatus.Loading);
+      String numericPhoneNumber = Uri.encodeComponent(phone);
+      acc = await _partyDAO?.getCustomerByPhone(numericPhoneNumber);
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      acc = null;
+      await showStatusDialog("assets/images/icon-success.png", 'Oops!!',
+          'Hong có sđt này mất rùi');
+      setState(ViewStatus.Completed);
+    }
+  }
+
+  Future<void> inviteParty(String cusId, String partyCode) async {
+    try {
+      setState(ViewStatus.Loading);
+      bool? isInvited = await _partyDAO?.inviteToParty(cusId, partyCode);
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      setState(ViewStatus.Completed);
     }
   }
 

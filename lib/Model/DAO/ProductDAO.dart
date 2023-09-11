@@ -17,7 +17,7 @@ class ProductDAO extends BaseDAO {
     final res = await request.get(
       // 'collections?menu-id=${menuId}',
       '/product/${productId}',
-      queryParameters: {"page": page, "size": size}..addAll(params),
+      // queryParameters: {"page": page, "size": size}..addAll(params),
     );
     if (res.data["data"] != null) {
       var listJson = res.data['data'];
@@ -94,7 +94,7 @@ class ProductDAO extends BaseDAO {
       // print("Request Note: " + note);
       final res = await request.post(
         '/order/card',
-        data: cart.toJsonAPi(),
+        data: cart.toCheckCartJsonAPi(),
       );
       if (res.statusCode == 200) {
         return AddProductToCartResponse.fromJson(res.data['data']);

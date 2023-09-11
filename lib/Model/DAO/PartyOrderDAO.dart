@@ -22,6 +22,29 @@ class PartyOrderDAO extends BaseDAO {
     return null;
   }
 
+  Future<AccountDTO?> getCustomerByPhone(String phone) async {
+    if (phone != null) {
+      final res = await request.get('/customer/find?phoneNumber=${phone}');
+      if (res.statusCode == 200) {
+        return AccountDTO.fromJson(res.data['data']);
+      }
+      return null;
+    }
+    return null;
+  }
+
+  Future<bool> inviteToParty(String cusId, String partyCode) async {
+    try {
+      final res = await request.post(
+        '/customer/invitation?customerId=${cusId}&partyCode=${partyCode}',
+        // data: ORDER_CANCEL_STATUS,
+      );
+      return res.statusCode == 200;
+    } catch (e) {
+      throw e;
+    }
+  }
+
   Future<PartyOrderStatus?> getPartyOrder(String? code) async {
     try {
       final res = await request.get(

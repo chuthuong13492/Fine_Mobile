@@ -61,7 +61,8 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                   child: IconButton(
                       padding: const EdgeInsets.all(0),
                       onPressed: () {
-                        Get.back();
+                        // Get.back();
+                        Get.offAllNamed(RouteHandler.NAV);
                       },
                       icon: const Icon(
                         Icons.chevron_left_rounded,
@@ -167,6 +168,9 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
             case 10:
               _curStep = 5;
               break;
+            case 11:
+              _curStep = 5;
+              break;
             default:
               _curStep = 2;
           }
@@ -190,7 +194,8 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                       child: Container(
                         width: Get.width,
                         child: Text(
-                          model.orderStatusDTO!.orderStatus == 10
+                          model.orderStatusDTO!.orderStatus == 10 ||
+                                  model.orderStatusDTO!.orderStatus == 11
                               ? "Đơn hàng được đặt ở ${model.orderStatusDTO!.stationName}"
                               : 'FINE sẽ báo vị trí box khi đơn hàng được giao đến',
                           style: TextStyle(
@@ -272,30 +277,35 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                                   color: FineTheme.palettes.shades100,
                                 ),
                                 const SizedBox(width: 4),
-                                Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Khung giờ giao',
-                                      style: TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 14,
-                                          fontStyle: FontStyle.normal,
-                                          color: FineTheme.palettes.neutral400),
-                                    ),
-                                    Text(
-                                      '$arriveTime - $checkoutTime',
-                                      style: TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14,
-                                          fontStyle: FontStyle.normal,
-                                          color: FineTheme.palettes.shades100),
-                                    ),
-                                  ],
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Khung giờ giao',
+                                        style: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 14,
+                                            fontStyle: FontStyle.normal,
+                                            color:
+                                                FineTheme.palettes.neutral400),
+                                      ),
+                                      Text(
+                                        '$arriveTime - $checkoutTime',
+                                        style: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            fontStyle: FontStyle.normal,
+                                            color:
+                                                FineTheme.palettes.shades100),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -312,7 +322,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                               }
                             },
                             child: Container(
-                              width: 120,
+                              // width: 80,
                               height: 40,
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,39 +338,41 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                                     color: FineTheme.palettes.shades100,
                                   ),
                                   const SizedBox(width: 4),
-                                  Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'QR Code của bạn',
-                                        style: TextStyle(
-                                            fontFamily: 'Montserrat',
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 14,
-                                            fontStyle: FontStyle.normal,
-                                            color:
-                                                FineTheme.palettes.neutral400),
-                                      ),
-                                      Container(
-                                        width: 150,
-                                        child: Text(
-                                          hasBox
-                                              ? 'Chi tiết QR Code'
-                                              : 'Đang xử lý...',
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Mã Qr Code',
                                           style: TextStyle(
                                               fontFamily: 'Montserrat',
-                                              fontWeight: FontWeight.w500,
+                                              fontWeight: FontWeight.w700,
                                               fontSize: 14,
                                               fontStyle: FontStyle.normal,
-                                              color:
-                                                  FineTheme.palettes.shades100),
-                                          overflow: TextOverflow.ellipsis,
+                                              color: FineTheme
+                                                  .palettes.neutral400),
                                         ),
-                                      ),
-                                    ],
+                                        Container(
+                                          width: 150,
+                                          child: Text(
+                                            hasBox
+                                                ? 'Chi tiết QR Code'
+                                                : 'Đang xử lý...',
+                                            style: TextStyle(
+                                                fontFamily: 'Montserrat',
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14,
+                                                fontStyle: FontStyle.normal,
+                                                color: FineTheme
+                                                    .palettes.shades100),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),

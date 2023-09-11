@@ -61,13 +61,13 @@ class Utils {
           actions: [
             child!,
           ],
-          cancelButton: CupertinoActionSheetAction(
-            child: Text(
-              'Chọn',
-              style: Get.theme.textTheme.headline2,
-            ),
-            onPressed: onClicked!,
-          ),
+          // cancelButton: CupertinoActionSheetAction(
+          //   child: Text(
+          //     'Chọn',
+          //     style: Get.theme.textTheme.headline2,
+          //   ),
+          //   onPressed: onClicked!,
+          // ),
         ),
       );
 

@@ -20,8 +20,12 @@ class Cart {
   int? orderType;
   int? partyType;
   String? timeSlotId;
+  String? productId;
+  int? quantity;
 
   Cart.get({
+    this.productId,
+    this.quantity,
     this.orderType,
     this.partyType,
     this.timeSlotId,
@@ -29,6 +33,8 @@ class Cart {
   });
 
   Cart({
+    this.productId,
+    this.quantity,
     this.orderType,
     this.partyType,
     this.timeSlotId,
@@ -45,13 +51,22 @@ class Cart {
 
   factory Cart.fromJson(dynamic json) {
     List<CartItem> list = [];
+    if (json["card"] != null) {
+      if (json["card"].length != 0) {
+        var itemJson = json["card"] as List;
+        list = itemJson.map((e) => CartItem.fromJson(e)).toList();
+      }
+    }
+
     if (json["orderDetails"] != null) {
       var itemJson = json["orderDetails"] as List;
       list = itemJson.map((e) => CartItem.fromJson(e)).toList();
     }
     return Cart.get(
-      orderType: json["partyType"] ?? 1,
-      partyType: json["partyType"],
+      orderType: json["orderType"] ?? 1,
+      partyType: json["partyType"] ?? 1,
+      productId: json["productId"],
+      quantity: json["quantity"],
       timeSlotId: json['timeSlotId'],
       orderDetails: list,
     );
@@ -95,6 +110,33 @@ class Cart {
     };
   }
 
+  Map<String, dynamic> toCheckCartJsonAPi() {
+    List<Map<String, dynamic>> listCartItem = [];
+    if (orderDetails != null) {
+      orderDetails!.forEach((element) {
+        listCartItem.add(element.toJson());
+      });
+    }
+    Map<String, dynamic> map = {
+      // "customerId": customerId,
+      // "deliveryPhone": deliveryPhone,
+
+      "productId": productId,
+      "quantity": quantity,
+      "timeSlotId": timeSlotId,
+      // "roomId": roomId,
+      // "note": note ?? null,
+      "card": listCartItem ?? null,
+      // "supplier_notes":
+      //     note != null ? note!.map((e) => e.toJson()).toList() : [],
+      // "vouchers": vouchers != null
+      //     ? vouchers?.map((voucher) => voucher.voucherCode)?.toList()
+      //     : null,
+    };
+    logger.i("Order: " + map.toString());
+    return map;
+  }
+
   Map<String, dynamic> toJsonAPi() {
     List<Map<String, dynamic>> listCartItem = [];
     if (orderDetails != null) {
@@ -102,7 +144,6 @@ class Cart {
         listCartItem.add(element.toJson());
       });
     }
-
     Map<String, dynamic> map = {
       // "customerId": customerId,
       // "deliveryPhone": deliveryPhone,
@@ -144,8 +185,7 @@ class Cart {
 
   void removeItem(CartItem item) {
     print("Quantity: ${item.quantity}");
-    orderDetails!.removeWhere((element) =>
-        element.findCartItem(item) && element.quantity == item.quantity);
+    orderDetails!.removeWhere((element) => element.findCartItem(item));
   }
 
   void updateQuantity(CartItem item) {

@@ -118,17 +118,17 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                         child: TouchOpacity(
                           onTap: () {
                             RootViewModel root = Get.find<RootViewModel>();
-                            root.openProductDetail(product, fetchDetail: true);
-                            // if (!root.isCurrentTimeSlotAvailable()) {
-                            //   showStatusDialog(
-                            //       "assets/images/error.png",
-                            //       "Opps",
-                            //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-                            // } else {
-                            //   // if (product.type == ProductType.MASTER_PRODUCT) {}
-                            //   root.openProductDetail(product,
-                            //       fetchDetail: true);
-                            // }
+                            // root.openProductDetail(product, fetchDetail: true);
+                            if (!root.isCurrentTimeSlotAvailable()) {
+                              showStatusDialog(
+                                  "assets/images/error.png",
+                                  "Opps",
+                                  "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+                            } else {
+                              // if (product.type == ProductType.MASTER_PRODUCT) {}
+                              root.openProductDetail(product,
+                                  fetchDetail: true);
+                            }
                           },
                           child: buildProductInMenu(product),
                         ),
@@ -266,12 +266,15 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                       height: 14,
                       child: Text(
                         formatPrice(product.attributes![0].price!),
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontFamily: "Montserrat",
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             overflow: TextOverflow.ellipsis,
-                            color: Colors.red),
+                            color: Get.find<RootViewModel>()
+                                    .isCurrentTimeSlotAvailable()
+                                ? Colors.red
+                                : Colors.grey),
                       ),
                     ),
                     const SizedBox(
@@ -285,7 +288,10 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                           children: [
                             FaIcon(
                               Icons.star_half,
-                              color: FineTheme.palettes.primary300,
+                              color: Get.find<RootViewModel>()
+                                      .isCurrentTimeSlotAvailable()
+                                  ? FineTheme.palettes.primary300
+                                  : Colors.grey,
                               size: 14,
                             ),
                             const SizedBox(
@@ -325,7 +331,10 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color: FineTheme.palettes.primary100,
+                    color:
+                        Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
+                            ? FineTheme.palettes.primary100
+                            : Colors.grey,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Center(
@@ -346,32 +355,27 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
             ),
             Positioned(
               left: 35,
-              child: Container(
-                width: 122,
-                height: 122,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  // image: const DecorationImage(
-                  //     fit: BoxFit.fill,
-                  //     image: CachedNetworkImageProvider(
-                  //         "https://static.tuoitre.vn/tto/i/s626/2011/10/05/AoGOfe8y.jpg")),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(100),
+                child: Container(
+                  width: 122,
+                  height: 122,
+                  // decoration: BoxDecoration(
+                  //   borderRadius: BorderRadius.circular(50),
+                  // ),
+                  child: ColorFiltered(
+                    colorFilter: ColorFilter.mode(
+                      Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
+                          ? Colors.transparent
+                          : Colors.grey,
+                      BlendMode.saturation,
+                    ),
+                    child: CacheImage(
+                        imageUrl: product.imageUrl == null
+                            ? 'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908'
+                            : product.imageUrl!),
+                  ),
                 ),
-                child: CacheImage(
-                    imageUrl: product.imageUrl == null
-                        ? 'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908'
-                        : product.imageUrl!),
-                // child: ColorFiltered(
-                //   colorFilter: ColorFilter.mode(
-                //     Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
-                //         ? Colors.transparent
-                //         : Colors.grey,
-                //     BlendMode.saturation,
-                //   ),
-                //   child: CacheImage(
-                //       imageUrl: product.imageUrl == null
-                //           ? 'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908'
-                //           : product.imageUrl!),
-                // ),
               ),
             ),
           ],

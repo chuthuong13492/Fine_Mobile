@@ -6,6 +6,7 @@ import 'package:fine/Model/DTO/ProductDTO.dart';
 import 'package:fine/Service/analytic_service.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/shared_pref.dart';
+import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
@@ -13,6 +14,7 @@ import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../Constant/view_status.dart';
 import 'base_model.dart';
 
 class ProductDetailViewModel extends BaseModel {
@@ -32,6 +34,7 @@ class ProductDetailViewModel extends BaseModel {
   //Bật cờ để đổi radio thành checkbox
   bool? isExtra;
   //List size
+  // List<ProductInCart>? productsRecomend;
   ProductDTO? master;
   ProductDAO? _dao;
   Cart? checkCurrentCart;
@@ -41,6 +44,7 @@ class ProductDetailViewModel extends BaseModel {
     isExtra = false;
     _dao = ProductDAO();
     checkCurrentCart = null;
+    // productsRecomend = null;
     this.affectPriceContent = new Map<String, List<String>>();
 
     this.selectedAttributes = new Map<String, String>();
@@ -230,7 +234,9 @@ class ProductDetailViewModel extends BaseModel {
 
   Future<void> addProductToCart({bool backToHome = true}) async {
     final root = Get.find<RootViewModel>();
+    final order = Get.find<OrderViewModel>();
     // await deleteMart();
+    Cart? cart = await getCart();
     showLoadingDialog();
     bool showOnHome = Get.find<bool>(tag: "showOnHome");
     // if (master.type == ProductType.MASTER_PRODUCT) {
@@ -260,7 +266,60 @@ class ProductDetailViewModel extends BaseModel {
     String description = "";
     // Cart newCart = Cart(5, '0902915671', 4);
     List<CartItem>? orderDetails = [];
-    CartItem item = new CartItem(master!.attributes![0].id, count, null);
+
+    checkCurrentCart = await getMart();
+    if (checkCurrentCart == null) {
+      // checkCurrentCart = Cart.get(
+      //   productId: master!.attributes![0].id,
+      //   quantity: count,
+      //   timeSlotId: root.selectedTimeSlot!.id,
+      //   orderDetails: [],
+      // );
+      checkCurrentCart = Cart(
+          productId: master!.attributes![0].id,
+          quantity: count,
+          timeSlotId: root.selectedTimeSlot!.id);
+      await setMart(checkCurrentCart!);
+      checkCurrentCart = await getMart();
+      AddProductToCartResponse? result =
+          await _dao!.checkProductToCart(checkCurrentCart!);
+      if (result!.productsRecommend != null) {
+        order.productRecomend = result.productsRecommend;
+      }
+      if (result.status!.success == false) {
+        await showStatusDialog("assets/images/error.png", "Box đã đầy",
+            "Box đã đầy mất ùi, bạn hong thể thêm ${result.product!.name}");
+      }
+      if (result.status!.errorCode == '2001') {
+        await showStatusDialog("assets/images/error.png", "Box đã đầy",
+            "Box đã đầy rùi, bạn chỉ có thể thêm ${result.product!.quantity} phần ${result.product!.name}");
+      }
+      final productList = result.card;
+      if (productList != null) {
+        for (var item in productList) {
+          CartItem cartItem = new CartItem(item.id, item.quantity!, null);
+          await addItemToCart(cartItem, root.selectedTimeSlot!.id!);
+          await addItemToMart(cartItem, root.selectedTimeSlot!.id!);
+          if (item.id == checkCurrentCart!.productId) {
+            await AnalyticsService.getInstance()!
+                .logChangeCart(null, item.quantity!, true, productInCart: item);
+          }
+        }
+      }
+      checkCurrentCart = await getMart();
+      if (checkCurrentCart!.productId != null) {
+        checkCurrentCart!.productId = null;
+        checkCurrentCart!.quantity = 0;
+      }
+      if (checkCurrentCart!.orderDetails != null &&
+          checkCurrentCart!.productId == null) {
+        await setCart(checkCurrentCart!);
+      }
+    } else {
+      await processCart(
+          master!.attributes![0].id, count, root.selectedTimeSlot!.id);
+    }
+
     // await addItemToMart(item, root.selectedTimeSlot!.id!);
     // // if (checkCurrentCart == null) {
     // //   orderDetails.add(item);
@@ -300,74 +359,10 @@ class ProductDetailViewModel extends BaseModel {
 
     // // print("Item: " + item.master.productInMenuId.toString());
 
-    // // await addItemToCart(item, root.selectedTimeSlot!.id!);
-    // // checkCurrentCart = await getCart();
-    // checkCurrentCart = await getMart();
-    // if (checkCurrentCart != null) {
-    //   final checkProduct = await _dao!.checkProductToCart(checkCurrentCart!);
-    //   // await deleteCart();
-    //   // currentCart = await getCart();
-    //   // ProductInCart? productInMart;
-    //   // for (var item in checkCurrentCart!.orderDetails!) {
-    //   //   productInMart = checkProduct!.products!.firstWhere((element) =>
-    //   //       element.status!.success == true && element.id! == item.productId);
-    //   // }
+    // showOnHome
+    //     ? await addItemToCart(item, root.selectedTimeSlot!.id!)
+    //     : await addItemToMart(item, root.selectedTimeSlot!.id!);
 
-    //   if (checkProduct!.products != null) {
-    //     await deleteCart();
-    //     await deleteMart();
-    //   }
-    //   for (var item in checkProduct.products!) {
-    //     final productInCart = ProductInCart(
-    //         status: StatusProductInCart(
-    //             success: item.status!.success,
-    //             message: item.status!.message,
-    //             errorCode: item.status!.errorCode),
-    //         id: item.id,
-    //         name: item.name,
-    //         code: item.code,
-    //         size: item.size,
-    //         price: item.price,
-    //         quantity: item.quantity);
-
-    //     if (productInCart.status!.success == true &&
-    //         productInCart.status!.message != 'Success') {
-    //       // final notSuccessProduct = checkProduct.products!
-    //       //     .firstWhere((element) => element.status!.message != 'Success');
-    //       await showStatusDialog(
-    //         "assets/images/error.png",
-    //         "Box đã hết chỗ",
-    //         "Bạn chỉ có thể thêm ${productInCart.quantity} sản phẩm ${productInCart.name}",
-    //       );
-    //     }
-    //     if (productInCart.status!.success == true) {
-    //       CartItem cartItem =
-    //           new CartItem(productInCart.id, productInCart.quantity!, null);
-
-    //       await addItemToMart(cartItem, root.selectedTimeSlot!.id!);
-    //       showOnHome
-    //           ? await addItemToCart(cartItem, root.selectedTimeSlot!.id!)
-    //           : await addItemToMart(cartItem, root.selectedTimeSlot!.id!);
-    //       await AnalyticsService.getInstance()!.logChangeCart(
-    //           null, cartItem.quantity, true,
-    //           productInCart: productInCart);
-    //       hideDialog();
-    //     } else {
-    //       await showStatusDialog(
-    //         "assets/images/error.png",
-    //         "Box đã hết chỗ",
-    //         "Bạn không thể thêm  sản phẩm ${productInCart.name}",
-    //       );
-    //     }
-    //   }
-    // }
-    // Cart? currentCart = await getCart();
-    // cart.addItem(item);
-    showOnHome
-        ? await addItemToCart(item, root.selectedTimeSlot!.id!)
-        : await addItemToMart(item, root.selectedTimeSlot!.id!);
-    await AnalyticsService.getInstance()!
-        .logChangeCart(master!, item.quantity, true);
     hideDialog();
     if (backToHome) {
       if (isPartyMode) {
@@ -383,6 +378,66 @@ class ProductDetailViewModel extends BaseModel {
       } else {
         Get.find<OrderViewModel>().prepareOrder();
       }
+    }
+  }
+
+  Future<void> processCart(
+      String? productId, int? quantity, String? timeSlotId) async {
+    OrderViewModel order = Get.find<OrderViewModel>();
+    if (productId != null && quantity != null) {
+      checkCurrentCart = await getMart();
+      checkCurrentCart!.productId = productId;
+      checkCurrentCart!.quantity = quantity;
+      await setMart(checkCurrentCart!);
+      checkCurrentCart = await getMart();
+      AddProductToCartResponse? result =
+          await _dao!.checkProductToCart(checkCurrentCart!);
+      if (result!.productsRecommend != null) {
+        order.productRecomend = result.productsRecommend;
+      }
+      if (result.status!.success == false) {
+        await showStatusDialog("assets/images/error.png", "Box đã đầy",
+            "Box đã đầy mất ùi, bạn hong thể thêm ${result.product!.name}");
+      }
+      if (result.status!.errorCode == '2001') {
+        await showStatusDialog("assets/images/error.png", "Box đã đầy",
+            "Box đã đầy rùi, bạn chỉ có thể thêm ${result.product!.quantity} phần ${result.product!.name}");
+      }
+      final productList = result.card!;
+      if (productList != null) {
+        for (var item in productList) {
+          CartItem cartItem = new CartItem(item.id, item.quantity!, null);
+          await removeItemFromCart(cartItem);
+          await removeItemFromMart(cartItem);
+          await addItemToCart(cartItem, timeSlotId!);
+          await addItemToMart(cartItem, timeSlotId);
+          if (item.id == checkCurrentCart!.productId) {
+            await AnalyticsService.getInstance()!
+                .logChangeCart(null, item.quantity!, true, productInCart: item);
+          }
+        }
+      }
+      checkCurrentCart = await getMart();
+
+      if (checkCurrentCart!.productId != null) {
+        checkCurrentCart!.productId = null;
+        checkCurrentCart!.quantity = 0;
+      }
+      if (checkCurrentCart!.orderDetails != null &&
+          checkCurrentCart!.productId == null) {
+        await setCart(checkCurrentCart!);
+      }
+    }
+  }
+
+  Future<void> addCheckProduct() async {
+    try {
+      setState(ViewStatus.Loading);
+      final root = Get.find<RootViewModel>();
+
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      setState(ViewStatus.Completed);
     }
   }
 }

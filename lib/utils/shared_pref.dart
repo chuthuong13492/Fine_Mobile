@@ -40,7 +40,7 @@ Future<void> setCart(Cart cart) async {
 
 Future<void> setMart(Cart cart) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  await prefs.setString('MART', jsonEncode(cart.toJson()));
+  await prefs.setString('MART', jsonEncode(cart.toCheckCartJsonAPi()));
 }
 
 Future<bool> setPartyCode(String code) async {
@@ -84,10 +84,10 @@ Future<void> addItemToCart(CartItem item, String timeSlotId) async {
 
 Future<void> addItemToMart(CartItem item, String timeSlotId) async {
   Cart? cart = await getMart();
-  if (cart == null) {
-    cart = new Cart(timeSlotId: timeSlotId);
-  }
-  cart.addItem(item);
+  // if (cart != null) {
+  //   cart = Cart(timeSlotId: timeSlotId);
+  // }
+  cart!.addItem(item);
   await setMart(cart);
 }
 
@@ -99,13 +99,15 @@ Future<bool> removeItemFromCart(CartItem item) async {
   cart.removeItem(item);
   print("Delete success!");
   print("Items: ${cart.orderDetails?.length.toString()}");
-  if (cart.orderDetails?.length == 0) {
-    await deleteCart();
-    return true;
-  } else {
-    await setCart(cart);
-    return false;
-  }
+  await setCart(cart);
+  return false;
+  // if (cart.orderDetails?.length == 0) {
+  //   await deleteCart();
+  //   return true;
+  // } else {
+  //   await setCart(cart);
+  //   return false;
+  // }
 }
 
 Future<bool> removeItemFromMart(CartItem item) async {
@@ -114,14 +116,15 @@ Future<bool> removeItemFromMart(CartItem item) async {
     return false;
   }
   cart.removeItem(item);
-
-  if (cart.orderDetails?.length == 0) {
-    await deleteMart();
-    return true;
-  } else {
-    await setMart(cart);
-    return false;
-  }
+  await setMart(cart);
+  return false;
+  // if (cart.orderDetails?.length == 0) {
+  //   await deleteMart();
+  //   return true;
+  // } else {
+  //   await setMart(cart);
+  //   return false;
+  // }
 }
 
 Future<void> deleteCart() async {

@@ -1,5 +1,7 @@
 import 'package:fine/Accessories/custom_button_switch.dart';
+import 'package:fine/Accessories/index.dart';
 import 'package:fine/Constant/route_constraint.dart';
+import 'package:fine/Utils/format_price.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
@@ -271,7 +273,7 @@ Future<int> showOptionDialog(String text,
                             child: Center(
                               child: Text(
                                 firstOption ?? "Hủy",
-                                style: FineTheme.typograhpy.body2.copyWith(
+                                style: FineTheme.typograhpy.subtitle1.copyWith(
                                   color: Colors.red,
                                 ),
                               ),
@@ -301,7 +303,335 @@ Future<int> showOptionDialog(String text,
                             child: Center(
                               child: Text(
                                 secondOption ?? "Đồng ý",
-                                style: FineTheme.typograhpy.body2.copyWith(
+                                style: FineTheme.typograhpy.subtitle1.copyWith(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            option = 1;
+                            hideDialog();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const Positioned(
+              top: -30,
+              right: 95,
+              child: Image(
+                image: AssetImage("assets/images/logo.png"),
+                width: 160,
+                height: 160,
+              ),
+            )
+          ],
+        ),
+      ),
+    ),
+    barrierDismissible: true,
+  );
+  return option!;
+}
+
+Future<int> showInviteDialog(String text,
+    {String? firstOption, String? secondOption}) async {
+  // hideDialog();
+  int? option;
+  bool shouldPop = false;
+  await Get.dialog(
+    WillPopScope(
+      onWillPop: () async {
+        return shouldPop;
+      },
+      child: Dialog(
+        backgroundColor: Colors.white,
+        elevation: 8.0,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0))),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Expanded(
+              child: Container(
+                height: 120,
+                decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('assets/images/party_img.png'),
+                        fit: BoxFit.fill),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.0),
+                        topRight: Radius.circular(16.0))),
+              ),
+            ),
+
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: const Icon(
+                      AntDesign.closecircleo,
+                      color: Colors.red,
+                    ),
+                    onPressed: () {
+                      option = 0;
+                      PartyOrderViewModel party =
+                          Get.find<PartyOrderViewModel>();
+                      party.acc = null;
+                      hideDialog();
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 84,
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 16),
+                  child: CustomInviteParty(),
+                ),
+              ],
+            ),
+            // Positioned(
+            //   top: 0,
+            //   right: 95,
+            //   child: Image(
+            //     image: AssetImage("assets/images/party_img.png"),
+            //     width: Get.width,
+            //     height: Get.height * 0.12,
+            //   ),
+            // )
+          ],
+        ),
+      ),
+    ),
+    barrierDismissible: true,
+  );
+  return option!;
+}
+
+Future<int> showConfirmOrderDialog(
+    int quantity, double totalAmount, double shippingFee, double finalAmount,
+    {String? firstOption, String? secondOption}) async {
+  // hideDialog();
+  int? option;
+  bool shouldPop = false;
+  await Get.dialog(
+    WillPopScope(
+      onWillPop: () async {
+        return shouldPop;
+      },
+      child: Dialog(
+        backgroundColor: Colors.white,
+        elevation: 8.0,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0))),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: const Icon(
+                      AntDesign.closecircleo,
+                      color: Colors.red,
+                    ),
+                    onPressed: () {
+                      option = 0;
+                      hideDialog();
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 54,
+                ),
+                Text(
+                  'Xác nhận đơn hàng',
+                  style: FineTheme.typograhpy.h2
+                      .copyWith(color: FineTheme.palettes.primary100),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Text(
+                              "Tạm tính",
+                              style: FineTheme.typograhpy.subtitle1,
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(
+                              width: 4,
+                            ),
+                            Icon(
+                              Icons.circle,
+                              size: 5,
+                              color: FineTheme.palettes.shades200,
+                            ),
+                            const SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              "($quantity Món)",
+                              style: FineTheme.typograhpy.subtitle1,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        formatPrice(totalAmount),
+                        style: const TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            fontStyle: FontStyle.normal),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Phí giao hàng",
+                        style: FineTheme.typograhpy.subtitle1,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        formatPrice(shippingFee),
+                        style: const TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            fontStyle: FontStyle.normal),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Thanh toán bằng",
+                        style: FineTheme.typograhpy.subtitle1,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        'Ví FINE',
+                        style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                            fontStyle: FontStyle.normal,
+                            color: FineTheme.palettes.primary100),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Tổng cộng",
+                        style: FineTheme.typograhpy.subtitle1,
+                        textAlign: TextAlign.center,
+                      ),
+                      Text(
+                        formatPrice(finalAmount),
+                        style: const TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          fontStyle: FontStyle.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                      border: Border(
+                    top: BorderSide(
+                      color: FineTheme.palettes.neutral500,
+                    ),
+                  )),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          // color: Colors.grey,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                              // bottomRight: Radius.circular(16),
+                              bottomLeft: Radius.circular(16),
+                            )),
+                          ),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                            child: Center(
+                              child: Text(
+                                firstOption ?? "Hủy",
+                                style: FineTheme.typograhpy.subtitle1.copyWith(
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            option = 0;
+                            hideDialog();
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        child: ElevatedButton(
+                          // color: kPrimary,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: FineTheme.palettes.primary200,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                bottomRight: Radius.circular(16),
+                                // bottomLeft: Radius.circular(16),
+                              ),
+                            ),
+                          ),
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(top: 16.0, bottom: 16.0),
+                            child: Center(
+                              child: Text(
+                                secondOption ?? "Đồng ý",
+                                style: FineTheme.typograhpy.subtitle1.copyWith(
                                   color: Colors.white,
                                 ),
                               ),
@@ -582,6 +912,12 @@ Future<int> showPartyDialog(String? partyCode) async {
 
 void hideDialog() {
   if (Get.isDialogOpen!) {
+    Get.back();
+  }
+}
+
+void hideSnackbar() {
+  if (Get.isSnackbarOpen) {
     Get.back();
   }
 }

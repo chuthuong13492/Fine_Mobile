@@ -19,9 +19,8 @@ import '../Accessories/index.dart';
 import '../ViewModel/root_viewModel.dart';
 
 class ProductsFilterPage extends StatefulWidget {
-  final Map<String, dynamic> params;
-  const ProductsFilterPage({Key? key, this.params = const {}})
-      : super(key: key);
+  final MenuDTO? menu;
+  const ProductsFilterPage({Key? key, this.menu}) : super(key: key);
 
   @override
   State<ProductsFilterPage> createState() => _ProductsFilterPageState();
@@ -41,18 +40,18 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
   void initState() {
     super.initState();
     // _prodFilterModel = ProductFilterViewModel();
-    _prodFilterModel!.setParam(this.widget.params);
+    // _prodFilterModel!.setParam(this.widget.menu!);
     // Timer.periodic(const Duration(seconds: 5), (_) {
     //   Get.find<ProductFilterViewModel>().getProductsWithFilter();
     // });
-    _prodFilterModel!.getProductsWithFilter();
+    _prodFilterModel!.getProductsWithFilter(id: widget.menu!.id);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: DefaultAppBar(
-        title: widget.params["menu"]["menuName"],
+        title: this.widget.menu!.menuName,
       ),
       body: Container(
         height: Get.height,
@@ -65,7 +64,7 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
                 child: Container(
                   padding: const EdgeInsets.only(top: 0),
                   child: Column(
-                    // crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // _buildFilter(),
                       ...renderProductFilterSection().toList(),
@@ -97,8 +96,12 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
               .toList();
 
           if (model.status == ViewStatus.Loading) {
-            // return _buildLoading();
-            return const SizedBox.shrink();
+            return _buildLoading();
+            // return const Flexible(
+            //   child: Center(
+            //     child: LoadingFine(),
+            //   ),
+            // );
           }
 
           if (model.status == ViewStatus.Error) {

@@ -24,18 +24,23 @@ class ProductFilterViewModel extends BaseModel {
   Map<String, dynamic> get params => _params;
   // List get categoryParams => _params['id'] ?? [];
 
-  setParam(Map<String, dynamic> param) {
-    _params.addAll(param);
-    print(_params);
+  setParam(MenuDTO menu) {
+    menuDTO = menu;
+    // print(_params);
     notifyListeners();
   }
+  // setParam(Map<String, dynamic> param) {
+  //   _params.addAll(param);
+  //   // print(_params);
+  //   notifyListeners();
+  // }
 
-  Future<void> getProductsWithFilter({int? id}) async {
+  Future<void> getProductsWithFilter({String? id}) async {
     // RootViewModel root = Get.find<RootViewModel>();
     // MenuDTO currentMenu = root.selectedMenu;
     try {
-      print("Filter param");
-      print(params);
+      // print("Filter param");
+      // print(params);
       setState(ViewStatus.Loading);
       // CampusDTO currentStore = await getStore();
       // var products = await _productDAO.getAllProductOfStore(
@@ -44,22 +49,22 @@ class ProductFilterViewModel extends BaseModel {
       //   params: this.params,
       // );
       // listProducts = products;
-      if (params["menu"] != null) {
-        var products =
-            await _productDAO?.getProductsByMenuId(params["menu"]["id"]);
+      if (id != null) {
+        var products = await _productDAO?.getProductsByMenuId(id);
         listProducts = products!.where((element) => element.isActive!).toList();
         params.clear();
       }
-      if (params["store"] != null) {
-        var products = await _productDAO
-            ?.getProductsInMenuByStoreId(params["store"]["id"]);
-        listProducts = products!.where((element) => element.isActive!).toList();
-        params.clear();
-      }
+
+      // if (params["store"] != null) {
+      //   var products = await _productDAO
+      //       ?.getProductsInMenuByStoreId(params["store"]["id"]);
+      //   listProducts = products!.where((element) => element.isActive!).toList();
+      //   params.clear();
+      // }
       setState(ViewStatus.Completed);
       notifyListeners();
     } catch (e) {
-      setState(ViewStatus.Error, e.toString());
+      setState(ViewStatus.Completed);
     }
   }
 }

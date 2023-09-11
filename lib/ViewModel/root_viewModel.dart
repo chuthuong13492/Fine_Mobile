@@ -21,6 +21,7 @@ import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
+import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -40,16 +41,15 @@ class RootViewModel extends BaseModel {
   TimeSlotDTO? selectedTimeSlot;
   List<TimeSlotDTO>? listTimeSlot;
   ProductDAO? _productDAO;
-  StationDAO? _stationDAO;
+
   DestinationDAO? _destinationDAO;
   bool changeAddress = false;
   bool isNextDay = false;
-  Uint8List? imageBytes;
 
   RootViewModel() {
     _productDAO = ProductDAO();
     _destinationDAO = DestinationDAO();
-    _stationDAO = StationDAO();
+
     selectedTimeSlot = null;
   }
   Future refreshMenu() async {
@@ -314,7 +314,9 @@ class RootViewModel extends BaseModel {
       }
     } else {
       await orderViewModel.getCurrentCart();
-
+      ProductDetailViewModel productDetailViewModel =
+          Get.find<ProductDetailViewModel>();
+      OrderViewModel order = Get.find<OrderViewModel>();
       if (orderViewModel.currentCart != null) {
         if (orderViewModel.currentCart!.timeSlotId != selectedTimeSlot!.id) {
           final cartTimeSlot = listTimeSlot!
@@ -335,9 +337,31 @@ class RootViewModel extends BaseModel {
           selectedTimeSlot = cartTimeSlot[0];
           await refreshMenu();
           notifyListeners();
+          productDetailViewModel.checkCurrentCart = await getMart();
+          CartItem itemInCart = CartItem(
+              productDetailViewModel
+                  .checkCurrentCart!.orderDetails![0].productId,
+              productDetailViewModel
+                      .checkCurrentCart!.orderDetails![0].quantity -
+                  1,
+              null);
+          await updateItemFromMart(itemInCart);
+          await productDetailViewModel.processCart(
+              itemInCart.productId, 1, selectedTimeSlot!.id);
           await orderViewModel.prepareOrder();
           await Get.toNamed(RouteHandler.ORDER);
         } else {
+          productDetailViewModel.checkCurrentCart = await getMart();
+          CartItem itemInCart = CartItem(
+              productDetailViewModel
+                  .checkCurrentCart!.orderDetails![0].productId,
+              productDetailViewModel
+                      .checkCurrentCart!.orderDetails![0].quantity -
+                  1,
+              null);
+          await updateItemFromMart(itemInCart);
+          await productDetailViewModel.processCart(
+              itemInCart.productId, 1, selectedTimeSlot!.id);
           await Get.toNamed(RouteHandler.ORDER);
         }
       } else {
@@ -345,18 +369,6 @@ class RootViewModel extends BaseModel {
         showStatusDialog("assets/images/error.png", "Giỏ hàng đang trống kìaaa",
             "Hiện tại giỏ của bạn đang trống , bạn hãy thêm sản phẩm vào nhé 😃.");
       }
-    }
-  }
-
-  Future<void> getBoxQrCode(String boxId) async {
-    try {
-      setState(ViewStatus.Loading);
-      final qrcode = await _stationDAO!.getBoxById(boxId);
-      imageBytes = qrcode;
-      await Future.delayed(const Duration(milliseconds: 200));
-      setState(ViewStatus.Completed);
-    } catch (e) {
-      print(e.toString());
     }
   }
 
@@ -485,13 +497,22 @@ class RootViewModel extends BaseModel {
         option = 1;
         isNextDay = false;
       } else {
-        option = await showOptionDialog(text!);
-        isNextDay = true;
+        if (timeSlot!.id! == "7d2b363a-18fa-45e5-bfc9-0f52ef705524") {
+          option = await showOptionDialog(text!);
+          isNextDay = true;
+        } else {
+          await showStatusDialog("assets/images/error.png", "Opps",
+              "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+          option = 0;
+          isNextDay = false;
+        }
       }
     } else {
       if (!isAvailableForCurrentDay) {
-        isNextDay = true;
-        option = 1;
+        await showStatusDialog("assets/images/error.png", "Opps",
+            "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+        isNextDay = false;
+        option = 0;
       } else {
         isNextDay = false;
         option = 1;
@@ -501,26 +522,41 @@ class RootViewModel extends BaseModel {
     return TimeSlotOptionResult(isNextDay, option);
   }
 
-  // bool isCurrentTimeSlotAvailable() {
-  //   final currentDate = DateTime.now();
+  bool isCurrentTimeSlotAvailable() {
+    final currentDate = DateTime.now();
 
-  //   String currentTimeSlot = selectedTimeSlot!.closeTime!;
-  //   var beanTime = DateTime(
-  //     currentDate.year,
-  //     currentDate.month,
-  //     currentDate.day,
-  //     double.parse(currentTimeSlot.split(':')[0]).round(),
-  //     double.parse(currentTimeSlot.split(':')[1]).round(),
-  //   );
-  //   return beanTime.isAfter(currentDate) ||
-  //       beanTime.isAtSameMomentAs(currentDate);
-  //   // int differentTime = beanTime.difference(currentDate).inMilliseconds;
-  //   // if (differentTime <= 0) {
-  //   //   return false;
-  //   // } else {
-  //   //   return true;
-  //   // }
-  // }
+    String currentTimeSlot = selectedTimeSlot!.closeTime!;
+    var beanTime = DateTime(
+      currentDate.year,
+      currentDate.month,
+      currentDate.day,
+      double.parse(currentTimeSlot.split(':')[0]).round(),
+      double.parse(currentTimeSlot.split(':')[1]).round(),
+    );
+    if (selectedTimeSlot!.id! == "7d2b363a-18fa-45e5-bfc9-0f52ef705524") {
+      return true;
+    }
+    int differentTime = beanTime.difference(currentDate).inMilliseconds;
+    if (differentTime <= 0) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  bool isListTimeSlotAvailable(TimeSlotDTO timeslot) {
+    final currentDate = DateTime.now();
+
+    String currentTimeSlot = timeslot.closeTime!;
+    var beanTime = DateTime(
+      currentDate.year,
+      currentDate.month,
+      currentDate.day,
+      double.parse(currentTimeSlot.split(':')[0]).round(),
+      double.parse(currentTimeSlot.split(':')[1]).round(),
+    );
+    return beanTime.isBefore(currentDate);
+  }
 
   bool isTimeSlotAvailable(TimeSlotDTO? timeSlot) {
     final currentDate = DateTime.now();

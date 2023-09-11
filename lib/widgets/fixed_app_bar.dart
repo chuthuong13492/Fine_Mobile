@@ -34,6 +34,8 @@ class _FixedAppBarState extends State<FixedAppBar> {
   @override
   void initState() {
     super.initState();
+    // deleteCart();
+    // deleteMart();
     // deletePartyCode();
     // _orderViewModel!.getCurrentCart();
     _partyOrderViewModel!.getPartyOrder();

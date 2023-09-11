@@ -17,6 +17,7 @@ class OrderDTO {
   String? orderCode;
   String? partyCode;
   Customer? customer;
+  DateTime? checkInDate;
   double? totalAmount;
   double? finalAmount;
   double? totalOtherAmount;
@@ -37,6 +38,7 @@ class OrderDTO {
     this.orderCode,
     this.partyCode,
     this.customer,
+    this.checkInDate,
     this.totalAmount,
     this.finalAmount,
     this.totalOtherAmount,
@@ -58,6 +60,9 @@ class OrderDTO {
     orderCode = json["orderCode"];
     customer =
         json["customer"] == null ? null : Customer.fromJson(json["customer"]);
+    checkInDate = json['checkInDate'] as String != null
+        ? DateTime.parse(json['checkInDate'] as String)
+        : null;
     totalAmount = json["totalAmount"];
     finalAmount = json["finalAmount"];
     totalOtherAmount = json["totalOtherAmount"];

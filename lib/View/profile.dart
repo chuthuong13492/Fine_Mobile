@@ -1,4 +1,5 @@
 import 'package:fine/Accessories/index.dart';
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
@@ -6,6 +7,7 @@ import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -85,11 +87,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Column(
               children: [
                 account(userDTO!),
-                userAccount(model),
-                const SizedBox(
-                  height: 4,
+                Container(
+                  color: FineTheme.palettes.primary50,
+                  height: 16,
                 ),
-                // systemInfo(model)
+                _buildWalletSection(),
+                Container(
+                  color: FineTheme.palettes.primary50,
+                  height: 16,
+                ),
+                userAccount(model),
+                Container(
+                  color: FineTheme.palettes.primary50,
+                  height: 16,
+                ),
+                Container(
+                  width: Get.width,
+                  height: 107,
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage("assets/images/fine_profile_img.png"),
+                        fit: BoxFit.fitHeight),
+                  ),
+                ),
+                Container(
+                  color: FineTheme.palettes.primary50,
+                  height: 16,
+                ),
+                systemInfo(model)
               ],
             ),
           );
@@ -119,7 +144,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 100,
                 width: 100,
                 decoration: BoxDecoration(
-                    color: FineTheme.palettes.primary300,
+                    color: FineTheme.palettes.primary100,
                     shape: BoxShape.circle),
                 child: ClipOval(
                   child: CacheImage(
@@ -137,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Text(
                       user.name! == null ? "" : user.name!,
                       style: FineTheme.typograhpy.h2
-                          .copyWith(color: FineTheme.palettes.primary300),
+                          .copyWith(color: FineTheme.palettes.primary100),
                     ),
                     const SizedBox(
                       height: 4,
@@ -146,7 +171,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       TextSpan(
                           text: user.email ?? "...",
                           style: FineTheme.typograhpy.subtitle2
-                              .copyWith(color: FineTheme.palettes.primary300))
+                              .copyWith(color: FineTheme.palettes.primary100))
                     ]),
                     const SizedBox(
                       height: 4,
@@ -175,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   text: user.phone ?? "-",
                                   style: FineTheme.typograhpy.subtitle2
                                       .copyWith(
-                                          color: FineTheme.palettes.primary300))
+                                          color: FineTheme.palettes.primary100))
                             ]),
                         const SizedBox(
                           height: 4,
@@ -184,15 +209,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           padding: const EdgeInsets.only(right: 30),
                           child: InkWell(
                             onTap: () async {
-                              showLoadingDialog();
-                              AccountViewModel accountViewModel =
-                                  Get.find<AccountViewModel>();
-                              await accountViewModel.fetchUser(isRefetch: true);
-                              hideDialog();
+                              // showLoadingDialog();
+                              // AccountViewModel accountViewModel =
+                              //     Get.find<AccountViewModel>();
+                              // await accountViewModel.fetchUser(isRefetch: true);
+                              // hideDialog();
                             },
                             child: Icon(
-                              Icons.replay,
-                              color: FineTheme.palettes.primary300,
+                              Icons.info_outline_rounded,
+                              color: FineTheme.palettes.primary100,
                               size: 26,
                             ),
                           ),
@@ -202,39 +227,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(
                       height: 4,
                     ),
-                    // Container(
-                    //   width: 120,
-                    //   padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
-                    //   decoration: BoxDecoration(
-                    //     border: Border.all(color: FineTheme.palettes.primary300),
-                    //     color: Color(0xFFeffff4),
-                    //     borderRadius: BorderRadius.circular(8),
-                    //   ),
-                    //   child: Row(
-                    //     // crossAxisAlignment: CrossAxisAlignment.center,
-                    //     mainAxisAlignment: MainAxisAlignment.center,
-                    //     children: [
-                    //       Image.asset(
-                    //         'assets/images/icon.png',
-                    //         width: 20,
-                    //         height: 20,
-                    //       ),
-                    //       SizedBox(
-                    //         width: 2,
-                    //       ),
-                    //       Text(
-                    //         'Thành viên',
-                    //         style: TextStyle(
-                    //             color: Color(0xFF00ab56),
-                    //             fontSize: 14,
-                    //             fontWeight: FontWeight.bold),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
+                    Container(
+                      width: 120,
+                      padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                      decoration: BoxDecoration(
+                        border:
+                            Border.all(color: FineTheme.palettes.primary100),
+                        color: const Color(0xFFD5F5FA),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        // crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            'assets/images/logo2.png',
+                            width: 20,
+                            height: 20,
+                          ),
+                          const SizedBox(
+                            width: 2,
+                          ),
+                          const Text(
+                            'Thành viên',
+                            style: TextStyle(
+                                color: Color(0xFF238E9C),
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
                     // infoDetail("Số điện thoại: ", color: Colors.grey, list: [
                     //   TextSpan(
-                    //       text: model.currentUser!.phone ?? "-",
+                    //       text: user.phone ?? "-",
                     //       style: FineTheme.typograhpy.subtitle2
                     //           .copyWith(color: FineTheme.palettes.primary300))
                     // ]),
@@ -352,6 +378,155 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildWalletSection() {
+    return Container(
+      color: FineTheme.palettes.shades100,
+      width: Get.width,
+      // height: 220,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+      child: Center(
+        child: Container(
+          height: 207,
+          child: Stack(
+            children: [
+              Container(
+                // padding: const EdgeInsets.fromLTRB(16, 19, 19, 0),
+                height: 105,
+                width: Get.width,
+                child: Stack(
+                  children: [
+                    Image.asset(
+                      "assets/images/fine_wallet_img.png",
+                      width: Get.width,
+                      height: 105,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(16, 19, 19, 19),
+                      width: Get.width,
+                      height: 105,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Ví fine".toUpperCase(),
+                                    style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 18,
+                                        fontStyle: FontStyle.normal,
+                                        color: FineTheme.palettes.shades100),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "(đã kích hoạt)",
+                                    style: FineTheme.typograhpy.subtitle2
+                                        .copyWith(color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                "10.000",
+                                style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 18,
+                                    fontStyle: FontStyle.normal,
+                                    color: FineTheme.palettes.shades100),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                              onPressed: () {},
+                              icon: const Icon(
+                                Icons.chevron_right_outlined,
+                                size: 34,
+                                color: Colors.white,
+                              ))
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                transform: Matrix4.translationValues(0, -5, 0),
+                alignment: Alignment.bottomCenter,
+                child: Stack(
+                  children: [
+                    Image.asset(
+                      "assets/images/fine_point_img.png",
+                      width: Get.width,
+                      height: 105,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(16, 19, 19, 19),
+                      width: Get.width,
+                      height: 105,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Mầm non sành ăn",
+                                style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 18,
+                                    fontStyle: FontStyle.normal,
+                                    color: FineTheme.palettes.shades100),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "20",
+                                    style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 18,
+                                        fontStyle: FontStyle.normal,
+                                        color: FineTheme.palettes.shades100),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Image.asset(
+                                    "assets/icons/Grape.png",
+                                    width: 24,
+                                    height: 24,
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                              onPressed: () {},
+                              icon: const Icon(
+                                Icons.chevron_right_outlined,
+                                size: 34,
+                                color: Colors.white,
+                              ))
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget infoDetail(String title,
       {int? size, Color? color, List<InlineSpan>? list}) {
     return RichText(
@@ -365,43 +540,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget userAccount(AccountViewModel model) {
     return Container(
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
       child: Center(
         child: Column(
           children: <Widget>[
-            const Divider(),
+            const SizedBox(
+              height: 8,
+            ),
+            // const Divider(),
             // section(
             //     icon: const Icon(Icons.person, color: Colors.black54),
             //     title: Text("Cập nhật thông tin",
             //         style: FineTheme.typograhpy.subtitle2
             //             .copyWith(color: Colors.black54)),
             //     function: () async {
-            //       bool result = await Get.toNamed(RouteHandler.UPDATE,
-            //           arguments: model.currentUser);
-            //       if (result != null) {
-            //         if (result) {
-            //           await model.fetchUser();
-            //         }
-            //       }
+            //       // bool result = await Get.toNamed(RouteHandler.UPDATE,
+            //       //     arguments: model.currentUser);
+            //       // if (result != null) {
+            //       //   if (result) {
+            //       //     await model.fetchUser();
+            //       //   }
+            //       // }
             //     }),
             // const Divider(),
-            // section(
-            //     icon: const Icon(Icons.shopping_bag, color: Colors.black54),
-            //     title: Text("Đơn hàng",
-            //         style: FineTheme.typograhpy.subtitle2
-            //             .copyWith(color: Colors.black54)),
-            //     function: () {
-            //       Get.toNamed(RouteHandler.ORDER_HISTORY);
-            //     }),
-            // const Divider(),
-            // section(
-            //     icon: const Icon(Icons.history, color: Colors.black54),
-            //     title: Text("Lịch sử giao dịch",
-            //         style: FineTheme.typograhpy.subtitle2
-            //             .copyWith(color: Colors.black54)),
-            //     function: () {
-            //       Get.toNamed(RouteHandler.TRANSACTION);
-            //     }),
-            // const Divider(),
+            section(
+                icon: const Icon(Icons.shopping_bag, color: Color(0xFF238E9C)),
+                title: Text("Đơn hàng",
+                    style: FineTheme.typograhpy.subtitle2
+                        .copyWith(color: Colors.black54)),
+                function: () {
+                  Get.toNamed(RouteHandler.ORDER_HISTORY);
+                }),
+            const Divider(),
+            section(
+                icon: const Icon(Icons.history, color: Color(0xFF238E9C)),
+                title: Text("Lịch sử giao dịch",
+                    style: FineTheme.typograhpy.subtitle2
+                        .copyWith(color: Colors.black54)),
+                function: () {
+                  // Get.toNamed(RouteHandler.TRANSACTION);
+                }),
+            const Divider(),
             // section(
             //     icon: const Icon(Icons.credit_card_outlined, color: Colors.black54),
             //     title: Text("Nhập mã giới thiệu",
@@ -411,20 +590,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             //       await model.showRefferalMessage();
             //     }),
             // const Divider(),
-            // section(
-            //     icon: const Icon(
-            //       AntDesign.facebook_square,
-            //       color: Colors.black54,
-            //     ),
-            //     title: Text("Theo dõi BeanOi",
-            //         style: FineTheme.typograhpy.subtitle2
-            //             .copyWith(color: Colors.black54)),
-            //     function: () {
-            //       _launchUrl(
-            //           "https://www.facebook.com/Bean-%C6%A0i-103238875095890",
-            //           isFB: true);
-            //     }),
-            // const Divider(),
+            section(
+                icon: const Icon(
+                  AntDesign.facebook_square,
+                  color: Color(0xFF238E9C),
+                ),
+                title: Text("Theo dõi FINE",
+                    style: FineTheme.typograhpy.subtitle2
+                        .copyWith(color: Colors.black54)),
+                function: () {
+                  _launchUrl("https://www.facebook.com/finefnb", isFB: true);
+                }),
+            const Divider(),
             // section(
             //     icon: const Icon(Icons.feedback_outlined, color: Colors.black54),
             //     title: Text("Góp ý",
@@ -434,23 +611,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             //       await model.sendFeedback();
             //     }),
             // const Divider(),
-            // section(
-            //     icon: const Icon(Icons.help_outline, color: Colors.black54),
-            //     title: Text("Hỗ trợ",
-            //         style: FineTheme.typograhpy.subtitle2
-            //             .copyWith(color: Colors.black54)),
-            //     function: () async {
-            //       int option = await showOptionDialog(
-            //           "Vui lòng liên hệ FanPage",
-            //           firstOption: "Quay lại",
-            //           secondOption: "Liên hệ");
-            //       if (option == 1) {
-            //         _launchUrl(
-            //             "https://www.facebook.com/Bean-%C6%A0i-103238875095890",
-            //             isFB: true);
-            //       }
-            //     }),
-            // const Divider(),
+            section(
+                icon: const Icon(Icons.help_outline, color: Color(0xFF238E9C)),
+                title: Text("Hỗ trợ",
+                    style: FineTheme.typograhpy.subtitle2
+                        .copyWith(color: Colors.black54)),
+                function: () async {
+                  int option = await showOptionDialog(
+                      "Vui lòng liên hệ FanPage",
+                      firstOption: "Quay lại",
+                      secondOption: "Liên hệ");
+                  if (option == 1) {
+                    _launchUrl(
+                        "https://www.facebook.com/Bean-%C6%A0i-103238875095890",
+                        isFB: true);
+                  }
+                }),
+            const Divider(),
             section(
                 icon: const Icon(Icons.logout, color: Colors.black54),
                 title: Text(
@@ -461,15 +638,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 function: () async {
                   await model.processSignout();
                 }),
-            const Divider(),
-            // section(
-            //     icon: Icon(Icons.help_outline, color: Colors.black54),
-            //     title: Text("Design System",
-            //         style: Get.theme.textTheme.headline4
-            //             .copyWith(color: Colors.black54)),
-            //     function: () {
-            //       Get.toNamed(RouteHandler.DESIGN);
-            //     }),
+            // const Divider(),
+            const SizedBox(
+              height: 8,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget systemInfo(AccountViewModel model) {
+    return Container(
+      margin: const EdgeInsets.only(left: 32, right: 32, bottom: 0, top: 8),
+      padding: const EdgeInsets.only(left: 32, right: 32),
+      // decoration: BoxDecoration(
+      //   border: Border(top: BorderSide(color: kBackgroundGrey[3], width: 1)),
+      // ),
+
+      child: Center(
+        child: Column(
+          children: <Widget>[
+            Text(
+              "Version ${model.version} by Smjle Team",
+              style: FineTheme.typograhpy.body2.copyWith(color: Colors.black54),
+            ),
+            const SizedBox(
+              height: 4,
+            ),
+            Container(
+              // height: 40,
+              child: RichText(
+                text: TextSpan(
+                  text: "Fine delivery ",
+                  style: FineTheme.typograhpy.body1,
+                  // children: <TextSpan>[
+                  //   TextSpan(
+                  //     text: "UniTeam",
+                  //     style: TextStyle(
+                  //       fontSize: 14,
+                  //       fontStyle: FontStyle.italic,
+                  //     ),
+                  //   )
+                  // ],
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            )
           ],
         ),
       ),
@@ -488,18 +705,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 icon ?? const SizedBox.shrink(),
                 const SizedBox(
-                  width: 8,
+                  width: 10,
                 ),
                 title ?? const Text("Mặc định"),
               ],
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              color: Colors.grey,
-            )
+            // const Icon(
+            //   Icons.arrow_forward_ios,
+            //   color: Colors.grey,
+            // )
           ],
         ),
       ),
     );
+  }
+
+  void _launchUrl(String url, {bool isFB = false, forceWebView = false}) {
+    Get.toNamed(RouteHandler.WEBVIEW, arguments: url);
   }
 }

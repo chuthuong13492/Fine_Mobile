@@ -320,20 +320,28 @@ class ProductAttributes {
 }
 
 class AddProductToCartResponse {
-  List<ProductInCart>? products;
+  StatusProductInCart? status;
+  ProductInCart? product;
+  List<ProductInCart>? card;
   List<ProductInCart>? productsRecommend;
 
   AddProductToCartResponse({
-    this.products,
+    this.status,
+    this.product,
+    this.card,
     this.productsRecommend,
   });
 
   AddProductToCartResponse.fromJson(Map<String, dynamic> json) {
-    products = json["products"] == null
+    status = json["status"] == null
         ? null
-        : (json["products"] as List)
-            .map((e) => ProductInCart.fromJson(e))
-            .toList();
+        : StatusProductInCart.fromJson(json["status"]);
+    product = json["product"] == null
+        ? null
+        : ProductInCart.fromJson(json["product"]);
+    card = json["card"] == null
+        ? null
+        : (json["card"] as List).map((e) => ProductInCart.fromJson(e)).toList();
     productsRecommend = json["productsRecommend"] == null
         ? null
         : (json["productsRecommend"] as List)
@@ -348,32 +356,35 @@ class AddProductToCartResponse {
 }
 
 class ProductInCart {
-  StatusProductInCart? status;
+  // StatusProductInCart? status;
   String? id;
   String? name;
   String? code;
   String? size;
+  String? imageUrl;
   double? price;
   int? quantity;
 
   ProductInCart({
-    this.status,
+    // this.status,
     this.id,
     this.name,
     this.code,
     this.size,
+    this.imageUrl,
     this.price,
     this.quantity,
   });
 
   ProductInCart.fromJson(Map<String, dynamic> json) {
-    status = json["status"] == null
-        ? null
-        : StatusProductInCart.fromJson(json["status"]);
+    // status = json["status"] == null
+    //     ? null
+    //     : StatusProductInCart.fromJson(json["status"]);
     id = json["id"] as String;
     name = json["name"];
     code = json["code"];
     size = json["size"] ?? null;
+    imageUrl = json["imageUrl"] ?? null;
     price = json["price"];
     quantity = json["quantity"];
   }
@@ -388,6 +399,7 @@ class ProductInCart {
     _data["name"] = name;
     _data["code"] = code;
     _data["size"] = size;
+    _data["imageUrl"] = imageUrl;
     _data["price"] = price;
     _data["quantity"] = quantity;
     return _data;

@@ -2,6 +2,7 @@ import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/ViewModel/orderHistory_viewModel.dart';
+import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -112,6 +113,8 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                             child: IconButton(
                               padding: const EdgeInsets.all(0),
                               onPressed: () async {
+                                Get.find<OrderViewModel>()
+                                    .fetchStatus(orderDTO.id!);
                                 Get.toNamed(RouteHandler.QRCODE_SCREEN,
                                     arguments: orderDTO);
                               },
@@ -251,7 +254,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      '${orderDetails[index].productName}x',
+                      '${orderDetails[index].productName}',
                       style: TextStyle(
                           fontFamily: 'Montserrat',
                           fontSize: 15,

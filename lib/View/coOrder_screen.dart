@@ -8,12 +8,14 @@ import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/Utils/shared_pref.dart';
+import 'package:fine/View/invite_coOrder_screen.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -69,6 +71,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
       child: Scaffold(
         backgroundColor: FineTheme.palettes.neutral200,
         bottomNavigationBar: bottomBar(),
+        // drawer: InviteCoOrderScreen(),
         appBar: DefaultAppBar(
           title: "Đơn nhóm",
           backButton: Container(
@@ -90,31 +93,80 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
             ),
           ),
           actionButton: [
-            InkWell(
-              onTap: () async {
-                _partyViewModel!.partyCode = await getPartyCode();
-                await _partyViewModel!
-                    .cancelCoOrder(_partyViewModel!.partyCode!);
-                if (_partyViewModel!.partyOrderDTO == null) {
-                  // _stopTimer();
-                }
-              },
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 16, right: 16),
-                  child: Text(
-                    isAdmin! ? 'XÓA' : 'THOÁT',
-                    style: FineTheme.typograhpy.subtitle1
-                        .copyWith(color: Colors.red),
-                  ),
-                ),
-              ),
-            ),
+            Container(
+              padding: const EdgeInsets.only(right: 8),
+              child: IconButton(
+                  onPressed: () async {
+                    await showInviteDialog('text');
+                  },
+                  icon: Icon(
+                    Icons.group_add_rounded,
+                    color: FineTheme.palettes.primary100,
+                    size: 30,
+                  )),
+            )
+            // InkWell(
+            //   onTap: () async {
+            //     _partyViewModel!.partyCode = await getPartyCode();
+            //     await _partyViewModel!
+            //         .cancelCoOrder(_partyViewModel!.partyCode!);
+            //     if (_partyViewModel!.partyOrderDTO == null) {
+            //       // _stopTimer();
+            //     }
+            //   },
+            //   child: Center(
+            //     child: Padding(
+            //       padding: const EdgeInsets.only(left: 16, right: 16),
+            //       child: Text(
+            //         isAdmin! ? 'XÓA' : 'THOÁT',
+            //         style: FineTheme.typograhpy.subtitle1
+            //             .copyWith(color: Colors.red),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
         body: SafeArea(
           child: ListView(
             children: [
+              SizedBox(
+                  height: 8,
+                  child: Container(
+                    color: FineTheme.palettes.neutral200,
+                  )),
+              ScopedModelDescendant<PartyOrderViewModel>(
+                builder: (context, child, model) {
+                  final partyCode = model.partyOrderDTO!.partyCode;
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Mã:',
+                        style: FineTheme.typograhpy.subtitle2
+                            .copyWith(color: FineTheme.palettes.neutral400),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        partyCode!,
+                        style: FineTheme.typograhpy.subtitle2
+                            .copyWith(color: FineTheme.palettes.shades200),
+                      ),
+                      // const SizedBox(width: 8),
+                      IconButton(
+                          onPressed: () {
+                            Clipboard.setData(
+                                new ClipboardData(text: partyCode));
+                          },
+                          icon: Icon(
+                            Icons.copy,
+                            size: 20,
+                            color: FineTheme.palettes.neutral500,
+                          ))
+                    ],
+                  );
+                },
+              ),
               SizedBox(
                   height: 8,
                   child: Container(
@@ -543,7 +595,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
             }
 
             return Container(
-              height: 150,
+              height: 160,
               padding: const EdgeInsets.only(
                   left: 16, right: 16, top: 22, bottom: 32),
               color: FineTheme.palettes.shades100,
@@ -596,6 +648,29 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                             fontStyle: FontStyle.normal,
                             color: FineTheme.palettes.shades100),
                       )),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      _partyViewModel!.partyCode = await getPartyCode();
+                      await _partyViewModel!
+                          .cancelCoOrder(_partyViewModel!.partyCode!);
+                      if (_partyViewModel!.partyOrderDTO == null) {
+                        // _stopTimer();
+                      }
+                    },
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 16),
+                        child: Text(
+                          isAdmin! ? 'Xóa đơn nhóm' : 'Thoát đơn nhóm',
+                          style: FineTheme.typograhpy.subtitle1
+                              .copyWith(color: FineTheme.palettes.neutral500),
+                        ),
+                      ),
                     ),
                   ),
                 ],

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Utils/constrant.dart';
@@ -14,13 +16,16 @@ class OrderHistoryViewModel extends BaseModel {
   OrderDAO? _orderDAO;
   dynamic error;
   OrderDTO? orderDTO;
+  StationDAO? _stationDAO;
   ScrollController? scrollController;
   List<bool> selections = [true, false];
   OrderDTO? newTodayOrders;
+  Uint8List? imageBytes;
 
   OrderHistoryViewModel() {
     // orderDTO = dto;
     _orderDAO = OrderDAO();
+    _stationDAO = StationDAO();
     scrollController = ScrollController();
     scrollController!.addListener(() async {
       if (scrollController!.position.pixels ==
@@ -33,12 +38,13 @@ class OrderHistoryViewModel extends BaseModel {
     });
   }
 
-  // Future<void> changeStatus(int index) async {
-  //   selections = selections.map((e) => false).toList();
-  //   selections[index] = true;
-  //   notifyListeners();
-  //   await getOrders();
-  // }
+  Future<void> changeStatus(int index) async {
+    selections = selections.map((e) => false).toList();
+    selections[index] = true;
+    notifyListeners();
+    // await getOrders();
+  }
+
   Future<void> getOrders() async {
     try {
       setState(ViewStatus.Loading);
@@ -77,31 +83,28 @@ class OrderHistoryViewModel extends BaseModel {
     }
   }
 
-  // Future<void> getNewOrder() async {
-  //   try {
-  //     setState(ViewStatus.Loading);
-  //     final data = await _orderDAO?.getOrders();
-  //     final currentDateData = data?.firstWhere(
-  //         (orderSummary) =>
-  //             DateTime.parse(orderSummary.checkInDate!)
-  //                 .difference(DateTime.now())
-  //                 .inDays ==
-  //             0,
-  //         orElse: () => null as dynamic);
-  //     if (currentDateData != null) {
-  //       orderThumbnail.add(currentDateData);
-  //       newTodayOrders = currentDateData;
-  //     }
-  //     setState(ViewStatus.Completed);
-  //   } catch (e) {
-  //     bool result = await showErrorDialog();
-  //     if (result) {
-  //       await getNewOrder();
-  //     } else {
-  //       setState(ViewStatus.Error);
-  //     }
-  //   } finally {}
-  // }
+  Future<void> getNewOrder() async {
+    try {
+      setState(ViewStatus.Loading);
+      final data = await _orderDAO?.getOrders();
+      final currentDateData = data?.firstWhere(
+          (orderSummary) =>
+              orderSummary.checkInDate!.difference(DateTime.now()).inDays == 0,
+          orElse: () => null as dynamic);
+      if (currentDateData != null) {
+        orderThumbnail.add(currentDateData);
+        newTodayOrders = currentDateData;
+      }
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      bool result = await showErrorDialog();
+      if (result) {
+        await getNewOrder();
+      } else {
+        setState(ViewStatus.Error);
+      }
+    } finally {}
+  }
 
   Future<void> cancelOrder(int orderId) async {
     try {
@@ -136,6 +139,22 @@ class OrderHistoryViewModel extends BaseModel {
   void clearNewOrder(int orderId) {
     newTodayOrders = null;
     notifyListeners();
+  }
+
+  Future<void> getBoxQrCode(String boxId) async {
+    try {
+      setState(ViewStatus.Loading);
+      if (boxId != null) {
+        final qrcode = await _stationDAO!.getBoxById(boxId);
+        imageBytes = qrcode;
+      }
+      await Future.delayed(const Duration(milliseconds: 200));
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      imageBytes = null;
+      print(e.toString());
+      setState(ViewStatus.Completed);
+    }
   }
 
   Future<void> getMoreOrders() async {

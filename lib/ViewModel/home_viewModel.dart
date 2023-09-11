@@ -18,6 +18,7 @@ class HomeViewModel extends BaseModel {
   // List<CollectionDTO>? homeCollections;
   List<MenuDTO>? homeMenu;
   List<ProductDTO>? productList;
+
   HomeViewModel() {
     _collectionDAO = CollectionDAO();
     _storeDAO = StoreDAO();

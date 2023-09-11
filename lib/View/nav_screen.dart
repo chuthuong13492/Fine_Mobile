@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:fine/Accessories/cart_button.dart';
 import 'package:fine/View/qrcode_screen.dart';
 import 'package:fine/View/box_screen.dart';
@@ -13,9 +14,14 @@ import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/theme/color.dart';
 import 'package:fine/widgets/bottom_bar_item.dart';
 import 'package:fine/widgets/cruved_navigation_bar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+
+import '../Accessories/dialog.dart';
+import '../Utils/shared_pref.dart';
+import '../ViewModel/partyOrder_viewModel.dart';
 
 class RootScreen extends StatefulWidget {
   final int initScreenIndex;
@@ -26,6 +32,38 @@ class RootScreen extends StatefulWidget {
 }
 
 class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
+  Future listenFireBaseMessages() async {
+    FirebaseMessaging.onMessage.listen((event) async {
+      hideSnackbar();
+
+      RemoteNotification notification = event.notification!;
+
+      if (event.data['type'] == 'ForInvitation') {
+        PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+        int option = await showOptionDialog('${notification.body}');
+        if (option == 1) {
+          await deletePartyCode();
+          String code = event.data['key'];
+          await party.joinPartyOrder(code: code);
+        }
+      } else {
+        final snackBar = SnackBar(
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            content: AwesomeSnackbarContent(
+                title: notification.title!,
+                message: notification.body!,
+                contentType: ContentType.success));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+
+      // await showStatusDialog(
+      //     "assets/images/logo2.png", notification.title!, notification.body!);
+      print(event.data);
+    });
+  }
+
   RootViewModel? _rootViewModel;
   final navigationKey = GlobalKey<CurvedNavigationBarState>();
   int activeTab = 0;
@@ -97,6 +135,7 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
     // Timer.periodic(const Duration(milliseconds: 500), (_) {
     //   _rootViewModel!.liveLocation();
     // });
+    listenFireBaseMessages();
     activeTab = widget.initScreenIndex;
     _controller.forward();
   }
