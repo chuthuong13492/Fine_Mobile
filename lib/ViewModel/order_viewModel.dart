@@ -35,6 +35,7 @@ class OrderViewModel extends BaseModel {
   bool? loadingUpsell;
   String? errorMessage;
   List<String> listError = <String>[];
+  RootViewModel? root = Get.find<RootViewModel>();
 
   final ValueNotifier<int> notifier = ValueNotifier(0);
 
@@ -50,6 +51,8 @@ class OrderViewModel extends BaseModel {
   }
 
   Future<void> prepareOrder() async {
+    ProductDetailViewModel? productViewModel =
+        Get.find<ProductDetailViewModel>();
     try {
       if (!Get.isDialogOpen!) {
         setState(ViewStatus.Loading);
@@ -65,7 +68,16 @@ class OrderViewModel extends BaseModel {
         Get.back();
         await removeCart();
       }
+      CartItem itemInCart = new CartItem(
+          currentCart!.orderDetails![0].productId,
+          currentCart!.orderDetails![0].quantity - 1,
+          null);
+      await updateItemFromMart(itemInCart);
 
+      await productViewModel.processCart(
+          currentCart!.orderDetails![0].productId,
+          1,
+          root!.selectedTimeSlot!.id);
       // currentCart?.addProperties(root.selectedTimeSlot!.id!);
       // currentCart?.addProperties(5, '0902915671', root.selectedTimeSlot!.id!);
       // currentCart = await getCart();
@@ -180,19 +192,19 @@ class OrderViewModel extends BaseModel {
         // await Get.find<AccountViewModel>().fetchUser();
         if (result!.statusCode == 200) {
           await fetchStatus(result.order!.id!);
-          Get.offAndToNamed(
-            RouteHandler.CHECKING_ORDER_SCREEN,
-            arguments: result.order,
-          );
+
           await removeCart();
           await deletePartyCode();
           final partyModel = Get.find<PartyOrderViewModel>();
           await partyModel.isLinkedParty(false);
           // hideDialog();
-          // await showStatusDialog("assets/images/icon-success.png", 'Success',
-          //     'Bạn đã đặt hàng thành công');
-          await Get.find<OrderHistoryViewModel>().getOrders();
+          await showStatusDialog("assets/images/icon-success.png", 'Success',
+              'Bạn đã đặt hàng thành công');
+          // await Get.find<OrderHistoryViewModel>().getOrders();
           //////////
+          // await Future.delayed(const Duration(microseconds: 500));
+
+          ///
           // await Get.find<OrderHistoryViewModel>().getNewOrder();
           //////////
           PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
@@ -200,7 +212,11 @@ class OrderViewModel extends BaseModel {
           orderDTO = null;
           party.partyOrderDTO = null;
           party.partyCode = null;
-
+          // await setPartyCode(party.partyCode!);
+          Get.offAndToNamed(
+            RouteHandler.CHECKING_ORDER_SCREEN,
+            arguments: result.order,
+          );
           // Get.offAndToNamed(RoutHandler.NAV);
           // prepareOrder();
           // Get.back(result: true);
@@ -235,7 +251,7 @@ class OrderViewModel extends BaseModel {
     HomeViewModel? home = Get.find<HomeViewModel>();
     ProductDetailViewModel? productViewModel =
         Get.find<ProductDetailViewModel>();
-    RootViewModel? root = Get.find<RootViewModel>();
+
     // showLoadingDialog();
     print("Delete item...");
     bool result;
@@ -248,15 +264,15 @@ class OrderViewModel extends BaseModel {
     if (result) {
       await AnalyticsService.getInstance()
           ?.logChangeCart(product, item.quantity, false);
-      currentCart = await getCart();
-      CartItem itemInCart = new CartItem(
-          currentCart!.orderDetails![0].productId,
-          currentCart!.orderDetails![0].quantity - 1,
-          null);
-      await productViewModel.processCart(
-          currentCart!.orderDetails![0].productId,
-          1,
-          root.selectedTimeSlot!.id);
+      // currentCart = await getCart();
+      // CartItem itemInCart = new CartItem(
+      //     currentCart!.orderDetails![0].productId,
+      //     currentCart!.orderDetails![0].quantity - 1,
+      //     null);
+      // await productViewModel.processCart(
+      //     currentCart!.orderDetails![0].productId,
+      //     1,
+      //     root!.selectedTimeSlot!.id);
       // Get.back(result: true);
       await prepareOrder();
     } else {
@@ -269,7 +285,7 @@ class OrderViewModel extends BaseModel {
   Future<void> updateQuantity(OrderDetails item) async {
     final home = Get.find<HomeViewModel>();
     final productViewModel = Get.find<ProductDetailViewModel>();
-    final root = Get.find<RootViewModel>();
+    // final root = Get.find<RootViewModel>();
     // showLoadingDialog();
     // if (item.master.type == ProductType.GIFT_PRODUCT) {
     //   int originalQuantity = 0;
@@ -305,10 +321,10 @@ class OrderViewModel extends BaseModel {
       await updateItemFromMart(cartItem);
       await updateItemFromCart(cartItem);
       await productViewModel.processCart(
-          item.productId, 1, root.selectedTimeSlot!.id);
+          item.productId, 1, root!.selectedTimeSlot!.id);
     } else {
       await productViewModel.processCart(
-          item.productId, 1, root.selectedTimeSlot!.id);
+          item.productId, 1, root!.selectedTimeSlot!.id);
     }
 
     // await updateItemFromCart(cartItem);
@@ -323,7 +339,9 @@ class OrderViewModel extends BaseModel {
       currentCart = await getCart();
       currentCart?.addProperties(root.isNextDay == true ? 2 : 1);
       // currentCart?.addProperties(2);
-
+      if (currentCart == null) {
+        notifier.value = 0;
+      }
       notifier.value = currentCart!.itemQuantity();
 
       setState(ViewStatus.Completed);

@@ -42,15 +42,29 @@ class OrderHistoryViewModel extends BaseModel {
     selections = selections.map((e) => false).toList();
     selections[index] = true;
     notifyListeners();
-    // await getOrders();
+    await getOrders();
   }
 
   Future<void> getOrders() async {
     try {
       setState(ViewStatus.Loading);
       // OrderFilter filter = selections[0] ? OrderFilter.NEW : OrderFilter.DONE;
-      final data = await _orderDAO?.getOrders();
-      orderThumbnail = data!;
+
+      if (selections[0] == true) {
+        final data = await _orderDAO?.getOrders();
+        orderThumbnail = data!
+            .where((element) =>
+                element.orderStatus != 10 && element.orderStatus != 11)
+            .toList();
+      }
+      if (selections[1] == true) {
+        final data = await _orderDAO?.getOrders();
+        orderThumbnail = data!
+            .where((element) =>
+                element.orderStatus == 10 || element.orderStatus == 11)
+            .toList();
+      }
+      // orderThumbnail = data!;
       // if (_orderDAO!.metaDataDTO.size! != _orderDAO!.metaDataDTO.total!) {
       //   int size = _orderDAO!.metaDataDTO.total!;
       //   final data = await _orderDAO?.getOrders(size: size);

@@ -70,7 +70,7 @@ class _StationPickerScreenState extends State<StationPickerScreen> {
                 model.stationList == null && model.stationList!.isEmpty) {
               return Center(
                 child: Text(
-                  model.msg ?? "Hiện tại không có voucher khả dụng",
+                  model.msg ?? "Hiện tại không có station khả dụng",
                   style: FineTheme.typograhpy.subtitle1
                       .copyWith(color: FineTheme.palettes.primary100),
                 ),
@@ -134,6 +134,9 @@ class _StationPickerScreenState extends State<StationPickerScreen> {
             Center(
               child: SvgPicture.asset(
                 "assets/icons/box_icon.svg",
+                color: isApplied
+                    ? FineTheme.palettes.primary100
+                    : FineTheme.palettes.shades200,
                 height: 30,
                 width: 30,
               ),

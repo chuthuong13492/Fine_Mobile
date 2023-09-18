@@ -806,95 +806,95 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                           ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.only(right: 16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(56.0),
-                              child: BackdropFilter(
-                                filter:
-                                    ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-                                child: Container(
-                                  height: 40.0,
-                                  width: 40.0,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    // color: Colors.white.withOpacity(0.20),
-                                    color: FineTheme.palettes.primary100,
-                                    border: Border.all(color: Colors.white),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    'assets/icons/Search-product.svg',
-                                    width: 20,
-                                    height: 20,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 15,
-                            ),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(56.0),
-                              child: BackdropFilter(
-                                filter:
-                                    ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-                                child: Container(
-                                  height: 40.0,
-                                  width: 40.0,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    // color: Colors.white.withOpacity(0.20),
-                                    color: FineTheme.palettes.primary100,
+                      // Container(
+                      //   padding: const EdgeInsets.only(right: 16),
+                      //   child: Row(
+                      //     crossAxisAlignment: CrossAxisAlignment.start,
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //       ClipRRect(
+                      //         borderRadius: BorderRadius.circular(56.0),
+                      //         child: BackdropFilter(
+                      //           filter:
+                      //               ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                      //           child: Container(
+                      //             height: 40.0,
+                      //             width: 40.0,
+                      //             alignment: Alignment.center,
+                      //             decoration: BoxDecoration(
+                      //               shape: BoxShape.circle,
+                      //               // color: Colors.white.withOpacity(0.20),
+                      //               color: FineTheme.palettes.primary100,
+                      //               border: Border.all(color: Colors.white),
+                      //             ),
+                      //             child: SvgPicture.asset(
+                      //               'assets/icons/Search-product.svg',
+                      //               width: 20,
+                      //               height: 20,
+                      //               color: Colors.white,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       const SizedBox(
+                      //         width: 15,
+                      //       ),
+                      //       ClipRRect(
+                      //         borderRadius: BorderRadius.circular(56.0),
+                      //         child: BackdropFilter(
+                      //           filter:
+                      //               ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                      //           child: Container(
+                      //             height: 40.0,
+                      //             width: 40.0,
+                      //             alignment: Alignment.center,
+                      //             decoration: BoxDecoration(
+                      //               shape: BoxShape.circle,
+                      //               // color: Colors.white.withOpacity(0.20),
+                      //               color: FineTheme.palettes.primary100,
 
-                                    border: Border.all(color: Colors.white),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    'assets/icons/Heart.svg',
-                                    width: 20,
-                                    height: 20,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 15,
-                            ),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(56.0),
-                              child: BackdropFilter(
-                                filter:
-                                    ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-                                child: Container(
-                                  height: 40.0,
-                                  width: 40.0,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    // color: Colors.white.withOpacity(0.20),
-                                    color: FineTheme.palettes.primary100,
+                      //               border: Border.all(color: Colors.white),
+                      //             ),
+                      //             child: SvgPicture.asset(
+                      //               'assets/icons/Heart.svg',
+                      //               width: 20,
+                      //               height: 20,
+                      //               color: Colors.white,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //       const SizedBox(
+                      //         width: 15,
+                      //       ),
+                      //       ClipRRect(
+                      //         borderRadius: BorderRadius.circular(56.0),
+                      //         child: BackdropFilter(
+                      //           filter:
+                      //               ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+                      //           child: Container(
+                      //             height: 40.0,
+                      //             width: 40.0,
+                      //             alignment: Alignment.center,
+                      //             decoration: BoxDecoration(
+                      //               shape: BoxShape.circle,
+                      //               // color: Colors.white.withOpacity(0.20),
+                      //               color: FineTheme.palettes.primary100,
 
-                                    border: Border.all(color: Colors.white),
-                                  ),
-                                  child: SvgPicture.asset(
-                                    'assets/icons/Share.svg',
-                                    width: 20,
-                                    height: 20,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      //               border: Border.all(color: Colors.white),
+                      //             ),
+                      //             child: SvgPicture.asset(
+                      //               'assets/icons/Share.svg',
+                      //               width: 20,
+                      //               height: 20,
+                      //               color: Colors.white,
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

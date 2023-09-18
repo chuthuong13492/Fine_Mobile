@@ -91,19 +91,27 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
       model: Get.find<ProductFilterViewModel>(),
       child: ScopedModelDescendant<ProductFilterViewModel>(
         builder: (context, child, model) {
-          var list = model.listProducts!
-              .where((element) => element.isActive!)
-              .toList();
-
+          // if (model.status == ViewStatus.Loading) {
+          //   return _buildLoading();
+          //   // return const Flexible(
+          //   //   child: Center(
+          //   //     child: LoadingFine(),
+          //   //   ),
+          //   // );
+          // }
           if (model.status == ViewStatus.Loading) {
             return _buildLoading();
-            // return const Flexible(
-            //   child: Center(
-            //     child: LoadingFine(),
-            //   ),
-            // );
           }
-
+          if (model.status == ViewStatus.Error ||
+              model.listProducts == null && model.listProducts!.isEmpty) {
+            return Center(
+              child: Text(
+                model.msg ?? "Bạn đã xem hết rồi đấy 🐱‍👓",
+                style: FineTheme.typograhpy.subtitle1
+                    .copyWith(color: FineTheme.palettes.primary100),
+              ),
+            );
+          }
           if (model.status == ViewStatus.Error) {
             return Flexible(
               child: Center(
@@ -114,17 +122,17 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
               ),
             );
           }
-          if (list == null) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  "Bạn đã xem hết rồi đấy 🐱‍👓",
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          }
+          // if (list == null) {
+          //   return const Center(
+          //     child: Padding(
+          //       padding: EdgeInsets.all(8.0),
+          //       child: Text(
+          //         "Bạn đã xem hết rồi đấy 🐱‍👓",
+          //         textAlign: TextAlign.center,
+          //       ),
+          //     ),
+          //   );
+          // }
           return Flexible(
             child: Container(
               // width: Get.width,
@@ -136,8 +144,23 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
                     crossAxisSpacing: 20,
                     mainAxisSpacing: 16,
                     mainAxisExtent: 280),
-                itemCount: list.length,
+                itemCount: model.listProducts!.length,
                 itemBuilder: (context, index) {
+                  var list = model.listProducts!
+                      .where((element) => element.isActive!)
+                      .toList();
+                  if (index == list.length) {
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        "Bạn đã xem hết rồi đấy 🐱‍👓",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                    );
+                  }
                   final product = list.elementAt(index);
                   return InkWell(
                     onTap: () {

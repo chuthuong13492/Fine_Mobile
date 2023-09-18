@@ -20,12 +20,6 @@ class OrderDAO extends BaseDAO {
   Future<List<OrderDTO>?> getOrders({int? page, int? size}) async {
     final res = await request.get(
       '/customer/orders',
-      queryParameters: {
-        // "order-status":
-        //     filter == OrderFilter.NEW ? ORDER_NEW_STATUS : ORDER_DONE_STATUS,
-        "size": size ?? DEFAULT_SIZE,
-        "page": page ?? 1,
-      },
     );
     if (res.statusCode == 200) {
       var listJson = res.data['data'] as List;
@@ -38,7 +32,7 @@ class OrderDAO extends BaseDAO {
 
   Future<List<OrderDTO>?> getMoreOrders({int? page, int? size}) async {
     final res = await request.get(
-      '/customer/orders?Page=$page',
+      '/customer/orders?Page=${page}',
       queryParameters: {
         // "order-status":
         //     filter == OrderFilter.NEW ? ORDER_NEW_STATUS : ORDER_DONE_STATUS,
@@ -46,7 +40,7 @@ class OrderDAO extends BaseDAO {
         // "page": page ?? 1,
       },
     );
-    List<OrderDTO>? orderSummaryList;
+    // List<OrderDTO>? orderSummaryList;
     if (res.statusCode == 200) {
       var listJson = res.data['data'] as List;
       metaDataDTO = MetaDataDTO.fromJson(res.data["metadata"]);

@@ -429,15 +429,4 @@ class ProductDetailViewModel extends BaseModel {
       }
     }
   }
-
-  Future<void> addCheckProduct() async {
-    try {
-      setState(ViewStatus.Loading);
-      final root = Get.find<RootViewModel>();
-
-      setState(ViewStatus.Completed);
-    } catch (e) {
-      setState(ViewStatus.Completed);
-    }
-  }
 }

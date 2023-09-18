@@ -237,7 +237,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                   ),
                   const SizedBox(height: 8),
                   Image.asset(
-                    'assets/images/global_error.png',
+                    'assets/images/error.png',
                     fit: BoxFit.contain,
                   ),
                 ],
@@ -310,6 +310,10 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                                   "Opps",
                                   "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
                             } else {
+                              // ProductFilterViewModel productFilterViewModel =
+                              //     Get.find<ProductFilterViewModel>();
+                              // productFilterViewModel.getProductsWithFilter(
+                              //     id: homeMenu[index].id!);
                               Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
                                   arguments: homeMenu[index]);
                             }

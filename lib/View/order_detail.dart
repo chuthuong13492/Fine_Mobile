@@ -70,62 +70,75 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                       child: Container(
                         color: FineTheme.palettes.primary50,
                       )),
-                  Container(
-                    padding: const EdgeInsets.only(
-                        right: 16, left: 16, top: 10, bottom: 10),
+                  InkWell(
+                    onTap: () async {
+                      Get.find<OrderViewModel>().fetchStatus(orderDTO!.id!);
+                      Get.toNamed(RouteHandler.QRCODE_SCREEN,
+                          arguments: orderDTO);
+                    },
                     child: Container(
-                      height: 50,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Center(
-                            child: SvgPicture.asset(
-                              "assets/icons/box_icon.svg",
-                              height: 30,
-                              width: 30,
-                            ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.only(left: 16),
-                                  width: Get.width,
-                                  child: Text(
-                                    'Giao đến',
-                                    style: FineTheme.typograhpy.caption1,
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.only(left: 16),
-                                  width: Get.width,
-                                  child: Text(
-                                    orderDTO!.stationDTO!.name!,
-                                    style: FineTheme.typograhpy.subtitle2,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          Center(
-                            child: IconButton(
-                              padding: const EdgeInsets.all(0),
-                              onPressed: () async {
-                                Get.find<OrderViewModel>()
-                                    .fetchStatus(orderDTO.id!);
-                                Get.toNamed(RouteHandler.QRCODE_SCREEN,
-                                    arguments: orderDTO);
-                              },
-                              icon: const Icon(
-                                Icons.chevron_right_outlined,
-                                color: Colors.black,
-                                size: 30,
+                      padding: const EdgeInsets.only(
+                          right: 16, left: 16, top: 10, bottom: 10),
+                      child: Container(
+                        height: 50,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Center(
+                              child: SvgPicture.asset(
+                                "assets/icons/box_icon.svg",
+                                height: 30,
+                                width: 30,
                               ),
                             ),
-                          ),
-                        ],
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(left: 16),
+                                    width: Get.width,
+                                    child: Text(
+                                      'Giao đến',
+                                      style: FineTheme.typograhpy.caption1,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.only(left: 16),
+                                    width: Get.width,
+                                    child: Text(
+                                      orderDTO!.stationDTO!.name!,
+                                      style: FineTheme.typograhpy.subtitle2,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Center(
+                              child: Icon(
+                                Icons.chevron_right_outlined,
+                                color: FineTheme.palettes.shades200,
+                                size: 30,
+                              ),
+                              // child: IconButton(
+                              //   padding: const EdgeInsets.all(0),
+                              //   onPressed: () async {
+                              //     Get.find<OrderViewModel>()
+                              //         .fetchStatus(orderDTO.id!);
+                              //     Get.toNamed(RouteHandler.QRCODE_SCREEN,
+                              //         arguments: orderDTO);
+                              //   },
+                              //   icon: const Icon(
+                              //     Icons.chevron_right_outlined,
+                              //     color: Colors.black,
+                              //     size: 30,
+                              //   ),
+                              // ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

@@ -301,9 +301,15 @@ class RootViewModel extends BaseModel {
     } else if (party.partyOrderDTO != null) {
       if (party.partyOrderDTO!.timeSlotDTO!.id != selectedTimeSlot!.id) {
         // selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
-
-        int option = await showOptionDialog(
-            "Đơn nhóm của bạn đang ở khung giờ ${party.partyOrderDTO!.timeSlotDTO!.arriveTime} Bạn vui lòng đổi sang khung giờ này để tham gia đơn nhóm nhé");
+        int option = 0;
+        if (isCurrentTimeSlotAvailable()) {
+          option = await showOptionDialog(
+              "Đơn nhóm của bạn đang ở khung giờ ${party.partyOrderDTO!.timeSlotDTO!.arriveTime} Bạn vui lòng đổi sang khung giờ này để tham gia đơn nhóm nhé");
+        } else {
+          await deletePartyCode();
+          party.partyOrderDTO = null;
+          await orderViewModel.removeCart();
+        }
 
         if (option != 1) {
           return;
@@ -337,36 +343,38 @@ class RootViewModel extends BaseModel {
           selectedTimeSlot = cartTimeSlot[0];
           await refreshMenu();
           notifyListeners();
-          productDetailViewModel.checkCurrentCart = await getMart();
-          CartItem itemInCart = CartItem(
-              productDetailViewModel
-                  .checkCurrentCart!.orderDetails![0].productId,
-              productDetailViewModel
-                      .checkCurrentCart!.orderDetails![0].quantity -
-                  1,
-              null);
-          await updateItemFromMart(itemInCart);
-          await productDetailViewModel.processCart(
-              itemInCart.productId, 1, selectedTimeSlot!.id);
+          // productDetailViewModel.checkCurrentCart = await getMart();
+          // CartItem itemInCart = CartItem(
+          //     productDetailViewModel
+          //         .checkCurrentCart!.orderDetails![0].productId,
+          //     productDetailViewModel
+          //             .checkCurrentCart!.orderDetails![0].quantity -
+          //         1,
+          //     null);
+          // await updateItemFromMart(itemInCart);
+          // await productDetailViewModel.processCart(
+          //     itemInCart.productId, 1, selectedTimeSlot!.id);
           await orderViewModel.prepareOrder();
           await Get.toNamed(RouteHandler.ORDER);
         } else {
-          productDetailViewModel.checkCurrentCart = await getMart();
-          CartItem itemInCart = CartItem(
-              productDetailViewModel
-                  .checkCurrentCart!.orderDetails![0].productId,
-              productDetailViewModel
-                      .checkCurrentCart!.orderDetails![0].quantity -
-                  1,
-              null);
-          await updateItemFromMart(itemInCart);
-          await productDetailViewModel.processCart(
-              itemInCart.productId, 1, selectedTimeSlot!.id);
+          // productDetailViewModel.checkCurrentCart = await getMart();
+          // CartItem itemInCart = CartItem(
+          //     productDetailViewModel
+          //         .checkCurrentCart!.orderDetails![0].productId,
+          //     productDetailViewModel
+          //             .checkCurrentCart!.orderDetails![0].quantity -
+          //         1,
+          //     null);
+          // await updateItemFromMart(itemInCart);
+          // await productDetailViewModel.processCart(
+          //     itemInCart.productId, 1, selectedTimeSlot!.id);
           await Get.toNamed(RouteHandler.ORDER);
         }
       } else {
         await orderViewModel.getCurrentCart();
-        showStatusDialog("assets/images/error.png", "Giỏ hàng đang trống kìaaa",
+        showStatusDialog(
+            "assets/images/empty-cart-ipack.png",
+            "Giỏ hàng đang trống kìaaa",
             "Hiện tại giỏ của bạn đang trống , bạn hãy thêm sản phẩm vào nhé 😃.");
       }
     }

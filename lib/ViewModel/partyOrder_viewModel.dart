@@ -11,6 +11,7 @@ import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
+import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,6 +20,7 @@ import 'package:intl/intl.dart';
 class PartyOrderViewModel extends BaseModel {
   final root = Get.find<RootViewModel>();
   final _orderViewModel = Get.find<OrderViewModel>();
+
   PartyOrderDTO? partyOrderDTO;
   PartyOrderDAO? _partyDAO;
   AccountDTO? acc;
@@ -337,6 +339,7 @@ class PartyOrderViewModel extends BaseModel {
   }
 
   Future<void> deleteItem(OrderDetails item) async {
+    final _productViewModel = Get.find<ProductDetailViewModel>();
     // showLoadingDialog();
     print("Delete item...");
     bool result;
@@ -344,21 +347,49 @@ class PartyOrderViewModel extends BaseModel {
         ProductDTO(id: item.productId, productName: item.productName);
     CartItem cartItem = CartItem(item.productId, item.quantity, null);
     result = await removeItemFromCart(cartItem);
+    await removeItemFromMart(cartItem);
+
     print("Result: $result");
     if (result) {
       await AnalyticsService.getInstance()
           ?.logChangeCart(product, item.quantity, false);
       // Get.back(result: true);
+      _orderViewModel.currentCart = await getCart();
+      CartItem itemInCart = new CartItem(
+          _orderViewModel.currentCart!.orderDetails![0].productId,
+          _orderViewModel.currentCart!.orderDetails![0].quantity - 1,
+          null);
+      await _productViewModel.processCart(
+          _orderViewModel.currentCart!.orderDetails![0].productId,
+          1,
+          root.selectedTimeSlot!.id);
       await addProductToPartyOrder();
     } else {
+      await removeItemFromCart(cartItem);
       _orderViewModel.currentCart = await getCart();
       await addProductToPartyOrder();
     }
   }
 
   Future<void> updateQuantity(OrderDetails item) async {
-    CartItem cartItem = new CartItem(item.productId, item.quantity, null);
-    await updateItemFromCart(cartItem);
+    final _productViewModel = Get.find<ProductDetailViewModel>();
+    _orderViewModel.currentCart = await getCart();
+    var checkCart = _orderViewModel.currentCart;
+    final itemInCart = checkCart!.orderDetails!
+        .firstWhere((element) => element.productId == item.productId);
+    if (itemInCart.quantity > item.quantity) {
+      CartItem cartItem = new CartItem(item.productId, item.quantity - 1, null);
+
+      await updateItemFromMart(cartItem);
+      await updateItemFromCart(cartItem);
+      await _productViewModel.processCart(
+          item.productId, 1, root.selectedTimeSlot!.id);
+    } else {
+      await _productViewModel.processCart(
+          item.productId, 1, root.selectedTimeSlot!.id);
+    }
+    // CartItem cartItem = new CartItem(item.productId, item.quantity, null);
+    // await updateItemFromCart(cartItem);
     await addProductToPartyOrder();
   }
 

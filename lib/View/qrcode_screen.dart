@@ -76,7 +76,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                 ),
               ),
               SizedBox(
-                width: 180,
+                // width: 180,
                 child: Text(
                   widget.order.orderCode!,
                   style: const TextStyle(
@@ -135,7 +135,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
               SizedBox(
                 width: 250,
                 child: Text(
-                  'widget.order.stationDTO!.name!',
+                  widget.order.stationDTO!.name!,
                   style: const TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 16,

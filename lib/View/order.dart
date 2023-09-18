@@ -159,20 +159,27 @@ class _OrderScreenState extends State<OrderScreen> {
                                   )),
                               // UpSellCollection(),
                               hasProductRecomend
-                                  ? Column(
-                                      children: [
-                                        Container(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                0, 10, 0, 10),
-                                            child: _buidProductRecomend(
-                                                model.productRecomend)),
-                                        SizedBox(
-                                            height: 8,
-                                            child: Container(
-                                              color:
-                                                  FineTheme.palettes.neutral200,
-                                            )),
-                                      ],
+                                  ? SlideFadeTransition(
+                                      offset: 0.2,
+                                      direction: Direction.horizontal,
+                                      delayStart:
+                                          const Duration(milliseconds: 100),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                              padding:
+                                                  const EdgeInsets.fromLTRB(
+                                                      0, 10, 0, 10),
+                                              child: _buidProductRecomend(
+                                                  model.productRecomend)),
+                                          SizedBox(
+                                              height: 8,
+                                              child: Container(
+                                                color: FineTheme
+                                                    .palettes.neutral200,
+                                              )),
+                                        ],
+                                      ),
                                     )
                                   : const SizedBox.shrink(),
 

@@ -132,14 +132,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       final orderSummaryList = model.orderThumbnail
           .where((element) => element.itemQuantity != 0)
           .toList();
-      orderSummaryList.sort((a, b) {
-        DateTime aDate = a.checkInDate!;
-        DateTime bDate = b.checkInDate!;
-        return bDate.compareTo(aDate);
-      });
+      // orderSummaryList.sort((a, b) {
+      //   DateTime aDate = a.checkInDate!;
+      //   DateTime bDate = b.checkInDate!;
+      //   return bDate.compareTo(aDate);
+      // });
       if (status == ViewStatus.Loading) {
-        return const Center(
-          child: LoadingFine(),
+        return const Padding(
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 50),
+          child: Center(
+            child: LoadingFine(),
+          ),
         );
       } else if (status == ViewStatus.Empty ||
           orderSummaryList == null ||
@@ -247,14 +250,44 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   Widget _buildOrderItem(OrderDTO orderDTO) {
     bool isSuccess = false;
     String text = "";
-    if (orderDTO.orderStatus == 4) {
-      isSuccess = false;
-      text = "Đang thực hiện";
+    final status = orderDTO.orderStatus;
+    switch (status) {
+      case 5:
+        isSuccess = false;
+        text = "Xác nhận đơn hàng";
+        break;
+      case 6:
+        isSuccess = false;
+        text = "Đang được chuẩn bị";
+        break;
+      case 9:
+        isSuccess = false;
+        text = "Đang đến station";
+        break;
+      case 10:
+        isSuccess = true;
+        text = "Đã hoàn thành";
+        break;
+      case 11:
+        isSuccess = true;
+        text = "Đã hoàn thành";
+        break;
+      default:
+        isSuccess = false;
+        text = "Đang thực hiện";
     }
-    if (orderDTO.orderStatus == 10 || orderDTO.orderStatus == 11) {
-      isSuccess = true;
-      text = "Hoàn thành";
-    }
+    // if (orderDTO.orderStatus == 4) {
+    //   isSuccess = false;
+    //   text = "Đang thực hiện";
+    // }
+    // if (orderDTO.orderStatus == 10 || orderDTO.orderStatus == 11) {
+    //   isSuccess = true;
+    //   text = "Hoàn thành";
+    // }
+    // if (orderDTO.orderStatus == 9) {
+    //   isSuccess = false;
+    //   text = "Đang đến station";
+    // }
     var campus = Get.find<RootViewModel>().currentStore;
     // final itemQuantity = inverseGeneralOrder.orderDetails!.fold<int>(0,
     //     (previousValue, element) {
@@ -308,7 +341,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'FPT University',
+                    orderDTO.stationDTO!.name!,
                     style: FineTheme.typograhpy.subtitle2
                         .copyWith(color: FineTheme.palettes.shades200),
                   ),

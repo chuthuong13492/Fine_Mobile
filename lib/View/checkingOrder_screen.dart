@@ -151,8 +151,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
         builder: (context, child, model) {
           final status = model.orderStatusDTO!.orderStatus;
           bool hasBox = false;
-          if (model.orderStatusDTO!.boxId !=
-              '00000000-0000-0000-0000-000000000000') {
+          if (status == 9 || status == 10) {
             hasBox = true;
           }
           switch (status) {
