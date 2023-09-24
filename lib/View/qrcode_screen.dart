@@ -37,7 +37,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
       appBar: DefaultAppBar(title: "Box QR Code"),
       body: Padding(
         padding: const EdgeInsets.only(right: 16, left: 16),
-        child: ListView(
+        child: Column(
           children: [
             const SizedBox(height: 16),
             _buildOrderInfo(),

@@ -90,8 +90,7 @@ class RootViewModel extends BaseModel {
         //     product.id, store.id, selectedMenu.menuId);
         product = await _productDAO?.getProductDetail(product?.id);
       }
-      bool result =
-          await Get.toNamed(RouteHandler.PRODUCT_DETAIL, arguments: product);
+      await Get.toNamed(RouteHandler.PRODUCT_DETAIL, arguments: product);
       //
       hideDialog();
       await Get.delete<bool>(

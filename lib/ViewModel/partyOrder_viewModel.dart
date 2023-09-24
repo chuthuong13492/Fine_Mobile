@@ -280,6 +280,8 @@ class PartyOrderViewModel extends BaseModel {
         CartItem cartItem = new CartItem(item.productId, item.quantity, null);
         await addItemToCart(cartItem, root.selectedTimeSlot!.id!);
       }
+      _orderViewModel.isPartyOrder = true;
+      Get.toNamed(RouteHandler.ORDER);
       setState(ViewStatus.Completed);
     } catch (e) {
       // partyOrderDTO = null;

@@ -238,7 +238,7 @@ class ProductDetailViewModel extends BaseModel {
     // await deleteMart();
     Cart? cart = await getCart();
     showLoadingDialog();
-    bool showOnHome = Get.find<bool>(tag: "showOnHome");
+    // bool showOnHome = Get.find<bool>(tag: "showOnHome");
     // if (master.type == ProductType.MASTER_PRODUCT) {
     //   Map choice = new Map();
     //   for (int i = 0; i < affectPriceContent.keys.toList().length; i++) {
@@ -292,7 +292,7 @@ class ProductDetailViewModel extends BaseModel {
       }
       if (result.status!.errorCode == '2001') {
         await showStatusDialog("assets/images/error.png", "Box đã đầy",
-            "Box đã đầy rùi, bạn chỉ có thể thêm ${result.product!.quantity} phần ${result.product!.name}");
+            "Box đã đầy ùi, bạn chỉ có thể thêm ${result.product!.quantity} phần ${result.product!.name}");
       }
       final productList = result.card;
       if (productList != null) {
@@ -368,6 +368,7 @@ class ProductDetailViewModel extends BaseModel {
       if (isPartyMode) {
         Get.find<PartyOrderViewModel>().addProductToPartyOrder();
       } else {
+        order.isPartyOrder = false;
         Get.find<OrderViewModel>().prepareOrder();
       }
 
@@ -376,6 +377,7 @@ class ProductDetailViewModel extends BaseModel {
       if (isPartyMode) {
         Get.find<PartyOrderViewModel>().addProductToPartyOrder();
       } else {
+        order.isPartyOrder = false;
         Get.find<OrderViewModel>().prepareOrder();
       }
     }

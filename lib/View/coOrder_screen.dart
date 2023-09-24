@@ -54,18 +54,16 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Party> listParty = _partyViewModel!.partyOrderDTO!.partyOrder!;
+    // List<Party> listParty = _partyViewModel!.partyOrderDTO!.partyOrder!;
     AccountViewModel acc = Get.find<AccountViewModel>();
-    final user = listParty
-        .where((element) => element.customer!.id == acc.currentUser!.id)
-        .toList();
-    bool? isAdmin = false;
 
-    for (var item in user) {
-      if (item.customer!.isAdmin == true) {
-        isAdmin = true;
-      }
-    }
+    // bool? isAdmin = false;
+
+    // for (var item in user) {
+    //   if (item.customer!.isAdmin == true) {
+    //     isAdmin = true;
+    //   }
+    // }
     return ScopedModel(
       model: Get.find<PartyOrderViewModel>(),
       child: Scaffold(
@@ -83,9 +81,10 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
               child: InkWell(
                 onTap: () {
                   // _stopTimer();
-                  // Get.offAndToNamed(RoutHandler.NAV);
-
+                  // Get.offAndToNamed(RouteHandler.NAV);
+                  // Get.find<bool>(tag: "showOnHome");
                   Get.back();
+                  hideDialog();
                 },
                 child: Icon(Icons.arrow_back_ios,
                     size: 20, color: FineTheme.palettes.primary100),
@@ -172,50 +171,51 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                   child: Container(
                     color: FineTheme.palettes.neutral200,
                   )),
-              Container(
-                color: Colors.white,
-                child: ScopedModelDescendant<PartyOrderViewModel>(
-                  builder: (context, child, model) {
-                    List<Widget> card = [];
-                    List<Party> list = model.partyOrderDTO!.partyOrder!;
-
-                    for (var item in user) {
-                      if (item.customer!.isAdmin == true) {
-                        list;
-                        for (var item in list) {
-                          card.add(_buildPartyList(item));
-                        }
-                        for (int i = 0; i < list.length; i++) {
-                          if (i % 2 != 0) {
-                            card.insert(
-                              i,
-                              Container(
-                                height: 24,
-                                color: FineTheme.palettes.neutral200,
-                              ),
-                            );
-                          }
-                        }
-                      } else {
-                        user;
-                        for (var item in user) {
-                          card.add(_buildPartyList(item));
+              ScopedModelDescendant<PartyOrderViewModel>(
+                builder: (context, child, model) {
+                  List<Widget> card = [];
+                  List<Party> list = model.partyOrderDTO!.partyOrder!;
+                  final user = list
+                      .where((element) =>
+                          element.customer!.id == acc.currentUser!.id)
+                      .toList();
+                  for (var item in user) {
+                    if (item.customer!.isAdmin == true) {
+                      list;
+                      for (var item in list) {
+                        card.add(_buildPartyList(item));
+                      }
+                      for (int i = 0; i < list.length; i++) {
+                        if (i % 2 != 0) {
+                          card.insert(
+                            i,
+                            Container(
+                              height: 24,
+                              color: FineTheme.palettes.neutral200,
+                            ),
+                          );
                         }
                       }
+                    } else {
+                      user;
+                      for (var item in user) {
+                        card.add(_buildPartyList(item));
+                      }
                     }
-                    if (list == null || list.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text("Không có người tham gia"),
-                      );
-                    }
-                    return Container(
-                      child: Column(
-                        children: card,
-                      ),
+                  }
+                  if (list == null || list.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text("Không có người tham gia"),
                     );
-                  },
-                ),
+                  }
+                  return Container(
+                    color: FineTheme.palettes.shades100,
+                    child: Column(
+                      children: card,
+                    ),
+                  );
+                },
               ),
             ],
           ),
@@ -623,7 +623,6 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                           if (cart != null) {
                             await model.preCoOrder();
                             // _stopTimer();
-                            Get.toNamed(RouteHandler.ORDER);
                           } else {
                             showStatusDialog(
                                 "assets/images/error.png",

@@ -172,9 +172,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ],
               ),
               InkWell(
-                onTap: () {
+                onTap: () async {
                   PartyOrderViewModel model = Get.find<PartyOrderViewModel>();
-                  showPartyDialog(model.partyCode);
+                  await showPartyDialog(model.partyCode, isHome: true);
                 },
                 child: Text(
                   "Tạo phòng",

@@ -22,4 +22,5 @@ class RouteHandler {
   static const String SIGN_UP = "/signup";
   static const String WEBVIEW = "/webview";
   static const String INVITE_SCREEN = "/invite_screen";
+  static const String TOP_UP_SCREEN = "/top_up_screen";
 }

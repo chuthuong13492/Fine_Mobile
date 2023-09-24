@@ -17,7 +17,10 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      return web;
+      throw UnsupportedError(
+        'DefaultFirebaseOptions have not been configured for web - '
+        'you can reconfigure this by running the FlutterFire CLI again.',
+      );
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -25,7 +28,10 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        return macos;
+        throw UnsupportedError(
+          'DefaultFirebaseOptions have not been configured for macos - '
+          'you can reconfigure this by running the FlutterFire CLI again.',
+        );
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -43,19 +49,9 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyB72_AJfWQfh1kZbQ6N829aHYOCuLPXTlg',
-    appId: '1:879820098286:web:6cd5291af85dd0cde381ff',
-    messagingSenderId: '879820098286',
-    projectId: 'fine-mobile-21acd',
-    authDomain: 'fine-mobile-21acd.firebaseapp.com',
-    storageBucket: 'fine-mobile-21acd.appspot.com',
-    measurementId: 'G-0SZRB07ZNW',
-  );
-
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBcsDAajVRAd3BY4IDUbvSPz-YSARQxmeE',
-    appId: '1:879820098286:android:4ca73cae7f56e83ce381ff',
+    appId: '1:879820098286:android:d29a59322c7e6d61e381ff',
     messagingSenderId: '879820098286',
     projectId: 'fine-mobile-21acd',
     storageBucket: 'fine-mobile-21acd.appspot.com',
@@ -63,21 +59,14 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyC2uGaWPI-MiCCx1EOMXVo3C_jFy0qIkoc',
-    appId: '1:879820098286:ios:99123f84ab9d74dce381ff',
+    appId: '1:879820098286:ios:437f509dc66e71f8e381ff',
     messagingSenderId: '879820098286',
     projectId: 'fine-mobile-21acd',
     storageBucket: 'fine-mobile-21acd.appspot.com',
-    iosClientId: '879820098286-kqctpm9jhlh49kop9r4fr4anahi2tnfn.apps.googleusercontent.com',
-    iosBundleId: 'com.example.fineMobile',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyC2uGaWPI-MiCCx1EOMXVo3C_jFy0qIkoc',
-    appId: '1:879820098286:ios:99123f84ab9d74dce381ff',
-    messagingSenderId: '879820098286',
-    projectId: 'fine-mobile-21acd',
-    storageBucket: 'fine-mobile-21acd.appspot.com',
-    iosClientId: '879820098286-kqctpm9jhlh49kop9r4fr4anahi2tnfn.apps.googleusercontent.com',
-    iosBundleId: 'com.example.fineMobile',
+    androidClientId:
+        '879820098286-6hfsh59lifspljpcvcuhgdor8itrq7qb.apps.googleusercontent.com',
+    iosClientId:
+        '879820098286-nom1urm7rmjv4lopbckj0misk5pa0i59.apps.googleusercontent.com',
+    iosBundleId: 'com.smjle.fineMobile',
   );
 }

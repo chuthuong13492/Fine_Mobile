@@ -63,7 +63,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
               if (model.status == ViewStatus.Loading) {
                 return const SizedBox.shrink();
               }
-              return ListView(
+              return Column(
                 children: [
                   SizedBox(
                       height: 8,

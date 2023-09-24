@@ -666,7 +666,7 @@ Future<int> showConfirmOrderDialog(
   return option!;
 }
 
-Future<int> showPartyDialog(String? partyCode) async {
+Future<int> showPartyDialog(String? partyCode, {bool isHome = false}) async {
   PartyOrderViewModel model = Get.find<PartyOrderViewModel>();
   TextEditingController controller = TextEditingController(text: '');
   bool isErrorInput = false;
@@ -853,6 +853,11 @@ Future<int> showPartyDialog(String? partyCode) async {
                         if (model.partyOrderDTO!.partyOrder != null) {
                           option = 1;
                           hideDialog();
+                          // if (isHome == true) {
+                          //   Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                          // } else {
+                          //   Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                          // }
                           Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
                         } else {
                           option = 1;
@@ -863,7 +868,15 @@ Future<int> showPartyDialog(String? partyCode) async {
                           await model.getPartyOrder();
                           option = 1;
                           hideDialog();
+                          // await Get.delete<bool>(
+                          //   tag: "showOnHome",
+                          // );
                           Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                          // if (isHome == true) {
+                          //   Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                          // } else {
+                          //   Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                          // }
                         } else {
                           option = 1;
                           hideDialog();

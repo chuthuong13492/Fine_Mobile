@@ -7,12 +7,36 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:879820098286:android:4ca73cae7f56e83ce381ff",
+        "mobilesdk_app_id": "1:879820098286:android:d29a59322c7e6d61e381ff",
         "android_client_info": {
-          "package_name": "com.example.fine_mobile"
+          "package_name": "com.smjle.fine_mobile"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "879820098286-7mffcntp1rr7cetrb8k50h723fsqevis.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.smjle.fine_mobile",
+            "certificate_hash": "269eb8978906bc290da765195aeed0cee4850b01"
+          }
+        },
+        {
+          "client_id": "879820098286-s11ii8jo219qfk1jeg5qjphfqqjhsg3f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.smjle.fine_mobile",
+            "certificate_hash": "dc5976d7b631fe81c521d556aa0d87af7df561c2"
+          }
+        },
+        {
+          "client_id": "879820098286-v7dslrnssia1h0isd1cbgphkgb5b7vka.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.smjle.fine_mobile",
+            "certificate_hash": "e65bcf72b0eba2c6c9076509fb4d0553df828322"
+          }
+        },
         {
           "client_id": "879820098286-jvgvpl8jvkd1ls9aca581n4ov5ie40vc.apps.googleusercontent.com",
           "client_type": 3
@@ -31,10 +55,10 @@
               "client_type": 3
             },
             {
-              "client_id": "879820098286-kqctpm9jhlh49kop9r4fr4anahi2tnfn.apps.googleusercontent.com",
+              "client_id": "879820098286-bqa2af3ih8l6f20dluaukjrr3pgbuq07.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.fineMobile"
+                "bundle_id": "com.example.ecloset"
               }
             }
           ]

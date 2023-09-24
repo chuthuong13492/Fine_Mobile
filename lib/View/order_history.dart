@@ -413,7 +413,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
   void _onTapOrderHistory(order) async {
     // get orderDetail
-    await Get.toNamed(RouteHandler.ORDER_HISTORY_DETAIL, arguments: order);
-    _orderHistoryViewModel.getOrders();
+    // await Get.toNamed(RouteHandler.ORDER_HISTORY_DETAIL, arguments: order);
+    // _orderHistoryViewModel.getOrders();
+    Get.toNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
+      "order": order,
+      "isFetch": false,
+    });
   }
 }

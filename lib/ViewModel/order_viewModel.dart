@@ -33,6 +33,7 @@ class OrderViewModel extends BaseModel {
   List<StationDTO>? stationList;
   List<ProductInCart>? productRecomend;
   bool? loadingUpsell;
+  bool? isPartyOrder;
   String? errorMessage;
   List<String> listError = <String>[];
   RootViewModel? root = Get.find<RootViewModel>();
@@ -47,6 +48,7 @@ class OrderViewModel extends BaseModel {
     // promoDao = new PromotionDAO();
     // _collectionDAO = CollectionDAO();
     loadingUpsell = false;
+    isPartyOrder = false;
     currentCart = null;
   }
 
@@ -68,16 +70,22 @@ class OrderViewModel extends BaseModel {
         Get.back();
         await removeCart();
       }
-      CartItem itemInCart = new CartItem(
-          currentCart!.orderDetails![0].productId,
-          currentCart!.orderDetails![0].quantity - 1,
-          null);
-      await updateItemFromMart(itemInCart);
 
-      await productViewModel.processCart(
-          currentCart!.orderDetails![0].productId,
-          1,
-          root!.selectedTimeSlot!.id);
+      if (isPartyOrder == false) {
+        CartItem itemInCart = new CartItem(
+            currentCart!.orderDetails![0].productId,
+            currentCart!.orderDetails![0].quantity - 1,
+            null);
+        await updateItemFromMart(itemInCart);
+
+        await productViewModel.processCart(
+            currentCart!.orderDetails![0].productId,
+            1,
+            root!.selectedTimeSlot!.id);
+      } else {
+        productRecomend = null;
+      }
+
       // currentCart?.addProperties(root.selectedTimeSlot!.id!);
       // currentCart?.addProperties(5, '0902915671', root.selectedTimeSlot!.id!);
       // currentCart = await getCart();
@@ -213,10 +221,10 @@ class OrderViewModel extends BaseModel {
           party.partyOrderDTO = null;
           party.partyCode = null;
           // await setPartyCode(party.partyCode!);
-          Get.offAndToNamed(
-            RouteHandler.CHECKING_ORDER_SCREEN,
-            arguments: result.order,
-          );
+          Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
+            "order": result.order,
+            "isFetch": true,
+          });
           // Get.offAndToNamed(RoutHandler.NAV);
           // prepareOrder();
           // Get.back(result: true);

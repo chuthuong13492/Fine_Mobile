@@ -18,9 +18,11 @@ import 'package:intl/intl.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class CheckingOrderScreen extends StatefulWidget {
+  final bool? isFetch;
   final OrderDTO order;
 
-  const CheckingOrderScreen({super.key, required this.order});
+  const CheckingOrderScreen(
+      {super.key, required this.order, required this.isFetch});
 
   @override
   State<CheckingOrderScreen> createState() => _CheckingOrderScreenState();
@@ -32,8 +34,12 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 2),
-        (timer) => _orderViewModel.fetchStatus(this.widget.order.id!));
+    if (widget.isFetch == true) {
+      _timer = Timer.periodic(const Duration(seconds: 2),
+          (timer) => _orderViewModel.fetchStatus(this.widget.order.id!));
+    } else {
+      _orderViewModel.fetchStatus(this.widget.order.id!);
+    }
   }
 
   @override
@@ -47,6 +53,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
     return Scaffold(
       backgroundColor: FineTheme.palettes.shades100,
       body: CustomScrollView(
+        physics: NeverScrollableScrollPhysics(),
         slivers: [
           SliverAppBar(
             leading: Container(
@@ -62,12 +69,16 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                       padding: const EdgeInsets.all(0),
                       onPressed: () {
                         // Get.back();
-                        Get.offAllNamed(RouteHandler.NAV);
+                        if (widget.isFetch == true) {
+                          Get.offAllNamed(RouteHandler.NAV);
+                        } else {
+                          Get.back();
+                        }
                       },
                       icon: const Icon(
                         Icons.chevron_left_rounded,
                         color: Color(0xFF238E9C),
-                        size: 32,
+                        size: 42,
                       )),
                 ),
               ),

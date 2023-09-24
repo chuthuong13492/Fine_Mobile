@@ -77,10 +77,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 )
               : ScopedModelDescendant<OrderViewModel>(
                   builder: (context, child, model) {
-                    bool hasProductRecomend = false;
-                    if (model.productRecomend!.length != 0) {
-                      hasProductRecomend = true;
-                    }
+                    final recommendProduct = model.productRecomend;
                     if (model.currentCart != null) {
                       ViewStatus status = model.status;
                       switch (status) {
@@ -158,7 +155,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                     color: FineTheme.palettes.neutral200,
                                   )),
                               // UpSellCollection(),
-                              hasProductRecomend
+                              recommendProduct != null
                                   ? SlideFadeTransition(
                                       offset: 0.2,
                                       direction: Direction.horizontal,
@@ -864,6 +861,7 @@ class _OrderScreenState extends State<OrderScreen> {
           style: FineTheme.typograhpy.overline));
       price += orderDetailList[i].unitPrice! * orderDetails.quantity;
     }
+
     // item.description = "Test đơn hàng";
 
     // if (item.description != null && item.description.isNotEmpty) {
@@ -949,7 +947,9 @@ class _OrderScreenState extends State<OrderScreen> {
                     children: [
                       ...list,
                       const SizedBox(width: 8),
-                      selectQuantity(orderDetails),
+                      _orderViewModel!.isPartyOrder == true
+                          ? const SizedBox(height: 8)
+                          : selectQuantity(orderDetails),
                     ],
                   )
                 ],

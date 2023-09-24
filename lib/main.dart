@@ -27,6 +27,7 @@ import 'package:fine/View/sign_up.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/View/station_picker_screen.dart';
 import 'package:fine/View/store_select_screen.dart';
+import 'package:fine/View/topUp_screen.dart';
 import 'package:fine/View/welcome_screen.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/ViewModel/startup_viewModel.dart';
@@ -123,10 +124,14 @@ class MyApp extends StatelessWidget {
                     durationInSeconds: settings.arguments as int),
                 settings: settings);
           case RouteHandler.CHECKING_ORDER_SCREEN:
+            Map map = settings.arguments as Map;
             return CupertinoPageRoute<bool>(
-                builder: (context) =>
-                    CheckingOrderScreen(order: settings.arguments as dynamic),
+                builder: (context) => CheckingOrderScreen(
+                    order: map["order"], isFetch: map["isFetch"]),
                 settings: settings);
+          case RouteHandler.TOP_UP_SCREEN:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => const TopUpScreen(), settings: settings);
           case RouteHandler.PRODUCT_DETAIL:
             return CupertinoPageRoute<bool>(
                 builder: (context) => ProductDetailScreen(

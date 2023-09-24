@@ -443,7 +443,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ],
                           ),
                           IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.toNamed(RouteHandler.TOP_UP_SCREEN);
+                              },
                               icon: const Icon(
                                 Icons.chevron_right_outlined,
                                 size: 34,

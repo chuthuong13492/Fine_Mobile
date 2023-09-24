@@ -35,6 +35,9 @@ class _WebViewScreenState extends State<WebViewScreen> {
     final controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..loadRequest(Uri.parse("${widget.url}"));
+    // ..setNavigationDelegate(NavigationDelegate(
+
+    // ));
     return Scaffold(
       appBar: DefaultAppBar(
         title: widget.url,
