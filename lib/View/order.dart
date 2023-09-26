@@ -69,8 +69,7 @@ class _OrderScreenState extends State<OrderScreen> {
       child: Scaffold(
           backgroundColor: FineTheme.palettes.shades100,
           appBar: DefaultAppBar(title: "Trang thanh toán"),
-          bottomNavigationBar:
-              bottomBar(_orderViewModel!.orderDTO!.otherAmounts!),
+          bottomNavigationBar: bottomBar(),
           body: onInit
               ? const Center(
                   child: Text('Không có giỏ hàng'),
@@ -1170,279 +1169,280 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  Widget bottomBar(List<OtherAmounts> otherAmounts) {
-    double? shippingFee;
-    for (var item in otherAmounts) {
-      if (item.type == 1) {
-        shippingFee = item.amount!;
-      }
-    }
+  Widget bottomBar() {
     // var isCurrentTimeSlotAvailable =
     //     Get.find<RootViewModel>().isCurrentTimeSlotAvailable();
-    return ScopedModel(
-      model: Get.find<OrderViewModel>(),
-      child: ScopedModelDescendant<OrderViewModel>(
-        builder: (context, child, model) {
-          return Container(
-            padding: const EdgeInsets.only(left: 8, right: 8, top: 12),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey,
-                  offset: Offset(0.0, 1.0), //(x,y)
-                  blurRadius: 6.0,
+    return ScopedModelDescendant<OrderViewModel>(
+      builder: (context, child, model) {
+        final otherAmounts = model.orderDTO!.otherAmounts;
+        double? shippingFee;
+        for (var item in otherAmounts!) {
+          if (item.type == 1) {
+            shippingFee = item.amount!;
+          }
+        }
+        return onInit
+            ? const SizedBox.shrink()
+            : Container(
+                padding: const EdgeInsets.only(left: 8, right: 8, top: 12),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey,
+                      offset: Offset(0.0, 1.0), //(x,y)
+                      blurRadius: 6.0,
+                    ),
+                  ],
+                  borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(40),
+                      topLeft: Radius.circular(40)),
                 ),
-              ],
-              borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(40), topLeft: Radius.circular(40)),
-            ),
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                Container(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: InkWell(
-                              onTap: () {},
-                              child: Row(
-                                children: const [
-                                  Text(
-                                    'Thêm Voucher',
-                                    style: TextStyle(
-                                        fontFamily: 'Montserrat',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        fontStyle: FontStyle.normal),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: InkWell(
+                                  onTap: () {},
+                                  child: Row(
+                                    children: const [
+                                      Text(
+                                        'Thêm Voucher',
+                                        style: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            fontStyle: FontStyle.normal),
+                                      ),
+                                      SizedBox(
+                                        width: 20,
+                                      ),
+                                      Icon(
+                                        Icons.keyboard_arrow_up,
+                                        size: 24,
+                                      )
+                                    ],
                                   ),
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  Icon(
-                                    Icons.keyboard_arrow_up,
-                                    size: 24,
-                                  )
-                                ],
+                                ),
                               ),
-                            ),
+                              Container(
+                                width: 102,
+                                child: InkWell(
+                                  onTap: () {},
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: const [
+                                      Text(
+                                        'Tiền mặt',
+                                        style: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            fontStyle: FontStyle.normal),
+                                      ),
+                                      SizedBox(
+                                        width: 20,
+                                      ),
+                                      Icon(
+                                        Icons.keyboard_arrow_up,
+                                        size: 24,
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          Container(
-                            width: 102,
+                          const SizedBox(height: 15),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      'Phí giao hàng',
+                                      style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          fontStyle: FontStyle.normal),
+                                    ),
+                                    Text(
+                                      formatPrice(shippingFee!),
+                                      style: const TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w400,
+                                          fontStyle: FontStyle.normal),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                width: 102,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '',
+                                      style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          fontStyle: FontStyle.normal),
+                                    ),
+                                    Text(
+                                      model.status == ViewStatus.Loading
+                                          ? "..."
+                                          : formatPrice(
+                                              model.orderDTO!.finalAmount!),
+                                      style: const TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                          fontStyle: FontStyle.normal),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          Center(
                             child: InkWell(
-                              onTap: () {},
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: const [
-                                  Text(
-                                    'Tiền mặt',
-                                    style: TextStyle(
-                                        fontFamily: 'Montserrat',
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        fontStyle: FontStyle.normal),
-                                  ),
-                                  SizedBox(
-                                    width: 20,
-                                  ),
-                                  Icon(
-                                    Icons.keyboard_arrow_up,
-                                    size: 24,
-                                  )
-                                ],
+                              onTap: () async {
+                                await model.orderCart();
+                                // if (isCurrentTimeSlotAvailable) {
+                                //   await model.orderCart();
+                                // } else {
+                                //   await model.removeCart();
+                                //   showStatusDialog(
+                                //       "assets/images/error.png",
+                                //       "Opps",
+                                //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
+                                //   Get.back();
+                                // }
+                              },
+                              child: Container(
+                                width: 190,
+                                height: 40,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(20)),
+                                    color: Color(0xFF238E9C)),
+                                child: const Center(
+                                  child: Text("Đặt ngay",
+                                      // isCurrentTimeSlotAvailable
+                                      //     ? "Đặt ngay"
+                                      //     : "Khung giờ đã kết thúc",
+                                      style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w700,
+                                          fontStyle: FontStyle.normal,
+                                          color: Colors.white)),
+                                ),
                               ),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Phí giao hàng',
-                                  style: TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      fontStyle: FontStyle.normal),
-                                ),
-                                Text(
-                                  formatPrice(shippingFee!),
-                                  style: const TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w400,
-                                      fontStyle: FontStyle.normal),
-                                )
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            width: 102,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '',
-                                  style: TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      fontStyle: FontStyle.normal),
-                                ),
-                                Text(
-                                  _orderViewModel!.status == ViewStatus.Loading
-                                      ? "..."
-                                      : formatPrice(_orderViewModel!
-                                          .orderDTO!.finalAmount!),
-                                  style: const TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      fontStyle: FontStyle.normal),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 18),
-                      Center(
-                        child: InkWell(
-                          onTap: () async {
-                            await model.orderCart();
-                            // if (isCurrentTimeSlotAvailable) {
-                            //   await model.orderCart();
-                            // } else {
-                            //   await model.removeCart();
-                            //   showStatusDialog(
-                            //       "assets/images/error.png",
-                            //       "Opps",
-                            //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-                            //   Get.back();
-                            // }
-                          },
-                          child: Container(
-                            width: 190,
-                            height: 40,
-                            decoration: const BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20)),
-                                color: Color(0xFF238E9C)),
-                            child: const Center(
-                              child: Text("Đặt ngay",
-                                  // isCurrentTimeSlotAvailable
-                                  //     ? "Đặt ngay"
-                                  //     : "Khung giờ đã kết thúc",
-                                  style: TextStyle(
-                                      fontFamily: 'Montserrat',
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      fontStyle: FontStyle.normal,
-                                      color: Colors.white)),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  // child: Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   crossAxisAlignment: CrossAxisAlignment.center,
-                  //   children: [
-                  //     Expanded(
-                  //       flex: 4,
-                  //       child: Padding(
-                  //         padding: const EdgeInsets.fromLTRB(8, 0, 0, 8),
-                  //         child: Container(
-                  //           alignment: Alignment.centerLeft,
-                  //           child: Column(
-                  //             mainAxisAlignment: MainAxisAlignment.start,
-                  //             crossAxisAlignment: CrossAxisAlignment.start,
-                  //             children: [
-                  //               Text(
-                  //                 "Tổng cộng",
-                  //                 style: FineTheme.typograhpy.caption1.copyWith(
-                  //                     color: FineTheme.palettes.neutral600),
-                  //               ),
-                  //               const SizedBox(height: 6),
-                  //               Text(
-                  //                 _orderViewModel!.status == ViewStatus.Loading
-                  //                     ? "..."
-                  //                     : formatPrice(_orderViewModel!
-                  //                         .orderDTO!.finalAmount!),
-                  //                 style: FineTheme.typograhpy.subtitle1
-                  //                     .copyWith(fontWeight: FontWeight.bold),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     Expanded(
-                  //       flex: 7,
-                  //       child: Padding(
-                  //         padding: const EdgeInsets.fromLTRB(0, 0, 8, 8),
-                  //         child: InkWell(
-                  //           onTap: () async {
-                  //             await model.orderCart();
-                  //           },
-                  //           child: Container(
-                  //             height: 41,
-                  //             padding: const EdgeInsets.all(6),
-                  //             decoration: BoxDecoration(
-                  //               color: FineTheme.palettes.primary200,
-                  //               borderRadius: BorderRadius.circular(8),
-                  //               border: Border.all(
-                  //                 color: FineTheme.palettes.primary200,
-                  //                 width: 1,
-                  //                 style: BorderStyle.solid,
-                  //               ),
-                  //               boxShadow: [
-                  //                 BoxShadow(
-                  //                   color: FineTheme.palettes.primary300,
-                  //                   offset: const Offset(0, 4),
-                  //                 ),
-                  //               ],
-                  //             ),
-                  //             child: Row(
-                  //               mainAxisAlignment: MainAxisAlignment.center,
-                  //               crossAxisAlignment: CrossAxisAlignment.center,
-                  //               children: [
-                  //                 Text(
-                  //                     isMenuAvailable
-                  //                         ? "Đặt đơn"
-                  //                         : "Khung giờ đã kết thúc",
-                  //                     style: FineTheme.typograhpy.subtitle1
-                  //                         .copyWith(
-                  //                             color: isMenuAvailable
-                  //                                 ? Colors.white
-                  //                                 : FineTheme
-                  //                                     .palettes.neutral800)),
-                  //               ],
-                  //             ),
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
+                      // child: Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   crossAxisAlignment: CrossAxisAlignment.center,
+                      //   children: [
+                      //     Expanded(
+                      //       flex: 4,
+                      //       child: Padding(
+                      //         padding: const EdgeInsets.fromLTRB(8, 0, 0, 8),
+                      //         child: Container(
+                      //           alignment: Alignment.centerLeft,
+                      //           child: Column(
+                      //             mainAxisAlignment: MainAxisAlignment.start,
+                      //             crossAxisAlignment: CrossAxisAlignment.start,
+                      //             children: [
+                      //               Text(
+                      //                 "Tổng cộng",
+                      //                 style: FineTheme.typograhpy.caption1.copyWith(
+                      //                     color: FineTheme.palettes.neutral600),
+                      //               ),
+                      //               const SizedBox(height: 6),
+                      //               Text(
+                      //                 _orderViewModel!.status == ViewStatus.Loading
+                      //                     ? "..."
+                      //                     : formatPrice(_orderViewModel!
+                      //                         .orderDTO!.finalAmount!),
+                      //                 style: FineTheme.typograhpy.subtitle1
+                      //                     .copyWith(fontWeight: FontWeight.bold),
+                      //               ),
+                      //             ],
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     Expanded(
+                      //       flex: 7,
+                      //       child: Padding(
+                      //         padding: const EdgeInsets.fromLTRB(0, 0, 8, 8),
+                      //         child: InkWell(
+                      //           onTap: () async {
+                      //             await model.orderCart();
+                      //           },
+                      //           child: Container(
+                      //             height: 41,
+                      //             padding: const EdgeInsets.all(6),
+                      //             decoration: BoxDecoration(
+                      //               color: FineTheme.palettes.primary200,
+                      //               borderRadius: BorderRadius.circular(8),
+                      //               border: Border.all(
+                      //                 color: FineTheme.palettes.primary200,
+                      //                 width: 1,
+                      //                 style: BorderStyle.solid,
+                      //               ),
+                      //               boxShadow: [
+                      //                 BoxShadow(
+                      //                   color: FineTheme.palettes.primary300,
+                      //                   offset: const Offset(0, 4),
+                      //                 ),
+                      //               ],
+                      //             ),
+                      //             child: Row(
+                      //               mainAxisAlignment: MainAxisAlignment.center,
+                      //               crossAxisAlignment: CrossAxisAlignment.center,
+                      //               children: [
+                      //                 Text(
+                      //                     isMenuAvailable
+                      //                         ? "Đặt đơn"
+                      //                         : "Khung giờ đã kết thúc",
+                      //                     style: FineTheme.typograhpy.subtitle1
+                      //                         .copyWith(
+                      //                             color: isMenuAvailable
+                      //                                 ? Colors.white
+                      //                                 : FineTheme
+                      //                                     .palettes.neutral800)),
+                      //               ],
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          );
-        },
-      ),
+              );
+      },
     );
   }
 }

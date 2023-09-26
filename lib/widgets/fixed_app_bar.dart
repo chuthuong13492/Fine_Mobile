@@ -36,7 +36,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
     super.initState();
     // deleteCart();
     // deleteMart();
-    deletePartyCode();
+    // deletePartyCode();
     // _orderViewModel!.getCurrentCart();
     _partyOrderViewModel!.getPartyOrder();
   }
@@ -60,7 +60,8 @@ class _FixedAppBarState extends State<FixedAppBar> {
       // ),
       child: Container(
         color: Colors.transparent,
-        padding: const EdgeInsets.only(left: 17, right: 17, bottom: 10),
+        padding:
+            const EdgeInsets.only(left: 17, right: 17, top: 10, bottom: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           // mainAxisAlignment: MainAxisAlignment.center,

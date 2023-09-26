@@ -2,6 +2,7 @@ import 'package:fine/Accessories/index.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/index.dart';
+import 'package:fine/Utils/format_price.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
@@ -91,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   color: FineTheme.palettes.primary50,
                   height: 16,
                 ),
-                _buildWalletSection(),
+                _buildWalletSection(userDTO),
                 Container(
                   color: FineTheme.palettes.primary50,
                   height: 16,
@@ -378,7 +379,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildWalletSection() {
+  Widget _buildWalletSection(AccountDTO acc) {
     return Container(
       color: FineTheme.palettes.shades100,
       width: Get.width,
@@ -432,7 +433,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                               Text(
-                                "10.000",
+                                formatPrice(acc.balance!),
                                 style: TextStyle(
                                     fontFamily: 'Montserrat',
                                     fontWeight: FontWeight.w700,

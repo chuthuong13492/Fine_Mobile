@@ -1,5 +1,6 @@
 import 'package:fine/Accessories/index.dart';
 import 'package:fine/Utils/format_price.dart';
+import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/topUp_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
@@ -27,6 +28,21 @@ class TopUpScreen extends StatefulWidget {
 }
 
 class _TopUpScreenState extends State<TopUpScreen> {
+  final TopUpViewModel _topUpViewModel = Get.find<TopUpViewModel>();
+  // final flutterWebViewPlugin = FlutterWebviewPlugin();
+  // Future<void> urlListen() async {
+  //   flutterWebViewPlugin.onUrlChanged.listen((String url) {
+  //     if (url == 'https://prod.fine-api.smjle.vn/') {
+  //       // Đã đến màn hình thành công, thực hiện các hành động cần thiết
+  //       // (ví dụ: hiển thị thông báo thanh toán thành công)
+  //       // Đóng trình duyệt web
+  //       flutterWebViewPlugin.close();
+  //       // Chuyển hướng trở lại màn hình chính hoặc màn hình thông báo thành công
+  //       Get.back();
+  //     }
+  //   });
+  // }
+
   final txt = TextEditingController();
   String formatVnd(double input) {
     return NumberFormat.currency(
@@ -39,6 +55,18 @@ class _TopUpScreenState extends State<TopUpScreen> {
   int getNumericValue(String formattedVnd) {
     String cleanValue = formattedVnd.replaceAll(RegExp(r'[^\d]'), '');
     return int.tryParse(cleanValue) ?? 0;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // urlListen();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _topUpViewModel.amount = null;
   }
 
   @override
@@ -58,7 +86,9 @@ class _TopUpScreenState extends State<TopUpScreen> {
                 child: Container(
                   child: IconButton(
                       padding: const EdgeInsets.all(0),
-                      onPressed: () {
+                      onPressed: () async {
+                        final acc = Get.find<AccountViewModel>();
+                        await acc.fetchUser();
                         Get.back();
                       },
                       icon: const Icon(
@@ -474,12 +504,14 @@ class _TopUpScreenState extends State<TopUpScreen> {
             )),
         child: InkWell(
           onTap: () async {
-            showModalBottomSheet(
-                context: context,
-                backgroundColor: Colors.transparent,
-                builder: (BuildContext context) {
-                  return PaymentMethodWidgets();
-                });
+            TopUpViewModel topUpViewModel = Get.find<TopUpViewModel>();
+            await topUpViewModel.getUrl();
+            // showModalBottomSheet(
+            //     context: context,
+            //     backgroundColor: Colors.transparent,
+            //     builder: (BuildContext context) {
+            //       return PaymentMethodWidgets();
+            //     });
           },
           child: Center(
               child: Text(

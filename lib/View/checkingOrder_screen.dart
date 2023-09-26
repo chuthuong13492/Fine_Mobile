@@ -89,49 +89,46 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
             delegate: SliverChildListDelegate(<Widget>[
               Container(
                 width: MediaQuery.of(context).size.width,
-                child: ScopedModel(
-                  model: Get.find<OrderHistoryViewModel>(),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                        child: Container(
-                            // margin: const EdgeInsets.only(top: -50),
-                            transform: Matrix4.translationValues(30, 0.0, 0.0),
-                            height: 400,
-                            child: Image.asset(
-                              'assets/images/human_boxes.png',
-                              height: 410,
-                              width: 200,
-                            )),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                          // margin: const EdgeInsets.only(top: -50),
+                          transform: Matrix4.translationValues(30, 0.0, 0.0),
+                          height: 400,
+                          child: Image.asset(
+                            'assets/images/human_boxes.png',
+                            height: 410,
+                            width: 200,
+                          )),
+                    ),
+                    Container(
+                      width: Get.width,
+                      height: 350,
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(36),
+                        color: FineTheme.palettes.primary100,
                       ),
-                      Container(
-                        width: Get.width,
-                        height: 350,
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(36),
-                          color: FineTheme.palettes.primary100,
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const SizedBox(height: 16),
-                            Container(
-                              width: 85,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(15),
-                                color: Colors.white,
-                              ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 16),
+                          Container(
+                            width: 85,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(15),
+                              color: Colors.white,
                             ),
-                            const SizedBox(height: 16),
-                            _buildCheckingOrder(),
-                          ],
-                        ),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildCheckingOrder(),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ]),
@@ -142,16 +139,17 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
   }
 
   Widget _buildCheckingOrder() {
+    final orderHistory = Get.find<OrderHistoryViewModel>();
     final inputFormat = DateFormat('HH:mm:ss');
     final outputFormat = DateFormat('HH:mm');
-    final arriveTime = outputFormat
-        .format(inputFormat.parse(widget.order.timeSlot!.arriveTime!));
-    final checkoutTime = outputFormat
-        .format(inputFormat.parse(widget.order.timeSlot!.checkoutTime!));
+    final arriveTime = outputFormat.format(
+        inputFormat.parse(orderHistory.orderDTO!.timeSlot!.arriveTime!));
+    final checkoutTime = outputFormat.format(
+        inputFormat.parse(orderHistory.orderDTO!.timeSlot!.checkoutTime!));
     int _curStep = 2;
     final List<String> titles = [
       'Xác nhận đơn hàng',
-      'Đơn hàng đang được chuẩn bị tại cửa hàng',
+      'Đơn hàng đã chuẩn bị tại cửa hàng',
       'Đơn hàng đang đến station',
       'Bạn có thể lấy đơn hàng từ station rồi!!! '
     ];
@@ -162,7 +160,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
         builder: (context, child, model) {
           final status = model.orderStatusDTO!.orderStatus;
           bool hasBox = false;
-          if (status == 9 || status == 10) {
+          if (status == 10) {
             hasBox = true;
           }
           switch (status) {
@@ -329,6 +327,11 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                                   RouteHandler.QRCODE_SCREEN,
                                   arguments: widget.order,
                                 );
+                              } else {
+                                await showStatusDialog(
+                                    "assets/images/error-loading.gif",
+                                    'Chưa có QR Code rùi',
+                                    'Đơn hàng chưa tới station');
                               }
                             },
                             child: Container(

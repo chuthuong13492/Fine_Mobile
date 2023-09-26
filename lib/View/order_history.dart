@@ -307,9 +307,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               leading: IconButton(
                   onPressed: () async {
+                    await _orderHistoryViewModel.getOrderByOrderId(
+                        id: orderDTO.id);
                     await Get.find<OrderViewModel>().fetchStatus(orderDTO.id!);
-                    Get.toNamed(RouteHandler.QRCODE_SCREEN,
-                        arguments: orderDTO);
+                    await Get.toNamed(RouteHandler.QRCODE_SCREEN,
+                        arguments: _orderHistoryViewModel.orderDTO);
                   },
                   icon: Icon(
                     FontAwesomeIcons.qrcode,
@@ -341,7 +343,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    orderDTO.stationDTO!.name!,
+                    orderDTO.orderCode!,
                     style: FineTheme.typograhpy.subtitle2
                         .copyWith(color: FineTheme.palettes.shades200),
                   ),
@@ -411,12 +413,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     );
   }
 
-  void _onTapOrderHistory(order) async {
+  void _onTapOrderHistory(OrderDTO order) async {
+    await _orderHistoryViewModel.getOrderByOrderId(id: order.id);
+
     // get orderDetail
-    // await Get.toNamed(RouteHandler.ORDER_HISTORY_DETAIL, arguments: order);
+    // await Get.toNamed(RouteHandler.ORDER_HISTORY_DETAIL,
+    //     arguments: _orderHistoryViewModel.orderDTO);
     // _orderHistoryViewModel.getOrders();
-    Get.toNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
-      "order": order,
+    await Get.find<OrderViewModel>()
+        .fetchStatus(_orderHistoryViewModel.orderDTO!.id!);
+    await Get.toNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
+      "order": _orderHistoryViewModel.orderDTO,
       "isFetch": false,
     });
   }

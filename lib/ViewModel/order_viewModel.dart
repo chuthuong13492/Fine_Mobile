@@ -215,16 +215,23 @@ class OrderViewModel extends BaseModel {
           ///
           // await Get.find<OrderHistoryViewModel>().getNewOrder();
           //////////
-          PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+
           productRecomend = null;
           orderDTO = null;
-          party.partyOrderDTO = null;
-          party.partyCode = null;
+          partyModel.partyOrderDTO = null;
+          partyModel.partyCode = null;
           // await setPartyCode(party.partyCode!);
-          Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
-            "order": result.order,
-            "isFetch": true,
-          });
+          // await Get.offNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
+          //   "order": result.order,
+          //   "isFetch": true,
+          // });
+          final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
+          await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
+          await Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
+              arguments: {
+                "order": result.order,
+                "isFetch": true,
+              });
           // Get.offAndToNamed(RoutHandler.NAV);
           // prepareOrder();
           // Get.back(result: true);
