@@ -13,6 +13,7 @@ import 'package:fine/View/start_up.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
+import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
 import 'package:flutter/services.dart';
@@ -79,12 +80,10 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
             child: Material(
               color: Colors.white,
               child: InkWell(
-                onTap: () {
-                  // _stopTimer();
-                  // Get.offAndToNamed(RouteHandler.NAV);
-                  // Get.find<bool>(tag: "showOnHome");
+                onTap: () async {
+                  // await Get.find<RootViewModel>().checkHasParty();
+                  // await _partyViewModel?.getCoOrderStatus();
                   Get.back();
-                  hideDialog();
                 },
                 child: Icon(Icons.arrow_back_ios,
                     size: 20, color: FineTheme.palettes.primary100),
@@ -261,12 +260,19 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                   width: 140,
                   child: Text(
                     party.customer!.name!,
-                    style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                        fontStyle: FontStyle.normal,
-                        color: FineTheme.palettes.neutral600),
+                    style: isAdmin
+                        ? TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            fontStyle: FontStyle.normal,
+                            color: FineTheme.palettes.primary100)
+                        : TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            fontStyle: FontStyle.normal,
+                            color: FineTheme.palettes.neutral600),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -277,12 +283,19 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                       : isYou
                           ? 'Bạn'
                           : '',
-                  style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13,
-                      fontStyle: FontStyle.normal,
-                      color: FineTheme.palettes.neutral500),
+                  style: isAdmin
+                      ? TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                          fontStyle: FontStyle.normal,
+                          color: FineTheme.palettes.primary100)
+                      : TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontWeight: FontWeight.w500,
+                          fontSize: 13,
+                          fontStyle: FontStyle.normal,
+                          color: FineTheme.palettes.neutral500),
                 ),
                 const SizedBox(width: 8),
                 !isAdmin
@@ -582,7 +595,6 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
             final listUser = model.partyOrderDTO!.partyOrder!
                 .where((element) => element.customer!.id == acc.currentUser!.id)
                 .toList();
-
             for (var item in listUser) {
               if (item.customer!.isConfirm == false) {
                 isUserConfirm = false;
@@ -617,7 +629,6 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                         if (!isAllConfirm!) {
                           await model.confirmationParty();
                           // _stopTimer();
-                          Get.toNamed(RouteHandler.CONFIRM_ORDER_SCREEN);
                         } else {
                           Cart? cart = await getCart();
                           if (cart != null) {
@@ -654,12 +665,13 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                   ),
                   InkWell(
                     onTap: () async {
-                      _partyViewModel!.partyCode = await getPartyCode();
-                      await _partyViewModel!
-                          .cancelCoOrder(_partyViewModel!.partyCode!);
-                      if (_partyViewModel!.partyOrderDTO == null) {
-                        // _stopTimer();
+                      if (isAdmin == true) {
+                        await _partyViewModel?.getCustomerInParty();
+                      } else {
+                        await _partyViewModel!.cancelCoOrder();
                       }
+
+                      // await _partyViewModel?.getCustomerInParty();
                     },
                     child: Center(
                       child: Padding(
@@ -667,7 +679,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                         child: Text(
                           isAdmin! ? 'Xóa đơn nhóm' : 'Thoát đơn nhóm',
                           style: FineTheme.typograhpy.subtitle1
-                              .copyWith(color: FineTheme.palettes.neutral500),
+                              .copyWith(color: Colors.red),
                         ),
                       ),
                     ),

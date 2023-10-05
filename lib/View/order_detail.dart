@@ -1,5 +1,6 @@
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
+import 'package:fine/Utils/format_phone.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/ViewModel/orderHistory_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
@@ -563,7 +564,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                   child: Container(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  dto.customer!.phone!,
+                  formatPhoneNumberWithDots(dto.customer!.phone!),
                   style: const TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 16,

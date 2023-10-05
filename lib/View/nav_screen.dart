@@ -168,7 +168,7 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   Widget MainScreen() {
     return Scaffold(
         extendBody: true,
-        // floatingActionButton: CartButton(),
+        floatingActionButton: CartButton(),
         backgroundColor: FineTheme.palettes.neutral200,
         bottomNavigationBar: CurvedNavigationBar(
           color: FineTheme.palettes.primary100,

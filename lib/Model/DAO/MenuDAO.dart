@@ -10,7 +10,7 @@ class MenuDAO extends BaseDAO {
       '/menu/timeslot/${timeSlotId}',
       queryParameters: params,
     );
-    var listJson = res.data['data'] as List;
+    var listJson = res.data['data']["menus"] as List;
     if (listJson.length != 0) {
       return listJson.map((e) => MenuDTO.fromJson(e)).toList();
     }

@@ -1,12 +1,16 @@
+import 'dart:async';
+
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/ViewModel/category_viewModel.dart';
+import 'package:fine/ViewModel/currentTime_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/productFilter_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
 import 'package:fine/widgets/shimmer_block.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -28,17 +32,24 @@ class HomeMenuSection extends StatefulWidget {
 class _HomeMenuSectionState extends State<HomeMenuSection> {
   ScrollController scrollController = ScrollController();
   RootViewModel? _rootViewModel;
+  Timer? _timer;
+  DateTime? now;
+
   @override
   void initState() {
     super.initState();
     // scrollController.dispose();
     _rootViewModel = Get.find<RootViewModel>();
     // Get.find<CategoryViewModel>().getCategories();
+    _timer = Timer.periodic(
+        const Duration(seconds: 1), (timer) => now = DateTime.now());
+
     Get.find<RootViewModel>().getListTimeSlot();
   }
 
   @override
   Widget build(BuildContext context) {
+    // String formattedDate = DateFormat('dd-MM HH:mm:ss').format(now!);
     return Container(
       padding: const EdgeInsets.only(left: 15, right: 15),
       child: Column(
@@ -56,17 +67,36 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                     text = 'HÔM NAY';
                   }
                   return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Menu theo bữa ',
-                        style: FineTheme.typograhpy.buttonLg
-                            .copyWith(color: Colors.black),
+                      Row(
+                        children: [
+                          Text(
+                            'Menu theo bữa ',
+                            style: FineTheme.typograhpy.buttonLg
+                                .copyWith(color: Colors.black),
+                          ),
+                          // Text(
+                          //   text,
+                          //   style: FineTheme.typograhpy.buttonLg
+                          //       .copyWith(color: FineTheme.palettes.primary300),
+                          // ),
+                        ],
                       ),
-                      Text(
-                        text,
-                        style: FineTheme.typograhpy.buttonLg
-                            .copyWith(color: FineTheme.palettes.primary300),
-                      ),
+                      StreamBuilder<DateTime>(
+                        stream: Stream.periodic(
+                            const Duration(seconds: 1), (i) => DateTime.now()),
+                        builder: (context, snapshot) {
+                          return Text(
+                            snapshot.data != null
+                                ? DateFormat('dd-MM HH:mm:ss')
+                                    .format(snapshot.data!)
+                                : 'Loading...',
+                            style: FineTheme.typograhpy.buttonLg
+                                .copyWith(color: FineTheme.palettes.primary100),
+                          );
+                        },
+                      )
                     ],
                   );
                 },
@@ -89,19 +119,15 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
       model: Get.find<RootViewModel>(),
       child: ScopedModelDescendant<RootViewModel>(
         builder: (context, child, model) {
-          var list = model.listTimeSlot
+          var list = model.previousTimeSlotList
               ?.where((element) => element.isActive == true)
               .toList();
-
-          var firstTimeSlot = model.listTimeSlot!.firstWhere((element) =>
-              element.id == '7d2b363a-18fa-45e5-bfc9-0f52ef705524');
-          bool isAvailable(List<TimeSlotDTO> timeSlots,
-              bool Function(TimeSlotDTO) condition) {
-            return timeSlots.every((timeSlot) => condition(timeSlot));
-          }
-
-          bool areAllSlotsAvailable =
-              isAvailable(list!, model.isListTimeSlotAvailable);
+          // var firstTimeSlot = model.listTimeSlot!.firstWhere((element) =>
+          //     element.id == '7d2b363a-18fa-45e5-bfc9-0f52ef705524');
+          // bool isAvailable(List<TimeSlotDTO> timeSlots,
+          //     bool Function(TimeSlotDTO) condition) {
+          //   return timeSlots.every((timeSlot) => condition(timeSlot));
+          // }
 
           // bool isTimeSlotAvaible = model.isCurrentTimeSlotAvailable();
           final status = model.status;
@@ -142,7 +168,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
               scrollDirection: Axis.horizontal,
               separatorBuilder: (context, index) =>
                   SizedBox(width: FineTheme.spacing.xs),
-              itemCount: list.length,
+              itemCount: list!.length,
               itemBuilder: (context, index) {
                 DateFormat inputFormat = DateFormat('HH:mm:ss');
                 DateTime arrive = inputFormat.parse(list[index].arriveTime!);
@@ -153,7 +179,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                 String checkoutTime = outputFormat.format(checkout);
 
                 bool isSelect = model.selectedTimeSlot?.id == list[index].id;
-                bool isFirstTimeSlot = list[index].id == firstTimeSlot.id;
+                // bool isFirstTimeSlot = list[index].id == firstTimeSlot.id;
                 // bool isSelect = false;
                 return Container(
                   // height: 30,
@@ -162,7 +188,7 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                   child: InkWell(
                     onTap: () async {
                       if (model.selectedTimeSlot != null) {
-                        model.confirmTimeSlot(model.listTimeSlot?[index]);
+                        model.confirmTimeSlot(list[index]);
                       }
                     },
                     child: Container(
@@ -285,15 +311,15 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   SizedBox(
-                    height: 180,
+                    height: 170,
                     child: GridView.count(
                       physics: const ScrollPhysics(),
                       // padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                       primary: false,
                       childAspectRatio: 1.1,
                       shrinkWrap: true,
-                      crossAxisSpacing: 10,
-                      mainAxisSpacing: 30,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 25,
                       crossAxisCount: 2,
                       controller: scrollController,
                       scrollDirection: Axis.horizontal,
@@ -304,19 +330,8 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                             //     arguments: {'menu': homeMenu[index].toJson()});
                             final root = Get.find<RootViewModel>();
 
-                            if (!root.isCurrentTimeSlotAvailable()) {
-                              showStatusDialog(
-                                  "assets/images/error.png",
-                                  "Opps",
-                                  "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-                            } else {
-                              // ProductFilterViewModel productFilterViewModel =
-                              //     Get.find<ProductFilterViewModel>();
-                              // productFilterViewModel.getProductsWithFilter(
-                              //     id: homeMenu[index].id!);
-                              Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
-                                  arguments: homeMenu[index]);
-                            }
+                            Get.toNamed(RouteHandler.PRODUCT_FILTER_LIST,
+                                arguments: homeMenu[index]);
                           },
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -328,10 +343,11 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                                   width: 42,
                                   child: ColorFiltered(
                                     colorFilter: ColorFilter.mode(
-                                      Get.find<RootViewModel>()
-                                              .isCurrentTimeSlotAvailable()
-                                          ? Colors.transparent
-                                          : Colors.grey,
+                                      // Get.find<RootViewModel>()
+                                      //         .isCurrentTimeSlotAvailable()
+                                      //     ?
+                                      Colors.transparent,
+                                      // : Colors.grey,
                                       BlendMode.saturation,
                                     ),
                                     child: CacheImage(

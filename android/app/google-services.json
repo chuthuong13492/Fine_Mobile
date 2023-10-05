@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "879820098286-advenu5r53p7al7betpu2ccau5rdenmv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.smjle.fine_mobile",
+            "certificate_hash": "eaae2a523413e439221002ae2fc64a23f3a75d1a"
+          }
+        },
+        {
           "client_id": "879820098286-s11ii8jo219qfk1jeg5qjphfqqjhsg3f.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

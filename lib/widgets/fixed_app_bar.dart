@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
@@ -17,6 +19,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+import '../Model/DTO/index.dart';
+
 class FixedAppBar extends StatefulWidget {
   final double height;
 
@@ -29,16 +33,25 @@ class FixedAppBar extends StatefulWidget {
 class _FixedAppBarState extends State<FixedAppBar> {
   PartyOrderViewModel? _partyOrderViewModel = Get.find<PartyOrderViewModel>();
   OrderViewModel? _orderViewModel = Get.find<OrderViewModel>();
+  RootViewModel? root;
   final TextEditingController searchController = TextEditingController();
+
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    // deleteCart();
-    // deleteMart();
-    // deletePartyCode();
+    root = Get.find<RootViewModel>();
     // _orderViewModel!.getCurrentCart();
-    _partyOrderViewModel!.getPartyOrder();
+    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      Get.find<RootViewModel>().getListTimeSlot();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancel the timer when widget is disposed
+    super.dispose();
   }
 
   @override
@@ -49,26 +62,35 @@ class _FixedAppBarState extends State<FixedAppBar> {
       duration: const Duration(milliseconds: 300),
       // decoration: const BoxDecoration(
       //   boxShadow: [
-      //                     BoxShadow(
+      //     BoxShadow(
       //         color: Colors.grey,
-      //         spreadRadius: 3,
-      //         // blurRadius: 6,
-      //         offset: Offset(0, 25) // changes position of shadow
+      //         spreadRadius: -4,
+      //         blurRadius: 4,
+      //         offset: Offset(0, 5) // changes position of shadow
       //         ),
       //   ],
-      //   // color: FineTheme.palettes.primary100,
       // ),
       child: Container(
-        color: Colors.transparent,
+        color: Colors.white,
         padding:
             const EdgeInsets.only(left: 17, right: 17, top: 10, bottom: 10),
+        // decoration: const BoxDecoration(
+        //   boxShadow: [
+        //                     BoxShadow(
+        //         color: Colors.grey,
+        //         spreadRadius: 3,
+        //         // blurRadius: 6,
+        //         offset: Offset(0, 25) // changes position of shadow
+        //         ),
+        //   ],
+        // ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           // mainAxisAlignment: MainAxisAlignment.center,
           children: [
             select(),
             const SizedBox(
-              height: 24,
+              height: 8,
             ),
             search(),
           ],
@@ -81,33 +103,9 @@ class _FixedAppBarState extends State<FixedAppBar> {
     bool hasQuantity = false;
     int quantity = 0;
     return ScopedModel(
-      model: Get.find<OrderViewModel>(),
-      child: ScopedModelDescendant<OrderViewModel>(
+      model: Get.find<PartyOrderViewModel>(),
+      child: ScopedModelDescendant<PartyOrderViewModel>(
         builder: (context, child, model) {
-          // PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
-          // if (party.partyOrderDTO != null) {
-          //   quantity = party.currentCart!.itemQuantity();
-          // } else {
-          //   if (model.currentCart == null) {
-          //     quantity;
-          //   } else {
-          //     quantity = model.currentCart!.itemQuantity();
-          //   }
-          // }
-          if (model.currentCart != null) {
-            quantity = model.currentCart!.itemQuantity();
-          }
-
-          if (model.currentCart != null) {
-            hasQuantity = true;
-          }
-          if (model.notifier.value == 0) {
-            hasQuantity = false;
-          }
-          // if (party.currentCart != null) {
-          //   hasQuantity = true;
-          // }
-          // int quantiy = model.currentCart!.itemQuantity();
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -169,63 +167,71 @@ class _FixedAppBarState extends State<FixedAppBar> {
               const SizedBox(
                 width: 25,
               ),
-              ValueListenableBuilder(
-                valueListenable: model.notifier,
-                builder: (context, value, child) {
-                  return InkWell(
-                    onTap: () async {
-                      final root = Get.find<RootViewModel>();
-                      await root.navOrder();
-                    },
-                    child: Container(
-                      width: 54,
-                      padding: const EdgeInsets.all(7),
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                                color: FineTheme.palettes.primary100,
-                                borderRadius: BorderRadius.circular(50)),
-                            child: Center(
-                              child: Image.asset(
-                                "assets/icons/shopping-bag-02.png",
-                                height: 24,
-                                width: 24,
-                              ),
+              InkWell(
+                onTap: () async {
+                  await showPartyDialog(model, isHome: true);
+                  // final root = Get.find<RootViewModel>();
+                  // await root.navOrder();
+                },
+                child: Container(
+                  width: 50,
+                  // height: 45,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                      color: FineTheme.palettes.shades100,
+                      borderRadius: BorderRadius.circular(100),
+                      border: Border.all(color: FineTheme.palettes.primary100)),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            color: FineTheme.palettes.shades100,
+                            borderRadius: BorderRadius.circular(100)),
+                        child: Center(
+                          child: SvgPicture.asset(
+                            "assets/icons/Party.svg",
+                            width: 30,
+                            height: 30,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: -10,
+                        left: 30,
+                        // right: 20,
+                        child: AnimatedContainer(
+                          padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                          duration: const Duration(microseconds: 300),
+                          // width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            color: FineTheme.palettes.primary300,
+                            //border: Border.all(color: Colors.grey),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "New",
+                              style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 10,
+                                  fontStyle: FontStyle.normal,
+                                  color: FineTheme.palettes.shades100),
                             ),
                           ),
-                          hasQuantity
-                              ? Positioned(
-                                  top: -2,
-                                  left: 30,
-                                  child: AnimatedContainer(
-                                    duration: const Duration(microseconds: 300),
-                                    width: 18,
-                                    height: 18,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(16),
-                                      color: Colors.red,
-                                      //border: Border.all(color: Colors.grey),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        value.toString(),
-                                        style: FineTheme.typograhpy.subtitle1
-                                            .copyWith(color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                        ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              )
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(
+                width: 15,
+              ),
             ],
           );
         },
@@ -234,6 +240,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
   }
 
   Widget select() {
+    // String dropdownDaysSelect = "Hôm nay";
     return ScopedModel(
         model: Get.find<RootViewModel>(),
         child: ScopedModelDescendant<RootViewModel>(
@@ -263,7 +270,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
                 Expanded(
                   child: InkWell(
                     onTap: () async {
-                      Get.offAllNamed(RouteHandler.STORE_SELECT);
+                      // Get.offAllNamed(RouteHandler.STORE_SELECT);
 
                       // AccountViewModel root = Get.find<AccountViewModel>();
                       // root.processSignout();
@@ -319,19 +326,19 @@ class _FixedAppBarState extends State<FixedAppBar> {
                               ],
                             ),
                           ),
-                          // SizedBox(
-                          //   width: 8,
-                          // ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 15),
-                            child: Center(
-                              child: Image.asset(
-                                "assets/icons/chevron-down.png",
-                                width: 18,
-                                height: 18,
-                              ),
-                            ),
-                          )
+                          const SizedBox(
+                            width: 8,
+                          ),
+                          // Padding(
+                          //   padding: const EdgeInsets.only(right: 15),
+                          //   child: Center(
+                          //     child: Image.asset(
+                          //       "assets/icons/chevron-down.png",
+                          //       width: 18,
+                          //       height: 18,
+                          //     ),
+                          //   ),
+                          // )
                         ],
                       ),
                     ),
@@ -340,25 +347,66 @@ class _FixedAppBarState extends State<FixedAppBar> {
                 const SizedBox(
                   width: 22,
                 ),
-                InkWell(
-                  onTap: () {},
-                  child: Image.asset(
-                    "assets/icons/notification-message.png",
-                    width: 24,
-                    height: 24,
+                Center(
+                  child: SizedBox(
+                    height: 29,
+                    child: DropdownButton<String>(
+                      value: model.isNextDay == false ? "Hôm nay" : "Hôm sau",
+                      underline: const SizedBox.shrink(),
+                      items: [
+                        DropdownMenuItem<String>(
+                            value: "Hôm nay",
+                            child: Text(
+                              "HÔM NAY",
+                              style: model.isNextDay == false
+                                  ? FineTheme.typograhpy.subtitle1.copyWith(
+                                      color: FineTheme.palettes.primary200)
+                                  : FineTheme.typograhpy.subtitle1.copyWith(
+                                      color: FineTheme.palettes.neutral500),
+                            )),
+                        DropdownMenuItem<String>(
+                            value: "Hôm sau",
+                            child: Text("HÔM SAU",
+                                style: model.isNextDay == true
+                                    ? FineTheme.typograhpy.subtitle1.copyWith(
+                                        color: FineTheme.palettes.primary200)
+                                    : FineTheme.typograhpy.subtitle1.copyWith(
+                                        color: FineTheme.palettes.neutral500))),
+                      ],
+                      style: FineTheme.typograhpy.subtitle1
+                          .copyWith(color: FineTheme.palettes.primary300),
+                      onChanged: (value) async {
+                        // setState(() {
+                        //   dropdownDaysSelect = value!;
+                        // });
+                        if (value!.contains("Hôm nay")) {
+                          await model.changeDay(0);
+                        } else {
+                          await model.changeDay(1);
+                        }
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                InkWell(
-                  onTap: () {},
-                  child: Image.asset(
-                    "assets/icons/menu-02.png",
-                    width: 24,
-                    height: 24,
-                  ),
-                ),
+                )
+                // InkWell(
+                //   onTap: () {},
+                //   child: Image.asset(
+                //     "assets/icons/notification-message.png",
+                //     width: 24,
+                //     height: 24,
+                //   ),
+                // ),
+                // const SizedBox(
+                //   width: 8,
+                // ),
+                // InkWell(
+                //   onTap: () {},
+                //   child: Image.asset(
+                //     "assets/icons/menu-02.png",
+                //     width: 24,
+                //     height: 24,
+                //   ),
+                // ),
               ],
             );
           },

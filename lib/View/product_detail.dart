@@ -24,6 +24,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+import '../ViewModel/order_viewModel.dart';
+
 class ProductDetailScreen extends StatefulWidget {
   final ProductDTO dto;
 
@@ -174,7 +176,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               InkWell(
                 onTap: () async {
                   PartyOrderViewModel model = Get.find<PartyOrderViewModel>();
-                  await showPartyDialog(model.partyCode, isHome: true);
+
+                  await showPartyDialog(model);
                 },
                 child: Text(
                   "Tạo phòng",
@@ -202,9 +205,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     width: 10,
                   ),
                   Container(
-                    width: 260,
+                    width: 220,
                     child: Text(
-                      "Khao 15% cho đơn hàng nhóm từ 180K",
+                      "Hoàn tiền cho đơn nhóm nè",
                       style: FineTheme.typograhpy.body1,
                       overflow: TextOverflow.ellipsis,
                     ),

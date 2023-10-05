@@ -7,6 +7,7 @@ import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/View/LoginScreen/login_byPhone.dart';
 import 'package:fine/View/LoginScreen/login_byPhoneOTP.dart';
+import 'package:fine/View/TopUp/transactionHistory_screen.dart';
 import 'package:fine/View/checkingOrder_screen.dart';
 import 'package:fine/View/coOrder_screen.dart';
 import 'package:fine/View/confirm_party_screen.dart';
@@ -27,7 +28,7 @@ import 'package:fine/View/sign_up.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/View/station_picker_screen.dart';
 import 'package:fine/View/store_select_screen.dart';
-import 'package:fine/View/topUp_screen.dart';
+import 'package:fine/View/TopUp/topUp_screen.dart';
 import 'package:fine/View/welcome_screen.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/ViewModel/startup_viewModel.dart';
@@ -113,6 +114,10 @@ class MyApp extends StatelessWidget {
             return SlideBottomRoute(
               page: OrderHistoryDetail(order: settings.arguments as dynamic),
             );
+          case RouteHandler.TRANSACTION_HISTORY:
+            return SlideBottomRoute(
+              page: TransactionHistoryScreen(),
+            );
           case RouteHandler.QRCODE_SCREEN:
             return CupertinoPageRoute<bool>(
                 builder: (context) =>
@@ -126,8 +131,7 @@ class MyApp extends StatelessWidget {
           case RouteHandler.CHECKING_ORDER_SCREEN:
             Map map = settings.arguments as Map;
             return CupertinoPageRoute<bool>(
-                builder: (context) => CheckingOrderScreen(
-                    order: map["order"], isFetch: map["isFetch"]),
+                builder: (context) => CheckingOrderScreen(order: map["order"]),
                 settings: settings);
           case RouteHandler.TOP_UP_SCREEN:
             return CupertinoPageRoute<bool>(

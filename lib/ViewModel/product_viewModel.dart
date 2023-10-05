@@ -264,8 +264,6 @@ class ProductDetailViewModel extends BaseModel {
       isPartyMode = true;
     }
     String description = "";
-    // Cart newCart = Cart(5, '0902915671', 4);
-    List<CartItem>? orderDetails = [];
 
     checkCurrentCart = await getMart();
     if (checkCurrentCart == null) {
@@ -281,39 +279,47 @@ class ProductDetailViewModel extends BaseModel {
           timeSlotId: root.selectedTimeSlot!.id);
       await setMart(checkCurrentCart!);
       checkCurrentCart = await getMart();
-      AddProductToCartResponse? result =
+      AddProductToCartStatus? result =
           await _dao!.checkProductToCart(checkCurrentCart!);
-      if (result!.productsRecommend != null) {
-        order.productRecomend = result.productsRecommend;
+      if (result?.code == 4006) {
+        Get.back();
+        await showStatusDialog("assets/images/error.png", "Oops!",
+            "Bạn chỉ có đặt 2 đơn trong 1 khung giờ thui!!");
       }
-      if (result.status!.success == false) {
-        await showStatusDialog("assets/images/error.png", "Box đã đầy",
-            "Box đã đầy mất ùi, bạn hong thể thêm ${result.product!.name}");
-      }
-      if (result.status!.errorCode == '2001') {
-        await showStatusDialog("assets/images/error.png", "Box đã đầy",
-            "Box đã đầy ùi, bạn chỉ có thể thêm ${result.product!.quantity} phần ${result.product!.name}");
-      }
-      final productList = result.card;
-      if (productList != null) {
-        for (var item in productList) {
-          CartItem cartItem = new CartItem(item.id, item.quantity!, null);
-          await addItemToCart(cartItem, root.selectedTimeSlot!.id!);
-          await addItemToMart(cartItem, root.selectedTimeSlot!.id!);
-          if (item.id == checkCurrentCart!.productId) {
-            await AnalyticsService.getInstance()!
-                .logChangeCart(null, item.quantity!, true, productInCart: item);
+      if (result?.addProduct != null) {
+        if (result!.addProduct!.productsRecommend != null) {
+          order.productRecomend = result.addProduct!.productsRecommend;
+        }
+        if (result.addProduct!.status!.success == false) {
+          await showStatusDialog("assets/images/error.png", "Box đã đầy",
+              "Box đã đầy mất ùi, bạn hong thể thêm ${result.addProduct!.product!.name}");
+        }
+        if (result.addProduct!.status!.errorCode == '2001') {
+          await showStatusDialog("assets/images/error.png", "Box đã đầy",
+              "Box đã đầy ùi, bạn chỉ có thể thêm ${result.addProduct!.product!.quantity} phần ${result.addProduct!.product!.name}");
+        }
+        final productList = result.addProduct!.card;
+        if (productList != null) {
+          for (var item in productList) {
+            CartItem cartItem = new CartItem(item.id, item.quantity!, null);
+            await addItemToCart(cartItem, root.selectedTimeSlot!.id!);
+            await addItemToMart(cartItem, root.selectedTimeSlot!.id!);
+            if (item.id == checkCurrentCart!.productId) {
+              await AnalyticsService.getInstance()!.logChangeCart(
+                  null, item.quantity!, true,
+                  productInCart: item);
+            }
           }
         }
-      }
-      checkCurrentCart = await getMart();
-      if (checkCurrentCart!.productId != null) {
-        checkCurrentCart!.productId = null;
-        checkCurrentCart!.quantity = 0;
-      }
-      if (checkCurrentCart!.orderDetails != null &&
-          checkCurrentCart!.productId == null) {
-        await setCart(checkCurrentCart!);
+        checkCurrentCart = await getMart();
+        if (checkCurrentCart!.productId != null) {
+          checkCurrentCart!.productId = null;
+          checkCurrentCart!.quantity = 0;
+        }
+        if (checkCurrentCart!.orderDetails != null &&
+            checkCurrentCart!.productId == null) {
+          await setCart(checkCurrentCart!);
+        }
       }
     } else {
       await processCart(
@@ -392,42 +398,49 @@ class ProductDetailViewModel extends BaseModel {
       checkCurrentCart!.quantity = quantity;
       await setMart(checkCurrentCart!);
       checkCurrentCart = await getMart();
-      AddProductToCartResponse? result =
+      AddProductToCartStatus? result =
           await _dao!.checkProductToCart(checkCurrentCart!);
-      if (result!.productsRecommend != null) {
-        order.productRecomend = result.productsRecommend;
+      if (result?.code == 4006) {
+        Get.back();
+        await showStatusDialog("assets/images/error.png", "Oops!",
+            "Bạn chỉ có đặt 2 đơn trong 1 khung giờ thui!!");
       }
-      if (result.status!.success == false) {
-        await showStatusDialog("assets/images/error.png", "Box đã đầy",
-            "Box đã đầy mất ùi, bạn hong thể thêm ${result.product!.name}");
-      }
-      if (result.status!.errorCode == '2001') {
-        await showStatusDialog("assets/images/error.png", "Box đã đầy",
-            "Box đã đầy rùi, bạn chỉ có thể thêm ${result.product!.quantity} phần ${result.product!.name}");
-      }
-      final productList = result.card!;
-      if (productList != null) {
-        for (var item in productList) {
-          CartItem cartItem = new CartItem(item.id, item.quantity!, null);
-          await removeItemFromCart(cartItem);
-          await removeItemFromMart(cartItem);
-          await addItemToCart(cartItem, timeSlotId!);
-          await addItemToMart(cartItem, timeSlotId);
-          if (item.id == checkCurrentCart!.productId) {
-            await AnalyticsService.getInstance()!
-                .logChangeCart(null, item.quantity!, true, productInCart: item);
+      if (result?.addProduct != null) {
+        if (result!.addProduct!.productsRecommend != null) {
+          order.productRecomend = result.addProduct!.productsRecommend;
+        }
+        if (result.addProduct!.status!.success == false) {
+          await showStatusDialog("assets/images/error.png", "Box đã đầy",
+              "Box đã đầy mất ùi, bạn hong thể thêm ${result.addProduct!.product!.name}");
+        }
+        if (result.addProduct!.status!.errorCode == '2001') {
+          await showStatusDialog("assets/images/error.png", "Box đã đầy",
+              "Box đã đầy rùi, bạn chỉ có thể thêm ${result.addProduct!.product!.quantity} phần ${result.addProduct!.product!.name}");
+        }
+        final productList = result.addProduct!.card!;
+        if (productList != null) {
+          for (var item in productList) {
+            CartItem cartItem = new CartItem(item.id, item.quantity!, null);
+            await removeItemFromCart(cartItem);
+            await removeItemFromMart(cartItem);
+            await addItemToCart(cartItem, timeSlotId!);
+            await addItemToMart(cartItem, timeSlotId);
+            // if (item.id == checkCurrentCart!.productId) {
+            //   await AnalyticsService.getInstance()!
+            //       .logChangeCart(null, item.quantity!, true, productInCart: item);
+            // }
           }
         }
-      }
-      checkCurrentCart = await getMart();
+        checkCurrentCart = await getMart();
 
-      if (checkCurrentCart!.productId != null) {
-        checkCurrentCart!.productId = null;
-        checkCurrentCart!.quantity = 0;
-      }
-      if (checkCurrentCart!.orderDetails != null &&
-          checkCurrentCart!.productId == null) {
-        await setCart(checkCurrentCart!);
+        if (checkCurrentCart!.productId != null) {
+          checkCurrentCart!.productId = null;
+          checkCurrentCart!.quantity = 0;
+        }
+        if (checkCurrentCart!.orderDetails != null &&
+            checkCurrentCart!.productId == null) {
+          await setCart(checkCurrentCart!);
+        }
       }
     }
   }

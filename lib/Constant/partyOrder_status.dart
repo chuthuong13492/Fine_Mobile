@@ -2,7 +2,7 @@ import 'package:fine/Model/DTO/index.dart';
 
 class PartyOrderStatus {
   int? statusCode;
-  String? code;
+  int? code;
   String? message;
   PartyOrderDTO? partyOrderDTO;
 

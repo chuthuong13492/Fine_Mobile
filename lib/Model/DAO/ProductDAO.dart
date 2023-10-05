@@ -70,39 +70,34 @@ class ProductDAO extends BaseDAO {
     return null;
   }
 
-  Future<AddProductToCartResponse?> checkProductToCart(Cart cart) async {
-    // try {
-    //   final res = await request.post(
-    //     '/order/card',
-    //     data: cart.toJsonAPi(),
-    //   );
-    //   return AddProductToCartStatus(
-    //     statusCode: res.statusCode,
-    //     code: res.data['code'],
-    //     message: res.data['message'],
-    //     product: AddProductToCartResponse.fromList(res.data['data']),
-    //   );
-    // } on DioError catch (e) {
-    //   return AddProductToCartStatus(
-    //       statusCode: e.response!.statusCode,
-    //       code: e.response!.data['code'],
-    //       message: e.response!.data['message']);
-    // } catch (e) {
-    //   throw e;
-    // }
-    if (cart != null) {
-      // print("Request Note: " + note);
-      final res = await request.post(
-        '/order/card',
-        data: cart.toCheckCartJsonAPi(),
-      );
-      if (res.statusCode == 200) {
-        return AddProductToCartResponse.fromJson(res.data['data']);
-      }
+  Future<AddProductToCartStatus?> checkProductToCart(Cart cart) async {
+    try {
+      if (cart != null) {
+        // print("Request Note: " + note);
+        final res = await request.post(
+          '/order/card',
+          data: cart.toCheckCartJsonAPi(),
+        );
+        if (res.statusCode == 200) {
+          return AddProductToCartStatus(
+              statusCode: res.statusCode,
+              code: res.data['status']['errorCode'],
+              message: res.data['status']['message'],
+              addProduct: AddProductToCartResponse.fromJson(res.data['data']));
+          // return AddProductToCartResponse.fromJson(res.data['data']);
+        }
 
+        return null;
+      }
       return null;
+    } on DioError catch (e) {
+      return AddProductToCartStatus(
+          statusCode: e.response!.data["statusCode"],
+          code: e.response!.data['errorCode'],
+          message: e.response!.data['message']);
+    } catch (e) {
+      throw e;
     }
-    return null;
   }
 
   // Future<ProductDTO>? getProductDetail(int? productId,

@@ -119,16 +119,9 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                           onTap: () {
                             RootViewModel root = Get.find<RootViewModel>();
                             // root.openProductDetail(product, fetchDetail: true);
-                            if (!root.isCurrentTimeSlotAvailable()) {
-                              showStatusDialog(
-                                  "assets/images/error.png",
-                                  "Opps",
-                                  "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-                            } else {
-                              // if (product.type == ProductType.MASTER_PRODUCT) {}
-                              root.openProductDetail(product,
-                                  fetchDetail: true);
-                            }
+
+                            // if (product.type == ProductType.MASTER_PRODUCT) {}
+                            root.openProductDetail(product, fetchDetail: true);
                           },
                           child: buildProductInMenu(product),
                         ),
@@ -267,14 +260,17 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                       child: Text(
                         formatPrice(product.attributes![0].price!),
                         style: TextStyle(
-                            fontFamily: "Montserrat",
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            overflow: TextOverflow.ellipsis,
-                            color: Get.find<RootViewModel>()
-                                    .isCurrentTimeSlotAvailable()
-                                ? Colors.red
-                                : Colors.grey),
+                          fontFamily: "Montserrat",
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          overflow: TextOverflow.ellipsis,
+                          color:
+                              // Get.find<RootViewModel>()
+                              //         .isCurrentTimeSlotAvailable()
+                              //     ?
+                              Colors.red,
+                          // : Colors.grey,
+                        ),
                       ),
                     ),
                     const SizedBox(
@@ -288,10 +284,12 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                           children: [
                             FaIcon(
                               Icons.star_half,
-                              color: Get.find<RootViewModel>()
-                                      .isCurrentTimeSlotAvailable()
-                                  ? FineTheme.palettes.primary300
-                                  : Colors.grey,
+                              color:
+                                  //  Get.find<RootViewModel>()
+                                  //         .isCurrentTimeSlotAvailable()
+                                  //     ?
+                                  FineTheme.palettes.primary300,
+                              // : Colors.grey,
                               size: 14,
                             ),
                             const SizedBox(
@@ -332,9 +330,10 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                   height: 50,
                   decoration: BoxDecoration(
                     color:
-                        Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
-                            ? FineTheme.palettes.primary100
-                            : Colors.grey,
+                        // Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
+                        //     ?
+                        FineTheme.palettes.primary100,
+                    // : Colors.grey,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Center(
@@ -365,9 +364,10 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                   // ),
                   child: ColorFiltered(
                     colorFilter: ColorFilter.mode(
-                      Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
-                          ? Colors.transparent
-                          : Colors.grey,
+                      // Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
+                      //     ?
+                      Colors.transparent,
+                      // : Colors.grey,
                       BlendMode.saturation,
                     ),
                     child: CacheImage(

@@ -51,14 +51,36 @@ class StoreDAO extends BaseDAO {
   }
 
   Future<List<BlogDTO>?> getBlogs() async {
-    final res = await request.get(
-      "/blog-post",
-      // queryParameters: {"page": page, "size": size}..addAll(params),
-    );
-    if (res.data['data'] != null) {
-      var listJson = res.data['data'] as List;
-      metaDataDTO = MetaDataDTO.fromJson(res.data['metadata']);
-      return listJson.map((e) => BlogDTO.fromJson(e)).toList();
+    List listBlog = [
+      {
+        'active': true,
+        'imageUrl':
+            "https://img.freepik.com/premium-photo/set-organic-healthy-diet-food-superfoods-beans-legumes-nuts-seeds-greens-fruit-vegetables-dark-blue-background-copy-space-top-view_136595-12939.jpg",
+      },
+      {
+        'active': true,
+        'imageUrl':
+            "https://img.freepik.com/premium-photo/food-background-set-food-old-black-background-concept-healthy-eating-top-view-free-space-text_187166-34662.jpg",
+      },
+      {
+        'active': true,
+        'imageUrl':
+            "https://img.freepik.com/premium-photo/healthy-food-background-autumn-fresh-vegetables-dark-stone-table-with-copy-space-top-view_127032-1954.jpg",
+      },
+      {
+        'active': true,
+        'imageUrl':
+            "https://t4.ftcdn.net/jpg/05/53/15/53/360_F_553155350_Oy6YtiH5ovW3SyInD94Pr3gKqI7YaL3V.webp",
+      }
+    ];
+    // final res = await request.get(
+    //   "/blog-post",
+    //   // queryParameters: {"page": page, "size": size}..addAll(params),
+    // );
+    if (listBlog != null) {
+      // var listJson = res.data['data'] as List;
+      // metaDataDTO = MetaDataDTO.fromJson(res.data['metadata']);
+      return listBlog.map((e) => BlogDTO.fromJson(e)).toList();
     }
     return null;
   }

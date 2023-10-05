@@ -260,7 +260,7 @@ class _CustomInvitePartyState extends State<CustomInviteParty> {
                                   }
                                   String phone =
                                       '+' + country.phoneCode + _phone!;
-                                  await model.getCustomByPhone(phone);
+                                  await model.getCustomerByPhone(phone);
                                   // await model.signInWithPhone(
                                   //     phone, widget.isLoginMail!);
                                 }
@@ -318,19 +318,25 @@ class _CustomInvitePartyState extends State<CustomInviteParty> {
                         ),
                         Container(
                           child: isCountdown == false
-                              ? TextButton(
-                                  onPressed: () {
-                                    startCountdown();
-                                    setState(() {
-                                      isCountdown = true;
-                                    });
-                                  },
-                                  child: Text(
-                                    'Mời'.toUpperCase(),
-                                    style: FineTheme.typograhpy.subtitle1
-                                        .copyWith(color: Colors.green),
-                                  ),
-                                )
+                              ? model.isInvited == false
+                                  ? TextButton(
+                                      onPressed: () {
+                                        startCountdown();
+                                        setState(() {
+                                          isCountdown = true;
+                                        });
+                                      },
+                                      child: Text(
+                                        'Mời'.toUpperCase(),
+                                        style: FineTheme.typograhpy.subtitle1
+                                            .copyWith(color: Colors.green),
+                                      ),
+                                    )
+                                  : Text(
+                                      'Đã Mời'.toUpperCase(),
+                                      style: FineTheme.typograhpy.subtitle1
+                                          .copyWith(color: Colors.green),
+                                    )
                               : TextButton(
                                   onPressed: () {
                                     setState(() {

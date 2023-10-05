@@ -4,6 +4,7 @@ import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
+import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/cupertino.dart';
@@ -338,8 +339,9 @@ Future<int> showOptionDialog(String text,
   return option!;
 }
 
-Future<int> showInviteDialog(String text,
+Future<int> showInputVoucherDialog(
     {String? firstOption, String? secondOption}) async {
+  TextEditingController controller = TextEditingController(text: '');
   // hideDialog();
   int? option;
   bool shouldPop = false;
@@ -392,6 +394,163 @@ Future<int> showInviteDialog(String text,
                 const SizedBox(
                   height: 84,
                 ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        flex: 7,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(8)),
+                              border: Border.all(
+                                  color: FineTheme.palettes.primary100)),
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                            child: TextField(
+                              onChanged: (input) {},
+                              controller: controller,
+                              decoration: InputDecoration(
+                                  hintText: 'Nhập voucher',
+                                  border: InputBorder.none,
+                                  suffixIcon: IconButton(
+                                    icon: const Icon(
+                                      Icons.clear,
+                                      size: 16,
+                                      color: Colors.grey,
+                                    ),
+                                    onPressed: () {
+                                      controller.clear();
+                                    },
+                                  )),
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                fontStyle: FontStyle.normal,
+                                color: FineTheme.palettes.neutral500,
+                              ),
+                              keyboardType: TextInputType.multiline,
+                              maxLines: 1,
+                              autofocus: true,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 3,
+                        fit: FlexFit.tight,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(8)),
+                                color: FineTheme.palettes.primary100,
+                                border: Border.all(
+                                  color: FineTheme.palettes.primary100,
+                                )),
+                            child: TextButton(
+                                onPressed: () async {
+                                  PartyOrderViewModel party =
+                                      Get.find<PartyOrderViewModel>();
+                                  option = 1;
+                                  if (controller.text.contains("LPO")) {
+                                    await party.joinPartyOrder(
+                                        code: controller.text);
+                                    hideDialog();
+                                  } else {
+                                    await showStatusDialog(
+                                        "assets/images/logo2.png",
+                                        "Sai mã mất rùi",
+                                        "Mã code hong đúng nè 😓");
+                                  }
+                                },
+                                child: const Text('Tham gia',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 15))),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            // Positioned(
+            //   top: 0,
+            //   right: 95,
+            //   child: Image(
+            //     image: AssetImage("assets/images/party_img.png"),
+            //     width: Get.width,
+            //     height: Get.height * 0.12,
+            //   ),
+            // )
+          ],
+        ),
+      ),
+    ),
+    barrierDismissible: true,
+  );
+  return option!;
+}
+
+Future<int> showInviteDialog(String text,
+    {String? firstOption, String? secondOption}) async {
+  // hideDialog();
+  int? option;
+  bool shouldPop = false;
+  await Get.dialog(
+    WillPopScope(
+      onWillPop: () async {
+        return shouldPop;
+      },
+      child: Dialog(
+        backgroundColor: Colors.white,
+        elevation: 8.0,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0))),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Expanded(
+              child: Container(
+                height: 120,
+                decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('assets/images/party_img.png'),
+                        fit: BoxFit.fill),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.0),
+                        topRight: Radius.circular(16.0))),
+              ),
+            ),
+
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: const Icon(
+                      FontAwesome.close,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      option = 0;
+                      PartyOrderViewModel party =
+                          Get.find<PartyOrderViewModel>();
+                      party.isInvited = false;
+                      party.acc = null;
+                      hideDialog();
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 84,
+                ),
                 const Padding(
                   padding: EdgeInsets.only(bottom: 16),
                   child: CustomInviteParty(),
@@ -407,6 +566,87 @@ Future<int> showInviteDialog(String text,
             //     height: Get.height * 0.12,
             //   ),
             // )
+          ],
+        ),
+      ),
+    ),
+    barrierDismissible: true,
+  );
+  return option!;
+}
+
+Future<int> showLeaderDialog(
+    {String? firstOption, String? secondOption}) async {
+  // hideDialog();
+  int? option;
+  bool shouldPop = false;
+  await Get.dialog(
+    WillPopScope(
+      onWillPop: () async {
+        return shouldPop;
+      },
+      child: Dialog(
+        backgroundColor: Colors.white,
+        elevation: 8.0,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0))),
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Expanded(
+              child: Container(
+                height: 120,
+                decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('assets/images/party_img.png'),
+                        fit: BoxFit.fill),
+                    borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.0),
+                        topRight: Radius.circular(16.0))),
+              ),
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: IconButton(
+                    icon: const Icon(
+                      FontAwesome.close,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      option = 0;
+                      PartyOrderViewModel party =
+                          Get.find<PartyOrderViewModel>();
+                      party.acc = null;
+                      hideDialog();
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 84,
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                  child: Center(
+                    child: Text("Chọn new Leader!!!",
+                        style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            fontStyle: FontStyle.normal,
+                            height: 1.2,
+                            color: FineTheme.palettes.primary100)),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 16),
+                  child: RadioList(),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -666,8 +906,8 @@ Future<int> showConfirmOrderDialog(
   return option!;
 }
 
-Future<int> showPartyDialog(String? partyCode, {bool isHome = false}) async {
-  PartyOrderViewModel model = Get.find<PartyOrderViewModel>();
+Future<int> showPartyDialog(PartyOrderViewModel model, {bool? isHome}) async {
+  // PartyOrderViewModel model = Get.find<PartyOrderViewModel>();
   TextEditingController controller = TextEditingController(text: '');
   bool isErrorInput = false;
   // hideDialog();
@@ -711,8 +951,16 @@ Future<int> showPartyDialog(String? partyCode, {bool isHome = false}) async {
                       color: Colors.white,
                       size: 24,
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       option = 0;
+                      model.partyCode = await getPartyCode();
+                      if (model.partyCode == null) {
+                        model.isLinkedParty(false);
+                      }
+                      // if (model.isLinked == true) {
+                      //   Get.find<OrderViewModel>().isPartyOrder =
+                      //       model.isLinked;
+                      // }
                       hideDialog();
                     },
                   ),
@@ -746,168 +994,159 @@ Future<int> showPartyDialog(String? partyCode, {bool isHome = false}) async {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Đơn liên kết',
-                          style: FineTheme.typograhpy.subtitle1,
-                        ),
-                      ),
-                      CustomCupertinoSwitch(
-                        value: model.isLinked!,
-                        onChanged: (value) {
-                          model.isLinkedParty(value);
-                        },
-                      )
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                  child: Row(
-                    children: [
-                      Flexible(
-                        flex: 7,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)),
-                              border: Border.all(
-                                  color: FineTheme.palettes.primary100)),
-                          child: Padding(
-                            padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                            child: TextField(
-                              onChanged: (input) {},
-                              controller: controller,
-                              decoration: InputDecoration(
-                                  hintText: 'Nhập code party',
-                                  border: InputBorder.none,
-                                  suffixIcon: IconButton(
-                                    icon: const Icon(
-                                      Icons.clear,
-                                      size: 16,
-                                      color: Colors.grey,
-                                    ),
-                                    onPressed: () {
-                                      controller.clear();
-                                    },
-                                  )),
-                              style: TextStyle(
-                                fontFamily: 'Montserrat',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                                fontStyle: FontStyle.normal,
-                                color: FineTheme.palettes.neutral500,
-                              ),
-                              keyboardType: TextInputType.multiline,
-                              maxLines: 1,
-                              autofocus: true,
+                model.partyCode == null
+                    ? Column(
+                        children: [
+                          const SizedBox(height: 12),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Đơn liên kết',
+                                    style: FineTheme.typograhpy.subtitle1,
+                                  ),
+                                ),
+                                CustomCupertinoSwitch(
+                                  value: model.isLinked!,
+                                  onChanged: (value) {
+                                    model.isLinkedParty(value);
+                                  },
+                                )
+                              ],
                             ),
                           ),
-                        ),
-                      ),
-                      Flexible(
-                        flex: 3,
-                        fit: FlexFit.tight,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(8)),
-                                color: FineTheme.palettes.primary100,
-                                border: Border.all(
-                                  color: FineTheme.palettes.primary100,
-                                )),
-                            child: TextButton(
-                                onPressed: () async {
-                                  PartyOrderViewModel party =
-                                      Get.find<PartyOrderViewModel>();
-                                  option = 1;
-                                  await party.joinPartyOrder(
-                                      code: controller.text);
-                                },
-                                child: const Text('Tham gia',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 15))),
+                          const SizedBox(height: 12),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                            child: Row(
+                              children: [
+                                Flexible(
+                                  flex: 7,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(8)),
+                                        border: Border.all(
+                                            color:
+                                                FineTheme.palettes.primary100)),
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                                      child: TextField(
+                                        onChanged: (input) {},
+                                        controller: controller,
+                                        decoration: InputDecoration(
+                                            hintText: 'Nhập code party',
+                                            border: InputBorder.none,
+                                            suffixIcon: IconButton(
+                                              icon: const Icon(
+                                                Icons.clear,
+                                                size: 16,
+                                                color: Colors.grey,
+                                              ),
+                                              onPressed: () {
+                                                controller.clear();
+                                              },
+                                            )),
+                                        style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                          fontStyle: FontStyle.normal,
+                                          color: FineTheme.palettes.neutral500,
+                                        ),
+                                        keyboardType: TextInputType.multiline,
+                                        maxLines: 1,
+                                        autofocus: true,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Flexible(
+                                  flex: 3,
+                                  fit: FlexFit.tight,
+                                  child: Padding(
+                                    padding:
+                                        const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius: const BorderRadius.all(
+                                              Radius.circular(8)),
+                                          color: FineTheme.palettes.primary100,
+                                          border: Border.all(
+                                            color:
+                                                FineTheme.palettes.primary100,
+                                          )),
+                                      child: TextButton(
+                                          onPressed: () async {
+                                            PartyOrderViewModel party =
+                                                Get.find<PartyOrderViewModel>();
+                                            option = 1;
+                                            if (controller.text
+                                                .contains("CPO")) {
+                                              await party.joinPartyOrder(
+                                                  code: controller.text);
+                                            } else {
+                                              await showStatusDialog(
+                                                  "assets/images/logo2.png",
+                                                  "Sai mã mất rùi",
+                                                  "Mã code hong đúng nè 😓");
+                                            }
+                                          },
+                                          child: const Text('Tham gia',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 15))),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
+                          const SizedBox(height: 12),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: InkWell(
-                    onTap: () async {
-                      model.partyCode = await getPartyCode();
-                      if (model.partyCode == null) {
-                        await model.coOrder();
-                        if (model.partyOrderDTO!.partyOrder != null) {
-                          option = 1;
-                          hideDialog();
-                          // if (isHome == true) {
-                          //   Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
-                          // } else {
-                          //   Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
-                          // }
-                          Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                    child: CustomeCreateParty(
+                      model: model,
+                      onChange: () async {
+                        model.partyCode = await getPartyCode();
+                        final order = Get.find<OrderViewModel>();
+                        order.currentCart = await getCart();
+                        if (order.currentCart != null) {
+                          if (model.partyCode == null) {
+                            await model.createCoOrder();
+                            if (model.partyOrderDTO!.partyOrder != null) {
+                              if (isHome == true) {
+                                option = 1;
+                                hideDialog();
+                                Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                              } else {
+                                option = 1;
+                                hideDialog();
+                                Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                              }
+                            } else {
+                              option = 1;
+                              hideDialog();
+                              await Get.find<OrderViewModel>().prepareOrder();
+                              // hideDialog();
+                            }
+                          }
                         } else {
-                          option = 1;
                           hideDialog();
+                          await showStatusDialog(
+                              'assets/images/logo2.png',
+                              "Xin lũi nhe 🥹",
+                              "Bạn phải có ít nhất 1 món mới tạo đc Party nè");
                         }
-                      } else {
-                        if (model.partyOrderDTO!.partyOrder != null) {
-                          await model.getPartyOrder();
-                          option = 1;
-                          hideDialog();
-                          // await Get.delete<bool>(
-                          //   tag: "showOnHome",
-                          // );
-                          Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
-                          // if (isHome == true) {
-                          //   Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
-                          // } else {
-                          //   Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
-                          // }
-                        } else {
-                          option = 1;
-                          hideDialog();
-                        }
-                      }
-                    },
-                    child: Container(
-                      height: 55,
-                      width: Get.width,
-                      decoration: BoxDecoration(
-                        color: FineTheme.palettes.primary100,
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(5),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          partyCode ?? "Tạo phòng Party",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 16,
-                            fontStyle: FontStyle.normal,
-                            color: FineTheme.palettes.shades100,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+                      },
+                    )),
               ],
             ),
           ],

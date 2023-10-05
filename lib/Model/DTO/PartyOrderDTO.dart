@@ -3,22 +3,31 @@ import 'index.dart';
 class PartyOrderDTO {
   String? id;
   String? partyCode;
+  int? partyType;
+  int? orderType;
   TimeSlotDTO? timeSlotDTO;
+  bool? isPayment;
   List<Party>? partyOrder;
 
   PartyOrderDTO({
     this.id,
     this.partyCode,
+    this.partyType,
+    this.orderType,
     this.timeSlotDTO,
+    this.isPayment,
     this.partyOrder,
   });
 
   PartyOrderDTO.fromJson(Map<String, dynamic> json) {
     id = json["id"] as String;
     partyCode = json["partyCode"] as String;
+    partyType = json["partyType"];
+    orderType = json["orderType"];
     timeSlotDTO = json["timeSlot"] == null
         ? null
         : TimeSlotDTO.fromJson(json["timeSlot"]);
+    isPayment = json["isPayment"];
     partyOrder = json["partyOrder"] == null
         ? null
         : (json["partyOrder"] as List).map((e) => Party.fromJson(e)).toList();
@@ -82,5 +91,26 @@ class Party {
       _data["orderDetails"] = orderDetails?.map((e) => e.toJson()).toList();
     }
     return _data;
+  }
+}
+
+class PartyStatus {
+  int? numberOfMember;
+  bool? isReady;
+  bool? isFinish;
+  bool? isDelete;
+
+  PartyStatus({
+    this.numberOfMember,
+    this.isReady,
+    this.isFinish,
+    this.isDelete,
+  });
+
+  PartyStatus.fromJson(Map<String, dynamic> json) {
+    numberOfMember = json["numberOfMember"] ?? 0;
+    isReady = json["isReady"];
+    isFinish = json["isFinish"];
+    isDelete = json["isDelete"];
   }
 }

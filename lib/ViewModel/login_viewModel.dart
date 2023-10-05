@@ -42,6 +42,7 @@ class LoginViewModel extends BaseModel {
       await _analyticsService.logLogin(method);
       // TODO: Thay uid = idToken
       String token = await userCredential.user!.getIdToken();
+      print("idToken: $token");
       String phone = userCredential.user!.phoneNumber!;
       String numericPhoneNumber = Uri.encodeComponent(phone);
 
@@ -62,7 +63,7 @@ class LoginViewModel extends BaseModel {
         return userInfo;
       } else {
         final fcmToken = await FirebaseMessaging.instance.getToken();
-        final userInfo = await _dao!.login(token, fcmToken!);
+        final userInfo = await _dao?.login(token, fcmToken!);
         await PushNotificationService.getInstance()!.init();
 
         await _analyticsService.setUserProperties(userInfo!);

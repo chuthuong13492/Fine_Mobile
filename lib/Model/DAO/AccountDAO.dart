@@ -92,6 +92,14 @@ class AccountDAO extends BaseDAO {
     return acc;
   }
 
+  Future<String?> getCurrentTime() async {
+    final res = await request.get("/customer/time");
+    if (res.data != null) {
+      return res.data;
+    }
+    return null;
+  }
+
   // Future<UserWallet> linkAccountToWallet(String phone) async {
   //   try {
   //     Response response =

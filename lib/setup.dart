@@ -1,10 +1,11 @@
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Service/firebase_dynamic_link_services.dart';
 import 'package:fine/Service/push_notification_service.dart';
-import 'package:fine/View/topUp_screen.dart';
+import 'package:fine/View/TopUp/topUp_screen.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
 import 'package:fine/ViewModel/category_viewModel.dart';
+import 'package:fine/ViewModel/currentTime_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
 import 'package:fine/ViewModel/orderHistory_viewModel.dart';
@@ -39,6 +40,7 @@ void createRouteBindings() async {
   Get.put(ProductFilterViewModel());
   Get.put(ProductDetailViewModel());
   Get.put(TopUpViewModel());
+  Get.put(TimeCheckViewModel());
   // Get.put(DynamicLinkService());
   // Get.lazyPut<WalletController>(
   //   () => WalletController(),

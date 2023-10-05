@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:dio/dio.dart';
 import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Accessories/index.dart';
@@ -34,6 +36,8 @@ class OrderViewModel extends BaseModel {
   List<ProductInCart>? productRecomend;
   bool? loadingUpsell;
   bool? isPartyOrder;
+  bool? isLinked;
+  String? codeParty;
   String? errorMessage;
   List<String> listError = <String>[];
   RootViewModel? root = Get.find<RootViewModel>();
@@ -48,8 +52,9 @@ class OrderViewModel extends BaseModel {
     // promoDao = new PromotionDAO();
     // _collectionDAO = CollectionDAO();
     loadingUpsell = false;
-    isPartyOrder = false;
+    // isPartyOrder = false;
     currentCart = null;
+    codeParty = null;
   }
 
   Future<void> prepareOrder() async {
@@ -63,48 +68,46 @@ class OrderViewModel extends BaseModel {
       //   RootViewModel root = Get.find<RootViewModel>();
       //   campusDTO = root.currentStore;
       // }
-
+      isLinked = Get.find<PartyOrderViewModel>().isLinked;
+      if (isLinked == true) {
+        isPartyOrder = false;
+      }
       // currentCart = await getCart();
+      codeParty = await getPartyCode();
+
       await getCurrentCart();
-      if (currentCart!.orderDetails!.length == 0) {
-        Get.back();
-        await removeCart();
+      if (currentCart != null) {
+        if (currentCart!.orderDetails!.length == 0 &&
+            currentCart?.partyType == null) {
+          Get.back();
+          Get.find<PartyOrderViewModel>().isLinked = false;
+          isLinked = false;
+          await deletePartyCode();
+          await removeCart();
+        }
       }
-
+      // isPartyOrder = false;
       if (isPartyOrder == false) {
-        CartItem itemInCart = new CartItem(
-            currentCart!.orderDetails![0].productId,
-            currentCart!.orderDetails![0].quantity - 1,
-            null);
-        await updateItemFromMart(itemInCart);
+        if (currentCart != null) {
+          if (currentCart!.orderDetails!.length != 0) {
+            CartItem itemInCart = new CartItem(
+                currentCart!.orderDetails![0].productId,
+                currentCart!.orderDetails![0].quantity - 1,
+                null);
+            await updateItemFromMart(itemInCart);
 
-        await productViewModel.processCart(
-            currentCart!.orderDetails![0].productId,
-            1,
-            root!.selectedTimeSlot!.id);
+            await productViewModel.processCart(
+                currentCart!.orderDetails![0].productId,
+                1,
+                root!.selectedTimeSlot!.id);
+          } else {
+            productRecomend = [];
+          }
+        }
       } else {
-        productRecomend = null;
+        productRecomend = [];
       }
 
-      // currentCart?.addProperties(root.selectedTimeSlot!.id!);
-      // currentCart?.addProperties(5, '0902915671', root.selectedTimeSlot!.id!);
-      // currentCart = await getCart();
-
-      // await deleteCart();
-      // await deleteMart();
-      //       if (currentCart.payment == null) {
-      //   if (listPayments.values.contains(1)) {
-      //     currentCart.payment = PaymentTypeEnum.Cash;
-      //   }
-      // }
-      // if (currentCart.timeSlotId == null) {
-      //   if (Get.find<RootViewModel>().listAvailableTimeSlots.isNotEmpty) {
-      //     currentCart.timeSlotId =
-      //         Get.find<RootViewModel>().listAvailableTimeSlots[0].id;
-      //   } else {
-      //     errorMessage = "Hiện tại đã hết khung giờ giao hàng";
-      //   }
-      // }
       listError.clear();
       if (currentCart != null) {
         orderDTO = await _dao?.prepareOrder(currentCart!);
@@ -191,23 +194,24 @@ class OrderViewModel extends BaseModel {
         if (code != null) {
           orderDTO!.addProperties(code);
         }
-        // LocationDTO location =
-        //     campusDTO.locations.firstWhere((element) => element.isSelected);
-
-        // DestinationDTO destination =
-        //     location.destinations.firstWhere((element) => element.isSelected);
         OrderStatus? result = await _dao?.createOrders(orderDTO!);
-        // await Get.find<AccountViewModel>().fetchUser();
         if (result!.statusCode == 200) {
           await fetchStatus(result.order!.id!);
-
+          final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
+          await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
+          await Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
+              arguments: {
+                "order": result.order,
+                // "isFetch": true,
+              });
+          await showStatusDialog("assets/images/icon-success.png", 'Success',
+              'Bạn đã đặt hàng thành công');
           await removeCart();
           await deletePartyCode();
           final partyModel = Get.find<PartyOrderViewModel>();
           await partyModel.isLinkedParty(false);
           // hideDialog();
-          await showStatusDialog("assets/images/icon-success.png", 'Success',
-              'Bạn đã đặt hàng thành công');
+
           // await Get.find<OrderHistoryViewModel>().getOrders();
           //////////
           // await Future.delayed(const Duration(microseconds: 500));
@@ -215,7 +219,8 @@ class OrderViewModel extends BaseModel {
           ///
           // await Get.find<OrderHistoryViewModel>().getNewOrder();
           //////////
-
+          isPartyOrder = false;
+          isLinked = false;
           productRecomend = null;
           orderDTO = null;
           partyModel.partyOrderDTO = null;
@@ -225,13 +230,7 @@ class OrderViewModel extends BaseModel {
           //   "order": result.order,
           //   "isFetch": true,
           // });
-          final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
-          await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
-          await Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
-              arguments: {
-                "order": result.order,
-                "isFetch": true,
-              });
+
           // Get.offAndToNamed(RoutHandler.NAV);
           // prepareOrder();
           // Get.back(result: true);
@@ -257,7 +256,7 @@ class OrderViewModel extends BaseModel {
       orderStatusDTO = await _dao!.fetchOrderStatus(orderId);
       setState(ViewStatus.Completed);
     } catch (e) {
-      orderStatusDTO = null;
+      // orderStatusDTO = null;
       setState(ViewStatus.Completed);
     }
   }
@@ -289,6 +288,7 @@ class OrderViewModel extends BaseModel {
       //     1,
       //     root!.selectedTimeSlot!.id);
       // Get.back(result: true);
+
       await prepareOrder();
     } else {
       await removeItemFromCart(cartItem);

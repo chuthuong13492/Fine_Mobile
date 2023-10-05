@@ -7,6 +7,17 @@ import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/request.dart';
 
 class PartyOrderDAO extends BaseDAO {
+  Future<PartyStatus?> getPartyStatus(String code) async {
+    if (code != null) {
+      final res = await request.get(
+        '/order/coOrder/status/$code',
+      );
+      if (res.data["data"] != null) {
+        return PartyStatus.fromJson(res.data["data"]);
+      }
+    }
+  }
+
   Future<PartyOrderDTO?> coOrder(Cart cart) async {
     if (cart != null) {
       // print("Request Note: " + note);
@@ -45,21 +56,30 @@ class PartyOrderDAO extends BaseDAO {
     }
   }
 
-  Future<PartyOrderStatus?> getPartyOrder(String? code) async {
+  Future<PartyOrderStatus?> getPartyOrder(String? codeParty) async {
     try {
       final res = await request.get(
-        '/order/coOrder/$code',
+        '/order/coOrder/$codeParty',
       );
-      return PartyOrderStatus(
-        statusCode: res.statusCode,
-        code: res.data['code'],
-        message: res.data['message'],
-        partyOrderDTO: PartyOrderDTO.fromJson(res.data['data']),
-      );
+      if (res.data['data'] != null) {
+        return PartyOrderStatus(
+          statusCode: res.statusCode,
+          code: res.data['status']['errorCode'],
+          message: res.data['status']['message'],
+          partyOrderDTO: PartyOrderDTO.fromJson(res.data['data']),
+        );
+      } else {
+        return PartyOrderStatus(
+          statusCode: res.statusCode,
+          code: res.data['status']['errorCode'],
+          message: res.data['status']['message'],
+          partyOrderDTO: null,
+        );
+      }
     } on DioError catch (e) {
       return PartyOrderStatus(
-          statusCode: e.response!.statusCode,
-          code: e.response!.data['code'],
+          statusCode: e.response!.data["statusCode"],
+          code: e.response!.data['errorCode'],
           message: e.response!.data['message']);
     } catch (e) {
       throw e;
@@ -67,21 +87,21 @@ class PartyOrderDAO extends BaseDAO {
     // print("Request Note: " + note);
   }
 
-  Future<PartyOrderStatus?> joinPartyOrder(String? code) async {
+  Future<PartyOrderStatus?> joinPartyOrder(String? partyCode) async {
     try {
       final res = await request.put(
-        '/order/coOrder/party?partyCode=$code',
+        '/order/coOrder/party?partyCode=$partyCode',
       );
       return PartyOrderStatus(
         statusCode: res.statusCode,
-        code: res.data['code'],
-        message: res.data['message'],
-        partyOrderDTO: PartyOrderDTO.fromJson(res.data['data']),
+        code: res.data['status']['errorCode'],
+        message: res.data['status']['message'],
+        partyOrderDTO: null,
       );
     } on DioError catch (e) {
       return PartyOrderStatus(
-          statusCode: e.response!.statusCode,
-          code: e.response!.data['code'],
+          statusCode: e.response!.data["statusCode"],
+          code: e.response!.data['errorCode'],
           message: e.response!.data['message']);
     } catch (e) {
       throw e;
@@ -104,7 +124,7 @@ class PartyOrderDAO extends BaseDAO {
 
   Future<OrderDetails?> confirmPartyOrder(String? code) async {
     // print("Request Note: " + note);
-    final res = await request.post(
+    final res = await request.put(
       '/order/coOrder/confirmation?partyCode=$code',
     );
     if (res.statusCode == 200) {
@@ -125,11 +145,20 @@ class PartyOrderDAO extends BaseDAO {
     return null;
   }
 
-  Future<bool> logoutCoOrder(String code) async {
-    final res = await request.put(
-      '/order/coOrder/out?partyCode=$code',
-      // data: ORDER_CANCEL_STATUS,
-    );
+  Future<bool> logoutCoOrder(String code, String? memberId, int type) async {
+    Response? res;
+    if (memberId == null) {
+      res = await request.put(
+        '/order/coOrder/out?partyCode=$code&type=$type',
+        // data: ORDER_CANCEL_STATUS,
+      );
+    } else {
+      res = await request.put(
+        '/order/coOrder/out?type=$type&partyCode=$code&memberId=$memberId',
+        // data: ORDER_CANCEL_STATUS,
+      );
+    }
+
     return res.statusCode == 200;
   }
 }

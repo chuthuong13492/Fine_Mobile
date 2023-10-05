@@ -11,6 +11,7 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:get/get.dart';
+import 'package:fine/Utils/format_phone.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -198,7 +199,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             color: Colors.black,
                             list: [
                               TextSpan(
-                                  text: user.phone ?? "-",
+                                  text:
+                                      formatPhoneNumberWithDots(user.phone!) ??
+                                          "-",
                                   style: FineTheme.typograhpy.subtitle2
                                       .copyWith(
                                           color: FineTheme.palettes.primary100))

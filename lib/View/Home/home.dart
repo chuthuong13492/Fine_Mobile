@@ -25,6 +25,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -104,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     width: 300,
                                     height: 300,
                                     child: Image.asset(
-                                      'assets/images/error.png',
+                                      'assets/images/error-loading.gif',
                                       fit: BoxFit.contain,
                                     ),
                                   ),
@@ -177,12 +178,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<Widget> renderHomeSections() {
     return [
-      // banner(),
+      banner(),
       const SizedBox(height: 18),
       const HomeMenuSection(),
-      interalBanner(),
-      const HomeSpecifiHomeSection(),
+      // interalBanner(),
       buildVoucherSection(),
+
+      // Container(
+      //   color: FineTheme.palettes.primary50,
+      //   height: 8,
+      // ),
+      const HomeSpecifiHomeSection(),
+      // buildVoucherSection(),
       // const HomeStoreSection(),
     ];
   }
@@ -204,26 +211,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 78,
                 width: Get.width,
                 child: Container(
-                  height: 50,
-                  padding: const EdgeInsets.only(top: 17, bottom: 17),
+                  height: 55,
+                  padding: const EdgeInsets.only(top: 8, bottom: 8),
                   color: FineTheme.palettes.primary100,
                   child: Center(
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.asset(
-                          "assets/icons/voucher.png",
-                          width: 20,
-                          height: 16,
+                        Center(
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(100)),
+                            child: SvgPicture.asset(
+                              "assets/icons/Party.svg",
+                              width: 20,
+                              height: 20,
+                            ),
+                          ),
                         ),
                         const SizedBox(
-                          width: 24,
+                          width: 12,
                         ),
-                        Text(
-                          "Bạn ơi mã giảm giá đang vẫy gọi bạn nè !",
-                          style: FineTheme.typograhpy.subtitle2
-                              .copyWith(color: FineTheme.palettes.shades100),
+                        Container(
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Tạo đơn nhóm để được hưởng nhiều ưu đãiii !",
+                            style: FineTheme.typograhpy.subtitle2
+                                .copyWith(color: FineTheme.palettes.shades100),
+                          ),
                         ),
                       ],
                     ),
@@ -305,7 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       .toList();
                   // ignore: sized_box_for_whitespace
                   return Container(
-                    height: (Get.width) * (817 / 1914),
+                    height: (Get.width) * (747 / 2000),
                     width: (Get.width),
                     // margin: EdgeInsets.only(bottom: 8, top: 8),
                     child: Swiper(

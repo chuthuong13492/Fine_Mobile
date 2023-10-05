@@ -1,4 +1,5 @@
 import 'package:fine/Accessories/index.dart';
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/topUp_viewModel.dart';
@@ -7,11 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import '../widgets/payment_method_widget.dart';
+import '../../widgets/payment_method_widget.dart';
 
 // class TopUpScreen extends StatefulWidget {
 //   const TopUpScreen({super.key});
@@ -29,19 +31,6 @@ class TopUpScreen extends StatefulWidget {
 
 class _TopUpScreenState extends State<TopUpScreen> {
   final TopUpViewModel _topUpViewModel = Get.find<TopUpViewModel>();
-  // final flutterWebViewPlugin = FlutterWebviewPlugin();
-  // Future<void> urlListen() async {
-  //   flutterWebViewPlugin.onUrlChanged.listen((String url) {
-  //     if (url == 'https://prod.fine-api.smjle.vn/') {
-  //       // Đã đến màn hình thành công, thực hiện các hành động cần thiết
-  //       // (ví dụ: hiển thị thông báo thanh toán thành công)
-  //       // Đóng trình duyệt web
-  //       flutterWebViewPlugin.close();
-  //       // Chuyển hướng trở lại màn hình chính hoặc màn hình thông báo thành công
-  //       Get.back();
-  //     }
-  //   });
-  // }
 
   final txt = TextEditingController();
   String formatVnd(double input) {
@@ -99,6 +88,24 @@ class _TopUpScreenState extends State<TopUpScreen> {
                 ),
               ),
             ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  child: InkWell(
+                    onTap: () {
+                      Get.toNamed(RouteHandler.TRANSACTION_HISTORY);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Image.asset("assets/icons/clock.png"),
+                    ),
+                  ),
+                ),
+              ),
+            ],
             backgroundColor: FineTheme.palettes.shades100,
           ),
           SliverList(

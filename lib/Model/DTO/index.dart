@@ -14,3 +14,4 @@ export 'TimeSlotDTO.dart';
 export 'StationDTO.dart';
 export 'RoomDTO.dart';
 export 'PartyOrderDTO.dart';
+export 'Transaction.dart';

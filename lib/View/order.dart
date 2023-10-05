@@ -15,6 +15,7 @@ import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -68,15 +69,42 @@ class _OrderScreenState extends State<OrderScreen> {
       model: Get.find<OrderViewModel>(),
       child: Scaffold(
           backgroundColor: FineTheme.palettes.shades100,
-          appBar: DefaultAppBar(title: "Trang thanh toán"),
+          appBar: DefaultAppBar(
+            title: "Trang thanh toán",
+            actionButton: [
+              ScopedModelDescendant<OrderViewModel>(
+                builder: (context, child, model) {
+                  if (model.isLinked == false) {
+                    return const SizedBox.shrink();
+                  }
+                  return InkWell(
+                    onTap: () async {
+                      await Get.find<PartyOrderViewModel>().cancelCoOrder();
+                    },
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 16),
+                        child: Text(
+                          'THOÁT',
+                          style: FineTheme.typograhpy.subtitle1
+                              .copyWith(color: Colors.red),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
           bottomNavigationBar: bottomBar(),
           body: onInit
               ? const Center(
-                  child: Text('Không có giỏ hàng'),
+                  child: LoadingFine(),
                 )
               : ScopedModelDescendant<OrderViewModel>(
                   builder: (context, child, model) {
                     final recommendProduct = model.productRecomend;
+
                     if (model.currentCart != null) {
                       ViewStatus status = model.status;
                       switch (status) {
@@ -111,7 +139,51 @@ class _OrderScreenState extends State<OrderScreen> {
                               //       margin: const EdgeInsets.only(top: 8),
                               //       child: layoutAddress()),
                               // ),
-
+                              model.codeParty != null
+                                  ? Container(
+                                      color: FineTheme.palettes.neutral200,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Mã:',
+                                            style: FineTheme
+                                                .typograhpy.subtitle2
+                                                .copyWith(
+                                                    color: FineTheme
+                                                        .palettes.neutral400),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            model.codeParty!,
+                                            style: FineTheme
+                                                .typograhpy.subtitle2
+                                                .copyWith(
+                                                    color: FineTheme
+                                                        .palettes.shades200),
+                                          ),
+                                          // const SizedBox(width: 8),
+                                          IconButton(
+                                              onPressed: () async {
+                                                await showStatusDialog(
+                                                    "assets/images/logo2.png",
+                                                    "Mời bạn bè ngay nhé",
+                                                    "Gửi mã voucher này cho bạn bè để được hoàn tiền nè ^^");
+                                                Clipboard.setData(
+                                                    new ClipboardData(
+                                                        text: model.codeParty));
+                                              },
+                                              icon: Icon(
+                                                Icons.copy,
+                                                size: 20,
+                                                color: FineTheme
+                                                    .palettes.neutral500,
+                                              ))
+                                        ],
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
                               Container(
                                 padding: const EdgeInsets.only(
                                     right: 16, left: 16, top: 10, bottom: 10),
@@ -134,17 +206,31 @@ class _OrderScreenState extends State<OrderScreen> {
                                   child: Container(
                                     color: FineTheme.palettes.neutral200,
                                   )),
-                              Container(
-                                padding: const EdgeInsets.only(
-                                    right: 16, left: 16, top: 10, bottom: 10),
-                                child: layoutPartyCode(),
-                              ),
+                              model.isPartyOrder == false ||
+                                      model.isPartyOrder == null
+                                  ? model.isLinked == false
+                                      ? Column(
+                                          children: [
+                                            Container(
+                                              padding: const EdgeInsets.only(
+                                                  right: 16,
+                                                  left: 16,
+                                                  top: 10,
+                                                  bottom: 10),
+                                              child: layoutPartyCode(),
+                                            ),
+                                            SizedBox(
+                                                height: 8,
+                                                child: Container(
+                                                  color: FineTheme
+                                                      .palettes.neutral200,
+                                                )),
+                                          ],
+                                        )
+                                      : const SizedBox.shrink()
+                                  : const SizedBox.shrink(),
                               // Container(child: buildBeanReward()),
-                              SizedBox(
-                                  height: 8,
-                                  child: Container(
-                                    color: FineTheme.palettes.neutral200,
-                                  )),
+
                               Container(
                                   child: layoutOrder(
                                       model.orderDTO!.orderDetails!)),
@@ -154,28 +240,21 @@ class _OrderScreenState extends State<OrderScreen> {
                                     color: FineTheme.palettes.neutral200,
                                   )),
                               // UpSellCollection(),
-                              recommendProduct != null
-                                  ? SlideFadeTransition(
-                                      offset: 0.2,
-                                      direction: Direction.horizontal,
-                                      delayStart:
-                                          const Duration(milliseconds: 100),
-                                      child: Column(
-                                        children: [
-                                          Container(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      0, 10, 0, 10),
-                                              child: _buidProductRecomend(
-                                                  model.productRecomend)),
-                                          SizedBox(
-                                              height: 8,
-                                              child: Container(
-                                                color: FineTheme
-                                                    .palettes.neutral200,
-                                              )),
-                                        ],
-                                      ),
+                              recommendProduct!.length != 0
+                                  ? Column(
+                                      children: [
+                                        Container(
+                                            padding: const EdgeInsets.fromLTRB(
+                                                0, 10, 0, 10),
+                                            child: _buidProductRecomend(
+                                                model.productRecomend)),
+                                        SizedBox(
+                                            height: 8,
+                                            child: Container(
+                                              color:
+                                                  FineTheme.palettes.neutral200,
+                                            )),
+                                      ],
                                     )
                                   : const SizedBox.shrink(),
 
@@ -492,7 +571,7 @@ class _OrderScreenState extends State<OrderScreen> {
                 onTap: () {
                   // await deletePartyCode();
                   // model.partyCode = await getPartyCode();
-                  showPartyDialog(model.partyCode);
+                  showPartyDialog(model);
                 },
                 child: Text(
                   "Tạo đơn",
@@ -705,20 +784,31 @@ class _OrderScreenState extends State<OrderScreen> {
             ],
           ),
         ),
-        ListView.separated(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.only(right: 16, left: 16),
-              child: productCard(list[index]),
-            );
-          },
-          itemCount: list.length,
-          separatorBuilder: (context, index) => Divider(
-            color: FineTheme.palettes.neutral700,
-          ),
-        )
+        list.length != 0
+            ? ListView.separated(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 16, left: 16),
+                    child: productCard(list[index]),
+                  );
+                },
+                itemCount: list.length,
+                separatorBuilder: (context, index) => Divider(
+                  color: FineTheme.palettes.neutral700,
+                ),
+              )
+            : Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        right: 16, left: 16, top: 8, bottom: 8),
+                    child: Text("Giỏ hàng đang trống...",
+                        style: FineTheme.typograhpy.subtitle2),
+                  ),
+                ],
+              )
       ],
     );
   }
@@ -946,9 +1036,12 @@ class _OrderScreenState extends State<OrderScreen> {
                     children: [
                       ...list,
                       const SizedBox(width: 8),
-                      _orderViewModel!.isPartyOrder == true
-                          ? const SizedBox(height: 8)
-                          : selectQuantity(orderDetails),
+                      _orderViewModel!.isPartyOrder == false ||
+                              _orderViewModel!.isPartyOrder == null
+                          ? selectQuantity(orderDetails)
+                          : const SizedBox(
+                              height: 8,
+                            ),
                     ],
                   )
                 ],
@@ -1106,6 +1199,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                       text:
                                           // "${_orderViewModel!.orderDTO!.discount ?? 0}",
                                           "0",
+                                      // _orderViewModel?.codeParty != null
+                                      //     ? "Hoàn tiền ship"
+                                      //     : "0",
                                       style: FineTheme.typograhpy.subtitle2
                                           .copyWith(color: Colors.black),
                                     ),
@@ -1211,26 +1307,68 @@ class _OrderScreenState extends State<OrderScreen> {
                             children: [
                               Expanded(
                                 child: InkWell(
-                                  onTap: () {},
-                                  child: Row(
-                                    children: const [
-                                      Text(
-                                        'Thêm Voucher',
-                                        style: TextStyle(
-                                            fontFamily: 'Montserrat',
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w700,
-                                            fontStyle: FontStyle.normal),
-                                      ),
-                                      SizedBox(
-                                        width: 20,
-                                      ),
-                                      Icon(
-                                        Icons.keyboard_arrow_up,
-                                        size: 24,
-                                      )
-                                    ],
-                                  ),
+                                  onTap: () async {
+                                    if (model.isLinked != true) {
+                                      await showInputVoucherDialog();
+                                    }
+                                  },
+                                  child: model.isLinked == true
+                                      ? model.codeParty != null
+                                          ? SlideFadeTransition(
+                                              offset: -1,
+                                              direction: Direction.horizontal,
+                                              delayStart: const Duration(
+                                                  milliseconds: 100),
+                                              child: Text(
+                                                "Voucher:  ${model.codeParty!}",
+                                                style: const TextStyle(
+                                                    fontFamily: 'Montserrat',
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w700,
+                                                    fontStyle:
+                                                        FontStyle.normal),
+                                              ),
+                                            )
+                                          : Row(
+                                              children: const [
+                                                Text(
+                                                  'Thêm Voucher',
+                                                  style: TextStyle(
+                                                      fontFamily: 'Montserrat',
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      fontStyle:
+                                                          FontStyle.normal),
+                                                ),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Icon(
+                                                  Icons.keyboard_arrow_up,
+                                                  size: 24,
+                                                )
+                                              ],
+                                            )
+                                      : Row(
+                                          children: const [
+                                            Text(
+                                              'Thêm Voucher',
+                                              style: TextStyle(
+                                                  fontFamily: 'Montserrat',
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontStyle: FontStyle.normal),
+                                            ),
+                                            SizedBox(
+                                              width: 20,
+                                            ),
+                                            Icon(
+                                              Icons.keyboard_arrow_up,
+                                              size: 24,
+                                            )
+                                          ],
+                                        ),
                                 ),
                               ),
                               Container(
@@ -1241,7 +1379,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: const [
                                       Text(
-                                        'Tiền mặt',
+                                        'Ví Fine',
                                         style: TextStyle(
                                             fontFamily: 'Montserrat',
                                             fontSize: 12,
@@ -1322,16 +1460,6 @@ class _OrderScreenState extends State<OrderScreen> {
                             child: InkWell(
                               onTap: () async {
                                 await model.orderCart();
-                                // if (isCurrentTimeSlotAvailable) {
-                                //   await model.orderCart();
-                                // } else {
-                                //   await model.removeCart();
-                                //   showStatusDialog(
-                                //       "assets/images/error.png",
-                                //       "Opps",
-                                //       "Hiện tại khung giờ bạn chọn đã chốt đơn. Bạn vui lòng xem khung giờ khác nhé 😓 ");
-                                //   Get.back();
-                                // }
                               },
                               child: Container(
                                 width: 190,
@@ -1355,6 +1483,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               ),
                             ),
                           ),
+                          const SizedBox(height: 18),
                         ],
                       ),
                       // child: Row(

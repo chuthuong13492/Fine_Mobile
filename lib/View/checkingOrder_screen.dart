@@ -18,11 +18,10 @@ import 'package:intl/intl.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class CheckingOrderScreen extends StatefulWidget {
-  final bool? isFetch;
+  // final bool? isFetch;
   final OrderDTO order;
 
-  const CheckingOrderScreen(
-      {super.key, required this.order, required this.isFetch});
+  const CheckingOrderScreen({super.key, required this.order});
 
   @override
   State<CheckingOrderScreen> createState() => _CheckingOrderScreenState();
@@ -34,12 +33,12 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.isFetch == true) {
-      _timer = Timer.periodic(const Duration(seconds: 2),
-          (timer) => _orderViewModel.fetchStatus(this.widget.order.id!));
-    } else {
-      _orderViewModel.fetchStatus(this.widget.order.id!);
-    }
+    // if (widget.isFetch == true) {
+    _timer = Timer.periodic(const Duration(seconds: 2),
+        (timer) => _orderViewModel.fetchStatus(this.widget.order.id!));
+    // } else {
+    //   _orderViewModel.fetchStatus(this.widget.order.id!);
+    // }
   }
 
   @override
@@ -67,13 +66,17 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                   //     border: Border.all(color: FineTheme.palettes.primary100)),
                   child: IconButton(
                       padding: const EdgeInsets.all(0),
-                      onPressed: () {
+                      onPressed: () async {
                         // Get.back();
-                        if (widget.isFetch == true) {
-                          Get.offAllNamed(RouteHandler.NAV);
-                        } else {
-                          Get.back();
-                        }
+                        // if (widget.isFetch == true) {
+                        //   await Get.find<RootViewModel>().checkHasParty();
+
+                        //   Get.offAllNamed(RouteHandler.NAV);
+                        // } else {
+                        await Get.find<RootViewModel>().checkHasParty();
+
+                        Get.back();
+                        // }
                       },
                       icon: const Icon(
                         Icons.chevron_left_rounded,

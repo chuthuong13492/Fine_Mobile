@@ -2,15 +2,15 @@ import 'package:fine/Model/DTO/index.dart';
 
 class AddProductToCartStatus {
   int? statusCode;
-  String? code;
+  int? code;
   String? message;
-  List<AddProductToCartResponse>? product;
+  AddProductToCartResponse? addProduct;
 
   AddProductToCartStatus({
     this.statusCode,
     this.code,
     this.message,
-    this.product,
+    this.addProduct,
   });
 }
 
