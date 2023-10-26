@@ -1,4 +1,3 @@
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Utils/platform.dart';
 import 'package:fine/theme/FineTheme/index.dart';

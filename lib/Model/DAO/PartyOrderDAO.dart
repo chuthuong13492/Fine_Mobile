@@ -87,10 +87,11 @@ class PartyOrderDAO extends BaseDAO {
     // print("Request Note: " + note);
   }
 
-  Future<PartyOrderStatus?> joinPartyOrder(String? partyCode) async {
+  Future<PartyOrderStatus?> joinPartyOrder(
+      String? partyCode, String? timeSlotId) async {
     try {
       final res = await request.put(
-        '/order/coOrder/party?partyCode=$partyCode',
+        '/order/coOrder/party?partyCode=$partyCode&timeSlotId=$timeSlotId',
       );
       return PartyOrderStatus(
         statusCode: res.statusCode,
@@ -158,6 +159,15 @@ class PartyOrderDAO extends BaseDAO {
         // data: ORDER_CANCEL_STATUS,
       );
     }
+
+    return res.statusCode == 200;
+  }
+
+  Future<bool> removeMember(String code, String? memberId) async {
+    final res = await request.put(
+      '/order/coOrder/member?partyCode=$code&memberId=$memberId',
+      // data: ORDER_CANCEL_STATUS,
+    );
 
     return res.statusCode == 200;
   }

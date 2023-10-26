@@ -1,6 +1,7 @@
 import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DAO/index.dart';
+import 'package:fine/Model/DTO/Transaction.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,6 +10,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 // import 'package:url_launcher/url_launcher.dart';
 
 import '../Constant/route_constraint.dart';
+import '../Utils/constrant.dart';
 
 class TopUpViewModel extends BaseModel {
   // final flutterWebviewPlugin = new FlutterWebviewPlugin();
@@ -17,9 +19,20 @@ class TopUpViewModel extends BaseModel {
   double? amount;
   RxInt setAmountIndex = 0.obs;
   String? topUpUrl;
+  ScrollController? scrollController;
+  List<TransactionDTO> listTransaction = [];
+
   TopUpViewModel() {
     _dao = TopUpDAO();
     topUpUrl = null;
+    scrollController = ScrollController();
+    scrollController!.addListener(() async {
+      if (scrollController!.position.pixels ==
+          scrollController!.position.maxScrollExtent) {
+        int total_page = (_dao!.metaDataDTO.total! / DEFAULT_SIZE).ceil();
+        if (total_page > _dao!.metaDataDTO.page!) {}
+      }
+    });
   }
 
   setOnChangeValue(int value) {
@@ -33,14 +46,41 @@ class TopUpViewModel extends BaseModel {
     amount = setAmountIndex.value.toDouble();
     print(amount);
     notifyListeners();
-    // if (amount != null) {
-    //   notifier.value = amount!;
-    // } else {
-    //   notifier.value = setAmountIndex.value.toDouble();
-    // }
+  }
 
-    // setAmountIndex.value = amount as int;
-    // update();
+  Future<void> getTransaction() async {
+    try {
+      setState(ViewStatus.Loading);
+      final data = await _dao?.getTransaction();
+      listTransaction = data!;
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      bool result = await showErrorDialog();
+      if (result) {
+        await getTransaction();
+      } else {
+        setState(ViewStatus.Error);
+      }
+    } finally {}
+  }
+
+  Future<void> getMoreTransaction() async {
+    try {
+      setState(ViewStatus.LoadMore);
+      final data =
+          await _dao?.getMoreTransaction(page: _dao!.metaDataDTO.page! + 1);
+      listTransaction += data!;
+      await Future.delayed(const Duration(milliseconds: 1000));
+      setState(ViewStatus.Completed);
+      // notifyListeners();
+    } catch (e) {
+      bool result = await showErrorDialog();
+      if (result) {
+        await getMoreTransaction();
+      } else {
+        setState(ViewStatus.Error);
+      }
+    }
   }
 
   Future<void> getUrl() async {
@@ -50,9 +90,13 @@ class TopUpViewModel extends BaseModel {
         showStatusDialog("assets/images/error.png", "Chưa chọn số tiền kìaa",
             "Bạn hãy chọn số tiền cần nạp nhé");
         return;
+      } else if (amount! < 10000) {
+        showStatusDialog("assets/images/error-loading.gif", "Chưa đủ số tiền",
+            "Nạp thấp nhất 10k nheee 😚");
+        return;
       }
       topUpUrl = await _dao?.getTopUpUrl(amount.toString());
-      final Uri url = Uri.parse(topUpUrl!);
+      // final Uri url = Uri.parse(topUpUrl!);
       Get.toNamed(RouteHandler.WEBVIEW, arguments: topUpUrl);
 
       // flutterWebviewPlugin.launch(topUpUrl!, hidden: true);

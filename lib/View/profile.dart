@@ -85,40 +85,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           }
 
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                account(userDTO!),
-                Container(
-                  color: FineTheme.palettes.primary50,
-                  height: 16,
+          return ListView(
+            children: [
+              account(userDTO!),
+              Container(
+                color: FineTheme.palettes.primary50,
+                height: 16,
+              ),
+              _buildWalletSection(userDTO),
+              Container(
+                color: FineTheme.palettes.primary50,
+                height: 16,
+              ),
+              userAccount(model),
+              Container(
+                color: FineTheme.palettes.primary50,
+                height: 16,
+              ),
+              Container(
+                width: Get.width,
+                height: 107,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage("assets/images/fine_profile_img.png"),
+                      fit: BoxFit.fitHeight),
                 ),
-                _buildWalletSection(userDTO),
-                Container(
-                  color: FineTheme.palettes.primary50,
-                  height: 16,
-                ),
-                userAccount(model),
-                Container(
-                  color: FineTheme.palettes.primary50,
-                  height: 16,
-                ),
-                Container(
-                  width: Get.width,
-                  height: 107,
-                  decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage("assets/images/fine_profile_img.png"),
-                        fit: BoxFit.fitHeight),
-                  ),
-                ),
-                Container(
-                  color: FineTheme.palettes.primary50,
-                  height: 16,
-                ),
-                systemInfo(model)
-              ],
-            ),
+              ),
+              Container(
+                color: FineTheme.palettes.primary50,
+                height: 16,
+              ),
+              systemInfo(model)
+            ],
           );
         },
       ),
@@ -142,18 +140,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                    color: FineTheme.palettes.primary100,
-                    shape: BoxShape.circle),
-                child: ClipOval(
-                  child: CacheImage(
-                    imageUrl: img,
-                  ),
-                ),
-              ),
+              user.imageUrl != null
+                  ? Container(
+                      height: 100,
+                      width: 100,
+                      decoration: BoxDecoration(
+                          color: FineTheme.palettes.primary100,
+                          shape: BoxShape.circle),
+                      child: ClipOval(
+                        child: CacheImage(
+                          imageUrl: user.imageUrl!,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      height: 100,
+                      width: 100,
+                      decoration: BoxDecoration(
+                          color: FineTheme.palettes.slate600,
+                          shape: BoxShape.circle),
+                      child: const ClipOval(
+                        child: Image(
+                          width: 120,
+                          height: 120,
+                          image: AssetImage("assets/images/logo2.png"),
+                        ),
+                      ),
+                    ),
               const SizedBox(
                 width: 16,
               ),
@@ -628,9 +641,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       firstOption: "Quay lại",
                       secondOption: "Liên hệ");
                   if (option == 1) {
-                    _launchUrl(
-                        "https://www.facebook.com/Bean-%C6%A0i-103238875095890",
-                        isFB: true);
+                    _launchUrl("https://www.facebook.com/finefnb", isFB: true);
                   }
                 }),
             const Divider(),

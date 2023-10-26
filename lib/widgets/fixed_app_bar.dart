@@ -6,25 +6,31 @@ import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
+import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
+import 'package:fine/widgets/cache_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:searchfield/searchfield.dart';
 
 import '../Model/DTO/index.dart';
 
 class FixedAppBar extends StatefulWidget {
+  final FocusNode searchFocusNode;
   final double height;
 
-  const FixedAppBar({super.key, required this.height});
+  const FixedAppBar(
+      {super.key, required this.height, required this.searchFocusNode});
 
   @override
   State<FixedAppBar> createState() => _FixedAppBarState();
@@ -35,6 +41,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
   OrderViewModel? _orderViewModel = Get.find<OrderViewModel>();
   RootViewModel? root;
   final TextEditingController searchController = TextEditingController();
+  FocusNode _focusNode = FocusNode();
 
   Timer? _timer;
 
@@ -43,15 +50,18 @@ class _FixedAppBarState extends State<FixedAppBar> {
     super.initState();
     root = Get.find<RootViewModel>();
     // _orderViewModel!.getCurrentCart();
-    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
-      Get.find<RootViewModel>().getListTimeSlot();
+    _focusNode = widget.searchFocusNode;
+    _timer = Timer.periodic(const Duration(minutes: 1), (timer) async {
+      await Get.find<RootViewModel>().getListTimeSlot();
     });
   }
 
   @override
   void dispose() {
-    _timer?.cancel(); // Cancel the timer when widget is disposed
     super.dispose();
+    _timer?.cancel();
+    _focusNode.unfocus();
+    searchController.text = '';
   }
 
   @override
@@ -60,6 +70,9 @@ class _FixedAppBarState extends State<FixedAppBar> {
       // color: FineTheme.palettes.shades100,
       width: Get.width,
       duration: const Duration(milliseconds: 300),
+      onEnd: () {
+        _focusNode.unfocus();
+      },
       // decoration: const BoxDecoration(
       //   boxShadow: [
       //     BoxShadow(
@@ -100,24 +113,52 @@ class _FixedAppBarState extends State<FixedAppBar> {
   }
 
   Widget search() {
+    //    String removeDiacritics(String input) {
+    //   return input.replaceAll(RegExp(r'[^\x00-\x7F]'), ''); // Remove diacritics
+    // }
+    // List<String> getSuggestions(String query) {
+
+    //   return list
+    //       .where((item) => removeDiacritics(item.toLowerCase())
+    //           .contains(query.toLowerCase()))
+    //       .toList();
+    // }
+
+    // List<String> list = [
+    //   'Sản phẩm 1',
+    //   'Sản phẩm 2',
+    //   'Sản phẩm 3',
+    //   'Bánh mỳ',
+    //   'Bánh cuốn',
+    //   'Bánh gai',
+    //   'Trà sữa',
+    //   'Trà đào'
+    // ];
+
     bool hasQuantity = false;
     int quantity = 0;
     return ScopedModel(
-      model: Get.find<PartyOrderViewModel>(),
-      child: ScopedModelDescendant<PartyOrderViewModel>(
+      model: Get.find<HomeViewModel>(),
+      child: ScopedModelDescendant<HomeViewModel>(
         builder: (context, child, model) {
+          var list = model.productList;
+
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.only(left: 11, right: 11),
+                  // padding: const EdgeInsets.only(left: 10, right: 10),
                   // color: Colors.transparent,
                   alignment: Alignment.center,
                   height: 54,
                   decoration: BoxDecoration(
                     color: FineTheme.palettes.shades100,
-                    borderRadius: BorderRadius.circular(25),
+                    borderRadius: _focusNode.hasFocus
+                        ? BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25))
+                        : BorderRadius.circular(25),
                     boxShadow: [
                       BoxShadow(
                         color: FineTheme.palettes.shades200.withOpacity(0.1),
@@ -130,36 +171,115 @@ class _FixedAppBarState extends State<FixedAppBar> {
                       ), //BoxShadow
                     ],
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Center(
-                          child: SvgPicture.asset(
-                        "assets/icons/Search-home.svg",
-                        width: 24,
-                        height: 24,
-                        color: FineTheme.palettes.primary100,
-                      )),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        child: Center(
-                          child: TextFormField(
-                            controller: searchController,
-                            keyboardType: TextInputType.text,
-                            obscureText: false,
-                            decoration: const InputDecoration(
-                              // hintText: text,
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(0),
-                              hintStyle: TextStyle(
-                                height: 1,
-                              ),
-                            ),
-                          ),
+                  child: SearchField(
+                    controller: searchController,
+                    searchStyle: FineTheme.typograhpy.body1,
+                    searchInputDecoration: InputDecoration(
+                      // prefix: SvgPicture.asset(
+                      //   "assets/icons/Search-home.svg",
+                      //   width: 24,
+                      //   height: 24,
+                      //   color: FineTheme.palettes.primary100,
+                      // ),
+                      // disabledBorder: InputBorder.none,
+
+                      prefixIcon: Transform.scale(
+                        scale: 0.4,
+                        child: SvgPicture.asset(
+                          "assets/icons/Search-home.svg",
                         ),
                       ),
+
+                      border: InputBorder.none,
+                    ),
+                    itemHeight: 60,
+                    maxSuggestionsInViewPort: 4,
+                    // controller: searchController,
+
+                    suggestionsDecoration: SuggestionDecoration(
+                        color: Colors.white,
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(10),
+                          bottomRight: Radius.circular(10),
+                        )),
+
+                    onSuggestionTap: (SearchFieldListItem<ProductDTO> p0) {
+                      _focusNode.unfocus();
+                      setState(() {
+                        searchController.text = '';
+                      });
+                      // widget.searchFocusNode.requestFocus();
+                      Get.find<RootViewModel>()
+                          .openProductDetail(p0.item!.id!, fetchDetail: true);
+                    },
+                    onSubmit: (query) {},
+                    focusNode: _focusNode,
+
+                    scrollbarAlwaysVisible: false,
+                    onSearchTextChanged: (query) {
+                      final filter = list!
+                          .where((element) => element.productName!
+                              .toLowerCase()
+                              .contains(query.toLowerCase()))
+                          .toList();
+                      return filter
+                          .map(
+                            (e) => SearchFieldListItem<ProductDTO>(
+                              item: e,
+                              e.productName!,
+                              child: Row(
+                                children: [
+                                  const SizedBox(
+                                    width: 8,
+                                  ),
+                                  SizedBox(
+                                    width: 50,
+                                    height: 50,
+                                    child: CacheStoreImage(
+                                      imageUrl: e.imageUrl!,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 16,
+                                  ),
+                                  Text(
+                                    e.productName!,
+                                    style: FineTheme.typograhpy.caption1,
+                                  )
+                                ],
+                              ),
+                            ),
+                          )
+                          .toList();
+                    },
+                    suggestions: [
+                      ...list!
+                          .map((e) => SearchFieldListItem<ProductDTO>(
+                                item: e,
+                                e.productName!,
+                                child: Row(
+                                  children: [
+                                    const SizedBox(
+                                      width: 8,
+                                    ),
+                                    SizedBox(
+                                      width: 50,
+                                      height: 50,
+                                      child: CacheStoreImage(
+                                        imageUrl: e.imageUrl!,
+                                      ),
+                                    ),
+                                    const SizedBox(
+                                      width: 16,
+                                    ),
+                                    Text(
+                                      e.productName!,
+                                      style: FineTheme.typograhpy.caption1,
+                                    )
+                                  ],
+                                ),
+                              ))
+                          .toList(),
                     ],
                   ),
                 ),
@@ -169,7 +289,11 @@ class _FixedAppBarState extends State<FixedAppBar> {
               ),
               InkWell(
                 onTap: () async {
-                  await showPartyDialog(model, isHome: true);
+                  setState(() {
+                    widget.searchFocusNode.unfocus();
+                  });
+
+                  await showPartyDialog(isHome: true);
                   // final root = Get.find<RootViewModel>();
                   // await root.navOrder();
                 },

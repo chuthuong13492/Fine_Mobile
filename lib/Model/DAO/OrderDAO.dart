@@ -103,8 +103,8 @@ class OrderDAO extends BaseDAO {
       }
     } on DioError catch (e) {
       return OrderStatus(
-          statusCode: e.response!.statusCode,
-          code: e.response!.data['code'],
+          statusCode: e.response!.data["statusCode"],
+          code: e.response!.data['errorCode'],
           message: e.response!.data['message']);
     } catch (e) {
       throw e;

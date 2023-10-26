@@ -19,6 +19,7 @@ import 'package:fine/View/onboard.dart';
 import 'package:fine/View/order.dart';
 import 'package:fine/View/order_detail.dart';
 import 'package:fine/View/order_history.dart';
+import 'package:fine/View/prepareCoOrder_screen.dart';
 import 'package:fine/View/product_detail.dart';
 import 'package:fine/View/product_filter_list.dart';
 import 'package:fine/View/profile.dart';
@@ -145,6 +146,11 @@ class MyApp extends StatelessWidget {
           case RouteHandler.ORDER:
             return CupertinoPageRoute<bool>(
                 builder: (context) => OrderScreen(), settings: settings);
+          case RouteHandler.PREPARE_CO_ORDER:
+            return CupertinoPageRoute<bool>(
+                builder: (context) =>
+                    PrepareCoOrderScreen(dto: settings.arguments as dynamic),
+                settings: settings);
           case RouteHandler.STATION_PICKER_SCREEN:
             return CupertinoPageRoute<bool>(
                 builder: (context) => StationPickerScreen(),

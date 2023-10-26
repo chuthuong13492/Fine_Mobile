@@ -14,10 +14,11 @@ import 'BaseDAO.dart';
 // TODO: Test Start_up Screen + FCM TOken
 
 class AccountDAO extends BaseDAO {
-  Future<AccountDTO?> login(String idToken, String fcmToken) async {
+  Future<AccountDTO?> login(
+      String idToken, String fcmToken, bool isPhone) async {
     try {
       Response response = await request.post("customer/login",
-          data: {"idToken": idToken, 'fcmToken': fcmToken});
+          data: {"idToken": idToken, 'fcmToken': fcmToken, 'isPhone': isPhone});
       final user = response.data['data'];
       final userDTO = AccountDTO.fromJson(user['customer']);
       final accessToken = user["access_token"] as String;

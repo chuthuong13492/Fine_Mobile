@@ -4,6 +4,7 @@ import 'package:fine/Model/DTO/MenuDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
+import 'package:fine/ViewModel/productFilter_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/cache_image.dart';
@@ -19,6 +20,7 @@ import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../../Accessories/index.dart';
+import '../../ViewModel/product_viewModel.dart';
 
 class HomeSpecifiHomeSection extends StatefulWidget {
   const HomeSpecifiHomeSection({super.key});
@@ -121,7 +123,8 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                             // root.openProductDetail(product, fetchDetail: true);
 
                             // if (product.type == ProductType.MASTER_PRODUCT) {}
-                            root.openProductDetail(product, fetchDetail: true);
+                            root.openProductDetail(product.id!,
+                                fetchDetail: true);
                           },
                           child: buildProductInMenu(product),
                         ),
@@ -324,16 +327,18 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
               right: 12,
               bottom: 29,
               child: InkWell(
-                onTap: () {},
+                onTap: () async {
+                  ProductDetailViewModel model =
+                      Get.find<ProductDetailViewModel>();
+                  // model.master = product;
+                  model.selectAttribute = product.attributes![0];
+                  await model.addProductToCart();
+                },
                 child: Container(
                   width: 50,
                   height: 50,
                   decoration: BoxDecoration(
-                    color:
-                        // Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
-                        //     ?
-                        FineTheme.palettes.primary100,
-                    // : Colors.grey,
+                    color: FineTheme.palettes.primary100,
                     borderRadius: BorderRadius.circular(100),
                   ),
                   child: Center(

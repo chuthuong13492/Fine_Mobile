@@ -6,6 +6,7 @@ import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
+import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -138,9 +139,9 @@ Future<bool> showErrorDialog(
             Align(
               alignment: Alignment.topRight,
               child: IconButton(
-                icon: const Icon(
-                  AntDesign.closecircleo,
-                  color: Colors.red,
+                icon: Icon(
+                  FontAwesome.close,
+                  color: FineTheme.palettes.primary100,
                 ),
                 onPressed: () {
                   hideDialog();
@@ -222,9 +223,9 @@ Future<int> showOptionDialog(String text,
                 Align(
                   alignment: Alignment.topLeft,
                   child: IconButton(
-                    icon: const Icon(
-                      AntDesign.closecircleo,
-                      color: Colors.red,
+                    icon: Icon(
+                      FontAwesome.close,
+                      color: FineTheme.palettes.primary100,
                     ),
                     onPressed: () {
                       option = 0;
@@ -455,19 +456,22 @@ Future<int> showInputVoucherDialog(
                                 onPressed: () async {
                                   PartyOrderViewModel party =
                                       Get.find<PartyOrderViewModel>();
-                                  option = 1;
+
                                   if (controller.text.contains("LPO")) {
                                     await party.joinPartyOrder(
                                         code: controller.text);
-                                    hideDialog();
+
+                                    option = 1;
                                   } else {
+                                    option = 1;
+                                    hideDialog();
                                     await showStatusDialog(
                                         "assets/images/logo2.png",
                                         "Sai mã mất rùi",
                                         "Mã code hong đúng nè 😓");
                                   }
                                 },
-                                child: const Text('Tham gia',
+                                child: const Text('Thêm',
                                     style: TextStyle(
                                         color: Colors.white, fontSize: 15))),
                           ),
@@ -575,7 +579,7 @@ Future<int> showInviteDialog(String text,
   return option!;
 }
 
-Future<int> showLeaderDialog(
+Future<int> showMemberDialog(String text, bool? isDelete,
     {String? firstOption, String? secondOption}) async {
   // hideDialog();
   int? option;
@@ -631,7 +635,7 @@ Future<int> showLeaderDialog(
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                   child: Center(
-                    child: Text("Chọn new Leader!!!",
+                    child: Text(text,
                         style: TextStyle(
                             fontFamily: 'Montserrat',
                             fontSize: 24,
@@ -641,9 +645,9 @@ Future<int> showLeaderDialog(
                             color: FineTheme.palettes.primary100)),
                   ),
                 ),
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 16),
-                  child: RadioList(),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: RadioList(isRemove: isDelete!),
                 ),
               ],
             ),
@@ -682,9 +686,9 @@ Future<int> showConfirmOrderDialog(
                 Align(
                   alignment: Alignment.topLeft,
                   child: IconButton(
-                    icon: const Icon(
-                      AntDesign.closecircleo,
-                      color: Colors.red,
+                    icon: Icon(
+                      FontAwesome.close,
+                      color: FineTheme.palettes.primary100,
                     ),
                     onPressed: () {
                       option = 0;
@@ -906,9 +910,7 @@ Future<int> showConfirmOrderDialog(
   return option!;
 }
 
-Future<int> showPartyDialog(PartyOrderViewModel model, {bool? isHome}) async {
-  // PartyOrderViewModel model = Get.find<PartyOrderViewModel>();
-  TextEditingController controller = TextEditingController(text: '');
+Future<void> showPartyDialog({bool? isHome}) async {
   bool isErrorInput = false;
   // hideDialog();
   int? option;
@@ -951,16 +953,14 @@ Future<int> showPartyDialog(PartyOrderViewModel model, {bool? isHome}) async {
                       color: Colors.white,
                       size: 24,
                     ),
-                    onPressed: () async {
-                      option = 0;
-                      model.partyCode = await getPartyCode();
+                    onPressed: () {
+                      PartyOrderViewModel model =
+                          Get.find<PartyOrderViewModel>();
+
                       if (model.partyCode == null) {
-                        model.isLinkedParty(false);
+                        model.isLinked = false;
                       }
-                      // if (model.isLinked == true) {
-                      //   Get.find<OrderViewModel>().isPartyOrder =
-                      //       model.isLinked;
-                      // }
+
                       hideDialog();
                     },
                   ),
@@ -994,158 +994,10 @@ Future<int> showPartyDialog(PartyOrderViewModel model, {bool? isHome}) async {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                model.partyCode == null
-                    ? Column(
-                        children: [
-                          const SizedBox(height: 12),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Đơn liên kết',
-                                    style: FineTheme.typograhpy.subtitle1,
-                                  ),
-                                ),
-                                CustomCupertinoSwitch(
-                                  value: model.isLinked!,
-                                  onChanged: (value) {
-                                    model.isLinkedParty(value);
-                                  },
-                                )
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                            child: Row(
-                              children: [
-                                Flexible(
-                                  flex: 7,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(8)),
-                                        border: Border.all(
-                                            color:
-                                                FineTheme.palettes.primary100)),
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                      child: TextField(
-                                        onChanged: (input) {},
-                                        controller: controller,
-                                        decoration: InputDecoration(
-                                            hintText: 'Nhập code party',
-                                            border: InputBorder.none,
-                                            suffixIcon: IconButton(
-                                              icon: const Icon(
-                                                Icons.clear,
-                                                size: 16,
-                                                color: Colors.grey,
-                                              ),
-                                              onPressed: () {
-                                                controller.clear();
-                                              },
-                                            )),
-                                        style: TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 16,
-                                          fontStyle: FontStyle.normal,
-                                          color: FineTheme.palettes.neutral500,
-                                        ),
-                                        keyboardType: TextInputType.multiline,
-                                        maxLines: 1,
-                                        autofocus: true,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Flexible(
-                                  flex: 3,
-                                  fit: FlexFit.tight,
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(8)),
-                                          color: FineTheme.palettes.primary100,
-                                          border: Border.all(
-                                            color:
-                                                FineTheme.palettes.primary100,
-                                          )),
-                                      child: TextButton(
-                                          onPressed: () async {
-                                            PartyOrderViewModel party =
-                                                Get.find<PartyOrderViewModel>();
-                                            option = 1;
-                                            if (controller.text
-                                                .contains("CPO")) {
-                                              await party.joinPartyOrder(
-                                                  code: controller.text);
-                                            } else {
-                                              await showStatusDialog(
-                                                  "assets/images/logo2.png",
-                                                  "Sai mã mất rùi",
-                                                  "Mã code hong đúng nè 😓");
-                                            }
-                                          },
-                                          child: const Text('Tham gia',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 15))),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                        ],
-                      )
-                    : const SizedBox.shrink(),
                 Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     child: CustomeCreateParty(
-                      model: model,
-                      onChange: () async {
-                        model.partyCode = await getPartyCode();
-                        final order = Get.find<OrderViewModel>();
-                        order.currentCart = await getCart();
-                        if (order.currentCart != null) {
-                          if (model.partyCode == null) {
-                            await model.createCoOrder();
-                            if (model.partyOrderDTO!.partyOrder != null) {
-                              if (isHome == true) {
-                                option = 1;
-                                hideDialog();
-                                Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
-                              } else {
-                                option = 1;
-                                hideDialog();
-                                Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
-                              }
-                            } else {
-                              option = 1;
-                              hideDialog();
-                              await Get.find<OrderViewModel>().prepareOrder();
-                              // hideDialog();
-                            }
-                          }
-                        } else {
-                          hideDialog();
-                          await showStatusDialog(
-                              'assets/images/logo2.png',
-                              "Xin lũi nhe 🥹",
-                              "Bạn phải có ít nhất 1 món mới tạo đc Party nè");
-                        }
-                      },
+                      isHome: isHome!,
                     )),
               ],
             ),
@@ -1155,7 +1007,7 @@ Future<int> showPartyDialog(PartyOrderViewModel model, {bool? isHome}) async {
     ),
     barrierDismissible: true,
   );
-  return option!;
+  // return option!;
 }
 
 void hideDialog() {

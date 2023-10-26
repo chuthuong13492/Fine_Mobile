@@ -16,6 +16,7 @@ class StartUpView extends StatelessWidget {
       child: ScopedModelDescendant<StartUpViewModel>(
           builder: (context, child, model) {
         return Scaffold(
+          resizeToAvoidBottomInset: false,
           backgroundColor: Colors.white,
           body: Stack(
             children: [

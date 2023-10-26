@@ -205,7 +205,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                         color: FineTheme.palettes.primary50,
                       )),
                   Container(
-                    padding: const EdgeInsets.only(bottom: 10),
+                    // padding: const EdgeInsets.only(bottom: 0),
                     child: layoutOrderDetails(orderDTO.orderDetails),
                   ),
                   SizedBox(
@@ -252,33 +252,30 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Container(
-                width: 250,
-                child: Row(
-                  children: [
-                    Text(
-                      '${orderDetails![index].quantity}x',
-                      style: TextStyle(
+              Row(
+                children: [
+                  Text(
+                    '${orderDetails![index].quantity}x',
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      fontStyle: FontStyle.normal,
+                      color: FineTheme.palettes.shades200,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${orderDetails[index].productName}',
+                    style: TextStyle(
                         fontFamily: 'Montserrat',
                         fontSize: 15,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w500,
                         fontStyle: FontStyle.normal,
                         color: FineTheme.palettes.shades200,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '${orderDetails[index].productName}',
-                      style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          fontStyle: FontStyle.normal,
-                          color: FineTheme.palettes.shades200,
-                          overflow: TextOverflow.ellipsis),
-                    ),
-                  ],
-                ),
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                ],
               ),
               Expanded(
                   child: Container(
@@ -387,13 +384,10 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
             Expanded(
                 child: Container(
               alignment: Alignment.centerRight,
-              child: const Text(
-                'Tiền mặt',
-                style: TextStyle(
-                    fontFamily: 'Montserrat',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    fontStyle: FontStyle.normal),
+              child: Text(
+                'Ví Fine',
+                style: FineTheme.typograhpy.subtitle1
+                    .copyWith(color: FineTheme.palettes.primary100),
               ),
             )),
           ],

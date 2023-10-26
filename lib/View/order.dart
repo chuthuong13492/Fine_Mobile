@@ -8,6 +8,7 @@ import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/View/start_up.dart';
+import 'package:fine/View/station_picker_screen.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
@@ -27,6 +28,7 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../Accessories/index.dart';
 import '../ViewModel/home_viewModel.dart';
+import '../ViewModel/product_viewModel.dart';
 import '../widgets/touchopacity.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -41,7 +43,9 @@ class _OrderScreenState extends State<OrderScreen> {
   AutoScrollController? controller;
   final scrollDirection = Axis.vertical;
   bool onInit = true;
+  bool onCallListStation = false;
   int index = 0;
+
   @override
   void initState() {
     super.initState();
@@ -50,11 +54,13 @@ class _OrderScreenState extends State<OrderScreen> {
         viewportBoundaryGetter: () =>
             Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
         axis: scrollDirection);
-    // int? timeSlotId = _orderViewModel?.currentCart!.timeSlotId;
-    // index = Get.find<RootViewModel>()
-    //     .listAvailableTimeSlots
-    //     .indexWhere((element) => element.id == timeSlotId);
   }
+
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   onCallListStation = false;
+  // }
 
   void prepareCart() async {
     await _orderViewModel?.prepareOrder();
@@ -71,32 +77,54 @@ class _OrderScreenState extends State<OrderScreen> {
           backgroundColor: FineTheme.palettes.shades100,
           appBar: DefaultAppBar(
             title: "Trang thanh toán",
-            actionButton: [
-              ScopedModelDescendant<OrderViewModel>(
-                builder: (context, child, model) {
-                  if (model.isLinked == false) {
-                    return const SizedBox.shrink();
-                  }
-                  return InkWell(
-                    onTap: () async {
-                      await Get.find<PartyOrderViewModel>().cancelCoOrder();
-                    },
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 16),
-                        child: Text(
-                          'THOÁT',
-                          style: FineTheme.typograhpy.subtitle1
-                              .copyWith(color: Colors.red),
-                        ),
-                      ),
-                    ),
-                  );
-                },
+            backButton: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(32),
               ),
+              child: Material(
+                color: Colors.white,
+                child: InkWell(
+                  onTap: () async {
+                    if (_orderViewModel?.notifierTimeRemaining.value != 0) {
+                      await _orderViewModel?.delLockBox();
+                    }
+                    Get.back();
+                  },
+                  child: Icon(Icons.arrow_back_ios,
+                      size: 20, color: FineTheme.palettes.primary100),
+                ),
+              ),
+            ),
+            actionButton: [
+              onInit
+                  ? const SizedBox.shrink()
+                  : ScopedModelDescendant<OrderViewModel>(
+                      builder: (context, child, model) {
+                        if (model.isLinked == false) {
+                          return const SizedBox.shrink();
+                        }
+                        return InkWell(
+                          onTap: () async {
+                            await Get.find<PartyOrderViewModel>()
+                                .cancelCoOrder();
+                          },
+                          child: Center(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 16, right: 16),
+                              child: Text(
+                                'THOÁT',
+                                style: FineTheme.typograhpy.subtitle1
+                                    .copyWith(color: Colors.red),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ],
           ),
-          bottomNavigationBar: bottomBar(),
+          bottomNavigationBar: onInit ? const SizedBox.shrink() : bottomBar(),
           body: onInit
               ? const Center(
                   child: LoadingFine(),
@@ -124,24 +152,12 @@ class _OrderScreenState extends State<OrderScreen> {
                             ],
                           );
                         case ViewStatus.Loading:
-
                         case ViewStatus.Completed:
                           return ListView(
                             children: [
-                              SizedBox(
-                                  height: 8,
-                                  child: Container(
-                                    color: FineTheme.palettes.neutral200,
-                                  )),
-                              // Hero(
-                              //   tag: CART_TAG,
-                              //   child: Container(
-                              //       margin: const EdgeInsets.only(top: 8),
-                              //       child: layoutAddress()),
-                              // ),
                               model.codeParty != null
                                   ? Container(
-                                      color: FineTheme.palettes.neutral200,
+                                      color: FineTheme.palettes.shades100,
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -172,7 +188,8 @@ class _OrderScreenState extends State<OrderScreen> {
                                                     "Gửi mã voucher này cho bạn bè để được hoàn tiền nè ^^");
                                                 Clipboard.setData(
                                                     new ClipboardData(
-                                                        text: model.codeParty));
+                                                        text:
+                                                            model.codeParty!));
                                               },
                                               icon: Icon(
                                                 Icons.copy,
@@ -184,15 +201,75 @@ class _OrderScreenState extends State<OrderScreen> {
                                       ),
                                     )
                                   : const SizedBox.shrink(),
+                              ValueListenableBuilder(
+                                valueListenable: model.notifierTimeRemaining,
+                                builder: (context, value, child) {
+                                  return value != 0
+                                      ? Container(
+                                          padding: const EdgeInsets.all(8),
+                                          width: Get.width,
+                                          color: FineTheme.palettes.primary50,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                value.toString(),
+                                                style: FineTheme
+                                                    .typograhpy.subtitle1
+                                                    .copyWith(
+                                                        color: FineTheme
+                                                            .palettes
+                                                            .primary300),
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                "Thời gian hoàn thành đơn",
+                                                style: FineTheme
+                                                    .typograhpy.subtitle1
+                                                    .copyWith(
+                                                  color: FineTheme
+                                                      .palettes.primary300,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        )
+                                      : SizedBox(
+                                          height: 8,
+                                          child: Container(
+                                            color: FineTheme.palettes.primary50,
+                                          ));
+                                },
+                              ),
+
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                color: FineTheme.palettes.primary100,
+                                child: Center(
+                                  child: Text(
+                                    "Đơn hàng này sẽ vừa với ${model.orderDTO?.boxQuantity} box !!!",
+                                    style: FineTheme.typograhpy.subtitle2
+                                        .copyWith(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                              // SizedBox(
+                              //     height: 8,
+                              //     child: Container(
+                              //       color: FineTheme.palettes.primary50,
+                              //     )),
+
                               Container(
                                 padding: const EdgeInsets.only(
                                     right: 16, left: 16, top: 10, bottom: 10),
                                 child: layoutStaionPickup(model),
                               ),
+
                               SizedBox(
                                   height: 8,
                                   child: Container(
-                                    color: FineTheme.palettes.neutral200,
+                                    color: FineTheme.palettes.primary50,
                                   )),
                               AutoScrollTag(
                                 index: 1,
@@ -204,7 +281,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               SizedBox(
                                   height: 8,
                                   child: Container(
-                                    color: FineTheme.palettes.neutral200,
+                                    color: FineTheme.palettes.primary50,
                                   )),
                               model.isPartyOrder == false ||
                                       model.isPartyOrder == null
@@ -223,7 +300,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 height: 8,
                                                 child: Container(
                                                   color: FineTheme
-                                                      .palettes.neutral200,
+                                                      .palettes.primary50,
                                                 )),
                                           ],
                                         )
@@ -237,7 +314,7 @@ class _OrderScreenState extends State<OrderScreen> {
                               SizedBox(
                                   height: 8,
                                   child: Container(
-                                    color: FineTheme.palettes.neutral200,
+                                    color: FineTheme.palettes.primary50,
                                   )),
                               // UpSellCollection(),
                               recommendProduct!.length != 0
@@ -252,7 +329,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                             height: 8,
                                             child: Container(
                                               color:
-                                                  FineTheme.palettes.neutral200,
+                                                  FineTheme.palettes.primary50,
                                             )),
                                       ],
                                     )
@@ -297,8 +374,13 @@ class _OrderScreenState extends State<OrderScreen> {
       text = "Có lỗi xảy ra...";
     }
     return InkWell(
-      onTap: () {
-        Get.toNamed(RouteHandler.STATION_PICKER_SCREEN);
+      onTap: () async {
+        if (model.notifierTimeRemaining.value == 0) {
+          await model.getListStation();
+        }
+        if (model.stationList != null) {
+          Get.toNamed(RouteHandler.STATION_PICKER_SCREEN);
+        }
       },
       child: Container(
         height: 50,
@@ -393,7 +475,7 @@ class _OrderScreenState extends State<OrderScreen> {
             child: Container(
               color: FineTheme.palettes.shades100,
               width: Get.width,
-              height: 155,
+              height: 130,
               child: ListView.separated(
                 itemBuilder: (context, index) {
                   var product = list![index];
@@ -401,10 +483,12 @@ class _OrderScreenState extends State<OrderScreen> {
                     color: Colors.white,
                     child: TouchOpacity(
                       onTap: () {
-                        Utils.showSheet(
-                          context,
-                          child: buidProductPicker(),
-                        );
+                        // Get.find<RootViewModel>()
+                        //     .openProductDetail(product.id!, fetchDetail: true);
+                        // Utils.showSheet(
+                        //   context,
+                        //   child: buidProductPicker(),
+                        // );
                       },
                       child: _buildProduct(product),
                     ),
@@ -424,10 +508,13 @@ class _OrderScreenState extends State<OrderScreen> {
 
   Widget _buildProduct(ProductInCart product) {
     return Container(
-      width: 110,
-      height: 200,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      width: 300,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: FineTheme.palettes.primary100),
+      ),
+      child: Row(
         children: [
           Stack(
             children: [
@@ -437,8 +524,8 @@ class _OrderScreenState extends State<OrderScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  width: 110,
-                  height: 110,
+                  width: 90,
+                  height: 90,
                   child: CacheStoreImage(
                     imageUrl: product.imageUrl ?? defaultImage,
                   ),
@@ -466,27 +553,121 @@ class _OrderScreenState extends State<OrderScreen> {
                   )),
             ],
           ),
-          SizedBox(height: FineTheme.spacing.xxs),
-          Text(
-            product.name!,
-            style: FineTheme.typograhpy.subtitle2,
-            overflow: TextOverflow.ellipsis,
+          const SizedBox(
+            width: 18,
           ),
-          const SizedBox(height: 4),
-          Container(
-            // height: 40,
-            child: Text(
-              formatPrice(15000),
-              style: FineTheme.typograhpy.caption1
-                  .copyWith(color: FineTheme.palettes.primary100),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    product.name!,
+                    style: FineTheme.typograhpy.subtitle2.copyWith(
+                      color: FineTheme.palettes.shades200,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      formatPrice(15000),
+                      style: FineTheme.typograhpy.caption1.copyWith(
+                        color: FineTheme.palettes.primary300,
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () async {
+                        ProductDetailViewModel model =
+                            Get.find<ProductDetailViewModel>();
+                        // model.master = product;
+                        final prodAttributes = ProductAttributes(
+                          id: product.id,
+                        );
+                        model.selectAttribute = prodAttributes;
+                        await model.addProductToCart();
+                      },
+                      child: Icon(
+                        Icons.add_circle_outline,
+                        color: FineTheme.palettes.primary100,
+                      ),
+                    ),
+                  ],
+                )
+              ],
             ),
-          ),
+          )
         ],
       ),
     );
+    // return Container(
+    //   width: 110,
+    //   height: 200,
+    //   child: Column(
+    //     crossAxisAlignment: CrossAxisAlignment.center,
+    //     children: [
+    //       Stack(
+    //         children: [
+    //           Padding(
+    //             padding: const EdgeInsets.only(top: 5),
+    //             child: Container(
+    //               decoration: BoxDecoration(
+    //                 borderRadius: BorderRadius.circular(10),
+    //               ),
+    //               width: 110,
+    //               height: 110,
+    //               child: CacheStoreImage(
+    //                 imageUrl: product.imageUrl ?? defaultImage,
+    //               ),
+    //             ),
+    //           ),
+    //           Positioned(
+    //               top: 0,
+    //               child: Container(
+    //                 padding: const EdgeInsets.fromLTRB(8, 2, 8, 2),
+    //                 width: 46,
+    //                 height: 13,
+    //                 decoration: BoxDecoration(
+    //                   color: FineTheme.palettes.primary300,
+    //                   borderRadius: const BorderRadius.only(
+    //                       bottomRight: Radius.circular(10)),
+    //                 ),
+    //                 child: Text(
+    //                   "PROMO".toUpperCase(),
+    //                   style: const TextStyle(
+    //                       fontFamily: 'Montserrat',
+    //                       fontSize: 7,
+    //                       fontWeight: FontWeight.w700,
+    //                       color: Colors.white),
+    //                 ),
+    //               )),
+    //         ],
+    //       ),
+    //       SizedBox(height: FineTheme.spacing.xxs),
+    //       Text(
+    //         product.name!,
+    //         style: FineTheme.typograhpy.subtitle2,
+    //         overflow: TextOverflow.ellipsis,
+    //       ),
+    //       const SizedBox(height: 4),
+    //       Container(
+    //         // height: 40,
+    //         child: Text(
+    //           formatPrice(15000),
+    //           style: FineTheme.typograhpy.caption1
+    //               .copyWith(color: FineTheme.palettes.primary100),
+    //           textAlign: TextAlign.center,
+    //           maxLines: 2,
+    //           overflow: TextOverflow.ellipsis,
+    //         ),
+    //       ),
+    //     ],
+    //   ),
+    // );
   }
 
   Widget buidProductPicker() {
@@ -505,7 +686,7 @@ class _OrderScreenState extends State<OrderScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             child: Text(
-              'Chọn khung giờ giao hàng',
+              '',
               style: FineTheme.typograhpy.h2.copyWith(
                 color: FineTheme.palettes.primary100,
                 // fontWeight: FontWeight.bold,
@@ -568,10 +749,8 @@ class _OrderScreenState extends State<OrderScreen> {
                 ],
               ),
               InkWell(
-                onTap: () {
-                  // await deletePartyCode();
-                  // model.partyCode = await getPartyCode();
-                  showPartyDialog(model);
+                onTap: () async {
+                  await showPartyDialog(isHome: false);
                 },
                 child: Text(
                   "Tạo đơn",
@@ -761,6 +940,7 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Widget layoutOrder(List<OrderDetails> list) {
+    list.sort((a, b) => a.productName!.compareTo(b.productName!));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -997,9 +1177,10 @@ class _OrderScreenState extends State<OrderScreen> {
                                         borderRadius: BorderRadius.circular(4),
                                         child: Container(
                                           width: 31,
-                                          height: 28,
+                                          height: 31,
                                           child: CacheImage(
-                                              imageUrl: defaultImage),
+                                              imageUrl: orderDetails.imageUrl ??
+                                                  defaultImage),
                                         ),
                                       ),
                                     ),
@@ -1036,12 +1217,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     children: [
                       ...list,
                       const SizedBox(width: 8),
-                      _orderViewModel!.isPartyOrder == false ||
-                              _orderViewModel!.isPartyOrder == null
-                          ? selectQuantity(orderDetails)
-                          : const SizedBox(
-                              height: 8,
-                            ),
+                      selectQuantity(orderDetails),
                     ],
                   )
                 ],
@@ -1056,11 +1232,18 @@ class _OrderScreenState extends State<OrderScreen> {
   Widget selectQuantity(
     OrderDetails item,
   ) {
+    bool? isCoOrder = false;
     Color minusColor = FineTheme.palettes.neutral500;
     if (item.quantity >= 1) {
       minusColor = FineTheme.palettes.primary300;
     }
     Color plusColor = FineTheme.palettes.primary300;
+    if (_orderViewModel!.isPartyOrder == false ||
+        _orderViewModel!.isPartyOrder == null) {
+      isCoOrder = false;
+    } else {
+      isCoOrder = true;
+    }
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
       child: Container(
@@ -1077,15 +1260,17 @@ class _OrderScreenState extends State<OrderScreen> {
                 icon: Icon(
                   AntDesign.minuscircleo,
                   size: 16,
-                  color: minusColor,
+                  color: isCoOrder ? FineTheme.palettes.neutral500 : minusColor,
                 ),
                 onPressed: () async {
-                  if (item.quantity >= 1) {
-                    if (item.quantity == 1) {
-                      await _orderViewModel?.deleteItem(item);
-                    } else {
-                      item.quantity--;
-                      await _orderViewModel?.updateQuantity(item);
+                  if (isCoOrder! == false) {
+                    if (item.quantity >= 1) {
+                      if (item.quantity == 1) {
+                        await _orderViewModel?.deleteItem(item);
+                      } else {
+                        item.quantity--;
+                        await _orderViewModel?.updateQuantity(item);
+                      }
                     }
                   }
                 },
@@ -1106,11 +1291,13 @@ class _OrderScreenState extends State<OrderScreen> {
                 icon: Icon(
                   AntDesign.pluscircleo,
                   size: 16,
-                  color: plusColor,
+                  color: isCoOrder ? FineTheme.palettes.neutral500 : plusColor,
                 ),
                 onPressed: () async {
-                  item.quantity++;
-                  await _orderViewModel?.updateQuantity(item);
+                  if (isCoOrder == false) {
+                    item.quantity++;
+                    await _orderViewModel?.updateQuantity(item);
+                  }
                 },
               ),
             ),
@@ -1294,46 +1481,36 @@ class _OrderScreenState extends State<OrderScreen> {
                       topRight: Radius.circular(40),
                       topLeft: Radius.circular(40)),
                 ),
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: InkWell(
-                                  onTap: () async {
-                                    if (model.isLinked != true) {
-                                      await showInputVoucherDialog();
-                                    }
-                                  },
-                                  child: model.isLinked == true
-                                      ? model.codeParty != null
-                                          ? SlideFadeTransition(
-                                              offset: -1,
-                                              direction: Direction.horizontal,
-                                              delayStart: const Duration(
-                                                  milliseconds: 100),
-                                              child: Text(
-                                                "Voucher:  ${model.codeParty!}",
-                                                style: const TextStyle(
-                                                    fontFamily: 'Montserrat',
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
-                                                    fontStyle:
-                                                        FontStyle.normal),
-                                              ),
-                                            )
-                                          : Row(
-                                              children: const [
-                                                Text(
-                                                  'Thêm Voucher',
-                                                  style: TextStyle(
+                child: Container(
+                  child: ListView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () async {
+                                      if (model.isLinked != true) {
+                                        await showInputVoucherDialog();
+                                      }
+                                    },
+                                    child: model.isLinked == true
+                                        ? model.codeParty != null
+                                            ? SlideFadeTransition(
+                                                offset: -1,
+                                                direction: Direction.horizontal,
+                                                delayStart: const Duration(
+                                                    milliseconds: 100),
+                                                child: Text(
+                                                  "Voucher:  ${model.codeParty!}",
+                                                  style: const TextStyle(
                                                       fontFamily: 'Montserrat',
                                                       fontSize: 12,
                                                       fontWeight:
@@ -1341,234 +1518,252 @@ class _OrderScreenState extends State<OrderScreen> {
                                                       fontStyle:
                                                           FontStyle.normal),
                                                 ),
-                                                SizedBox(
-                                                  width: 20,
-                                                ),
-                                                Icon(
-                                                  Icons.keyboard_arrow_up,
-                                                  size: 24,
-                                                )
-                                              ],
-                                            )
-                                      : Row(
-                                          children: const [
-                                            Text(
-                                              'Thêm Voucher',
-                                              style: TextStyle(
-                                                  fontFamily: 'Montserrat',
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w700,
-                                                  fontStyle: FontStyle.normal),
-                                            ),
-                                            SizedBox(
-                                              width: 20,
-                                            ),
-                                            Icon(
-                                              Icons.keyboard_arrow_up,
-                                              size: 24,
-                                            )
-                                          ],
-                                        ),
+                                              )
+                                            : Row(
+                                                children: const [
+                                                  Text(
+                                                    'Thêm Voucher',
+                                                    style: TextStyle(
+                                                        fontFamily:
+                                                            'Montserrat',
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        fontStyle:
+                                                            FontStyle.normal),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 20,
+                                                  ),
+                                                  Icon(
+                                                    Icons.keyboard_arrow_up,
+                                                    size: 24,
+                                                  )
+                                                ],
+                                              )
+                                        : Row(
+                                            children: const [
+                                              Text(
+                                                'Thêm Voucher',
+                                                style: TextStyle(
+                                                    fontFamily: 'Montserrat',
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w700,
+                                                    fontStyle:
+                                                        FontStyle.normal),
+                                              ),
+                                              SizedBox(
+                                                width: 20,
+                                              ),
+                                              Icon(
+                                                Icons.keyboard_arrow_up,
+                                                size: 24,
+                                              )
+                                            ],
+                                          ),
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                width: 102,
-                                child: InkWell(
-                                  onTap: () {},
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: const [
-                                      Text(
-                                        'Ví Fine',
+                                Container(
+                                  width: 102,
+                                  child: InkWell(
+                                    onTap: () {},
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: const [
+                                        Text(
+                                          'Ví Fine',
+                                          style: TextStyle(
+                                              fontFamily: 'Montserrat',
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w700,
+                                              fontStyle: FontStyle.normal),
+                                        ),
+                                        SizedBox(
+                                          width: 20,
+                                        ),
+                                        Icon(
+                                          Icons.keyboard_arrow_up,
+                                          size: 24,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 15),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Phí giao hàng',
                                         style: TextStyle(
                                             fontFamily: 'Montserrat',
                                             fontSize: 12,
                                             fontWeight: FontWeight.w700,
                                             fontStyle: FontStyle.normal),
                                       ),
-                                      SizedBox(
-                                        width: 20,
-                                      ),
-                                      Icon(
-                                        Icons.keyboard_arrow_up,
-                                        size: 24,
+                                      Text(
+                                        formatPrice(shippingFee!),
+                                        style: const TextStyle(
+                                            fontFamily: 'Montserrat',
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400,
+                                            fontStyle: FontStyle.normal),
                                       )
                                     ],
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Phí giao hàng',
-                                      style: TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          fontStyle: FontStyle.normal),
-                                    ),
-                                    Text(
-                                      formatPrice(shippingFee!),
-                                      style: const TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w400,
-                                          fontStyle: FontStyle.normal),
-                                    )
-                                  ],
+                                SizedBox(
+                                  width: 102,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '',
+                                        style: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            fontStyle: FontStyle.normal),
+                                      ),
+                                      Text(
+                                        model.status == ViewStatus.Loading
+                                            ? "..."
+                                            : formatPrice(
+                                                model.orderDTO!.finalAmount!),
+                                        style: const TextStyle(
+                                            fontFamily: 'Montserrat',
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w700,
+                                            fontStyle: FontStyle.normal),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: 102,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '',
-                                      style: TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          fontStyle: FontStyle.normal),
-                                    ),
-                                    Text(
-                                      model.status == ViewStatus.Loading
-                                          ? "..."
-                                          : formatPrice(
-                                              model.orderDTO!.finalAmount!),
-                                      style: const TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w700,
-                                          fontStyle: FontStyle.normal),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 18),
-                          Center(
-                            child: InkWell(
-                              onTap: () async {
-                                await model.orderCart();
-                              },
-                              child: Container(
-                                width: 190,
-                                height: 40,
-                                decoration: const BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20)),
-                                    color: Color(0xFF238E9C)),
-                                child: const Center(
-                                  child: Text("Đặt ngay",
-                                      // isCurrentTimeSlotAvailable
-                                      //     ? "Đặt ngay"
-                                      //     : "Khung giờ đã kết thúc",
-                                      style: TextStyle(
-                                          fontFamily: 'Montserrat',
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w700,
-                                          fontStyle: FontStyle.normal,
-                                          color: Colors.white)),
+                              ],
+                            ),
+                            const SizedBox(height: 18),
+                            Center(
+                              child: InkWell(
+                                onTap: () async {
+                                  await model.orderCart();
+                                },
+                                child: Container(
+                                  width: 190,
+                                  height: 40,
+                                  decoration: const BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(20)),
+                                      color: Color(0xFF238E9C)),
+                                  child: const Center(
+                                    child: Text("Đặt ngay",
+                                        // isCurrentTimeSlotAvailable
+                                        //     ? "Đặt ngay"
+                                        //     : "Khung giờ đã kết thúc",
+                                        style: TextStyle(
+                                            fontFamily: 'Montserrat',
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w700,
+                                            fontStyle: FontStyle.normal,
+                                            color: Colors.white)),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 18),
-                        ],
+                            const SizedBox(height: 18),
+                          ],
+                        ),
+                        // child: Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   crossAxisAlignment: CrossAxisAlignment.center,
+                        //   children: [
+                        //     Expanded(
+                        //       flex: 4,
+                        //       child: Padding(
+                        //         padding: const EdgeInsets.fromLTRB(8, 0, 0, 8),
+                        //         child: Container(
+                        //           alignment: Alignment.centerLeft,
+                        //           child: Column(
+                        //             mainAxisAlignment: MainAxisAlignment.start,
+                        //             crossAxisAlignment: CrossAxisAlignment.start,
+                        //             children: [
+                        //               Text(
+                        //                 "Tổng cộng",
+                        //                 style: FineTheme.typograhpy.caption1.copyWith(
+                        //                     color: FineTheme.palettes.neutral600),
+                        //               ),
+                        //               const SizedBox(height: 6),
+                        //               Text(
+                        //                 _orderViewModel!.status == ViewStatus.Loading
+                        //                     ? "..."
+                        //                     : formatPrice(_orderViewModel!
+                        //                         .orderDTO!.finalAmount!),
+                        //                 style: FineTheme.typograhpy.subtitle1
+                        //                     .copyWith(fontWeight: FontWeight.bold),
+                        //               ),
+                        //             ],
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //     Expanded(
+                        //       flex: 7,
+                        //       child: Padding(
+                        //         padding: const EdgeInsets.fromLTRB(0, 0, 8, 8),
+                        //         child: InkWell(
+                        //           onTap: () async {
+                        //             await model.orderCart();
+                        //           },
+                        //           child: Container(
+                        //             height: 41,
+                        //             padding: const EdgeInsets.all(6),
+                        //             decoration: BoxDecoration(
+                        //               color: FineTheme.palettes.primary200,
+                        //               borderRadius: BorderRadius.circular(8),
+                        //               border: Border.all(
+                        //                 color: FineTheme.palettes.primary200,
+                        //                 width: 1,
+                        //                 style: BorderStyle.solid,
+                        //               ),
+                        //               boxShadow: [
+                        //                 BoxShadow(
+                        //                   color: FineTheme.palettes.primary300,
+                        //                   offset: const Offset(0, 4),
+                        //                 ),
+                        //               ],
+                        //             ),
+                        //             child: Row(
+                        //               mainAxisAlignment: MainAxisAlignment.center,
+                        //               crossAxisAlignment: CrossAxisAlignment.center,
+                        //               children: [
+                        //                 Text(
+                        //                     isMenuAvailable
+                        //                         ? "Đặt đơn"
+                        //                         : "Khung giờ đã kết thúc",
+                        //                     style: FineTheme.typograhpy.subtitle1
+                        //                         .copyWith(
+                        //                             color: isMenuAvailable
+                        //                                 ? Colors.white
+                        //                                 : FineTheme
+                        //                                     .palettes.neutral800)),
+                        //               ],
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
                       ),
-                      // child: Row(
-                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //   crossAxisAlignment: CrossAxisAlignment.center,
-                      //   children: [
-                      //     Expanded(
-                      //       flex: 4,
-                      //       child: Padding(
-                      //         padding: const EdgeInsets.fromLTRB(8, 0, 0, 8),
-                      //         child: Container(
-                      //           alignment: Alignment.centerLeft,
-                      //           child: Column(
-                      //             mainAxisAlignment: MainAxisAlignment.start,
-                      //             crossAxisAlignment: CrossAxisAlignment.start,
-                      //             children: [
-                      //               Text(
-                      //                 "Tổng cộng",
-                      //                 style: FineTheme.typograhpy.caption1.copyWith(
-                      //                     color: FineTheme.palettes.neutral600),
-                      //               ),
-                      //               const SizedBox(height: 6),
-                      //               Text(
-                      //                 _orderViewModel!.status == ViewStatus.Loading
-                      //                     ? "..."
-                      //                     : formatPrice(_orderViewModel!
-                      //                         .orderDTO!.finalAmount!),
-                      //                 style: FineTheme.typograhpy.subtitle1
-                      //                     .copyWith(fontWeight: FontWeight.bold),
-                      //               ),
-                      //             ],
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //     Expanded(
-                      //       flex: 7,
-                      //       child: Padding(
-                      //         padding: const EdgeInsets.fromLTRB(0, 0, 8, 8),
-                      //         child: InkWell(
-                      //           onTap: () async {
-                      //             await model.orderCart();
-                      //           },
-                      //           child: Container(
-                      //             height: 41,
-                      //             padding: const EdgeInsets.all(6),
-                      //             decoration: BoxDecoration(
-                      //               color: FineTheme.palettes.primary200,
-                      //               borderRadius: BorderRadius.circular(8),
-                      //               border: Border.all(
-                      //                 color: FineTheme.palettes.primary200,
-                      //                 width: 1,
-                      //                 style: BorderStyle.solid,
-                      //               ),
-                      //               boxShadow: [
-                      //                 BoxShadow(
-                      //                   color: FineTheme.palettes.primary300,
-                      //                   offset: const Offset(0, 4),
-                      //                 ),
-                      //               ],
-                      //             ),
-                      //             child: Row(
-                      //               mainAxisAlignment: MainAxisAlignment.center,
-                      //               crossAxisAlignment: CrossAxisAlignment.center,
-                      //               children: [
-                      //                 Text(
-                      //                     isMenuAvailable
-                      //                         ? "Đặt đơn"
-                      //                         : "Khung giờ đã kết thúc",
-                      //                     style: FineTheme.typograhpy.subtitle1
-                      //                         .copyWith(
-                      //                             color: isMenuAvailable
-                      //                                 ? Colors.white
-                      //                                 : FineTheme
-                      //                                     .palettes.neutral800)),
-                      //               ],
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
       },

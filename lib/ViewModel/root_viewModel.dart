@@ -61,6 +61,8 @@ class RootViewModel extends BaseModel {
   Future refreshMenu() async {
     // fetchStore();
     await Get.find<HomeViewModel>().getMenus();
+    await Get.find<HomeViewModel>().getProductListInTimeSlot();
+    await Get.find<HomeViewModel>().getReOrder();
   }
 
   Future startUp() async {
@@ -72,13 +74,34 @@ class RootViewModel extends BaseModel {
     await Get.find<RootViewModel>().getUserDestination();
     await Get.find<RootViewModel>().getListTimeSlot();
     await Get.find<HomeViewModel>().getMenus();
-    await Get.find<PartyOrderViewModel>().getPartyOrder();
-    // await Get.find<HomeViewModel>().getListSupplier();
-    // await Get.find<CategoryViewModel>().getCategories();
-    await Get.find<BlogsViewModel>().getBlogs();
-    await Get.find<OrderViewModel>().getCurrentCart();
-    await Get.find<RootViewModel>().checkHasParty();
-    await Get.find<PartyOrderViewModel>().getCoOrderStatus();
+    await Get.find<HomeViewModel>().getProductListInTimeSlot();
+
+    Get.find<HomeViewModel>().getReOrder();
+    Get.find<PartyOrderViewModel>().getPartyOrder();
+    Get.find<BlogsViewModel>().getBlogs();
+    Get.find<OrderViewModel>().getCurrentCart();
+    Get.find<RootViewModel>().getProductRecommend();
+    Get.find<RootViewModel>().checkHasParty();
+    Get.find<PartyOrderViewModel>().getCoOrderStatus();
+  }
+
+  Future<void> getProductRecommend() async {
+    Cart? cart = await getCart();
+    await deleteMart();
+    if (cart != null) {
+      if (cart.orderDetails!.length != 0) {
+        CartItem itemInCart = new CartItem(cart!.orderDetails![0].productId,
+            cart.orderDetails![0].quantity - 1, null);
+
+        await updateItemFromCart(itemInCart);
+        cart = await getCart();
+        await setMart(cart!);
+        await Get.find<ProductDetailViewModel>().processCart(
+            cart.orderDetails![0].productId, 1, selectedTimeSlot!.id);
+      } else {
+        Get.find<OrderViewModel>().productRecomend = [];
+      }
+    }
   }
 
   Future<void> changeDay(int index) async {
@@ -108,8 +131,8 @@ class RootViewModel extends BaseModel {
   }
 
   Future<void> checkHasParty() async {
-    Timer? _timer;
     final party = Get.find<PartyOrderViewModel>();
+    party.partyCode = await getPartyCode();
     if (party.partyCode != null) {
       if (party.partyCode!.contains("LPO")) {
         party.isLinked = true;
@@ -124,56 +147,35 @@ class RootViewModel extends BaseModel {
         }
       }
     } else {
+      party.isLinked = false;
       notifier.value = false;
     }
     notifyListeners();
   }
 
-  Future<void> openProductDetail(ProductDTO? product,
+  Future<void> openProductDetail(String productID,
       {showOnHome = true, fetchDetail = false}) async {
     Get.put<bool>(
       showOnHome,
       tag: "showOnHome",
     );
     try {
+      ProductDTO? item;
       if (fetchDetail) {
         showLoadingDialog();
         // CampusDTO store = await getStore();
         // product = await _productDAO.getProductDetail(
         //     product.id, store.id, selectedMenu.menuId);
-        product = await _productDAO?.getProductDetail(product?.id);
+        item = await _productDAO?.getProductDetail(productID);
       }
-      await Get.toNamed(RouteHandler.PRODUCT_DETAIL, arguments: product);
+
+      await Get.toNamed(RouteHandler.PRODUCT_DETAIL, arguments: item);
       //
       hideDialog();
       await Get.delete<bool>(
         tag: "showOnHome",
       );
-      // if (result != null) {
-      //   if (result) {
-      //     Get.rawSnackbar(
-      //       duration: Duration(seconds: 3),
-      //       snackPosition: SnackPosition.BOTTOM,
-      //       backgroundColor: Colors.white,
-      //       messageText: Text("Thêm món thành công ",
-      //           style: FineTheme.typograhpy.subtitle2),
-      //       icon: Icon(
-      //         Icons.check,
-      //         color: FineTheme.palettes.primary100,
-      //       ),
-      //       mainButton: InkWell(
-      //         onTap: () async {
-      //           await navOrder();
-      //         },
-      //         child: Text(
-      //           "Xem 🛒",
-      //           style: FineTheme.typograhpy.subtitle2,
-      //           textAlign: TextAlign.center,
-      //         ),
-      //       ),
-      //     );
-      //   }
-      // }
+
       notifyListeners();
     } catch (e) {
       await showErrorDialog(errorTitle: "Không tìm thấy sản phẩm");
@@ -349,8 +351,12 @@ class RootViewModel extends BaseModel {
         party.partyOrderDTO!.timeSlotDTO!.id == selectedTimeSlot!.id) {
       await party.getPartyOrder();
       await Future.delayed(const Duration(microseconds: 500));
-
+      // if (party.isPreCoOrder == true && party.orderDTO != null) {
+      //   Get.toNamed(RouteHandler.PREPARE_CO_ORDER, arguments: party.orderDTO);
+      // } else {
       Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+      // }
+
       // hideDialog();
     } else {
       if (party.partyOrderDTO != null) {
@@ -371,7 +377,12 @@ class RootViewModel extends BaseModel {
           }
           selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
           await refreshMenu();
+          // if (party.isPreCoOrder == true && party.orderDTO != null) {
+          //   Get.toNamed(RouteHandler.PREPARE_CO_ORDER,
+          //       arguments: party.orderDTO);
+          // } else {
           Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+          // }
           notifyListeners();
         }
       }
@@ -425,12 +436,12 @@ class RootViewModel extends BaseModel {
         await refreshMenu();
         notifyListeners();
 
-        await orderViewModel.prepareOrder();
+        // await orderViewModel.prepareOrder();
         await Future.delayed(const Duration(microseconds: 500));
         hideDialog();
         await Get.toNamed(RouteHandler.ORDER);
       } else {
-        await orderViewModel.prepareOrder();
+        // await orderViewModel.prepareOrder();
 
         await Future.delayed(const Duration(microseconds: 500));
         // hideDialog();
@@ -586,8 +597,11 @@ class RootViewModel extends BaseModel {
       PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
 
       if (party.partyOrderDTO != null) {
-        option = await showOptionDialog(
-            "Bạn có chắc không? Đổi khung giờ rồi là đơn nhóm bị xóa đó!!");
+        showStatusDialog('assets/images/logo2.png', "Đơn nhóm",
+            "Bạn đang trong đơn nhóm nên hong thể đổi được khung giờ nè!");
+        option = 0;
+        // option = await showOptionDialog(
+        //     "Bạn có chắc không? Đổi khung giờ rồi là đơn nhóm bị xóa đó!!");
       } else {
         if (orderViewModel.currentCart != null) {
           option = await showOptionDialog(

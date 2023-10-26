@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:fine/Accessories/cart_button.dart';
 import 'package:fine/View/qrcode_screen.dart';
 import 'package:fine/View/box_screen.dart';
@@ -15,6 +14,7 @@ import 'package:fine/theme/color.dart';
 import 'package:fine/widgets/bottom_bar_item.dart';
 import 'package:fine/widgets/cruved_navigation_bar.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -45,17 +45,51 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
           await deletePartyCode();
           String code = event.data['key'];
           await party.joinPartyOrder(code: code);
+          hideDialog();
         }
       } else {
-        final snackBar = SnackBar(
-            elevation: 0,
-            behavior: SnackBarBehavior.floating,
-            backgroundColor: Colors.transparent,
-            content: AwesomeSnackbarContent(
-                title: notification.title!,
-                message: notification.body!,
-                contentType: ContentType.success));
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        // final snackBar = SnackBar(
+        //     elevation: 0,
+        //     behavior: SnackBarBehavior.floating,
+        //     backgroundColor: Colors.transparent,
+        //     content: AwesomeSnackbarContent(
+        //         title: notification.title!,
+        //         message: notification.body!,
+        //         contentType: ContentType.success));
+        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        await showFlash(
+          context: context,
+          duration: const Duration(seconds: 4),
+          builder: (context, controller) {
+            return FlashBar(
+              controller: controller,
+              position: FlashPosition.bottom,
+              margin: const EdgeInsets.all(8),
+              shape: BeveledRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+              dismissDirections: const [
+                FlashDismissDirection.startToEnd,
+                FlashDismissDirection.endToStart,
+                FlashDismissDirection.vertical,
+              ],
+              forwardAnimationCurve: Curves.easeInOut,
+              reverseAnimationCurve: Curves.slowMiddle,
+              backgroundColor: Colors.white,
+              icon: const Icon(
+                Icons.check,
+                color: Colors.green,
+              ),
+              content: Text(
+                notification.body!,
+                style: FineTheme.typograhpy.subtitle1,
+              ),
+              title: Text(
+                notification.title!,
+                style: FineTheme.typograhpy.h2,
+              ),
+            );
+          },
+        );
       }
 
       // await showStatusDialog(
@@ -87,8 +121,6 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   final screens = [
     const HomeScreen(),
     const OrderHistoryScreen(),
-    // const BarcodeScreen(),
-    // const BoxScreen(),
     const ProfileScreen()
   ];
   final items = <Widget>[

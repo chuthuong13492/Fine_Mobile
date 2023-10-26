@@ -16,6 +16,7 @@ import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../Accessories/index.dart';
+import '../ViewModel/product_viewModel.dart';
 import '../ViewModel/root_viewModel.dart';
 
 class ProductsFilterPage extends StatefulWidget {
@@ -50,6 +51,7 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: CartButton(),
       appBar: DefaultAppBar(
         title: this.widget.menu!.menuName,
       ),
@@ -165,7 +167,7 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
                   return InkWell(
                     onTap: () {
                       RootViewModel root = Get.find<RootViewModel>();
-                      root.openProductDetail(product, fetchDetail: true);
+                      root.openProductDetail(product.id!, fetchDetail: true);
                     },
                     child: Stack(
                       children: [
@@ -333,7 +335,12 @@ class _ProductsFilterPageState extends State<ProductsFilterPage> {
                           right: 12,
                           bottom: 29,
                           child: InkWell(
-                            onTap: () {},
+                            onTap: () async {
+                              ProductDetailViewModel model =
+                                  Get.find<ProductDetailViewModel>();
+                              model.selectAttribute = product.attributes![0];
+                              await model.addProductToCart();
+                            },
                             child: Container(
                               width: 50,
                               height: 50,

@@ -9,6 +9,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: FineTheme.palettes.shades100,
       body: Stack(
         children: [

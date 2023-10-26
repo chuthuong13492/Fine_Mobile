@@ -30,7 +30,7 @@ class ProductSearchItem extends StatelessWidget {
         child: InkWell(
           onTap: () {
             RootViewModel root = Get.find<RootViewModel>();
-            root.openProductDetail(product, showOnHome: true);
+            root.openProductDetail(product!.id!, showOnHome: true);
           },
           child: Container(
             height: 110,
@@ -132,7 +132,7 @@ class ProductSearchItem extends StatelessWidget {
                   child: InkWell(
                     onTap: () {
                       RootViewModel root = Get.find<RootViewModel>();
-                      root.openProductDetail(product, showOnHome: true);
+                      root.openProductDetail(product!.id!, showOnHome: true);
                     },
                     child: Container(
                       width: 120,

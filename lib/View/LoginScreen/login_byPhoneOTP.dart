@@ -48,6 +48,7 @@ class _LoginWithPhoneOtpScreenState extends State<LoginWithPhoneOtpScreen> {
     return ScopedModel(
       model: LoginViewModel(),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.transparent,

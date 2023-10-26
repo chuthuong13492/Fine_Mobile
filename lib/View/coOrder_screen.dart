@@ -40,7 +40,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(seconds: 1),
-        (timer) => _partyViewModel!.getPartyOrder());
+        (timer) async => await _partyViewModel!.getPartyOrder());
   }
 
   @override
@@ -103,26 +103,6 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                     size: 30,
                   )),
             )
-            // InkWell(
-            //   onTap: () async {
-            //     _partyViewModel!.partyCode = await getPartyCode();
-            //     await _partyViewModel!
-            //         .cancelCoOrder(_partyViewModel!.partyCode!);
-            //     if (_partyViewModel!.partyOrderDTO == null) {
-            //       // _stopTimer();
-            //     }
-            //   },
-            //   child: Center(
-            //     child: Padding(
-            //       padding: const EdgeInsets.only(left: 16, right: 16),
-            //       child: Text(
-            //         isAdmin! ? 'XÓA' : 'THOÁT',
-            //         style: FineTheme.typograhpy.subtitle1
-            //             .copyWith(color: Colors.red),
-            //       ),
-            //     ),
-            //   ),
-            // ),
           ],
         ),
         body: SafeArea(
@@ -133,37 +113,38 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                   child: Container(
                     color: FineTheme.palettes.neutral200,
                   )),
-              ScopedModelDescendant<PartyOrderViewModel>(
-                builder: (context, child, model) {
-                  final partyCode = model.partyOrderDTO!.partyCode;
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Mã:',
-                        style: FineTheme.typograhpy.subtitle2
-                            .copyWith(color: FineTheme.palettes.neutral400),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        partyCode!,
-                        style: FineTheme.typograhpy.subtitle2
-                            .copyWith(color: FineTheme.palettes.shades200),
-                      ),
-                      // const SizedBox(width: 8),
-                      IconButton(
-                          onPressed: () {
-                            Clipboard.setData(
-                                new ClipboardData(text: partyCode));
-                          },
-                          icon: Icon(
-                            Icons.copy,
-                            size: 20,
-                            color: FineTheme.palettes.neutral500,
-                          ))
-                    ],
-                  );
-                },
+              // ScopedModelDescendant<PartyOrderViewModel>(
+              //   builder: (context, child, model) {
+              //     final partyCode = model.partyOrderDTO!.partyCode;
+              //     return ;
+              //   },
+              // ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Mã:',
+                    style: FineTheme.typograhpy.subtitle2
+                        .copyWith(color: FineTheme.palettes.neutral400),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    _partyViewModel!.partyCode!,
+                    style: FineTheme.typograhpy.subtitle2
+                        .copyWith(color: FineTheme.palettes.shades200),
+                  ),
+                  // const SizedBox(width: 8),
+                  IconButton(
+                      onPressed: () {
+                        Clipboard.setData(new ClipboardData(
+                            text: _partyViewModel!.partyCode!));
+                      },
+                      icon: Icon(
+                        Icons.copy,
+                        size: 20,
+                        color: FineTheme.palettes.neutral500,
+                      ))
+                ],
               ),
               SizedBox(
                   height: 8,
@@ -173,41 +154,50 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
               ScopedModelDescendant<PartyOrderViewModel>(
                 builder: (context, child, model) {
                   List<Widget> card = [];
-                  List<Party> list = model.partyOrderDTO!.partyOrder!;
-                  final user = list
-                      .where((element) =>
-                          element.customer!.id == acc.currentUser!.id)
-                      .toList();
-                  for (var item in user) {
-                    if (item.customer!.isAdmin == true) {
-                      list;
-                      for (var item in list) {
-                        card.add(_buildPartyList(item));
-                      }
-                      for (int i = 0; i < list.length; i++) {
-                        if (i % 2 != 0) {
-                          card.insert(
-                            i,
-                            Container(
-                              height: 24,
-                              color: FineTheme.palettes.neutral200,
-                            ),
-                          );
+                  List<Party>? list;
+                  if (model.partyOrderDTO != null) {
+                    list = model.partyOrderDTO!.partyOrder!;
+                  }
+                  List<Party>? user;
+                  if (list != null) {
+                    user = list
+                        .where((element) =>
+                            element.customer!.id == acc.currentUser!.id)
+                        .toList();
+                  }
+
+                  if (user != null) {
+                    for (var item in user) {
+                      if (item.customer!.isAdmin == true) {
+                        list;
+                        for (var item in list!) {
+                          card.add(_buildPartyList(item));
                         }
-                      }
-                    } else {
-                      user;
-                      for (var item in user) {
-                        card.add(_buildPartyList(item));
+                        for (int i = 0; i < list.length; i++) {
+                          if (i % 2 != 0) {
+                            card.insert(
+                              i,
+                              Container(
+                                height: 24,
+                                color: FineTheme.palettes.neutral200,
+                              ),
+                            );
+                          }
+                        }
+                      } else {
+                        user;
+                        for (var item in user) {
+                          card.add(_buildPartyList(item));
+                        }
                       }
                     }
                   }
-                  if (list == null || list.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text("Không có người tham gia"),
-                    );
-                  }
+                  // if (list == null || list.isEmpty) {
+                  //   return const Padding(
+                  //     padding: EdgeInsets.all(8.0),
+                  //     child: Text("Không có người tham gia"),
+                  //   );
+                  // }
                   return Container(
                     color: FineTheme.palettes.shades100,
                     child: Column(
@@ -226,6 +216,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
 
   Widget _buildPartyList(Party party) {
     final listProduct = party.orderDetails;
+    listProduct?.sort((a, b) => a.productName!.compareTo(b.productName!));
     AccountViewModel acc = Get.find<AccountViewModel>();
     bool hasProduct = true;
     // final order = Get.find<OrderViewModel>();
@@ -582,40 +573,90 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
         child: ScopedModelDescendant<PartyOrderViewModel>(
           builder: (context, child, model) {
             final acc = Get.find<AccountViewModel>();
-            int customer = model.partyOrderDTO!.partyOrder!.length;
-            final userConfirm = model.partyOrderDTO!.partyOrder!
-                .where((element) => element.customer!.isConfirm == true)
-                .toList();
-            bool? isAllConfirm = false;
-            if (userConfirm.length == customer) {
-              isAllConfirm = true;
+            int? customer;
+            List<Party>? userConfirm;
+            List<Party>? listUser;
+
+            if (model.partyOrderDTO != null) {
+              customer = model.partyOrderDTO!.partyOrder!.length;
+              userConfirm = model.partyOrderDTO!.partyOrder!
+                  .where((element) => element.customer!.isConfirm == true)
+                  .toList();
+              listUser = model.partyOrderDTO!.partyOrder!
+                  .where(
+                      (element) => element.customer!.id == acc.currentUser!.id)
+                  .toList();
             }
+
+            bool? isAllConfirm = false;
+            if (userConfirm != null) {
+              if (userConfirm.length == customer) {
+                isAllConfirm = true;
+              }
+            }
+
             bool? isAdmin = false;
             bool? isUserConfirm = false;
-            final listUser = model.partyOrderDTO!.partyOrder!
-                .where((element) => element.customer!.id == acc.currentUser!.id)
-                .toList();
-            for (var item in listUser) {
-              if (item.customer!.isConfirm == false) {
-                isUserConfirm = false;
-              } else {
-                isUserConfirm = true;
-              }
-              if (item.customer!.isAdmin == true) {
-                isAdmin = true;
+            if (listUser != null) {
+              for (var item in listUser) {
+                if (item.customer!.isConfirm == false) {
+                  isUserConfirm = false;
+                } else {
+                  isUserConfirm = true;
+                }
+                if (item.customer!.isAdmin == true) {
+                  isAdmin = true;
+                }
               }
             }
 
             return Container(
               height: 160,
               padding: const EdgeInsets.only(
-                  left: 16, right: 16, top: 22, bottom: 32),
+                  left: 16, right: 16, top: 5, bottom: 32),
               color: FineTheme.palettes.shades100,
               child: Column(
                 children: [
-                  Text(
-                      '${userConfirm.length}/${customer} thành viên đã xác nhận'),
-                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () async {
+                          if (isAdmin == true) {
+                            await _partyViewModel?.getCustomerInParty();
+                          } else {
+                            await _partyViewModel!.cancelCoOrder();
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                          child: const Icon(
+                            Icons.logout_outlined,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                      Text(
+                          '${userConfirm?.length}/${customer} thành viên đã xác nhận'),
+                      isAdmin == true
+                          ? InkWell(
+                              onTap: () async {
+                                await _partyViewModel?.getCustomerInParty(
+                                    isDelete: true);
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                child: Icon(
+                                  Icons.group_remove,
+                                  color: FineTheme.palettes.primary300,
+                                ),
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                    ],
+                  ),
+                  const SizedBox(height: 5),
                   Container(
                     height: 52,
                     width: Get.width,
@@ -630,15 +671,17 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                           await model.confirmationParty();
                           // _stopTimer();
                         } else {
-                          Cart? cart = await getCart();
-                          if (cart != null) {
-                            await model.preCoOrder();
-                            // _stopTimer();
-                          } else {
-                            showStatusDialog(
-                                "assets/images/error.png",
-                                "Giỏ hàng đang trống kìaa",
-                                "Bạn chọn thêm đồ ăn vào giỏ hàng nhe 😃.");
+                          if (isAdmin == true) {
+                            Cart? cart = await getCart();
+                            if (cart != null) {
+                              await model.preCoOrder();
+                              // _stopTimer();
+                            } else {
+                              showStatusDialog(
+                                  "assets/images/error.png",
+                                  "Giỏ hàng đang trống kìaa",
+                                  "Bạn chọn thêm đồ ăn vào giỏ hàng nhe 😃.");
+                            }
                           }
                         }
                       },
@@ -663,27 +706,29 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                   const SizedBox(
                     height: 8,
                   ),
-                  InkWell(
-                    onTap: () async {
-                      if (isAdmin == true) {
-                        await _partyViewModel?.getCustomerInParty();
-                      } else {
-                        await _partyViewModel!.cancelCoOrder();
-                      }
+                  // Expanded(
+                  //   child: InkWell(
+                  //     onTap: () async {
+                  //       if (isAdmin == true) {
+                  //         await _partyViewModel?.getCustomerInParty();
+                  //       } else {
+                  //         await _partyViewModel!.cancelCoOrder();
+                  //       }
 
-                      // await _partyViewModel?.getCustomerInParty();
-                    },
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 16, right: 16),
-                        child: Text(
-                          isAdmin! ? 'Xóa đơn nhóm' : 'Thoát đơn nhóm',
-                          style: FineTheme.typograhpy.subtitle1
-                              .copyWith(color: Colors.red),
-                        ),
-                      ),
-                    ),
-                  ),
+                  //       // await _partyViewModel?.getCustomerInParty();
+                  //     },
+                  //     child: Center(
+                  //       child: Container(
+                  //         padding: const EdgeInsets.only(left: 16, right: 16),
+                  //         child: Text(
+                  //           isAdmin! ? 'Xóa đơn nhóm' : 'Thoát đơn nhóm',
+                  //           style: FineTheme.typograhpy.subtitle1
+                  //               .copyWith(color: Colors.red),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             );

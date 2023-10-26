@@ -172,23 +172,23 @@ class _CustomInvitePartyState extends State<CustomInviteParty> {
                             // style: BorderStyle.solid,
                           ),
                         ),
-                        suffixIcon: controller.text.length < 9 ||
-                                controller.text.length > 10
-                            ? null
-                            : Container(
-                                height: 25,
-                                width: 25,
-                                margin: const EdgeInsets.all(10.0),
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.green,
-                                ),
-                                child: const Icon(
-                                  Icons.done,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
+                        // suffixIcon: controller.text.length < 9 ||
+                        //         controller.text.length > 10
+                        //     ? null
+                        //     : Container(
+                        //         height: 25,
+                        //         width: 25,
+                        //         margin: const EdgeInsets.all(10.0),
+                        //         decoration: const BoxDecoration(
+                        //           shape: BoxShape.circle,
+                        //           color: Colors.green,
+                        //         ),
+                        //         child: const Icon(
+                        //           Icons.done,
+                        //           color: Colors.white,
+                        //           size: 20,
+                        //         ),
+                        //       ),
                         prefixIcon: Container(
                           padding: const EdgeInsets.all(8),
                           child: InkWell(
@@ -261,6 +261,9 @@ class _CustomInvitePartyState extends State<CustomInviteParty> {
                                   String phone =
                                       '+' + country.phoneCode + _phone!;
                                   await model.getCustomerByPhone(phone);
+                                  model.isInvited = false;
+                                  isCountdown = false;
+                                  isCancled = false;
                                   // await model.signInWithPhone(
                                   //     phone, widget.isLoginMail!);
                                 }
@@ -323,6 +326,7 @@ class _CustomInvitePartyState extends State<CustomInviteParty> {
                                       onPressed: () {
                                         startCountdown();
                                         setState(() {
+                                          isCancled = false;
                                           isCountdown = true;
                                         });
                                       },

@@ -76,7 +76,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                 ),
               ),
               SizedBox(
-                // width: 180,
+                width: 180,
                 child: Text(
                   widget.order.orderCode!,
                   style: const TextStyle(

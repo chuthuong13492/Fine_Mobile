@@ -21,16 +21,18 @@ class StationPickerScreen extends StatefulWidget {
 class _StationPickerScreenState extends State<StationPickerScreen> {
   final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
       new GlobalKey<RefreshIndicatorState>();
-  Future<void> _refresh() async {
-    Get.find<OrderViewModel>().getListStation();
-  }
+  // Future<void> _refresh() async {
+  //   Get.find<OrderViewModel>().getListStation();
+  // }
 
   OrderViewModel? _orderViewModel;
   @override
   void initState() {
     super.initState();
-    _orderViewModel = Get.find<OrderViewModel>();
-    Get.find<OrderViewModel>().getListStation();
+    // _orderViewModel = Get.find<OrderViewModel>();
+    // if (_checkCall == false) {
+    //   Get.find<OrderViewModel>().getListStation();
+    // }
   }
 
   @override
@@ -38,15 +40,48 @@ class _StationPickerScreenState extends State<StationPickerScreen> {
     return Scaffold(
       backgroundColor: FineTheme.palettes.shades100,
       appBar: DefaultAppBar(title: "Chọn nơi nhận"),
-      body: Container(
-        child: RefreshIndicator(
-          key: _refreshIndicatorKey,
-          onRefresh: _refresh,
+      body: ScopedModel(
+        model: Get.find<OrderViewModel>(),
+        child: Container(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 16),
               // _buildSearchVoucher(),
+              ScopedModelDescendant<OrderViewModel>(
+                builder: (context, child, model) {
+                  return ValueListenableBuilder(
+                    valueListenable: model.notifierTimeRemaining,
+                    builder: (context, value, child) {
+                      if (value == 0) {
+                        return const SizedBox.shrink();
+                      }
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Bạn có ",
+                            style: FineTheme.typograhpy.subtitle1.copyWith(
+                              color: FineTheme.palettes.neutral500,
+                            ),
+                          ),
+                          Text(
+                            "${value} ",
+                            style: FineTheme.typograhpy.subtitle1
+                                .copyWith(color: FineTheme.palettes.primary100),
+                          ),
+                          Text(
+                            "giây để hoàn thành đơn hàng",
+                            style: FineTheme.typograhpy.subtitle1.copyWith(
+                              color: FineTheme.palettes.neutral500,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
               const SizedBox(height: 8),
               // _buildFilter(),
 
@@ -59,55 +94,55 @@ class _StationPickerScreenState extends State<StationPickerScreen> {
   }
 
   Widget _buildListStation() {
-    return ScopedModel(
-        model: Get.find<OrderViewModel>(),
-        child: ScopedModelDescendant<OrderViewModel>(
-          builder: (context, child, model) {
-            if (model.status == ViewStatus.Loading) {
-              return _buildLoading();
-            }
-            if (model.status == ViewStatus.Error ||
-                model.stationList == null && model.stationList!.isEmpty) {
-              return Center(
-                child: Text(
-                  model.msg ?? "Hiện tại không có station khả dụng",
-                  style: FineTheme.typograhpy.subtitle1
-                      .copyWith(color: FineTheme.palettes.primary100),
-                ),
+    return ScopedModelDescendant<OrderViewModel>(
+      builder: (context, child, model) {
+        if (model.status == ViewStatus.Loading) {
+          return _buildLoading();
+        }
+        if (model.status == ViewStatus.Error ||
+            model.stationList == null &&
+                model.stationList!.isEmpty &&
+                model.stationList?.length == 0) {
+          return Center(
+            child: Text(
+              model.msg ?? "Hiện tại không có station khả dụng",
+              style: FineTheme.typograhpy.subtitle1
+                  .copyWith(color: FineTheme.palettes.primary100),
+            ),
+          );
+        }
+        return Flexible(
+          child: ListView.separated(
+            itemBuilder: (context, index) {
+              if (index == model.stationList!.length) {
+                return const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Bạn đã xem hết rồi đấy 🐱‍👓",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                );
+              }
+              final station = model.stationList!.elementAt(index);
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    child: stationCard(station),
+                  ),
+                ],
               );
-            }
-            return Flexible(
-              child: ListView.separated(
-                itemBuilder: (context, index) {
-                  if (index == model.stationList!.length) {
-                    return const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        "Bạn đã xem hết rồi đấy 🐱‍👓",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                    );
-                  }
-                  final station = model.stationList!.elementAt(index);
-                  return Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                        child: stationCard(station),
-                      ),
-                    ],
-                  );
-                },
-                separatorBuilder: (context, index) =>
-                    MySeparator(color: FineTheme.palettes.neutral500),
-                itemCount: model.stationList!.length,
-              ),
-            );
-          },
-        ));
+            },
+            separatorBuilder: (context, index) =>
+                MySeparator(color: FineTheme.palettes.neutral500),
+            itemCount: model.stationList!.length,
+          ),
+        );
+      },
+    );
   }
 
   Widget stationCard(StationDTO? dto) {

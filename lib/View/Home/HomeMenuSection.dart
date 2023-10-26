@@ -83,20 +83,27 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                           // ),
                         ],
                       ),
-                      StreamBuilder<DateTime>(
-                        stream: Stream.periodic(
-                            const Duration(seconds: 1), (i) => DateTime.now()),
-                        builder: (context, snapshot) {
-                          return Text(
-                            snapshot.data != null
-                                ? DateFormat('dd-MM HH:mm:ss')
-                                    .format(snapshot.data!)
-                                : 'Loading...',
-                            style: FineTheme.typograhpy.buttonLg
-                                .copyWith(color: FineTheme.palettes.primary100),
-                          );
-                        },
+                      Text(
+                        now != null
+                            ? DateFormat('dd-MM HH:mm:ss').format(now!)
+                            : 'Loading...',
+                        style: FineTheme.typograhpy.buttonLg
+                            .copyWith(color: FineTheme.palettes.primary100),
                       )
+                      // StreamBuilder<DateTime>(
+                      //   stream: Stream.periodic(
+                      //       const Duration(seconds: 1), (i) => DateTime.now()),
+                      //   builder: (context, snapshot) {
+                      //     return Text(
+                      //       snapshot.data != null
+                      //           ? DateFormat('dd-MM HH:mm:ss')
+                      //               .format(snapshot.data!)
+                      //           : 'Loading...',
+                      //       style: FineTheme.typograhpy.buttonLg
+                      //           .copyWith(color: FineTheme.palettes.primary100),
+                      //     );
+                      //   },
+                      // )
                     ],
                   );
                 },

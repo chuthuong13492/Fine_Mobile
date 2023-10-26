@@ -6,6 +6,7 @@ import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DTO/ProductDTO.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/format_price.dart';
+import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/productFilter_viewModel.dart';
@@ -67,7 +68,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           slivers: [
             SliverPersistentHeader(
               delegate: CustomSliverAppBarDelegate(
-                  expandedHeight: 510, dto: widget.dto),
+                  expandedHeight: 520, dto: widget.dto),
               pinned: true,
             ),
             SliverList(
@@ -176,8 +177,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               InkWell(
                 onTap: () async {
                   PartyOrderViewModel model = Get.find<PartyOrderViewModel>();
-
-                  await showPartyDialog(model);
+                  // model.partyCode = await getPartyCode();
+                  await showPartyDialog(isHome: false);
                 },
                 child: Text(
                   "Tạo phòng",
@@ -909,7 +910,7 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   Widget buildFloating(double shrinkOffset) => Opacity(
         opacity: disappear(shrinkOffset),
         child: Container(
-          height: 275,
+          // height: 275,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             color: FineTheme.palettes.shades100,
@@ -923,61 +924,105 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
           child: Container(
             padding:
                 const EdgeInsets.only(top: 90, left: 16, right: 16, bottom: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    height: 55,
-                    // width: 280,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Center(
-                          child: Text(
-                            dto.productName!,
-                            overflow: TextOverflow.ellipsis,
-                            style: FineTheme.typograhpy.h1
-                                .copyWith(color: Colors.black, fontSize: 20),
+            child: ScopedModelDescendant<ProductDetailViewModel>(
+              builder: (context, child, model) {
+                bool? isSelect;
+
+                List<Widget> listWidget = [];
+                List<ProductAttributes>? attributeList =
+                    model.master!.attributes;
+                if (dto.attributes!.length > 1) {
+                  model.isExtra = true;
+                }
+                if (model.isExtra == true) {
+                  for (var i = 0; i < attributeList!.length; i++) {
+                    isSelect = model.selectAttribute!.id == attributeList[i].id;
+                    listWidget.add(
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              model.selectedAttribute(attributeList[i]);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.fromLTRB(16, 5, 16, 5),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                    color: isSelect
+                                        ? FineTheme.palettes.primary100
+                                        : FineTheme.palettes.neutral700,
+                                    width: 1.5),
+                              ),
+                              child: Text(
+                                "Size ${attributeList[i].size!}",
+                                style: FineTheme.typograhpy.subtitle1.copyWith(
+                                    color: isSelect
+                                        ? FineTheme.palettes.primary100
+                                        : FineTheme.palettes.neutral700),
+                              ),
+                            ),
                           ),
-                        ),
-                        Row(
+                          const SizedBox(width: 8),
+                        ],
+                      ),
+                    );
+                  }
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        height: 55,
+                        // width: 280,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            FaIcon(
-                              Icons.star_outlined,
-                              size: 24,
-                              color: FineTheme.palettes.primary300,
+                            Center(
+                              child: Text(
+                                dto.productName!,
+                                overflow: TextOverflow.ellipsis,
+                                style: FineTheme.typograhpy.h1.copyWith(
+                                    color: Colors.black, fontSize: 20),
+                              ),
                             ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              "4.9",
-                              style: FineTheme.typograhpy.h2
-                                  .copyWith(color: Colors.black),
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              "(+100)",
-                              style: FineTheme.typograhpy.subtitle2.copyWith(
-                                  color: FineTheme.palettes.neutral500),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                FaIcon(
+                                  Icons.star_outlined,
+                                  size: 24,
+                                  color: FineTheme.palettes.primary300,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  "4.9",
+                                  style: FineTheme.typograhpy.h2
+                                      .copyWith(color: Colors.black),
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  "(+100)",
+                                  style: FineTheme.typograhpy.subtitle2
+                                      .copyWith(
+                                          color: FineTheme.palettes.neutral500),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                // const SizedBox(
-                //   height: 8,
-                // ),
-                ScopedModelDescendant<ProductDetailViewModel>(
-                  builder: (context, child, model) {
-                    return Container(
+                    // const SizedBox(
+                    //   height: 8,
+                    // ),
+                    Container(
                       height: 48,
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1040,38 +1085,45 @@ class CustomSliverAppBarDelegate extends SliverPersistentHeaderDelegate {
                           )
                         ],
                       ),
-                    );
-                  },
-                ),
+                    ),
 
-                Container(
-                  width: 295,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Mô Tả",
-                        style: FineTheme.typograhpy.subtitle1,
+                    Container(
+                      width: 295,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          model.isExtra == true
+                              ? Row(
+                                  children: [
+                                    ...listWidget.toList(),
+                                  ],
+                                )
+                              : const SizedBox.shrink(),
+                          // Text(
+                          //   "Mô Tả",
+                          //   style: FineTheme.typograhpy.subtitle1,
+                          // ),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Text(
+                            "Ngon nhắm, hãy thử ngay nào",
+                            style: FineTheme.typograhpy.body2,
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            // dto.storeName!,
+                            "Đại học FPT",
+                            style: FineTheme.typograhpy.subtitle1,
+                          ),
+                        ],
                       ),
-                      const SizedBox(
-                        height: 2,
-                      ),
-                      Text(
-                        "Ngon nhắm, hãy thử ngay nào",
-                        style: FineTheme.typograhpy.body2,
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        // dto.storeName!,
-                        "Đại học FPT",
-                        style: FineTheme.typograhpy.subtitle1,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),

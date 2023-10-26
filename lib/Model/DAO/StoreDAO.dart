@@ -85,6 +85,30 @@ class StoreDAO extends BaseDAO {
     return null;
   }
 
+  Future<List<ReOrderDTO>?> getReOrder(String? timeSlotId,
+      {Map<String, dynamic> params = const {}}) async {
+    final res = await request.get(
+      // 'collections?menu-id=${menuId}',
+      '/menu/timeslot/${timeSlotId}',
+      queryParameters: params,
+    );
+    var listJson = res.data['data']["reOrders"] as List;
+    if (listJson.length != 0) {
+      return listJson.map((e) => ReOrderDTO.fromJson(e)).toList();
+    }
+    // final collections = CollectionDTO.fromJson(res.data["data"]);
+    return null;
+  }
+
+  Future<OrderDTO?> createReOrder(String id, int orderType) async {
+    final res = await request.post(
+      '/order/reOrder?orderId=$id&orderType=$orderType',
+    );
+    if (res.statusCode == 200) {
+      return OrderDTO.fromJson(res.data["data"]["orderResponse"]);
+    }
+    return null;
+  }
   //   Future<List<LocationDTO>> getLocations(int storeId) async {
   //   final res = await request.get('stores/$storeId/locations');
   //   var jsonList = res.data["data"] as List;

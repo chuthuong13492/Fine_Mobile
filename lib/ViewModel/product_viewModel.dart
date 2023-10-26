@@ -32,9 +32,10 @@ class ProductDetailViewModel extends BaseModel {
   //List choice option
   Map<ProductDTO, bool>? extra;
   //Bật cờ để đổi radio thành checkbox
-  bool? isExtra;
+  bool? isExtra = false;
   //List size
   // List<ProductInCart>? productsRecomend;
+  ProductAttributes? selectAttribute;
   ProductDTO? master;
   ProductDAO? _dao;
   Cart? checkCurrentCart;
@@ -44,49 +45,27 @@ class ProductDetailViewModel extends BaseModel {
     isExtra = false;
     _dao = ProductDAO();
     checkCurrentCart = null;
-    // productsRecomend = null;
-    this.affectPriceContent = new Map<String, List<String>>();
+    selectAttribute = null;
 
-    this.selectedAttributes = new Map<String, String>();
-    //
+    if (selectAttribute == null) {
+      if (master != null) {
+        selectAttribute = master!.attributes![0];
+        fixTotal = (selectAttribute!.price ?? 0) * count;
+        // // total = fixTotal + extraTotal;
+        total = fixTotal;
+      }
+    }
 
-    // if (master.type == ProductType.MASTER_PRODUCT) {
-    //   for (int i = 0; i < master.attributes.keys.length; i++) {
-    //     String attributeKey = master.attributes.keys.elementAt(i);
-    //     List<String> listAttributesName =
-    //         master.attributes[attributeKey].split(",");
-    //     listAttributesName.forEach((element) {
-    //       element.trim();
-    //     });
-    //     affectPriceContent[attributeKey] = listAttributesName;
-    //     selectedAttributes[attributeKey] = null;
-    //   }
-    // } else {
-    //   if (dto.type == ProductType.COMPLEX_PRODUCT &&
-    //       dto.extras != null &&
-    //       dto.extras.isNotEmpty) {
-    //     getExtra(dto);
-    //     isExtra = true;
-    //   } else {
-    //     this.extra = null;
-    //   }
-    //   fixTotal = master.price * count;
-    // }
-    fixTotal = (master?.attributes![0].price ?? 0) * count;
-    // // total = fixTotal + extraTotal;
-    total = fixTotal;
-
-    verifyOrder();
+    // verifyOrder();
     notifyListeners();
   }
 
-  // void getExtra(ProductDTO product) {
-  //   this.extra = new Map<ProductDTO, bool>();
-  //   for (ProductDTO dto in product.extras) {
-  //     extra[dto] = false;
-  //   }
-  //   notifyListeners();
-  // }
+  void selectedAttribute(ProductAttributes attributes) {
+    selectAttribute = attributes;
+    total = attributes.price;
+    count = 1;
+    notifyListeners();
+  }
 
   void addQuantity() {
     if (addColor == FineTheme.palettes.primary100) {
@@ -94,31 +73,8 @@ class ProductDetailViewModel extends BaseModel {
         minusColor = FineTheme.palettes.primary100;
       }
       count++;
-      // if (master.type == ProductType.MASTER_PRODUCT) {
-      //   Map choice = new Map();
-      //   for (int i = 0; i < affectPriceContent!.keys.toList().length; i++) {
-      //     choice[affectPriceContent!.keys.elementAt(i)] =
-      //         selectedAttributes?[affectPriceContent?.keys.elementAt(i)];
-      //   }
 
-      //   ProductDTO dto = master.getChildByAttributes(choice);
-      //   fixTotal = dto.price * count;
-      // } else {
-      //   fixTotal = master.price * count;
-      // }
-
-      // if (this.extra != null) {
-      //   extraTotal = 0;
-      //   for (int i = 0; i < extra.keys.length; i++) {
-      //     if (extra[extra.keys.elementAt(i)]) {
-      //       double price = extra.keys.elementAt(i).price * count;
-      //       extraTotal += price;
-      //     }
-      //   }
-      // }
-
-      // total = fixTotal + extraTotal;
-      fixTotal = (master?.attributes![0].price ?? 0) * count;
+      fixTotal = (selectAttribute!.price ?? 0) * count;
 
       total = fixTotal;
       notifyListeners();
@@ -155,7 +111,7 @@ class ProductDetailViewModel extends BaseModel {
       //     }
       //   }
       // }
-      fixTotal = (master?.attributes![0].price ?? 0) * count;
+      fixTotal = (selectAttribute!.price ?? 0) * count;
 
       // // total = fixTotal + extraTotal;
       total = fixTotal;
@@ -195,29 +151,29 @@ class ProductDetailViewModel extends BaseModel {
   //   notifyListeners();
   // }
 
-  void changeAffectIndex(int index) {
-    this.affectIndex = index;
-    if (index == affectPriceContent?.keys.toList().length) {
-      isExtra = true;
-    } else
-      isExtra = false;
-    notifyListeners();
-  }
+  // void changeAffectIndex(int index) {
+  //   this.affectIndex = index;
+  //   if (index == affectPriceContent?.keys.toList().length) {
+  //     isExtra = true;
+  //   } else
+  //     isExtra = false;
+  //   notifyListeners();
+  // }
 
-  void verifyOrder() {
-    order = true;
+  // void verifyOrder() {
+  //   order = true;
 
-    for (int i = 0; i < affectPriceContent!.keys.toList().length; i++) {
-      if (selectedAttributes![affectPriceContent!.keys.elementAt(i)] == null) {
-        order = false;
-      }
-    }
+  //   for (int i = 0; i < affectPriceContent!.keys.toList().length; i++) {
+  //     if (selectedAttributes![affectPriceContent!.keys.elementAt(i)] == null) {
+  //       order = false;
+  //     }
+  //   }
 
-    if (order!) {
-      addColor = FineTheme.palettes.primary100;
-    }
-    // setState(ViewStatus.Completed);
-  }
+  //   if (order!) {
+  //     addColor = FineTheme.palettes.primary100;
+  //   }
+  //   // setState(ViewStatus.Completed);
+  // }
 
   // void changExtra(bool value, int i) {
   //   extraTotal = 0;
@@ -235,32 +191,10 @@ class ProductDetailViewModel extends BaseModel {
   Future<void> addProductToCart({bool backToHome = true}) async {
     final root = Get.find<RootViewModel>();
     final order = Get.find<OrderViewModel>();
-    // await deleteMart();
-    Cart? cart = await getCart();
     showLoadingDialog();
-    // bool showOnHome = Get.find<bool>(tag: "showOnHome");
-    // if (master.type == ProductType.MASTER_PRODUCT) {
-    //   Map choice = new Map();
-    //   for (int i = 0; i < affectPriceContent.keys.toList().length; i++) {
-    //     choice[affectPriceContent.keys.elementAt(i)] =
-    //         selectedAttributes[affectPriceContent.keys.elementAt(i)];
-    //   }
-
-    //   ProductDTO dto = master.getChildByAttributes(choice);
-    //   listChoices.add(dto);
-    // }
-
-    // if (this.extra != null) {
-    //   for (int i = 0; i < extra.keys.length; i++) {
-    //     if (extra[extra.keys.elementAt(i)]) {
-    //       print(extra.keys.elementAt(i).type);
-    //       listChoices.add(extra.keys.elementAt(i));
-    //     }
-    //   }
-    // }
     bool isPartyMode = false;
     PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
-    if (party.partyOrderDTO != null) {
+    if (party.partyCode != null) {
       isPartyMode = true;
     }
     String description = "";
@@ -274,7 +208,7 @@ class ProductDetailViewModel extends BaseModel {
       //   orderDetails: [],
       // );
       checkCurrentCart = Cart(
-          productId: master!.attributes![0].id,
+          productId: selectAttribute!.id,
           quantity: count,
           timeSlotId: root.selectedTimeSlot!.id);
       await setMart(checkCurrentCart!);
@@ -285,6 +219,7 @@ class ProductDetailViewModel extends BaseModel {
         Get.back();
         await showStatusDialog("assets/images/error.png", "Oops!",
             "Bạn chỉ có đặt 2 đơn trong 1 khung giờ thui!!");
+        return;
       }
       if (result?.addProduct != null) {
         if (result!.addProduct!.productsRecommend != null) {
@@ -322,52 +257,8 @@ class ProductDetailViewModel extends BaseModel {
         }
       }
     } else {
-      await processCart(
-          master!.attributes![0].id, count, root.selectedTimeSlot!.id);
+      await processCart(selectAttribute!.id, count, root.selectedTimeSlot!.id);
     }
-
-    // await addItemToMart(item, root.selectedTimeSlot!.id!);
-    // // if (checkCurrentCart == null) {
-    // //   orderDetails.add(item);
-    // //   checkCurrentCart = Cart.get(
-    // //     orderType: 1,
-    // //     timeSlotId: root.selectedTimeSlot!.id!,
-    // //     orderDetails: orderDetails,
-    // //   );
-    // // } else {
-    // //   checkCurrentCart!.addItem(item);
-    // // }
-
-    // // checkCurrentCart!.addItem(item);
-
-    // // if (master.type == ProductType.GIFT_PRODUCT) {
-    // //   AccountViewModel account = Get.find<AccountViewModel>();
-    // //   if (account.currentUser == null) {
-    // //     await account.fetchUser();
-    // //   }
-
-    // //   double totalBean = account.currentUser.point;
-
-    // //   if (cart != null) {
-    // //     cart.items.forEach((element) {
-    // //       if (element.master.type == ProductType.GIFT_PRODUCT) {
-    // //         totalBean -= (element.master.price * element.quantity);
-    // //       }
-    // //     });
-    // //   }
-
-    // //   if (totalBean < (master.price * count)) {
-    // //     await showStatusDialog("assets/images/global_error.png",
-    // //         "Không đủ Bean", "Số bean hiện tại không đủ");
-    // //     return;
-    // //   }
-    // // }
-
-    // // print("Item: " + item.master.productInMenuId.toString());
-
-    // showOnHome
-    //     ? await addItemToCart(item, root.selectedTimeSlot!.id!)
-    //     : await addItemToMart(item, root.selectedTimeSlot!.id!);
 
     hideDialog();
     if (backToHome) {
@@ -405,7 +296,13 @@ class ProductDetailViewModel extends BaseModel {
         await showStatusDialog("assets/images/error.png", "Oops!",
             "Bạn chỉ có đặt 2 đơn trong 1 khung giờ thui!!");
       }
-      if (result?.addProduct != null) {
+      if (result?.addProduct?.status?.errorCode == "400" &&
+          result?.addProduct?.card == null) {
+        await showStatusDialog("assets/images/error.png", "Oops!",
+            "1 Đơn hàng chỉ được tối đa 6 món thui!!");
+      }
+      if (result?.addProduct?.card != null &&
+          result?.addProduct?.product != null) {
         if (result!.addProduct!.productsRecommend != null) {
           order.productRecomend = result.addProduct!.productsRecommend;
         }
@@ -421,14 +318,10 @@ class ProductDetailViewModel extends BaseModel {
         if (productList != null) {
           for (var item in productList) {
             CartItem cartItem = new CartItem(item.id, item.quantity!, null);
-            await removeItemFromCart(cartItem);
+            // await removeItemFromCart(cartItem);
             await removeItemFromMart(cartItem);
-            await addItemToCart(cartItem, timeSlotId!);
-            await addItemToMart(cartItem, timeSlotId);
-            // if (item.id == checkCurrentCart!.productId) {
-            //   await AnalyticsService.getInstance()!
-            //       .logChangeCart(null, item.quantity!, true, productInCart: item);
-            // }
+            // await addItemToCart(cartItem, timeSlotId!);
+            await addItemToMart(cartItem, timeSlotId!);
           }
         }
         checkCurrentCart = await getMart();

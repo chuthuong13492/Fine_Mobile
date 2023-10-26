@@ -19,7 +19,7 @@ class _InviteCoOrderScreenState extends State<InviteCoOrderScreen> {
   void initState() {
     super.initState();
     _secondsRemaining = widget.durationInSeconds;
-    _timer = Timer.periodic(Duration(seconds: 1), _updateTimer);
+    _timer = Timer.periodic(const Duration(seconds: 1), _updateTimer);
   }
 
   void _updateTimer(Timer timer) {

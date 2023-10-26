@@ -63,7 +63,7 @@ class LoginViewModel extends BaseModel {
         return userInfo;
       } else {
         final fcmToken = await FirebaseMessaging.instance.getToken();
-        final userInfo = await _dao?.login(token, fcmToken!);
+        final userInfo = await _dao?.login(token, fcmToken!, true);
         await PushNotificationService.getInstance()!.init();
 
         await _analyticsService.setUserProperties(userInfo!);
@@ -105,7 +105,7 @@ class LoginViewModel extends BaseModel {
         log('idToken: ' + idToken);
         log('fcmToken: ' + fcmToken.toString());
 
-        userInfo = await _dao?.login(idToken, fcmToken!);
+        userInfo = await _dao?.login(idToken, fcmToken!, false);
         if (userInfo == null) {
           await showStatusDialog("assets/images/error.png", 'Éc éc ⚠️',
               'Bạn vui lòng đăng nhập bằng mail trường nhé 🥰');
@@ -126,13 +126,6 @@ class LoginViewModel extends BaseModel {
             await Get.offAllNamed(RouteHandler.NAV);
           }
         }
-        // AccountViewModel accountViewModel = Get.find<AccountViewModel>();
-        // accountViewModel.currentUser = userInfo;
-
-        // if (userInfo != null) {
-
-        // }
-        // await Get.offAllNamed(RoutHandler.NAV);
       }
 
       await Future.delayed(const Duration(microseconds: 500));

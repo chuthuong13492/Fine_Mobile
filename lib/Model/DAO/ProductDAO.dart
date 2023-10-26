@@ -100,6 +100,17 @@ class ProductDAO extends BaseDAO {
     }
   }
 
+  Future<List<ProductDTO>?> getListProductInTimeSlot(String timeSlotId) async {
+    final res = await request.get('timeslot/listProduct', queryParameters: {
+      'timeSlotId': timeSlotId,
+    });
+    if (res.data["data"] != null) {
+      var listJson = res.data["data"] as List;
+      return listJson.map((e) => ProductDTO.fromJson(e)).toList();
+    }
+    return null;
+  }
+
   // Future<ProductDTO>? getProductDetail(int? productId,
   //     {Map<String, dynamic> params = const {}}) async {
   //   final res = await request.get(

@@ -34,8 +34,10 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
   void initState() {
     super.initState();
     // if (widget.isFetch == true) {
-    _timer = Timer.periodic(const Duration(seconds: 2),
-        (timer) => _orderViewModel.fetchStatus(this.widget.order.id!));
+    _timer = Timer.periodic(
+        const Duration(seconds: 2),
+        (timer) async =>
+            await _orderViewModel.fetchStatus(this.widget.order.id!));
     // } else {
     //   _orderViewModel.fetchStatus(this.widget.order.id!);
     // }
@@ -67,16 +69,8 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                   child: IconButton(
                       padding: const EdgeInsets.all(0),
                       onPressed: () async {
-                        // Get.back();
-                        // if (widget.isFetch == true) {
-                        //   await Get.find<RootViewModel>().checkHasParty();
-
-                        //   Get.offAllNamed(RouteHandler.NAV);
-                        // } else {
                         await Get.find<RootViewModel>().checkHasParty();
-
                         Get.back();
-                        // }
                       },
                       icon: const Icon(
                         Icons.chevron_left_rounded,
@@ -167,9 +161,12 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
             hasBox = true;
           }
           switch (status) {
-            case 5:
+            case 4:
               _curStep = 2;
               break;
+            // case 5:
+            //   _curStep = 3;
+            //   break;
             case 6:
               _curStep = 3;
               break;

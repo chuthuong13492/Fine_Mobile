@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_unnecessary_containers
 
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fine/Accessories/draggable_bottom_sheet.dart';
 import 'package:fine/Constant/route_constraint.dart';
@@ -8,6 +7,7 @@ import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/View/Home/HomeCategorySection.dart';
 import 'package:fine/View/Home/HomeCollectionSection.dart';
+import 'package:fine/View/Home/HomeReOrderSection.dart';
 import 'package:fine/View/Home/HomeSpecificMenuSection.dart';
 import 'package:fine/View/Home/HomeStoreSection.dart';
 import 'package:fine/View/Home/HomeMenuSection.dart';
@@ -51,6 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
     await Get.find<RootViewModel>().startUp();
   }
 
+  final focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -61,114 +63,119 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: FineTheme.palettes.shades100,
-      body: SafeArea(
-        // ignore: sized_box_for_whitespace
-        child: Container(
-          // color: FineTheme.palettes.primary100,
-          height: Get.height,
-          child: ScopedModel(
-            model: Get.find<HomeViewModel>(),
-            child: Stack(
-              children: [
-                Column(
-                  children: [
-                    FixedAppBar(
-                      // notifier: notifier,
-                      height: HEIGHT,
-                    ),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.only(top: 0),
-                        child: RefreshIndicator(
-                          key: _refreshIndicatorKey,
-                          onRefresh: _refresh,
-                          child: ScopedModelDescendant<HomeViewModel>(
-                              builder: (context, child, model) {
-                            if (model.status == ViewStatus.Error) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  const Center(
-                                    child: Text(
-                                      "Fine đã cố gắng hết sức ..\nNhưng vẫn bị con quỷ Bug đánh bại.",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          fontStyle: FontStyle.normal,
-                                          fontFamily: 'Montserrat',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 14),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  // ignore: sized_box_for_whitespace
-                                  Container(
-                                    width: 300,
-                                    height: 300,
-                                    child: Image.asset(
-                                      'assets/images/error-loading.gif',
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Center(
-                                    child: Text(
-                                      "Bạn vui lòng thử một số cách sau nhé!",
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Center(
-                                    child: Text(
-                                      "1. Tắt ứng dụng và mở lại",
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Center(
-                                    child: InkWell(
+      body: GestureDetector(
+        onTap: () => focusNode.unfocus(),
+        child: SafeArea(
+          // ignore: sized_box_for_whitespace
+          child: Container(
+            // color: FineTheme.palettes.primary100,
+            height: Get.height,
+            child: ScopedModel(
+              model: Get.find<HomeViewModel>(),
+              child: Stack(
+                children: [
+                  Column(
+                    children: [
+                      FixedAppBar(
+                        searchFocusNode: focusNode,
+                        // notifier: notifier,
+                        height: HEIGHT,
+                      ),
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.only(top: 0),
+                          child: RefreshIndicator(
+                            key: _refreshIndicatorKey,
+                            onRefresh: _refresh,
+                            child: ScopedModelDescendant<HomeViewModel>(
+                                builder: (context, child, model) {
+                              if (model.status == ViewStatus.Error) {
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    const Center(
                                       child: Text(
-                                        "2. Đặt hàng qua Fanpage ",
+                                        "Fine đã cố gắng hết sức ..\nNhưng vẫn bị con quỷ Bug đánh bại.",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontStyle: FontStyle.normal,
+                                            fontFamily: 'Montserrat',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    // ignore: sized_box_for_whitespace
+                                    Container(
+                                      width: 300,
+                                      height: 300,
+                                      child: Image.asset(
+                                        'assets/images/error-loading.gif',
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Center(
+                                      child: Text(
+                                        "Bạn vui lòng thử một số cách sau nhé!",
                                         textAlign: TextAlign.center,
                                       ),
-                                      // onTap: () =>
-                                      //     launch('fb://page/103238875095890'),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Center(
+                                      child: Text(
+                                        "1. Tắt ứng dụng và mở lại",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    const Center(
+                                      child: InkWell(
+                                        child: Text(
+                                          "2. Đặt hàng qua Fanpage ",
+                                          textAlign: TextAlign.center,
+                                        ),
+                                        // onTap: () =>
+                                        //     launch('fb://page/103238875095890'),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              } else {
+                                return Container(
+                                  // color: FineTheme.palettes.neutral200,
+                                  child:
+                                      NotificationListener<ScrollNotification>(
+                                    onNotification: (n) {
+                                      if (n.metrics.pixels <= HEIGHT) {
+                                        notifier.value = n.metrics.pixels;
+                                      }
+                                      return false;
+                                    },
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        // addAutomaticKeepAlives: true,
+                                        children: [
+                                          ...renderHomeSections().toList(),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ],
-                              );
-                            } else {
-                              return Container(
-                                // color: FineTheme.palettes.neutral200,
-                                child: NotificationListener<ScrollNotification>(
-                                  onNotification: (n) {
-                                    if (n.metrics.pixels <= HEIGHT) {
-                                      notifier.value = n.metrics.pixels;
-                                    }
-                                    return false;
-                                  },
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      // addAutomaticKeepAlives: true,
-                                      children: [
-                                        ...renderHomeSections().toList(),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
-                          }),
+                                );
+                              }
+                            }),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                // Positioned(
-                //   left: 0,
-                //   bottom: 0,
-                //   child: buildNewOrder(),
-                // ),
-              ],
+                    ],
+                  ),
+                  // Positioned(
+                  //   left: 0,
+                  //   bottom: 0,
+                  //   child: buildNewOrder(),
+                  // ),
+                ],
+              ),
             ),
           ),
         ),
@@ -183,7 +190,8 @@ class _HomeScreenState extends State<HomeScreen> {
       const HomeMenuSection(),
       // interalBanner(),
       buildVoucherSection(),
-
+      const HomeReOrderSection(),
+      // const SizedBox(height: 10),
       // Container(
       //   color: FineTheme.palettes.primary50,
       //   height: 8,
