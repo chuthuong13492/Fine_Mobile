@@ -60,7 +60,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          //  orderStatusBar(),
+          statusBar(),
           const SizedBox(height: 2),
           Expanded(
             child: Container(
@@ -71,6 +71,62 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
           ),
           const SizedBox(height: 70),
         ],
+      ),
+    );
+  }
+
+  Widget statusBar() {
+    return ScopedModel(
+      model: Get.find<TopUpViewModel>(),
+      child: ScopedModelDescendant<TopUpViewModel>(
+        builder: (context, child, model) {
+          return Center(
+            child: Container(
+              // color: Colors.amber,
+              // padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey,
+                    offset: Offset(0.0, 1.0), //(x,y)
+                    blurRadius: 6.0,
+                  ),
+                ],
+              ),
+              child: Center(
+                child: ToggleButtons(
+                  renderBorder: false,
+                  selectedColor: FineTheme.palettes.primary100,
+                  onPressed: (int index) async {
+                    await model.changeStatus(index);
+                  },
+                  // borderRadius: BorderRadius.circular(24),
+                  isSelected: model.selections,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: Text(
+                        "Thành công",
+                        textAlign: TextAlign.center,
+                        style: FineTheme.typograhpy.subtitle1,
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: Text(
+                        "Đang xử lý",
+                        textAlign: TextAlign.center,
+                        style: FineTheme.typograhpy.subtitle1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -217,8 +273,10 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                       ? Text(
                           "+ ${formatPrice(item.amount!)}",
                           textAlign: TextAlign.right,
-                          style: Get.theme.textTheme.headline2
-                              ?.copyWith(color: Colors.green),
+                          style: Get.theme.textTheme.headline2?.copyWith(
+                              color: item.status == 1 || item.status == 3
+                                  ? Colors.red
+                                  : Colors.green),
                         )
                       : Text(
                           "- ${formatPrice(item.amount!)}",

@@ -147,8 +147,8 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
     final List<String> titles = [
       'Xác nhận đơn hàng',
       'Đơn hàng đã chuẩn bị tại cửa hàng',
-      'Đơn hàng đang đến station',
-      'Bạn có thể lấy đơn hàng từ station rồi!!! '
+      'Đơn hàng đang đến trạm',
+      'Bạn có thể lấy đơn hàng từ trạm rồi!!! '
     ];
 
     return ScopedModel(

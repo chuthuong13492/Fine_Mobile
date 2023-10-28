@@ -132,9 +132,9 @@ class RootViewModel extends BaseModel {
 
   Future<void> checkHasParty() async {
     final party = Get.find<PartyOrderViewModel>();
-    party.partyCode = await getPartyCode();
-    if (party.partyCode != null) {
-      if (party.partyCode!.contains("LPO")) {
+    final partyCode = await getPartyCode();
+    if (partyCode != null) {
+      if (partyCode.contains("LPO")) {
         party.isLinked = true;
       } else {
         if (party.partyOrderDTO != null) {
@@ -151,6 +151,19 @@ class RootViewModel extends BaseModel {
       notifier.value = false;
     }
     notifyListeners();
+  }
+
+  Future<ProductDTO?> openProductShowSheet(String productId) async {
+    ProductDTO? item;
+    try {
+      item = await _productDAO?.getProductDetail(productId);
+      return item;
+    } catch (e) {
+      item = null;
+      await showErrorDialog(errorTitle: "Không tìm thấy sản phẩm");
+      hideDialog();
+    }
+    return null;
   }
 
   Future<void> openProductDetail(String productID,

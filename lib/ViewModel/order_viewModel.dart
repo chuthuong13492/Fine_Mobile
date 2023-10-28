@@ -72,8 +72,10 @@ class OrderViewModel extends BaseModel {
         isPartyOrder = false;
       }
       codeParty = await getPartyCode();
-
-      await getCurrentCart();
+      if (codeParty!.contains("LPO")) {
+        await party.joinPartyOrder(code: codeParty);
+      }
+      getCurrentCart();
       if (currentCart != null) {
         if (currentCart!.orderDetails!.length == 0 &&
             currentCart?.partyType == null) {
@@ -246,12 +248,15 @@ class OrderViewModel extends BaseModel {
           await fetchStatus(result.order!.id!);
           final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
           await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
-          Get.offNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
+          await Get.offNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
             "order": result.order,
             // "isFetch": true,
           });
-          await showStatusDialog("assets/images/icon-success.png", 'Success',
-              'Bạn đã đặt hàng thành công');
+          // await showStatusDialog("assets/images/icon-success.png", 'Success',
+          //     'Bạn đã đặt hàng thành công');
+          if (Get.currentRoute == "/party_order_screen") {
+            Get.back();
+          }
           removeCart();
           deletePartyCode();
           final partyModel = Get.find<PartyOrderViewModel>();

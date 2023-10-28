@@ -217,22 +217,34 @@ class ProductDetailViewModel extends BaseModel {
           await _dao!.checkProductToCart(checkCurrentCart!);
       if (result?.code == 4006) {
         Get.back();
+        order.removeCart();
         await showStatusDialog("assets/images/error.png", "Oops!",
             "Bạn chỉ có đặt 2 đơn trong 1 khung giờ thui!!");
         return;
       }
-      if (result?.addProduct != null) {
+      switch (result?.addProduct!.status!.errorCode) {
+        case "4002":
+          await showStatusDialog("assets/images/error.png", "Box đã đầy",
+              "Box đã đầy ùi, Box chỉ chứa tối đa 5 món thui nè");
+          return;
+        case "2001":
+          await showStatusDialog("assets/images/error.png", "Box đã đầy",
+              "Box đã đầy rùi, bạn chỉ có thể thêm ${result?.addProduct!.product!.quantity} phần ${result?.addProduct!.product!.name}");
+          return;
+        default:
+          break;
+      }
+      if (result?.addProduct?.card != null &&
+          result?.addProduct?.product != null) {
         if (result!.addProduct!.productsRecommend != null) {
           order.productRecomend = result.addProduct!.productsRecommend;
         }
         if (result.addProduct!.status!.success == false) {
           await showStatusDialog("assets/images/error.png", "Box đã đầy",
               "Box đã đầy mất ùi, bạn hong thể thêm ${result.addProduct!.product!.name}");
+          return;
         }
-        if (result.addProduct!.status!.errorCode == '2001') {
-          await showStatusDialog("assets/images/error.png", "Box đã đầy",
-              "Box đã đầy ùi, bạn chỉ có thể thêm ${result.addProduct!.product!.quantity} phần ${result.addProduct!.product!.name}");
-        }
+
         final productList = result.addProduct!.card;
         if (productList != null) {
           for (var item in productList) {
@@ -293,6 +305,7 @@ class ProductDetailViewModel extends BaseModel {
           await _dao!.checkProductToCart(checkCurrentCart!);
       if (result?.code == 4006) {
         Get.back();
+        order.removeCart();
         await showStatusDialog("assets/images/error.png", "Oops!",
             "Bạn chỉ có đặt 2 đơn trong 1 khung giờ thui!!");
       }
@@ -300,20 +313,42 @@ class ProductDetailViewModel extends BaseModel {
           result?.addProduct?.card == null) {
         await showStatusDialog("assets/images/error.png", "Oops!",
             "1 Đơn hàng chỉ được tối đa 6 món thui!!");
+        return;
+      }
+      // if (result?.addProduct?.status?.errorCode == '4002') {
+      //   await showStatusDialog("assets/images/error.png", "Box đã đầy",
+      //       "Box đã đầy ùi, Box chỉ chứa tối đa 5 món thui nè");
+      //   return;
+      // }
+      // if (result?.addProduct!.status!.errorCode == '2001') {
+      //   await showStatusDialog("assets/images/error.png", "Box đã đầy",
+      //       "Box đã đầy rùi, bạn chỉ có thể thêm ${result?.addProduct!.product!.quantity} phần ${result?.addProduct!.product!.name}");
+      //   return;
+      // }
+      switch (result?.addProduct!.status!.errorCode) {
+        case "4002":
+          await showStatusDialog("assets/images/error.png", "Box đã đầy",
+              "Box đã đầy ùi, Box chỉ chứa tối đa 5 món thui nè");
+          return;
+        case "2001":
+          await showStatusDialog("assets/images/error.png", "Box đã đầy",
+              "Box đã đầy rùi, bạn chỉ có thể thêm ${result?.addProduct!.product!.quantity} phần ${result?.addProduct!.product!.name}");
+          return;
+        default:
+          break;
       }
       if (result?.addProduct?.card != null &&
           result?.addProduct?.product != null) {
         if (result!.addProduct!.productsRecommend != null) {
           order.productRecomend = result.addProduct!.productsRecommend;
         }
+
         if (result.addProduct!.status!.success == false) {
           await showStatusDialog("assets/images/error.png", "Box đã đầy",
               "Box đã đầy mất ùi, bạn hong thể thêm ${result.addProduct!.product!.name}");
+          return;
         }
-        if (result.addProduct!.status!.errorCode == '2001') {
-          await showStatusDialog("assets/images/error.png", "Box đã đầy",
-              "Box đã đầy rùi, bạn chỉ có thể thêm ${result.addProduct!.product!.quantity} phần ${result.addProduct!.product!.name}");
-        }
+
         final productList = result.addProduct!.card!;
         if (productList != null) {
           for (var item in productList) {

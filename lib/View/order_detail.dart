@@ -73,9 +73,9 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                       )),
                   InkWell(
                     onTap: () async {
-                      Get.find<OrderViewModel>().fetchStatus(orderDTO!.id!);
-                      Get.toNamed(RouteHandler.QRCODE_SCREEN,
-                          arguments: orderDTO);
+                      // Get.find<OrderViewModel>().fetchStatus(orderDTO!.id!);
+                      // Get.toNamed(RouteHandler.QRCODE_SCREEN,
+                      //     arguments: orderDTO);
                     },
                     child: Container(
                       padding: const EdgeInsets.only(

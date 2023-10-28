@@ -212,7 +212,9 @@ class _FixedAppBarState extends State<FixedAppBar> {
                       Get.find<RootViewModel>()
                           .openProductDetail(p0.item!.id!, fetchDetail: true);
                     },
-                    onSubmit: (query) {},
+                    // onSubmit: (query) {
+                    //   _focusNode.hasFocus;
+                    // },
                     focusNode: _focusNode,
 
                     scrollbarAlwaysVisible: false,

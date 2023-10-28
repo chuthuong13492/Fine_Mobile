@@ -1,4 +1,5 @@
 import 'package:animator/animator.dart';
+import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -53,21 +54,22 @@ class Utils {
   static void showSheet(
     BuildContext context, {
     Widget? child,
+    List<Widget>? action,
     VoidCallback? onClicked,
   }) =>
       showCupertinoModalPopup(
         context: context,
         builder: (context) => CupertinoActionSheet(
-          actions: [
-            child!,
-          ],
-          // cancelButton: CupertinoActionSheetAction(
-          //   child: Text(
-          //     'Chọn',
-          //     style: Get.theme.textTheme.headline2,
-          //   ),
-          //   onPressed: onClicked!,
-          // ),
+          title: child,
+          actions: action,
+          cancelButton: CupertinoActionSheetAction(
+            onPressed: onClicked!,
+            child: Text(
+              'Chọn',
+              style: FineTheme.typograhpy.h2
+                  .copyWith(color: FineTheme.palettes.primary100),
+            ),
+          ),
         ),
       );
 

@@ -262,7 +262,7 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                       height: 14,
                       child: Text(
                         formatPrice(product.attributes![0].price!),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontFamily: "Montserrat",
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
@@ -298,7 +298,7 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                             const SizedBox(
                               width: 2,
                             ),
-                            Text(
+                            const Text(
                               "4.3",
                               style: TextStyle(
                                 fontFamily: "Montserrat",
@@ -328,11 +328,30 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
               bottom: 29,
               child: InkWell(
                 onTap: () async {
-                  ProductDetailViewModel model =
-                      Get.find<ProductDetailViewModel>();
-                  // model.master = product;
-                  model.selectAttribute = product.attributes![0];
-                  await model.addProductToCart();
+                  RootViewModel root = Get.find<RootViewModel>();
+                  ProductDTO? item =
+                      await root.openProductShowSheet(product.id!);
+                  // ProductDetailViewModel model =
+                  //     Get.find<ProductDetailViewModel>();
+                  // // model.master = product;
+                  // model.selectAttribute = product.attributes![0];
+                  // await model.addProductToCart();
+                  if (item != null) {
+                    // ignore: use_build_context_synchronously
+                    await showModalBottomSheet(
+                      context: context,
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12))),
+                      builder: (context) => buidProductPicker(item),
+                    );
+                    // Utils.showSheet(
+                    //   context,
+                    //   child: buidProductPicker(item),
+                    //   onClicked: () async {},
+                    // );
+                  }
                 },
                 child: Container(
                   width: 50,
@@ -368,7 +387,7 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                   //   borderRadius: BorderRadius.circular(50),
                   // ),
                   child: ColorFiltered(
-                    colorFilter: ColorFilter.mode(
+                    colorFilter: const ColorFilter.mode(
                       // Get.find<RootViewModel>().isCurrentTimeSlotAvailable()
                       //     ?
                       Colors.transparent,
@@ -387,6 +406,183 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
         ),
       ),
     );
+  }
+
+  Widget buidProductPicker(ProductDTO prod) {
+    return ScopedModel(
+        model: ProductDetailViewModel(dto: prod),
+        child: ScopedModelDescendant<ProductDetailViewModel>(
+          builder: (context, child, model) {
+            bool? isSelect;
+
+            List<Widget> listWidget = [];
+            List<ProductAttributes>? attributeList = model.master!.attributes;
+            if (prod.attributes!.length > 1) {
+              model.isExtra = true;
+            }
+            if (model.isExtra == true) {
+              for (var i = 0; i < attributeList!.length; i++) {
+                isSelect = model.selectAttribute!.id == attributeList[i].id;
+                listWidget.add(
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          model.selectedAttribute(attributeList[i]);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(16, 5, 16, 5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                                color: isSelect
+                                    ? FineTheme.palettes.primary100
+                                    : FineTheme.palettes.neutral700,
+                                width: 1.5),
+                          ),
+                          child: Text(
+                            "Size ${attributeList[i].size!}",
+                            style: FineTheme.typograhpy.subtitle1.copyWith(
+                                color: isSelect
+                                    ? FineTheme.palettes.primary100
+                                    : FineTheme.palettes.neutral700),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                  ),
+                );
+              }
+            }
+            return Container(
+              height: Get.height * 0.15,
+              // width: Get.width,
+
+              // color: FineTheme.palettes.shades100,
+              padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 90,
+                    height: 90,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: CacheImage(
+                          imageUrl: prod.imageUrl == null
+                              ? 'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908'
+                              : prod.imageUrl!),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
+                          child: Text(
+                            formatPrice(model.total!),
+                            style: TextStyle(
+                              fontFamily: "Montserrat",
+                              fontWeight: FontWeight.w600,
+                              fontSize: 24,
+                              color: FineTheme.palettes.primary300,
+                            ),
+                          ),
+                        ),
+                        model.isExtra == true
+                            ? Row(
+                                children: [
+                                  ...listWidget.toList(),
+                                ],
+                              )
+                            : Text(
+                                "Ngon nhắm, hãy thử ngay nào",
+                                style: FineTheme.typograhpy.body2,
+                              ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        // mainAxisSize: MainAxisSize.min,
+                        children: [
+                          InkWell(
+                            child: Icon(
+                              Icons.remove_circle_outline,
+                              size: 30,
+                              color: model.minusColor,
+                            ),
+                            onTap: () {
+                              model.minusQuantity();
+                            },
+                          ),
+                          // SizedBox(
+                          //   width: 8,
+                          // ),
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
+                            decoration: BoxDecoration(
+                                // border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Text(
+                              model.count.toString(),
+                              style: FineTheme.typograhpy.h2.copyWith(
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          // SizedBox(
+                          //   width: 1,
+                          // ),
+                          InkWell(
+                            child: Icon(
+                              Icons.add_circle_outline,
+                              size: 30,
+                              color: model.addColor,
+                            ),
+                            onTap: () {
+                              model.addQuantity();
+                            },
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: () async {
+                          await model.addProductToCart();
+                          Get.back();
+                        },
+                        child: Container(
+                          width: 100,
+                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: FineTheme.palettes.primary100,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Thêm",
+                              style: FineTheme.typograhpy.subtitle1
+                                  .copyWith(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            );
+          },
+        ));
   }
 
   Widget _buildLoading() {

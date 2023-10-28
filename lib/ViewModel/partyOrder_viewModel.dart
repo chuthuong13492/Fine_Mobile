@@ -9,6 +9,7 @@ import 'package:fine/Model/DAO/index.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Service/analytic_service.dart';
+import 'package:fine/Utils/format_time.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
@@ -290,20 +291,23 @@ class PartyOrderViewModel extends BaseModel {
             RegExp regex = RegExp(r'\b\w{8}-\w{4}-\w{4}-\w{4}-\w{12}\b');
             Match? match = regex.firstMatch(result!.message!);
             String linkedTimeSlot = match!.group(0)!;
-            if (root.selectedTimeSlot != linkedTimeSlot) {
+            if (root.selectedTimeSlot?.checkoutTime != linkedTimeSlot) {
               int option = await showOptionDialog(
-                  "Đơn nhóm hiện đã ở khung giờ khác. Bạn có muốn đổi khung giờ hong?");
-              if (option != null) {
+                  "Mã đơn nhóm đang ở ${formatTime(linkedTimeSlot)}. Bạn có muốn đổi khung giờ hong?");
+              if (option == 1) {
+                final timeSlot = root.listAvailableTimeSlot
+                    ?.firstWhere((element) => element.id == linkedTimeSlot);
+                if (timeSlot != null) {
+                  Get.find<OrderViewModel>().removeCart();
+                  root.selectedTimeSlot = timeSlot;
+                  await root.refreshMenu();
+                  Get.back();
+                  notifyListeners();
+                  return;
+                }
+              } else {
                 await deletePartyCode();
                 partyCode = null;
-                return;
-              }
-              final timeSlot = root.listAvailableTimeSlot
-                  ?.firstWhere((element) => element.id == linkedTimeSlot);
-              if (timeSlot != null) {
-                root.selectedTimeSlot = timeSlot;
-                await root.refreshMenu();
-                notifyListeners();
                 return;
               }
             }
@@ -315,6 +319,7 @@ class PartyOrderViewModel extends BaseModel {
         } else {
           switch (result?.code) {
             case 0:
+              Get.find<OrderViewModel>().removeCart;
               await getPartyOrder();
               Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
               break;
@@ -329,6 +334,7 @@ class PartyOrderViewModel extends BaseModel {
                   "Nhóm này đã đóng mất rùi!!!");
               break;
             case 4003:
+              Get.find<OrderViewModel>().removeCart;
               // await setPartyCode(code!);
               await getPartyOrder();
               Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
@@ -600,10 +606,10 @@ class PartyOrderViewModel extends BaseModel {
             partyCode!, id, isLinked == true ? 2 : 1);
         // await Future.delayed(const Duration(microseconds: 500));
         if (success!) {
+          await deletePartyCode();
           Get.back();
-          await showStatusDialog("assets/images/icon-success.png", "Thành công",
+          showStatusDialog("assets/images/icon-success.png", "Thành công",
               "Hãy xem thử các món khác bạn nhé 😓");
-          deletePartyCode();
           partyCode = null;
           _orderViewModel.removeCart();
           isLinked = false;

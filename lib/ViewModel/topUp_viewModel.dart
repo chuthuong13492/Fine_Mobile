@@ -21,6 +21,7 @@ class TopUpViewModel extends BaseModel {
   String? topUpUrl;
   ScrollController? scrollController;
   List<TransactionDTO> listTransaction = [];
+  List<bool> selections = [true, false];
 
   TopUpViewModel() {
     _dao = TopUpDAO();
@@ -48,11 +49,28 @@ class TopUpViewModel extends BaseModel {
     notifyListeners();
   }
 
+  Future<void> changeStatus(int index) async {
+    selections = selections.map((e) => false).toList();
+    selections[index] = true;
+    notifyListeners();
+    await getTransaction();
+  }
+
   Future<void> getTransaction() async {
     try {
       setState(ViewStatus.Loading);
-      final data = await _dao?.getTransaction();
-      listTransaction = data!;
+      if (selections[0] == true) {
+        final data = await _dao?.getTransaction();
+        listTransaction =
+            data!.where((element) => element.status == 2).toList();
+      }
+      if (selections[1] == true) {
+        final data = await _dao?.getTransaction();
+        listTransaction = data!
+            .where((element) => element.status == 1 || element.status == 3)
+            .toList();
+      }
+
       setState(ViewStatus.Completed);
     } catch (e) {
       bool result = await showErrorDialog();
