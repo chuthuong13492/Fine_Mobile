@@ -263,6 +263,7 @@ class OrderViewModel extends BaseModel {
               Get.currentRoute == "/order") {
             Get.back();
           }
+          return;
         }
         if (result.statusCode == 400) {
           Get.back();
