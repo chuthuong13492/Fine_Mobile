@@ -242,29 +242,27 @@ class OrderViewModel extends BaseModel {
         }
 
         if (result!.statusCode == 200) {
-          await delLockBox();
-          await fetchStatus(result.order!.id!);
-          final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
-          await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
-          await Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
-              arguments: {
-                "order": result.order,
-                // "isFetch": true,
-              });
-          // await showStatusDialog("assets/images/icon-success.png", 'Success',
-          //     'Bạn đã đặt hàng thành công');
-          if (Get.currentRoute == "/party_order_screen") {
-            Get.back();
-          }
           removeCart();
           deletePartyCode();
           final partyModel = Get.find<PartyOrderViewModel>();
 
-          productRecomend = null;
-          orderDTO = null;
           partyModel.partyOrderDTO = null;
           partyModel.partyCode = null;
           partyModel.isLinked = false;
+          await delLockBox();
+          await fetchStatus(result.order!.id!);
+          final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
+          await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
+          Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
+            "order": result.order,
+            // "isFetch": true,
+          });
+          // await showStatusDialog("assets/images/icon-success.png", 'Success',
+          //     'Bạn đã đặt hàng thành công');
+          if (Get.currentRoute == "/party_order_screen" ||
+              Get.currentRoute == "/order") {
+            Get.back();
+          }
         }
         if (result.statusCode == 400) {
           Get.back();
