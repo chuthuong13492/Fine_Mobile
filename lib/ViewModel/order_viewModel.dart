@@ -246,10 +246,11 @@ class OrderViewModel extends BaseModel {
           await fetchStatus(result.order!.id!);
           final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
           await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
-          await Get.offNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
-            "order": result.order,
-            // "isFetch": true,
-          });
+          await Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
+              arguments: {
+                "order": result.order,
+                // "isFetch": true,
+              });
           // await showStatusDialog("assets/images/icon-success.png", 'Success',
           //     'Bạn đã đặt hàng thành công');
           if (Get.currentRoute == "/party_order_screen") {

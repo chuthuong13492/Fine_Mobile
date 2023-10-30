@@ -1107,13 +1107,6 @@ class _OrderScreenState extends State<OrderScreen> {
     List<Widget> list = [];
     double price = 0;
     int startProduct = 0;
-    // if (item.master.type == ProductType.MASTER_PRODUCT) {
-    //   price = item.products[0].price * item.quantity;
-    //   startProduct = 1;
-    // } else {
-    //   price = item.master.price * item.quantity;
-    //   startProduct = 0;
-    // }
     if (orderDetails.orderId != null) {
       price = orderDetails.unitPrice! * orderDetails.quantity;
       startProduct = 1;
