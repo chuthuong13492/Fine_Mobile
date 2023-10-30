@@ -48,7 +48,6 @@ class OrderHistoryViewModel extends BaseModel {
   Future<void> getOrders() async {
     try {
       setState(ViewStatus.Loading);
-      // OrderFilter filter = selections[0] ? OrderFilter.NEW : OrderFilter.DONE;
 
       if (selections[0] == true) {
         final data = await _orderDAO?.getOrders();
@@ -64,14 +63,7 @@ class OrderHistoryViewModel extends BaseModel {
                 element.orderStatus == 10 || element.orderStatus == 11)
             .toList();
       }
-      // orderThumbnail = data!;
-      // if (_orderDAO!.metaDataDTO.size! != _orderDAO!.metaDataDTO.total!) {
-      //   int size = _orderDAO!.metaDataDTO.total!;
-      //   final data = await _orderDAO?.getOrders(size: size);
-      //   orderThumbnail = data!;
-      // }
 
-      // print(size);
       setState(ViewStatus.Completed);
       // notifyListeners();
     } catch (e) {
@@ -125,7 +117,6 @@ class OrderHistoryViewModel extends BaseModel {
       int option = await showOptionDialog("Hãy thử những món khác bạn nhé 😥.");
       if (option == 1) {
         showLoadingDialog();
-        // CampusDTO storeDTO = await getStore();
         final success = await _orderDAO?.cancelOrder(orderId);
         if (success!) {
           clearNewOrder(orderId);
@@ -174,9 +165,6 @@ class OrderHistoryViewModel extends BaseModel {
   Future<void> getMoreOrders() async {
     try {
       setState(ViewStatus.LoadMore);
-      // OrderFilter filter =
-      //     selections[0] ? OrderFilter.ORDERING : OrderFilter.DONE;
-
       final data = await _orderDAO?.getMoreOrders(
           page: _orderDAO!.metaDataDTO.page! + 1);
 

@@ -178,19 +178,15 @@ class _CustomeCreatePartyState extends State<CustomeCreateParty> {
                         await model.createCoOrder(isLinked!);
                         if (model.partyOrderDTO!.partyType == 1) {
                           if (widget.isHome == true) {
-                            // option = 1;
                             hideDialog();
                             Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
                           } else {
-                            // option = 1;
                             hideDialog();
                             Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
                           }
                         } else {
-                          // option = 1;
                           hideDialog();
                           await Get.find<OrderViewModel>().prepareOrder();
-                          // hideDialog();
                         }
                       }
                     } else {

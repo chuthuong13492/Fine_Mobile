@@ -72,12 +72,12 @@ class OrderViewModel extends BaseModel {
         isPartyOrder = false;
       }
       codeParty = await getPartyCode();
-      if (codeParty!.contains("LPO")) {
+      if (codeParty != null && codeParty!.contains("LPO")) {
         await party.joinPartyOrder(code: codeParty);
       }
-      getCurrentCart();
+      await getCurrentCart();
       if (currentCart != null) {
-        if (currentCart!.orderDetails!.length == 0 &&
+        if (currentCart!.orderDetails!.isEmpty &&
             currentCart?.partyType == null) {
           Get.back();
           Get.find<PartyOrderViewModel>().isLinked = false;
@@ -117,9 +117,7 @@ class OrderViewModel extends BaseModel {
         showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
             "Hiện tại khung giờ này đã đóng vào lúc ${root.selectedTimeSlot!.closeTime}, bạn hãy xem khung giờ khác nhé 😃.");
         await removeCart();
-        // if (e.response?.data['data'] != null) {
-        //   // orderAmount = OrderAmountDTO.fromJson(e.response.data['data']);
-        // }
+
         setState(ViewStatus.Completed);
       } else if (e.response?.statusCode == 404) {
         if (e.response?.data["error"] != null) {
@@ -303,10 +301,6 @@ class OrderViewModel extends BaseModel {
   }
 
   Future<void> deleteItem(OrderDetails item) async {
-    HomeViewModel? home = Get.find<HomeViewModel>();
-    ProductDetailViewModel? productViewModel =
-        Get.find<ProductDetailViewModel>();
-
     print("Delete item...");
     bool result;
     ProductDTO product =

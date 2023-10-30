@@ -89,7 +89,7 @@ class RootViewModel extends BaseModel {
     Cart? cart = await getCart();
     await deleteMart();
     if (cart != null) {
-      if (cart.orderDetails!.length != 0) {
+      if (cart.orderDetails!.isNotEmpty) {
         CartItem itemInCart = new CartItem(cart!.orderDetails![0].productId,
             cart.orderDetails![0].quantity - 1, null);
 
@@ -140,8 +140,6 @@ class RootViewModel extends BaseModel {
         if (party.partyOrderDTO != null) {
           notifier.value = true;
           await Get.find<PartyOrderViewModel>().getCoOrderStatus();
-          // _timer = Timer.periodic(const Duration(seconds: 5),
-          //     (timer) => Get.find<PartyOrderViewModel>().getCoOrderStatus());
         } else {
           notifier.value = false;
         }
@@ -176,9 +174,6 @@ class RootViewModel extends BaseModel {
       ProductDTO? item;
       if (fetchDetail) {
         showLoadingDialog();
-        // CampusDTO store = await getStore();
-        // product = await _productDAO.getProductDetail(
-        //     product.id, store.id, selectedMenu.menuId);
         item = await _productDAO?.getProductDetail(productID);
       }
 
@@ -433,11 +428,6 @@ class RootViewModel extends BaseModel {
                 element.id!.contains(orderViewModel.currentCart!.timeSlotId!));
             selectedTimeSlot = cartTimeSlot;
             notifyListeners();
-            // await orderViewModel.prepareOrder();
-            // await Future.delayed(const Duration(microseconds: 500));
-
-            // await Get.toNamed(RouteHandler.ORDER);
-            // hideDialog();
             return;
           }
         }
@@ -473,7 +463,6 @@ class RootViewModel extends BaseModel {
     DestinationDAO campusDAO = DestinationDAO();
     listTimeSlot = await campusDAO.getTimeSlot(DESTINATIONID);
     listAvailableTimeSlot = null;
-    bool found = false;
     if (isNextDay == false) {
       for (int i = 0; i < listTimeSlot!.length; i++) {
         TimeSlotDTO element = listTimeSlot![i];
@@ -483,7 +472,7 @@ class RootViewModel extends BaseModel {
         }
       }
 
-      if (previousTimeSlotList?.length == 0) {
+      if (previousTimeSlotList!.isEmpty) {
         previousTimeSlotList = listTimeSlot!;
         selectedTimeSlot = listTimeSlot![0];
         await refreshMenu();
@@ -492,8 +481,18 @@ class RootViewModel extends BaseModel {
         if (listsAreEqual(listTimeSlot!, previousTimeSlotList!)) {
           previousTimeSlotList = listTimeSlot!;
           selectedTimeSlot = listTimeSlot![0];
-          print("noti:");
           await refreshMenu();
+          if (Get.currentRoute == "/order") {
+            await showStatusDialog("assets/images/error.png", "Oops!",
+                "Đã qua khung giờ mất ruìi");
+            await Get.find<OrderViewModel>().removeCart();
+            Get.back();
+          } else {
+            final cart = await getCart();
+            if (cart != null) {
+              await Get.find<OrderViewModel>().removeCart();
+            }
+          }
           notifyListeners();
         } else {
           previousTimeSlotList = listTimeSlot;
@@ -505,65 +504,18 @@ class RootViewModel extends BaseModel {
           }
         }
       }
-
-      // await Get.find<HomeViewModel>().getMenus();
     } else {
       if (isOnClick == true) {
         isOnClick = false;
         final firstTimeSlot = listTimeSlot![0];
-        // listTimeSlot?.clear();
-        // listTimeSlot!.add(firstTimeSlot);
+
         previousTimeSlotList?.clear();
         previousTimeSlotList?.add(firstTimeSlot);
         selectedTimeSlot = listTimeSlot![0];
-        // if (selectedTimeSlot == null) {
-        //   selectedTimeSlot = listTimeSlot![0];
-        //   for (TimeSlotDTO element in listTimeSlot!) {
-        //     if (isTimeSlotAvailable(element)) {
-        //       selectedTimeSlot = element;
-
-        //       found = true;
-        //       break;
-        //     }
-        //   }
-        // } else {
-        //   for (TimeSlotDTO element in listTimeSlot!) {
-        //     if (selectedTimeSlot?.id == element.id) {
-        //       selectedTimeSlot = element;
-        //       // listAvailableTimeSlots = selectedMenu.timeSlots
-        //       //     .where((element) => isTimeSlotAvailable(element.checkoutTime))
-        //       //     .toList();
-        //       found = true;
-        //       break;
-        //     }
-        //   }
-        // }
         await refreshMenu();
         notifyListeners();
       }
     }
-
-    // if (found == false) {
-    //   Cart cart = await getCart();
-    //   if (cart != null) {
-    //     await showStatusDialog(
-    //         "assets/images/global_error.png",
-    //         "Khung giờ đã thay đổi",
-    //         "Các sản phẩm trong giỏ hàng đã bị xóa, còn nhiều món ngon đang chờ bạn nhé");
-    //     Get.find<OrderViewModel>().removeCart();
-    //   }
-    // } else {
-    //   if (!isCurrentMenuAvailable()) {
-    //     await showStatusDialog(
-    //       "assets/images/global_error.png",
-    //       "Đã hết giờ chốt đơn cho ${selectedMenu.menuName}",
-    //       "Bạn vui lòng chọn menu khác nhé.",
-    //     );
-    //     await fetchStore();
-    //     // remove cart
-    //     Get.find<OrderViewModel>().removeCart();
-    //   }
-    // }
   }
 
   Future<void> showProductByStore(SupplierDTO? supplierDTO,
@@ -576,9 +528,6 @@ class RootViewModel extends BaseModel {
       if (fetchDetail) {
         showLoadingDialog();
         List<ProductDTO>? productDTO;
-        // CampusDTO store = await getStore();
-        // product = await _productDAO.getProductDetail(
-        //     product.id, store.id, selectedMenu.menuId);
         productDTO =
             await _productDAO?.getProductsInMenuByStoreId(supplierDTO?.id);
       }

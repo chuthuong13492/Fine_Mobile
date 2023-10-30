@@ -93,10 +93,9 @@ class StoreDAO extends BaseDAO {
       queryParameters: params,
     );
     var listJson = res.data['data']["reOrders"] as List;
-    if (listJson.length != 0) {
+    if (listJson.isNotEmpty) {
       return listJson.map((e) => ReOrderDTO.fromJson(e)).toList();
     }
-    // final collections = CollectionDTO.fromJson(res.data["data"]);
     return null;
   }
 

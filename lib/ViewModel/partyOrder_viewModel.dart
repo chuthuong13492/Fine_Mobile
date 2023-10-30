@@ -137,7 +137,7 @@ class PartyOrderViewModel extends BaseModel {
       }
       if (result.partyOrderDTO != null) {
         if (result.partyOrderDTO!.isPayment == true) {
-          // Get.back();
+          Get.back();
           await deletePartyCode();
           await _orderViewModel.removeCart();
           partyCode = null;
@@ -552,13 +552,13 @@ class PartyOrderViewModel extends BaseModel {
       listCustomer = party.map((e) => e.customer).toList();
     }
     if (isDelete == false) {
-      if (listCustomer?.length == 0) {
+      if (listCustomer!.isEmpty) {
         await cancelCoOrder();
       } else {
         await showMemberDialog("Chọn new Leader!!!", false);
       }
     } else {
-      if (listCustomer?.length == 0) {
+      if (listCustomer!.isEmpty) {
         await showStatusDialog("assets/images/logo2.png", "Oops!!",
             "Đơn nhóm hiện chưa có thành viên nào cả");
       } else {
@@ -598,9 +598,6 @@ class PartyOrderViewModel extends BaseModel {
     try {
       int option = await showOptionDialog("Hãy thử những món khác bạn nhé 😥.");
       if (option == 1) {
-        // Get.back();
-        // showLoadingDialog();
-        // CampusDTO storeDTO = await getStore();
         partyCode = await getPartyCode();
         final success = await _partyDAO?.logoutCoOrder(
             partyCode!, id, isLinked == true ? 2 : 1);
@@ -639,9 +636,6 @@ class PartyOrderViewModel extends BaseModel {
       setState(ViewStatus.Loading);
       int option = await showOptionDialog("Xác nhận xóa member khỏi nhóm!!");
       if (option == 1) {
-        // Get.back();
-        // showLoadingDialog();
-        // CampusDTO storeDTO = await getStore();
         partyCode = await getPartyCode();
         final success = await _partyDAO?.removeMember(
           partyCode!,
@@ -685,17 +679,4 @@ class PartyOrderViewModel extends BaseModel {
       setState(ViewStatus.Completed);
     }
   }
-
-  // setLinkedParty(bool checkLinked) {
-  //   isLinked = checkLinked;
-  //   setState(ViewStatus.Completed);
-
-  //   notifyListeners();
-  // }
-
-  // bool isLinkedParty(bool? checkLinked) {
-  //   isLinked = checkLinked;
-  //   return isLinked!;
-  //   setState(ViewStatus.Completed);
-  // }
 }

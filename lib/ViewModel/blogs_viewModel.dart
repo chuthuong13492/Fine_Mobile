@@ -26,7 +26,6 @@ class BlogsViewModel extends BaseModel {
         blogs = await _storeDAO?.getBlogs();
       }
       await Future.delayed(const Duration(microseconds: 500));
-      // check truong hop product tra ve rong (do khong co menu nao trong TG do)
       setState(ViewStatus.Completed);
     } catch (e) {
       blogs = null;

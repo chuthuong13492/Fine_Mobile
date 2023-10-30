@@ -49,27 +49,8 @@ class HomeViewModel extends BaseModel {
         setState(ViewStatus.Completed);
         return;
       }
-      // final currentDate = DateTime.now();
-      // String currentTimeSlot = currentMenu.timeFromTo[1];
-      // var beanTime = new DateTime(
-      //   currentDate.year,
-      //   currentDate.month,
-      //   currentDate.day,
-      //   double.parse(currentTimeSlot.split(':')[0]).round(),
-      //   double.parse(currentTimeSlot.split(':')[1]).round(),
-      // );
-      // int differentTime = beanTime.difference(currentDate).inMilliseconds;
-      // if (!root.isCurrentMenuAvailable()) {
-      //   homeCollections = null;
-      //   setState(ViewStatus.Completed);
-      //   return;
-      // }
-      // homeCollections = await _collectionDAO!
-      //     .getCollections(currentMenu.menuId, params: {"show-on-home": true});
       homeMenu = await _menuDAO?.getMenus(currentTimeSlot.id);
-      // if (homeMenu == null || homeMenu!.isEmpty) {
-      //   setState(ViewStatus.Error);
-      // }
+
       await Future.delayed(const Duration(microseconds: 500));
       setState(ViewStatus.Completed);
     } catch (e) {
@@ -94,9 +75,7 @@ class HomeViewModel extends BaseModel {
         return;
       }
       reOrderList = await _storeDAO?.getReOrder(currentTimeSlot.id);
-      // if (homeMenu == null || homeMenu!.isEmpty) {
-      //   setState(ViewStatus.Error);
-      // }
+
       await Future.delayed(const Duration(microseconds: 500));
       setState(ViewStatus.Completed);
     } catch (e) {
@@ -109,7 +88,6 @@ class HomeViewModel extends BaseModel {
       setState(ViewStatus.Loading);
       RootViewModel root = Get.find<RootViewModel>();
       var currentTimeSlot = root.selectedTimeSlot;
-      // var currentMenu = root.selectedMenu;
       if (root.status == ViewStatus.Error) {
         setState(ViewStatus.Error);
         return;

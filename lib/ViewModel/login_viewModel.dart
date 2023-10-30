@@ -116,12 +116,12 @@ class LoginViewModel extends BaseModel {
             showLoadingDialog();
             await _analyticsService.setUserProperties(userInfo!);
             await Get.find<RootViewModel>().startUp();
-            // Get.rawSnackbar(
-            //     message: "Đăng nhập thành công!!",
-            //     duration: Duration(seconds: 2),
-            //     snackPosition: SnackPosition.BOTTOM,
-            //     margin: EdgeInsets.only(left: 8, right: 8, bottom: 32),
-            //     borderRadius: 8);
+            Get.rawSnackbar(
+                message: "Đăng nhập thành công!!",
+                duration: const Duration(seconds: 2),
+                snackPosition: SnackPosition.BOTTOM,
+                margin: const EdgeInsets.only(left: 8, right: 8, bottom: 32),
+                borderRadius: 8);
             hideDialog();
             await Get.offAllNamed(RouteHandler.NAV);
           }
@@ -132,7 +132,7 @@ class LoginViewModel extends BaseModel {
       setState(ViewStatus.Completed);
     } on FirebaseAuthException catch (e) {
       log(e.message!);
-      // });
+
       setState(ViewStatus.Completed);
     }
   }
@@ -190,19 +190,6 @@ class LoginViewModel extends BaseModel {
           await Get.offAllNamed(RouteHandler.NAV);
         }
       }
-      // if (userInfo!.name!.isEmpty) {
-      //   // Navigate to sign up screen
-      //   await Get.offAndToNamed(RouteHandler.SIGN_UP, arguments: userInfo);
-      // } else {
-      //   Get.rawSnackbar(
-      //       message: "Đăng nhập thành công!!",
-      //       duration: const Duration(seconds: 3),
-      //       snackPosition: SnackPosition.BOTTOM,
-      //       margin: const EdgeInsets.only(left: 8, right: 8, bottom: 32),
-      //       borderRadius: 8);
-      //   await Get.find<RootViewModel>().startUp();
-      //   await Get.offAllNamed(RouteHandler.NAV);
-      // }
     } on FirebaseAuthException catch (e) {
       await showStatusDialog("assets/images/error.png", "Error", e.message!);
     } catch (e) {
