@@ -44,7 +44,6 @@ class _OrderScreenState extends State<OrderScreen> {
   final scrollDirection = Axis.vertical;
   bool onInit = true;
   bool onCallListStation = false;
-  int index = 0;
 
   @override
   void initState() {
@@ -317,7 +316,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                     color: FineTheme.palettes.primary50,
                                   )),
                               // UpSellCollection(),
-                              recommendProduct!.length != 0
+                              recommendProduct!.isNotEmpty
                                   ? Column(
                                       children: [
                                         Container(
@@ -1238,61 +1237,18 @@ class _OrderScreenState extends State<OrderScreen> {
       isCoOrder = true;
     }
     return Padding(
-      padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
+      padding: const EdgeInsets.fromLTRB(0, 0, 12, 8),
       child: Container(
         child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              height: 18,
-              width: 18,
-              child: IconButton(
-                padding: const EdgeInsets.all(0.0),
-                icon: Icon(
-                  AntDesign.minuscircleo,
-                  size: 16,
-                  color: isCoOrder ? FineTheme.palettes.neutral500 : minusColor,
-                ),
-                onPressed: () async {
-                  if (isCoOrder! == false) {
-                    if (item.quantity >= 1) {
-                      if (item.quantity == 1) {
-                        await _orderViewModel?.deleteItem(item);
-                      } else {
-                        item.quantity--;
-                        await _orderViewModel?.updateQuantity(item);
-                      }
-                    }
-                  }
-                },
-              ),
+            Text("x", style: FineTheme.typograhpy.body2),
+            const SizedBox(
+              width: 2,
             ),
-            Container(
-              width: 30,
-              child: Text(
-                item.quantity.toString(),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            SizedBox(
-              height: 18,
-              width: 18,
-              child: IconButton(
-                padding: const EdgeInsets.all(0.0),
-                icon: Icon(
-                  AntDesign.pluscircleo,
-                  size: 16,
-                  color: isCoOrder ? FineTheme.palettes.neutral500 : plusColor,
-                ),
-                onPressed: () async {
-                  if (isCoOrder == false) {
-                    item.quantity++;
-                    await _orderViewModel?.updateQuantity(item);
-                  }
-                },
-              ),
+            Text(
+              item.quantity.toString(),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

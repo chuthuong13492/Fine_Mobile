@@ -16,6 +16,7 @@ import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
+import 'package:fine/ViewModel/cart_viewModel.dart';
 import 'package:fine/ViewModel/category_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/login_viewModel.dart';
@@ -29,6 +30,8 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+
+import '../Model/DTO/ConfirmCartDTO.dart';
 
 class RootViewModel extends BaseModel {
   Position? currentPosition;
@@ -79,25 +82,27 @@ class RootViewModel extends BaseModel {
     Get.find<HomeViewModel>().getReOrder();
     Get.find<PartyOrderViewModel>().getPartyOrder();
     Get.find<BlogsViewModel>().getBlogs();
-    Get.find<OrderViewModel>().getCurrentCart();
-    Get.find<RootViewModel>().getProductRecommend();
+    await checkCartAvailable();
+    // await Get.find<RootViewModel>().getProductRecommend();
     Get.find<RootViewModel>().checkHasParty();
     Get.find<PartyOrderViewModel>().getCoOrderStatus();
   }
 
   Future<void> getProductRecommend() async {
-    Cart? cart = await getCart();
+    ConfirmCart? cart = await getMart();
     await deleteMart();
     if (cart != null) {
       if (cart.orderDetails!.isNotEmpty) {
-        CartItem itemInCart = new CartItem(cart!.orderDetails![0].productId,
-            cart.orderDetails![0].quantity - 1, null);
+        ConfirmCartItem itemInCart = new ConfirmCartItem(
+            cart.orderDetails![0].productId,
+            cart.orderDetails![0].quantity - 1,
+            null);
 
-        await updateItemFromCart(itemInCart);
-        cart = await getCart();
+        await updateItemFromMart(itemInCart);
+        cart = await getMart();
         await setMart(cart!);
-        await Get.find<ProductDetailViewModel>().processCart(
-            cart.orderDetails![0].productId, 1, selectedTimeSlot!.id);
+        await Get.find<ProductDetailViewModel>()
+            .processCart(cart.orderDetails![0].productId, 1);
       } else {
         Get.find<OrderViewModel>().productRecomend = [];
       }
@@ -105,8 +110,8 @@ class RootViewModel extends BaseModel {
   }
 
   Future<void> changeDay(int index) async {
-    Get.find<OrderViewModel>().currentCart = await getCart();
-    final cart = Get.find<OrderViewModel>().currentCart;
+    final cart = await getCart();
+    // final cart = Get.find<OrderViewModel>().currentCart;
     int? option = 1;
     PartyOrderViewModel partyOrderViewModel = Get.find<PartyOrderViewModel>();
     if (partyOrderViewModel.partyOrderDTO != null) {
@@ -124,8 +129,10 @@ class RootViewModel extends BaseModel {
       }
       // option = 0;
       isOnClick = true;
-      await deletePartyCode();
-      await Get.find<OrderViewModel>().removeCart();
+      deletePartyCode();
+      await deleteCart();
+      Get.find<CartViewModel>().getCurrentCart();
+      // await Get.find<OrderViewModel>().removeCart();
       await getListTimeSlot();
     }
   }
@@ -191,104 +198,6 @@ class RootViewModel extends BaseModel {
     }
   }
 
-  Future<Position?> getCurrentLocation() async {
-    bool isServicEnabked = await Geolocator.isLocationServiceEnabled();
-    if (!isServicEnabked) {
-      return Future.error('Location service are disabled');
-    }
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permission are denied');
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permission are permanently denied, we cannot request permission');
-    }
-    // return await Geolocator.getCurrentPosition();
-  }
-
-  Future<void> liveLocation() async {
-    late LocationSettings locationSettings;
-    await getCurrentLocation();
-
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      locationSettings = AndroidSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: 100,
-          forceLocationManager: true,
-          intervalDuration: const Duration(seconds: 10),
-          //(Optional) Set foreground notification config to keep the app alive
-          //when going to the background
-          foregroundNotificationConfig: const ForegroundNotificationConfig(
-            notificationText:
-                "Example app will continue to receive your location even when you aren't using it",
-            notificationTitle: "Running in Background",
-            enableWakeLock: true,
-          ));
-    } else if (defaultTargetPlatform == TargetPlatform.iOS ||
-        defaultTargetPlatform == TargetPlatform.macOS) {
-      locationSettings = AppleSettings(
-        accuracy: LocationAccuracy.high,
-        activityType: ActivityType.fitness,
-        distanceFilter: 100,
-        pauseLocationUpdatesAutomatically: true,
-        // Only set to true if our app will be started up in the background.
-        showBackgroundLocationIndicator: false,
-      );
-    } else {
-      locationSettings = const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 100,
-      );
-    }
-
-    Geolocator.getPositionStream(locationSettings: locationSettings)
-        .listen((Position position) {
-      currentPosition = position;
-      // lat = position.latitude.toString();
-      // long = position.longitude.toString();
-      getAddressFromLatLng(position.longitude, position.latitude);
-    });
-    print("$currentPosition");
-  }
-
-  Future<void> getAddressFromLatLng(long, lat) async {
-    try {
-      List<Placemark> placemark = await placemarkFromCoordinates(lat, long);
-
-      Placemark place = placemark[0];
-
-      currentLocation =
-          "${place.locality}, ${place.street}, ${place.subLocality}, ${place.administrativeArea}, ${place.country}";
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  Future<void> getLocation() async {
-    try {
-      currentPosition = await getCurrentLocation();
-      getAddressFromLatLng(
-          currentPosition!.longitude, currentPosition!.latitude);
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  // Future<void> liveLocation() async {
-  //   try {
-  //     if (currentPosition == null) {
-
-  //     }
-  //     print("Lat: $lat, Long: $long");
-  //   } catch (e) {
-  //     currentPosition = null;
-  //   }
-  // }
-
   Future<void> getListDestination() async {
     try {
       setState(ViewStatus.Loading);
@@ -304,7 +213,6 @@ class RootViewModel extends BaseModel {
   Future<void> getUserDestination() async {
     try {
       setState(ViewStatus.Loading);
-      AccountViewModel accountViewModel = Get.find<AccountViewModel>();
       final userDestination =
           await _destinationDAO!.getUserDestination(DESTINATIONID);
       currentStore = userDestination;
@@ -317,34 +225,9 @@ class RootViewModel extends BaseModel {
 
   Future<void> setCurrentDestination(DestinationDTO destinationDTO) async {
     showLoadingDialog();
-    // Function eq = const ListEquality().equals;
-    // StoreDAO _storeDAO = new StoreDAO();
     currentStore = destinationDTO;
-    // List<LocationDTO> locations = await _storeDAO.getLocations(currentStore.id);
-    // if (!eq(locations, currentStore.locations)) {
-    //   currentStore.locations.forEach((location) {
-    //     if (location.isSelected) {
-    //       DestinationDTO destination = location.destinations
-    //           .where(
-    //             (element) => element.isSelected,
-    //           )
-    //           .first;
-    //       locations.forEach((element) {
-    //         if (element.id == location.id) {
-    //           element.isSelected = true;
-    //           element.destinations.forEach((des) {
-    //             if (des.id == destination.id) des.isSelected = true;
-    //           });
-    //         }
-    //       });
-    //     }
-    //   });
-
-    //   currentStore.locations = locations;
     await setStore(currentStore!);
     setState(ViewStatus.Completed);
-    // await getListTimeSlot(currentStore.id);
-    // await getListTimeSlot();
     await startUp();
     hideDialog();
     Get.toNamed(RouteHandler.NAV);
@@ -376,7 +259,7 @@ class RootViewModel extends BaseModel {
           } else {
             await deletePartyCode();
             party.partyOrderDTO = null;
-            await orderViewModel.removeCart();
+            // await orderViewModel.removeCart();
           }
           await Future.delayed(const Duration(microseconds: 500));
 
@@ -397,18 +280,57 @@ class RootViewModel extends BaseModel {
     }
   }
 
+  Future<void> checkCartAvailable() async {
+    DestinationDAO campusDAO = DestinationDAO();
+    final _cartViewModel = Get.find<CartViewModel>();
+    try {
+      await _cartViewModel.getCurrentCart();
+      final cart = _cartViewModel.currentCart;
+      if (cart != null) {
+        if (cart.isNextDay == false) {
+          isNextDay = false;
+          if (selectedTimeSlot!.id == cart.timeSlotId) {
+            selectedTimeSlot = previousTimeSlotList
+                ?.firstWhere((element) => element.id == cart.timeSlotId);
+          } else {
+            bool isCartTimeSlotAvailable = previousTimeSlotList!
+                .any((element) => element.id == cart.timeSlotId);
+            if (isCartTimeSlotAvailable) {
+              selectedTimeSlot = previousTimeSlotList
+                  ?.firstWhere((element) => element.id == cart.timeSlotId);
+            } else {
+              selectedTimeSlot = previousTimeSlotList![0];
+              await deleteCart();
+              await _cartViewModel.getCurrentCart();
+            }
+          }
+          await refreshMenu();
+          notifyListeners();
+        } else {
+          isNextDay = true;
+          isOnClick = true;
+          await getListTimeSlot();
+        }
+      }
+      notifyListeners();
+    } catch (e) {
+      await deleteCart();
+      await _cartViewModel.getCurrentCart();
+    }
+  }
+
   Future<void> navOrder() async {
-    OrderViewModel orderViewModel = Get.find<OrderViewModel>();
-    await orderViewModel.getCurrentCart();
+    final cart = await getCart();
+    // await orderViewModel.getCurrentCart();
     int option = 1;
-    if (orderViewModel.currentCart != null) {
-      if (orderViewModel.currentCart!.timeSlotId != selectedTimeSlot!.id) {
-        bool isTimeSlotInList = previousTimeSlotList!.any(
-            (element) => element.id == orderViewModel.currentCart!.timeSlotId);
+    if (cart != null) {
+      if (cart.timeSlotId != selectedTimeSlot!.id) {
+        bool isTimeSlotInList = previousTimeSlotList!
+            .any((element) => element.id == cart.timeSlotId);
         TimeSlotDTO? cartTimeSlot;
         if (isTimeSlotInList) {
-          cartTimeSlot = previousTimeSlotList?.firstWhere((element) =>
-              element.id!.contains(orderViewModel.currentCart!.timeSlotId!));
+          cartTimeSlot = previousTimeSlotList
+              ?.firstWhere((element) => element.id!.contains(cart.timeSlotId!));
           if (cartTimeSlot != null) {
             option = await showOptionDialog(
                 "Giỏ hàng của bạn đang ở khung giờ ${cartTimeSlot.arriveTime} Bạn vui lòng đổi sang khung giờ này để đặt hàng nhé");
@@ -424,8 +346,8 @@ class RootViewModel extends BaseModel {
             isOnClick = true;
 
             await getListTimeSlot();
-            cartTimeSlot = previousTimeSlotList?.firstWhere((element) =>
-                element.id!.contains(orderViewModel.currentCart!.timeSlotId!));
+            cartTimeSlot = previousTimeSlotList?.firstWhere(
+                (element) => element.id!.contains(cart.timeSlotId!));
             selectedTimeSlot = cartTimeSlot;
             notifyListeners();
             return;
@@ -438,20 +360,17 @@ class RootViewModel extends BaseModel {
         selectedTimeSlot = cartTimeSlot;
         await refreshMenu();
         notifyListeners();
-
-        // await orderViewModel.prepareOrder();
         await Future.delayed(const Duration(microseconds: 500));
         hideDialog();
-        await Get.toNamed(RouteHandler.ORDER);
+        await Get.toNamed(RouteHandler.CART_SCREEN);
       } else {
         // await orderViewModel.prepareOrder();
 
         await Future.delayed(const Duration(microseconds: 500));
         // hideDialog();
-        await Get.toNamed(RouteHandler.ORDER);
+        await Get.toNamed(RouteHandler.CART_SCREEN);
       }
     } else {
-      await orderViewModel.getCurrentCart();
       showStatusDialog(
           "assets/images/empty-cart-ipack.png",
           "Giỏ hàng đang trống kìaaa",
@@ -474,31 +393,31 @@ class RootViewModel extends BaseModel {
 
       if (previousTimeSlotList!.isEmpty) {
         previousTimeSlotList = listTimeSlot!;
-        selectedTimeSlot = listTimeSlot![0];
+        selectedTimeSlot = previousTimeSlotList![0];
         await refreshMenu();
         notifyListeners();
       } else {
         if (listsAreEqual(listTimeSlot!, previousTimeSlotList!)) {
           previousTimeSlotList = listTimeSlot!;
-          selectedTimeSlot = listTimeSlot![0];
+          selectedTimeSlot = previousTimeSlotList![0];
           await refreshMenu();
-          if (Get.currentRoute == "/order") {
-            await showStatusDialog("assets/images/error.png", "Oops!",
-                "Đã qua khung giờ mất ruìi");
-            await Get.find<OrderViewModel>().removeCart();
-            Get.back();
-          } else {
-            final cart = await getCart();
-            if (cart != null) {
-              await Get.find<OrderViewModel>().removeCart();
-            }
-          }
+          // if (Get.currentRoute == "/order") {
+          //   await showStatusDialog("assets/images/error.png", "Oops!",
+          //       "Đã qua khung giờ mất ruìi");
+          //   // await Get.find<OrderViewModel>().removeCart();
+          //   Get.back();
+          // } else {
+          //   final cart = await getCart();
+          //   if (cart != null) {
+          //     // await Get.find<OrderViewModel>().removeCart();
+          //   }
+          // }
           notifyListeners();
         } else {
           previousTimeSlotList = listTimeSlot;
           if (isOnClick == true) {
             isOnClick = false;
-            selectedTimeSlot = listTimeSlot![0];
+            selectedTimeSlot = previousTimeSlotList![0];
             await refreshMenu();
             notifyListeners();
           }
@@ -508,10 +427,9 @@ class RootViewModel extends BaseModel {
       if (isOnClick == true) {
         isOnClick = false;
         final firstTimeSlot = listTimeSlot![0];
-
         previousTimeSlotList?.clear();
         previousTimeSlotList?.add(firstTimeSlot);
-        selectedTimeSlot = listTimeSlot![0];
+        selectedTimeSlot = firstTimeSlot;
         await refreshMenu();
         notifyListeners();
       }
@@ -547,25 +465,15 @@ class RootViewModel extends BaseModel {
   Future<void> confirmTimeSlot(TimeSlotDTO? timeSlot) async {
     int option = 1;
     if (timeSlot?.id != selectedTimeSlot?.id) {
-      // TimeSlotOptionResult result = await checkTimeSlotOption(
-      //     timeSlot,
-      //     selectedTimeSlot,
-      //     "Hiện tại khung giờ này đã đóng vào lúc ${timeSlot?.arriveTime} trong ngày hôm nay, bạn có muốn chuyển sang khung giờ này vào ngày hôm sau hong ^^.");
-      // isNextDay = result.isNextDay;
-      // option = result.option;
-
-      OrderViewModel orderViewModel = Get.find<OrderViewModel>();
-      orderViewModel.currentCart = await getCart();
+      final cart = await getCart();
       PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
 
       if (party.partyOrderDTO != null) {
         showStatusDialog('assets/images/logo2.png', "Đơn nhóm",
             "Bạn đang trong đơn nhóm nên hong thể đổi được khung giờ nè!");
         option = 0;
-        // option = await showOptionDialog(
-        //     "Bạn có chắc không? Đổi khung giờ rồi là đơn nhóm bị xóa đó!!");
       } else {
-        if (orderViewModel.currentCart != null) {
+        if (cart != null) {
           option = await showOptionDialog(
               "Bạn có chắc không? Đổi khung giờ rồi là giỏ hàng bị xóa đó!!");
         }
@@ -574,11 +482,11 @@ class RootViewModel extends BaseModel {
       if (option == 1) {
         // showLoadingDialog();
         selectedTimeSlot = timeSlot;
-        await Get.find<OrderViewModel>().removeCart();
-        // await Get.find<OrderViewModel>().getCurrentCart();
-        await deletePartyCode();
+        deleteCart();
+        deleteMart();
+        Get.find<CartViewModel>().getCurrentCart();
+        deletePartyCode();
         party.partyOrderDTO = null;
-        // await setStore(currentStore);
         await refreshMenu();
         // hideDialog();
         notifyListeners();

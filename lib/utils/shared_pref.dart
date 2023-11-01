@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Model/DTO/ConfirmCartDTO.dart';
+
 Future<bool> setIsFirstOnboard(bool isFirstOnboard) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   return prefs.setBool('isFirstOnBoard', isFirstOnboard);
@@ -38,7 +40,7 @@ Future<void> setCart(Cart cart) async {
   await prefs.setString('CART', jsonEncode(cart.toJson()));
 }
 
-Future<void> setMart(Cart cart) async {
+Future<void> setMart(ConfirmCart cart) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.setString('MART', jsonEncode(cart.toCheckCartJsonAPi()));
 }
@@ -58,11 +60,11 @@ Future<Cart?> getCart() async {
   return null;
 }
 
-Future<Cart?> getMart() async {
+Future<ConfirmCart?> getMart() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   String? encodedCart = prefs.getString('MART');
   if (encodedCart != null) {
-    Cart cart = Cart.fromJson(jsonDecode(encodedCart));
+    ConfirmCart cart = ConfirmCart.fromJson(jsonDecode(encodedCart));
     return cart;
   }
   return null;
@@ -73,19 +75,20 @@ Future<String?> getPartyCode() async {
   return prefs.getString('PARTY_CODE');
 }
 
-Future<void> addItemToCart(CartItem item, String timeSlotId) async {
+Future<void> addItemToCart(
+    CartItem item, String timeSlotId, bool isNextDay) async {
   Cart? cart = await getCart();
   if (cart == null) {
-    cart = new Cart(timeSlotId: timeSlotId);
+    cart = new Cart(timeSlotId: timeSlotId, isNextDay: isNextDay);
   }
   cart.addItem(item);
   await setCart(cart);
 }
 
-Future<void> addItemToMart(CartItem item, String timeSlotId) async {
-  Cart? cart = await getMart();
+Future<void> addItemToMart(ConfirmCartItem item) async {
+  ConfirmCart? cart = await getMart();
   // if (cart != null) {
-  //   cart = Cart(timeSlotId: timeSlotId);
+  //   cart = ConfirmCart(timeSlotId: timeSlotId);
   // }
   cart!.addItem(item);
   await setMart(cart);
@@ -98,20 +101,18 @@ Future<bool> removeItemFromCart(CartItem item) async {
   }
   cart.removeItem(item);
   print("Delete success!");
-  print("Items: ${cart.orderDetails?.length.toString()}");
-  await setCart(cart);
-  return false;
-  // if (cart.orderDetails?.length == 0) {
-  //   await deleteCart();
-  //   return true;
-  // } else {
-  //   await setCart(cart);
-  //   return false;
-  // }
+  print("Items: ${cart.items!.length.toString()}");
+  if (cart.items!.isEmpty) {
+    await deleteCart();
+    return true;
+  } else {
+    await setCart(cart);
+    return false;
+  }
 }
 
-Future<bool> removeItemFromMart(CartItem item) async {
-  Cart? cart = await getMart();
+Future<bool> removeItemFromMart(ConfirmCartItem item) async {
+  ConfirmCart? cart = await getMart();
   if (cart == null) {
     return false;
   }
@@ -152,8 +153,8 @@ Future<void> updateItemFromCart(CartItem item) async {
   print("Save");
 }
 
-Future<void> updateItemFromMart(CartItem item) async {
-  Cart? cart = await getMart();
+Future<void> updateItemFromMart(ConfirmCartItem item) async {
+  ConfirmCart? cart = await getMart();
   if (cart == null) {
     return;
   }

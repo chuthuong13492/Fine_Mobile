@@ -13,6 +13,8 @@ import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:get/get.dart';
 
+import '../Model/DTO/ConfirmCartDTO.dart';
+
 class HomeViewModel extends BaseModel {
   StoreDAO? _storeDAO;
   CollectionDAO? _collectionDAO;
@@ -110,30 +112,31 @@ class HomeViewModel extends BaseModel {
     try {
       RootViewModel root = Get.find<RootViewModel>();
 
-      Cart? cart = await getCart();
-      List<CartItem> listCartItem = [];
-      if (cart != null) {
-        int option = await showOptionDialog(
-            "Bạn đang có giỏ hàng kìa. Bạn có muốn tiếp tục hông");
-        if (option != 1) {
-          return;
-        }
-      }
+      // ConfirmCart? cart = await getCart();
+      List<ConfirmCartItem> listCartItem = [];
+      // if (cart != null) {
+      //   int option = await showOptionDialog(
+      //       "Bạn đang có giỏ hàng kìa. Bạn có muốn tiếp tục hông");
+      //   if (option != 1) {
+      //     return;
+      //   }
+      // }
       await deleteCart();
       orderDTO =
           await _storeDAO?.createReOrder(id, root.isNextDay == true ? 2 : 1);
       if (orderDTO != null) {
         for (var item in orderDTO!.orderDetails!) {
-          listCartItem.add(CartItem(item.productId, item.quantity, null));
+          listCartItem
+              .add(ConfirmCartItem(item.productId, item.quantity, null));
         }
-        cart = Cart.get(
-          timeSlotId: orderDTO?.timeSlot?.id,
-          orderType: orderDTO?.orderType,
-          orderDetails: listCartItem,
-        );
-        await setCart(cart);
-        await setMart(cart);
-        await Get.find<OrderViewModel>().getCurrentCart();
+        // cart = ConfirmCart.get(
+        //   timeSlotId: orderDTO?.timeSlot?.id,
+        //   orderType: orderDTO?.orderType,
+        //   orderDetails: listCartItem,
+        // );
+        // await setCart(cart);
+        // await setMart(cart);
+        // await Get.find<OrderViewModel>().getCurrentCart();
         // if (cart != null) {
         //   await Get.find<OrderViewModel>().prepareOrder();
         //   Get.toNamed(RouteHandler.ORDER);

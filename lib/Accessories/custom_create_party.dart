@@ -172,7 +172,7 @@ class _CustomeCreatePartyState extends State<CustomeCreateParty> {
                   onTap: () async {
                     model.partyCode = await getPartyCode();
                     final order = Get.find<OrderViewModel>();
-                    order.currentCart = await getCart();
+                    // order.currentCart = await getCart();
                     if (order.currentCart != null) {
                       if (model.partyCode == null) {
                         await model.createCoOrder(isLinked!);

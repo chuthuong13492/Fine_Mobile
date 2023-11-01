@@ -6,6 +6,8 @@ import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/request.dart';
 
+import '../DTO/ConfirmCartDTO.dart';
+
 class PartyOrderDAO extends BaseDAO {
   Future<PartyStatus?> getPartyStatus(String code) async {
     if (code != null) {
@@ -18,7 +20,7 @@ class PartyOrderDAO extends BaseDAO {
     }
   }
 
-  Future<PartyOrderDTO?> coOrder(Cart cart) async {
+  Future<PartyOrderDTO?> coOrder(ConfirmCart cart) async {
     if (cart != null) {
       // print("Request Note: " + note);
       final res = await request.post(
@@ -109,7 +111,8 @@ class PartyOrderDAO extends BaseDAO {
     }
   }
 
-  Future<PartyOrderDTO?> addProductToParty(String? code, {Cart? cart}) async {
+  Future<PartyOrderDTO?> addProductToParty(String? code,
+      {ConfirmCart? cart}) async {
     // print("Request Note: " + note);
     final res = await request.post(
       '/order/coOrder/card?partyCode=$code',

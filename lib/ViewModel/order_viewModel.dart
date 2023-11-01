@@ -24,9 +24,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../Model/DAO/index.dart';
+import '../Model/DTO/ConfirmCartDTO.dart';
 
 class OrderViewModel extends BaseModel {
-  Cart? currentCart;
+  ConfirmCart? currentCart;
   OrderDAO? _dao;
   ProductDAO? _productDAO;
   StationDAO? _stationDAO;
@@ -82,7 +83,7 @@ class OrderViewModel extends BaseModel {
           Get.back();
           Get.find<PartyOrderViewModel>().isLinked = false;
           isLinked = false;
-          await removeCart();
+          // await removeCart();
           if (notifierTimeRemaining.value > 0) {
             await delLockBox();
           }
@@ -100,8 +101,8 @@ class OrderViewModel extends BaseModel {
 
         // Get.back();
       } else {
-        await removeCart();
-        await getCurrentCart();
+        // await removeCart();
+        // await getCurrentCart();
         Get.back();
       }
 
@@ -111,17 +112,17 @@ class OrderViewModel extends BaseModel {
     } on DioError catch (e, stacktra) {
       RootViewModel root = Get.find<RootViewModel>();
       print(stacktra.toString());
-      if (e.response?.statusCode == 400) {
+      if (e.response?.data["statusCode"] == 400) {
         String errorMsg = e.response?.data["message"];
         errorMessage = errorMsg;
         showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
             "Hiện tại khung giờ này đã đóng vào lúc ${root.selectedTimeSlot!.closeTime}, bạn hãy xem khung giờ khác nhé 😃.");
-        await removeCart();
+        // await removeCart();
 
         setState(ViewStatus.Completed);
-      } else if (e.response?.statusCode == 404) {
+      } else if (e.response?.data["statusCode"] == 404) {
         if (e.response?.data["error"] != null) {
-          setCart(currentCart!);
+          // setCart(currentCart!);
           setState(ViewStatus.Completed);
         }
       } else {
@@ -199,10 +200,10 @@ class OrderViewModel extends BaseModel {
     try {
       timeRemaining = 0;
       notifierTimeRemaining.value = 0;
+      orderDTO!.stationDTO = null;
       await _stationDAO?.changeStation(orderDTO!.orderCode!, 1,
           stationId:
               orderDTO!.stationDTO != null ? orderDTO!.stationDTO?.id : null);
-      orderDTO!.stationDTO = null;
       notifyListeners();
     } catch (e) {
       orderDTO!.stationDTO = null;
@@ -233,7 +234,7 @@ class OrderViewModel extends BaseModel {
           orderDTO!.addProperties(code);
         }
         OrderStatus? result;
-        if (orderDTO!.stationDTO != null) {
+        if (orderDTO!.stationDTO != null && notifierTimeRemaining.value != 0) {
           result = await _dao?.createOrders(orderDTO!);
         } else {
           showStatusDialog("assets/images/logo2.png", "Quá thời gian",
@@ -242,28 +243,28 @@ class OrderViewModel extends BaseModel {
         }
 
         if (result!.statusCode == 200) {
-          removeCart();
-          deletePartyCode();
-          final partyModel = Get.find<PartyOrderViewModel>();
-
-          partyModel.partyOrderDTO = null;
-          partyModel.partyCode = null;
-          partyModel.isLinked = false;
           await delLockBox();
           await fetchStatus(result.order!.id!);
           final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
           await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
-          Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
-            "order": result.order,
-            // "isFetch": true,
-          });
+          await Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
+              arguments: {
+                "order": result.order,
+                // "isFetch": true,
+              });
           // await showStatusDialog("assets/images/icon-success.png", 'Success',
           //     'Bạn đã đặt hàng thành công');
           if (Get.currentRoute == "/party_order_screen" ||
               Get.currentRoute == "/order") {
             Get.back();
           }
-          return;
+          // removeCart();
+          deletePartyCode();
+          final partyModel = Get.find<PartyOrderViewModel>();
+
+          partyModel.partyOrderDTO = null;
+          partyModel.partyCode = null;
+          partyModel.isLinked = false;
         }
         if (result.statusCode == 400) {
           Get.back();
@@ -278,6 +279,7 @@ class OrderViewModel extends BaseModel {
           await showStatusDialog(
               "assets/images/error.png", "Oops!", errorMessage!);
         }
+        notifyListeners();
       }
     } catch (e) {
       bool result = await showErrorDialog();
@@ -300,55 +302,57 @@ class OrderViewModel extends BaseModel {
     }
   }
 
-  Future<void> deleteItem(OrderDetails item) async {
-    print("Delete item...");
-    bool result;
-    ProductDTO product =
-        new ProductDTO(id: item.productId, productName: item.productName);
-    CartItem cartItem = new CartItem(item.productId, item.quantity, null);
-    result = await removeItemFromCart(cartItem);
-    await removeItemFromMart(cartItem);
-    print("Result: $result");
-    if (result) {
-      await AnalyticsService.getInstance()
-          ?.logChangeCart(product, item.quantity, false);
+  // Future<void> deleteItem(OrderDetails item) async {
+  //   print("Delete item...");
+  //   bool result;
+  //   ProductDTO product =
+  //       new ProductDTO(id: item.productId, productName: item.productName);
+  //   ConfirmCartItem cartItem =
+  //       new ConfirmCartItem(item.productId, item.quantity, null);
+  //   result = await removeItemFromCart(cartItem);
+  //   await removeItemFromMart(cartItem);
+  //   print("Result: $result");
+  //   if (result) {
+  //     await AnalyticsService.getInstance()
+  //         ?.logChangeCart(product, item.quantity, false);
 
-      await prepareOrder();
-    } else {
-      await removeItemFromCart(cartItem);
-      currentCart = await getCart();
-      await prepareOrder();
-    }
-  }
+  //     await prepareOrder();
+  //   } else {
+  //     await removeItemFromCart(cartItem);
+  //     currentCart = await getCart();
+  //     await prepareOrder();
+  //   }
+  // }
 
-  Future<void> updateQuantity(OrderDetails item) async {
-    final productViewModel = Get.find<ProductDetailViewModel>();
-    Cart? mart = await getMart();
-    final itemInCart = mart!.orderDetails!
-        .firstWhere((element) => element.productId == item.productId);
-    if (itemInCart.quantity > item.quantity) {
-      CartItem cartItem = new CartItem(item.productId, item.quantity - 1, null);
+  // Future<void> updateQuantity(OrderDetails item) async {
+  //   final productViewModel = Get.find<ProductDetailViewModel>();
+  //   ConfirmCart? mart = await getMart();
+  //   final itemInCart = mart!.orderDetails!
+  //       .firstWhere((element) => element.productId == item.productId);
+  //   if (itemInCart.quantity > item.quantity) {
+  //     ConfirmCartItem cartItem =
+  //         new ConfirmCartItem(item.productId, item.quantity - 1, null);
 
-      await updateItemFromMart(cartItem);
-      // await updateItemFromCart(cartItem);
-      await productViewModel.processCart(
-          item.productId, 1, root!.selectedTimeSlot!.id);
-    } else {
-      await productViewModel.processCart(
-          item.productId, 1, root!.selectedTimeSlot!.id);
-    }
+  //     await updateItemFromMart(cartItem);
+  //     // await updateItemFromCart(cartItem);
+  //     await productViewModel.processCart(
+  //         item.productId, 1, root!.selectedTimeSlot!.id);
+  //   } else {
+  //     await productViewModel.processCart(
+  //         item.productId, 1, root!.selectedTimeSlot!.id);
+  //   }
 
-    // await updateItemFromCart(cartItem);
-    await prepareOrder();
-    notifyListeners();
-  }
+  //   // await updateItemFromCart(cartItem);
+  //   await prepareOrder();
+  //   notifyListeners();
+  // }
 
   Future<void> getCurrentCart() async {
     try {
       setState(ViewStatus.Loading);
       RootViewModel root = Get.find<RootViewModel>();
-      currentCart = await getCart();
-      currentCart?.addProperties(root.isNextDay == true ? 2 : 1);
+      currentCart = await getMart();
+      // currentCart?.addProperties(root.isNextDay == true ? 2 : 1);
       // Cart? cart = await getMart();
       if (currentCart == null) {
         notifier.value = 0;
@@ -364,12 +368,12 @@ class OrderViewModel extends BaseModel {
     }
   }
 
-  Future<void> removeCart() async {
-    notifier.value = 0;
-    await deleteCart();
-    await deleteMart();
-    currentCart = await getCart();
-    setState(ViewStatus.Completed);
-    notifyListeners();
-  }
+  // Future<void> removeCart() async {
+  //   notifier.value = 0;
+  //   await deleteCart();
+  //   await deleteMart();
+  //   currentCart = await getCart();
+  //   setState(ViewStatus.Completed);
+  //   notifyListeners();
+  // }
 }

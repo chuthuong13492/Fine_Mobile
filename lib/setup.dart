@@ -4,6 +4,7 @@ import 'package:fine/Service/push_notification_service.dart';
 import 'package:fine/View/TopUp/topUp_screen.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/blogs_viewModel.dart';
+import 'package:fine/ViewModel/cart_viewModel.dart';
 import 'package:fine/ViewModel/category_viewModel.dart';
 import 'package:fine/ViewModel/currentTime_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
@@ -35,14 +36,11 @@ void createRouteBindings() async {
   Get.put(OrderHistoryViewModel());
   Get.put(BlogsViewModel());
   Get.put(CategoryViewModel());
+  Get.put(CartViewModel());
   Get.put(OrderViewModel());
   Get.put(PartyOrderViewModel());
   Get.put(ProductFilterViewModel());
   Get.put(ProductDetailViewModel());
   Get.put(TopUpViewModel());
   Get.put(TimeCheckViewModel());
-  // Get.put(DynamicLinkService());
-  // Get.lazyPut<WalletController>(
-  //   () => WalletController(),
-  // );
 }

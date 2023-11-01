@@ -6,6 +6,8 @@ import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/request.dart';
 
+import '../DTO/ConfirmCartDTO.dart';
+
 class ProductDAO extends BaseDAO {
   Future<ProductDTO?> getProductDetail(
     String? productId, {
@@ -70,7 +72,7 @@ class ProductDAO extends BaseDAO {
     return null;
   }
 
-  Future<AddProductToCartStatus?> checkProductToCart(Cart cart) async {
+  Future<AddProductToCartStatus?> checkProductToCart(ConfirmCart cart) async {
     try {
       if (cart != null) {
         // print("Request Note: " + note);

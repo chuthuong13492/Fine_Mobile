@@ -7,6 +7,8 @@ import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/request.dart';
 
+import '../DTO/ConfirmCartDTO.dart';
+
 class OrderDAO extends BaseDAO {
   Future<OrderDTO?> getOrderById(String? orderId) async {
     // data["destination_location_id"] = destinationId;
@@ -50,7 +52,7 @@ class OrderDAO extends BaseDAO {
     return null;
   }
 
-  Future<OrderDTO?> prepareOrder(Cart cart) async {
+  Future<OrderDTO?> prepareOrder(ConfirmCart cart) async {
     if (cart != null) {
       // print("Request Note: " + note);
       final res = await request.post(

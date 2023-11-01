@@ -8,6 +8,7 @@ import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/View/LoginScreen/login_byPhone.dart';
 import 'package:fine/View/LoginScreen/login_byPhoneOTP.dart';
 import 'package:fine/View/TopUp/transactionHistory_screen.dart';
+import 'package:fine/View/cart_screen.dart';
 import 'package:fine/View/checkingOrder_screen.dart';
 import 'package:fine/View/coOrder_screen.dart';
 import 'package:fine/View/confirm_party_screen.dart';
@@ -146,6 +147,9 @@ class MyApp extends StatelessWidget {
           case RouteHandler.ORDER:
             return CupertinoPageRoute<bool>(
                 builder: (context) => OrderScreen(), settings: settings);
+          case RouteHandler.CART_SCREEN:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => CartScreen(), settings: settings);
           case RouteHandler.PREPARE_CO_ORDER:
             return CupertinoPageRoute<bool>(
                 builder: (context) =>

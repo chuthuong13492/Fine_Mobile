@@ -6,6 +6,7 @@ import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/shared_pref.dart';
+import 'package:fine/ViewModel/cart_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/productFilter_viewModel.dart';
@@ -58,8 +59,8 @@ class _CartButtonState extends State<CartButton> {
             builder: (context, value, child) {
               return value == false
                   ? ScopedModel(
-                      model: Get.find<OrderViewModel>(),
-                      child: ScopedModelDescendant<OrderViewModel>(
+                      model: Get.find<CartViewModel>(),
+                      child: ScopedModelDescendant<CartViewModel>(
                         builder: (context, child, model) {
                           if (model.currentCart == null) {
                             return const SizedBox.shrink();

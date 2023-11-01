@@ -27,7 +27,7 @@ class _AppBarSate extends State<DefaultAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.white,
-      elevation: 2.0,
+      elevation: 0.6,
       centerTitle: true,
       // ignore: prefer_if_null_operators
       leading: widget.backButton != null

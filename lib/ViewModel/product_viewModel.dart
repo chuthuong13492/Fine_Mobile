@@ -6,6 +6,7 @@ import 'package:fine/Model/DTO/ProductDTO.dart';
 import 'package:fine/Service/analytic_service.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/shared_pref.dart';
+import 'package:fine/ViewModel/cart_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
@@ -15,9 +16,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../Constant/view_status.dart';
+import '../Model/DTO/ConfirmCartDTO.dart';
 import 'base_model.dart';
 
 class ProductDetailViewModel extends BaseModel {
+  final root = Get.find<RootViewModel>();
   Color minusColor = FineTheme.palettes.primary100;
   Color addColor = FineTheme.palettes.primary100;
   int? affectIndex = 0;
@@ -38,7 +41,7 @@ class ProductDetailViewModel extends BaseModel {
   ProductAttributes? selectAttribute;
   ProductDTO? master;
   ProductDAO? _dao;
-  Cart? checkCurrentCart;
+  ConfirmCart? checkCurrentCart;
 
   ProductDetailViewModel({ProductDTO? dto}) {
     master = dto;
@@ -78,8 +81,6 @@ class ProductDetailViewModel extends BaseModel {
 
       total = fixTotal;
       notifyListeners();
-      // total = (extraTotal + fixTotal) * count;
-      // notifyListeners();
     }
   }
 
@@ -89,251 +90,166 @@ class ProductDetailViewModel extends BaseModel {
       if (count == 1) {
         minusColor = FineTheme.palettes.neutral700;
       }
-      // if (master.type == ProductType.MASTER_PRODUCT) {
-      //   Map choice = new Map();
-      //   for (int i = 0; i < affectPriceContent.keys.toList().length; i++) {
-      //     choice[affectPriceContent.keys.elementAt(i)] =
-      //         selectedAttributes[affectPriceContent.keys.elementAt(i)];
-      //   }
 
-      //   ProductDTO dto = master.getChildByAttributes(choice);
-      //   fixTotal = dto.price * count;
-      // } else {
-      //   fixTotal = master.price * count;
-      // }
-
-      // if (this.extra != null) {
-      //   extraTotal = 0;
-      //   for (int i = 0; i < extra.keys.length; i++) {
-      //     if (extra[extra.keys.elementAt(i)]) {
-      //       double price = extra.keys.elementAt(i).price * count;
-      //       extraTotal += price;
-      //     }
-      //   }
-      // }
       fixTotal = (selectAttribute!.price ?? 0) * count;
 
-      // // total = fixTotal + extraTotal;
       total = fixTotal;
       notifyListeners();
-      // total = (extraTotal + fixTotal) * count;
-      // notifyListeners();
     }
   }
-
-  // void changeAffectPriceAtrribute(String attributeValue) {
-  //   String attributeKey = affectPriceContent.keys.elementAt(affectIndex);
-  //   selectedAttributes[attributeKey] = attributeValue;
-
-  //   verifyOrder();
-
-  //   if (order) {
-  //     if (master.type == ProductType.MASTER_PRODUCT) {
-  //       try {
-  //         ProductDTO dto = master.getChildByAttributes(selectedAttributes);
-  //         fixTotal = dto.price * count;
-  //         extraTotal = 0;
-  //         if (dto.hasExtra != null && dto.hasExtra) {
-  //           getExtra(dto);
-  //         } else {
-  //           this.extra = null;
-  //         }
-  //       } catch (e) {
-  //         showStatusDialog("assets/images/global_error.png",
-  //             "Sản phẩm không tồn tại", selectedAttributes.toString());
-  //         selectedAttributes[attributeKey] = null;
-  //         verifyOrder();
-  //       }
-  //     }
-  //     total = fixTotal + extraTotal;
-  //   }
-
-  //   notifyListeners();
-  // }
-
-  // void changeAffectIndex(int index) {
-  //   this.affectIndex = index;
-  //   if (index == affectPriceContent?.keys.toList().length) {
-  //     isExtra = true;
-  //   } else
-  //     isExtra = false;
-  //   notifyListeners();
-  // }
-
-  // void verifyOrder() {
-  //   order = true;
-
-  //   for (int i = 0; i < affectPriceContent!.keys.toList().length; i++) {
-  //     if (selectedAttributes![affectPriceContent!.keys.elementAt(i)] == null) {
-  //       order = false;
-  //     }
-  //   }
-
-  //   if (order!) {
-  //     addColor = FineTheme.palettes.primary100;
-  //   }
-  //   // setState(ViewStatus.Completed);
-  // }
-
-  // void changExtra(bool value, int i) {
-  //   extraTotal = 0;
-  //   extra[extra.keys.elementAt(i)] = value;
-  //   for (int j = 0; j < extra.keys.toList().length; j++) {
-  //     if (extra[extra.keys.elementAt(j)]) {
-  //       double price = extra.keys.elementAt(j).price * count;
-  //       extraTotal += price;
-  //     }
-  //   }
-  //   total = fixTotal + extraTotal;
-  //   notifyListeners();
-  // }
 
   Future<void> addProductToCart({bool backToHome = true}) async {
-    final root = Get.find<RootViewModel>();
-    final order = Get.find<OrderViewModel>();
     showLoadingDialog();
-    bool isPartyMode = false;
-    PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
-    if (party.partyCode != null) {
-      isPartyMode = true;
-    }
-    String description = "";
 
-    checkCurrentCart = await getMart();
-    if (checkCurrentCart == null) {
-      // checkCurrentCart = Cart.get(
-      //   productId: master!.attributes![0].id,
-      //   quantity: count,
-      //   timeSlotId: root.selectedTimeSlot!.id,
-      //   orderDetails: [],
-      // );
-      checkCurrentCart = Cart(
-          productId: selectAttribute!.id,
-          quantity: count,
-          timeSlotId: root.selectedTimeSlot!.id);
-      await setMart(checkCurrentCart!);
-      checkCurrentCart = await getMart();
-      AddProductToCartStatus? result =
-          await _dao!.checkProductToCart(checkCurrentCart!);
-      if (result?.code == 4006) {
-        Get.back();
-        order.removeCart();
-        await showStatusDialog("assets/images/error.png", "Oops!",
-            "Bạn chỉ có đặt 2 đơn trong 1 khung giờ thui!!");
-        return;
-      }
-      switch (result?.addProduct!.status!.errorCode) {
-        case "4002":
-          await showStatusDialog("assets/images/error.png", "Box đã đầy",
-              "Box đã đầy ùi, Box chỉ chứa tối đa 5 món thui nè");
-          return;
-        case "2001":
-          await showStatusDialog("assets/images/error.png", "Box đã đầy",
-              "Box đã đầy rùi, bạn chỉ có thể thêm ${result?.addProduct!.product!.quantity} phần ${result?.addProduct!.product!.name}");
-          return;
-        default:
-          break;
-      }
-      if (result?.addProduct?.card != null &&
-          result?.addProduct?.product != null) {
-        if (result!.addProduct!.productsRecommend != null) {
-          order.productRecomend = result.addProduct!.productsRecommend;
-        }
-        if (result.addProduct!.status!.success == false) {
-          await showStatusDialog("assets/images/error.png", "Box đã đầy",
-              "Box đã đầy mất ùi, bạn hong thể thêm ${result.addProduct!.product!.name}");
-          return;
-        }
-
-        final productList = result.addProduct!.card;
-        if (productList != null) {
-          for (var item in productList) {
-            CartItem cartItem = new CartItem(item.id, item.quantity!, null);
-            await addItemToCart(cartItem, root.selectedTimeSlot!.id!);
-            await addItemToMart(cartItem, root.selectedTimeSlot!.id!);
-            if (item.id == checkCurrentCart!.productId) {
-              await AnalyticsService.getInstance()!.logChangeCart(
-                  null, item.quantity!, true,
-                  productInCart: item);
-            }
-          }
-        }
-        checkCurrentCart = await getMart();
-        if (checkCurrentCart!.productId != null) {
-          checkCurrentCart!.productId = null;
-          checkCurrentCart!.quantity = 0;
-        }
-        if (checkCurrentCart!.orderDetails != null &&
-            checkCurrentCart!.productId == null) {
-          await setCart(checkCurrentCart!);
-        }
-      }
-    } else {
-      await processCart(selectAttribute!.id, count, root.selectedTimeSlot!.id);
-    }
-
+    CartItem item = CartItem(selectAttribute?.id, master?.productName,
+        master?.imageUrl, selectAttribute!.size, total, total, count);
+    await addItemToCart(item, root.selectedTimeSlot!.id!, root.isNextDay);
+    await AnalyticsService.getInstance()!
+        .logChangeCart(master, item.quantity, true);
+    await Get.find<CartViewModel>().getCurrentCart();
     hideDialog();
-    if (backToHome) {
-      if (isPartyMode) {
-        Get.find<PartyOrderViewModel>().addProductToPartyOrder();
-      } else {
-        order.isPartyOrder = false;
-        Get.find<OrderViewModel>().prepareOrder();
-      }
-
-      // Get.back(result: true);
-    } else {
-      if (isPartyMode) {
-        Get.find<PartyOrderViewModel>().addProductToPartyOrder();
-      } else {
-        order.isPartyOrder = false;
-        Get.find<OrderViewModel>().prepareOrder();
-      }
-    }
   }
 
-  Future<void> processCart(
-      String? productId, int? quantity, String? timeSlotId) async {
+  // Future<void> addProductToCart({bool backToHome = true}) async {
+  //   final root = Get.find<RootViewModel>();
+  //   final order = Get.find<OrderViewModel>();
+  //   showLoadingDialog();
+  //   bool isPartyMode = false;
+  //   PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+  //   if (party.partyCode != null) {
+  //     isPartyMode = true;
+  //   }
+  //   String description = "";
+
+  //   checkCurrentCart = await getMart();
+  //   if (checkCurrentCart == null) {
+  //     // checkCurrentCart = Cart.get(
+  //     //   productId: master!.attributes![0].id,
+  //     //   quantity: count,
+  //     //   timeSlotId: root.selectedTimeSlot!.id,
+  //     //   orderDetails: [],
+  //     // );
+  //     checkCurrentCart = ConfirmCart(
+  //         productId: selectAttribute!.id,
+  //         quantity: count,
+  //         timeSlotId: root.selectedTimeSlot!.id);
+  //     await setMart(checkCurrentCart!);
+  //     checkCurrentCart = await getMart();
+  //     AddProductToCartStatus? result =
+  //         await _dao!.checkProductToCart(checkCurrentCart!);
+  //     if (result?.code == 4006) {
+  //       Get.back();
+  //       order.removeCart();
+  //       await showStatusDialog("assets/images/error.png", "Oops!",
+  //           "Bạn chỉ có đặt 2 đơn trong 1 khung giờ thui!!");
+  //       return;
+  //     }
+  //     switch (result?.addProduct!.status!.errorCode) {
+  //       case "4002":
+  //         await showStatusDialog("assets/images/error.png", "Box đã đầy",
+  //             "Box đã đầy ùi, Box chỉ chứa tối đa 5 món thui nè");
+  //         return;
+  //       case "2001":
+  //         await showStatusDialog("assets/images/error.png", "Box đã đầy",
+  //             "Box đã đầy rùi, bạn chỉ có thể thêm ${result?.addProduct!.product!.quantity} phần ${result?.addProduct!.product!.name}");
+  //         return;
+  //       default:
+  //         break;
+  //     }
+  //     if (result?.addProduct?.card != null &&
+  //         result?.addProduct?.product != null) {
+  //       if (result!.addProduct!.productsRecommend != null) {
+  //         order.productRecomend = result.addProduct!.productsRecommend;
+  //       }
+  //       if (result.addProduct!.status!.success == false) {
+  //         await showStatusDialog("assets/images/error.png", "Box đã đầy",
+  //             "Box đã đầy mất ùi, bạn hong thể thêm ${result.addProduct!.product!.name}");
+  //         return;
+  //       }
+
+  //       final productList = result.addProduct!.card;
+  //       if (productList != null) {
+  //         for (var item in productList) {
+  //           ConfirmCartItem cartItem =
+  //               new ConfirmCartItem(item.id, item.quantity!, null);
+  //           await addItemToCart(cartItem, root.selectedTimeSlot!.id!);
+  //           await addItemToMart(cartItem, root.selectedTimeSlot!.id!);
+  //           if (item.id == checkCurrentCart!.productId) {
+  //             await AnalyticsService.getInstance()!.logChangeCart(
+  //                 null, item.quantity!, true,
+  //                 productInCart: item);
+  //           }
+  //         }
+  //       }
+  //       checkCurrentCart = await getMart();
+  //       if (checkCurrentCart!.productId != null) {
+  //         checkCurrentCart!.productId = null;
+  //         checkCurrentCart!.quantity = 0;
+  //       }
+  //       if (checkCurrentCart!.orderDetails != null &&
+  //           checkCurrentCart!.productId == null) {
+  //         await setCart(checkCurrentCart!);
+  //       }
+  //     }
+  //   } else {
+  //     await processCart(selectAttribute!.id, count, root.selectedTimeSlot!.id);
+  //   }
+
+  //   hideDialog();
+  //   if (backToHome) {
+  //     if (isPartyMode) {
+  //       Get.find<PartyOrderViewModel>().addProductToPartyOrder();
+  //     } else {
+  //       order.isPartyOrder = false;
+  //       Get.find<OrderViewModel>().prepareOrder();
+  //     }
+
+  //     // Get.back(result: true);
+  //   } else {
+  //     if (isPartyMode) {
+  //       Get.find<PartyOrderViewModel>().addProductToPartyOrder();
+  //     } else {
+  //       order.isPartyOrder = false;
+  //       Get.find<OrderViewModel>().prepareOrder();
+  //     }
+  //   }
+  // }
+
+  Future<bool?> processCart(String? productId, int? quantity) async {
     OrderViewModel order = Get.find<OrderViewModel>();
     if (productId != null && quantity != null) {
       checkCurrentCart = await getMart();
-      checkCurrentCart!.productId = productId;
-      checkCurrentCart!.quantity = quantity;
-      await setMart(checkCurrentCart!);
-      checkCurrentCart = await getMart();
+      if (checkCurrentCart == null) {
+        checkCurrentCart = ConfirmCart(
+            productId: productId,
+            quantity: quantity,
+            timeSlotId: root.selectedTimeSlot!.id);
+        await setMart(checkCurrentCart!);
+      } else {
+        checkCurrentCart!.productId = productId;
+        checkCurrentCart!.quantity = quantity;
+        await setMart(checkCurrentCart!);
+        checkCurrentCart = await getMart();
+      }
+
       AddProductToCartStatus? result =
           await _dao!.checkProductToCart(checkCurrentCart!);
       if (result?.code == 4006) {
         Get.back();
-        order.removeCart();
+        await Get.find<CartViewModel>().removeCart();
         await showStatusDialog("assets/images/error.png", "Oops!",
             "Bạn chỉ có đặt 2 đơn trong 1 khung giờ thui!!");
+        return false;
       }
-      if (result?.addProduct?.status?.errorCode == "400" &&
-          result?.addProduct?.card == null) {
-        await showStatusDialog("assets/images/error.png", "Oops!",
-            "1 Đơn hàng chỉ được tối đa 6 món thui!!");
-        return;
-      }
-      // if (result?.addProduct?.status?.errorCode == '4002') {
-      //   await showStatusDialog("assets/images/error.png", "Box đã đầy",
-      //       "Box đã đầy ùi, Box chỉ chứa tối đa 5 món thui nè");
-      //   return;
-      // }
-      // if (result?.addProduct!.status!.errorCode == '2001') {
-      //   await showStatusDialog("assets/images/error.png", "Box đã đầy",
-      //       "Box đã đầy rùi, bạn chỉ có thể thêm ${result?.addProduct!.product!.quantity} phần ${result?.addProduct!.product!.name}");
-      //   return;
-      // }
       switch (result?.addProduct!.status!.errorCode) {
         case "4002":
           await showStatusDialog("assets/images/error.png", "Box đã đầy",
               "Box đã đầy ùi, Box chỉ chứa tối đa 5 món thui nè");
-          return;
+          return false;
         case "2001":
           await showStatusDialog("assets/images/error.png", "Box đã đầy",
               "Box đã đầy rùi, bạn chỉ có thể thêm ${result?.addProduct!.product!.quantity} phần ${result?.addProduct!.product!.name}");
-          return;
+          return false;
         default:
           break;
       }
@@ -346,17 +262,18 @@ class ProductDetailViewModel extends BaseModel {
         if (result.addProduct!.status!.success == false) {
           await showStatusDialog("assets/images/error.png", "Box đã đầy",
               "Box đã đầy mất ùi, bạn hong thể thêm ${result.addProduct!.product!.name}");
-          return;
+          return false;
         }
 
         final productList = result.addProduct!.card!;
         if (productList != null) {
           for (var item in productList) {
-            CartItem cartItem = new CartItem(item.id, item.quantity!, null);
+            ConfirmCartItem cartItem =
+                new ConfirmCartItem(item.id, item.quantity!, null);
             // await removeItemFromCart(cartItem);
             await removeItemFromMart(cartItem);
             // await addItemToCart(cartItem, timeSlotId!);
-            await addItemToMart(cartItem, timeSlotId!);
+            await addItemToMart(cartItem);
           }
         }
         checkCurrentCart = await getMart();
@@ -367,9 +284,13 @@ class ProductDetailViewModel extends BaseModel {
         }
         if (checkCurrentCart!.orderDetails != null &&
             checkCurrentCart!.productId == null) {
-          await setCart(checkCurrentCart!);
+          await setMart(checkCurrentCart!);
         }
+        checkCurrentCart = await getMart();
+
+        return true;
       }
     }
+    return false;
   }
 }

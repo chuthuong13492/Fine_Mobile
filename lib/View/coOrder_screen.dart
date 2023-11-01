@@ -523,16 +523,16 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                   color: minusColor,
                 ),
                 onPressed: () async {
-                  if (isYou) {
-                    if (item.quantity >= 1) {
-                      if (item.quantity == 1) {
-                        await _partyViewModel?.deleteItem(item);
-                      } else {
-                        item.quantity--;
-                        await _partyViewModel?.updateQuantity(item);
-                      }
-                    }
-                  }
+                  // if (isYou) {
+                  //   if (item.quantity >= 1) {
+                  //     if (item.quantity == 1) {
+                  //       await _partyViewModel?.deleteItem(item);
+                  //     } else {
+                  //       item.quantity--;
+                  //       await _partyViewModel?.updateQuantity(item);
+                  //     }
+                  //   }
+                  // }
                 },
               ),
             ),
@@ -554,10 +554,10 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                   color: plusColor,
                 ),
                 onPressed: () async {
-                  if (isYou) {
-                    item.quantity++;
-                    await _partyViewModel?.updateQuantity(item);
-                  }
+                  // if (isYou) {
+                  //   item.quantity++;
+                  //   await _partyViewModel?.updateQuantity(item);
+                  // }
                 },
               ),
             ),
@@ -672,7 +672,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                           // _stopTimer();
                         } else {
                           if (isAdmin == true) {
-                            Cart? cart = await getCart();
+                            final cart = await getCart();
                             if (cart != null) {
                               await model.preCoOrder();
                               // _stopTimer();
