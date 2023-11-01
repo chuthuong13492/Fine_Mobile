@@ -171,30 +171,38 @@ class _CustomeCreatePartyState extends State<CustomeCreateParty> {
                 InkWell(
                   onTap: () async {
                     model.partyCode = await getPartyCode();
-                    final order = Get.find<OrderViewModel>();
+                    final cart = await getMart();
                     // order.currentCart = await getCart();
-                    if (order.currentCart != null) {
-                      if (model.partyCode == null) {
-                        await model.createCoOrder(isLinked!);
-                        if (model.partyOrderDTO!.partyType == 1) {
-                          if (widget.isHome == true) {
-                            hideDialog();
-                            Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                    if (cart != null) {
+                      if (cart.orderDetails!.isNotEmpty) {
+                        if (model.partyCode == null) {
+                          await model.createCoOrder(isLinked!);
+                          if (model.partyOrderDTO!.partyType == 1) {
+                            if (widget.isHome == true) {
+                              hideDialog();
+                              Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                            } else {
+                              hideDialog();
+                              Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                            }
                           } else {
                             hideDialog();
-                            Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                            await Get.find<OrderViewModel>().prepareOrder();
                           }
-                        } else {
-                          hideDialog();
-                          await Get.find<OrderViewModel>().prepareOrder();
                         }
+                      } else {
+                        hideDialog();
+                        await showStatusDialog(
+                            'assets/images/logo2.png',
+                            "Xin lũi nhe 🥹",
+                            "Bạn phải chọn ít nhất 1 món trong 🛒 mới tạo đc Party nè");
                       }
                     } else {
                       hideDialog();
                       await showStatusDialog(
                           'assets/images/logo2.png',
                           "Xin lũi nhe 🥹",
-                          "Bạn phải có ít nhất 1 món mới tạo đc Party nè");
+                          "Bạn phải chọn ít nhất 1 món trong 🛒 mới tạo đc Party nè");
                     }
                   },
                   child: Container(

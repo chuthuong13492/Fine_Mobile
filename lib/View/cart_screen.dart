@@ -1,7 +1,9 @@
 import 'package:fine/Accessories/index.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Utils/constrant.dart';
+import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/cart_viewModel.dart';
+import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -22,6 +24,7 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   CartViewModel? cartViewModel = Get.find<CartViewModel>();
+  final party = Get.find<PartyOrderViewModel>();
   AutoScrollController? controller;
   final scrollDirection = Axis.vertical;
   bool onInit = true;
@@ -373,83 +376,14 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  // Widget buildProduct() {
-  //   bool isChecked = false;
-  //   return Padding(
-  //     padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-  //     child: Container(
-  //       width: Get.width,
-  //       color: FineTheme.palettes.shades100,
-  //       padding: const EdgeInsets.all(8),
-  //       child: Row(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: [
-  //           Checkbox(
-  //             shape: RoundedRectangleBorder(
-  //                 borderRadius: BorderRadius.circular(100)),
-  //             value: isChecked,
-  //             onChanged: (value) {
-  //               isChecked = value!;
-  //             },
-  //           )
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  Widget cartSection() {
-    return ScopedModelDescendant<CartViewModel>(
-      builder: (context, child, model) {
-        return Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            // boxShadow: [
-            //   BoxShadow(
-            //     color: Colors.grey,
-            //     offset: Offset(0.0, 1.0), //(x,y)
-            //     blurRadius: 6.0,
-            //   ),
-            // ],
-          ),
-          child: TabBar(
-            indicatorColor: FineTheme.palettes.primary100,
-            overlayColor:
-                MaterialStateColor.resolveWith((Set<MaterialState> states) {
-              if (states.contains(MaterialState.focused)) {
-                return FineTheme.palettes.primary100;
-              }
-              if (states.contains(MaterialState.error)) {
-                return Colors.red;
-              }
-              return FineTheme.palettes.primary100;
-            }),
-            tabs: [
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 12),
-                child: Text("Tất cả ${model.currentCart!.itemQuantity()}",
-                    style: FineTheme.typograhpy.body1.copyWith(
-                      color: FineTheme.palettes.emerald25,
-                    )),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 12),
-                child: Text("Mua lại",
-                    style: FineTheme.typograhpy.body1.copyWith(
-                      color: FineTheme.palettes.emerald25,
-                    )),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Widget bottomBar(CartViewModel model) {
     bool isSelected = model.isCheckedList.any((element) => element == true);
-
+    bool hasParty = false;
+    if (party.partyCode != null) {
+      hasParty = true;
+    } else {
+      hasParty = false;
+    }
     return Container(
       height: 120,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 60),
@@ -498,9 +432,13 @@ class _CartScreenState extends State<CartScreen> {
           ),
           InkWell(
             onTap: isSelected
-                ? () async {
-                    await model.orderPayment();
-                  }
+                ? hasParty
+                    ? () async {
+                        await party.addProductToPartyOrder();
+                      }
+                    : () async {
+                        await model.orderPayment();
+                      }
                 : null,
             child: Container(
               width: 160,
@@ -524,7 +462,11 @@ class _CartScreenState extends State<CartScreen> {
               ),
               child: Center(
                 child: Text(
-                  isSelected ? "Thanh toán" : "Chưa chọn món",
+                  isSelected
+                      ? hasParty
+                          ? "Thêm vào Party"
+                          : "Thanh toán"
+                      : "Chưa chọn món",
                   style: FineTheme.typograhpy.subtitle1.copyWith(
                     color: isSelected
                         ? FineTheme.palettes.primary100

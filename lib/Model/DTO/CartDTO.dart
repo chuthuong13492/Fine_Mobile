@@ -50,10 +50,6 @@ class Cart {
     );
   }
 
-  void addProperties(bool nextDay) {
-    isNextDay = nextDay;
-  }
-
   Map<String, dynamic> toJson() {
     List listCartItem = items!.map((e) => e.toJson()).toList();
     return {

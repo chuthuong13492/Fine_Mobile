@@ -194,9 +194,7 @@ class _CartButtonState extends State<CartButton> {
                                           top: -10,
                                           left: 35,
                                           child: ValueListenableBuilder(
-                                            valueListenable:
-                                                Get.find<OrderViewModel>()
-                                                    .notifier,
+                                            valueListenable: model.notifier,
                                             builder:
                                                 (context, cartItem, child) {
                                               return cartItem != 0

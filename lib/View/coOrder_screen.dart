@@ -68,6 +68,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     return ScopedModel(
       model: Get.find<PartyOrderViewModel>(),
       child: Scaffold(
+        floatingActionButton: const CartParty(),
         backgroundColor: FineTheme.palettes.neutral200,
         bottomNavigationBar: bottomBar(),
         // drawer: InviteCoOrderScreen(),
@@ -495,74 +496,25 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   }
 
   Widget selectQuantity(OrderDetails item, bool isYou) {
-    Color minusColor = FineTheme.palettes.neutral500;
-    if (item.quantity >= 1) {
-      minusColor = FineTheme.palettes.primary300;
-    }
-    Color plusColor = FineTheme.palettes.primary300;
-    if (!isYou) {
-      minusColor = FineTheme.palettes.neutral700;
-      plusColor = FineTheme.palettes.neutral700;
-    }
+    // Color minusColor = FineTheme.palettes.neutral500;
+    // if (item.quantity >= 1) {
+    //   minusColor = FineTheme.palettes.primary300;
+    // }
+    // Color plusColor = FineTheme.palettes.primary300;
+    // if (!isYou) {
+    //   minusColor = FineTheme.palettes.neutral700;
+    //   plusColor = FineTheme.palettes.neutral700;
+    // }
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
-      child: Container(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 18,
-              width: 18,
-              child: IconButton(
-                padding: const EdgeInsets.all(0.0),
-                icon: Icon(
-                  AntDesign.minuscircleo,
-                  size: 16,
-                  color: minusColor,
-                ),
-                onPressed: () async {
-                  // if (isYou) {
-                  //   if (item.quantity >= 1) {
-                  //     if (item.quantity == 1) {
-                  //       await _partyViewModel?.deleteItem(item);
-                  //     } else {
-                  //       item.quantity--;
-                  //       await _partyViewModel?.updateQuantity(item);
-                  //     }
-                  //   }
-                  // }
-                },
-              ),
-            ),
-            Container(
-              width: 30,
-              child: Text(
-                item.quantity.toString(),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            SizedBox(
-              height: 18,
-              width: 18,
-              child: IconButton(
-                padding: const EdgeInsets.all(0.0),
-                icon: Icon(
-                  AntDesign.pluscircleo,
-                  size: 16,
-                  color: plusColor,
-                ),
-                onPressed: () async {
-                  // if (isYou) {
-                  //   item.quantity++;
-                  //   await _partyViewModel?.updateQuantity(item);
-                  // }
-                },
-              ),
-            ),
-          ],
-        ),
+      child: Row(
+        children: [
+          Text("x", style: FineTheme.typograhpy.body2),
+          const SizedBox(
+            width: 2,
+          ),
+          Text(item.quantity.toString(), style: FineTheme.typograhpy.body2),
+        ],
       ),
     );
   }

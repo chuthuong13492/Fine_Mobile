@@ -45,7 +45,6 @@ class OrderViewModel extends BaseModel {
   List<String> listError = <String>[];
   RootViewModel? root = Get.find<RootViewModel>();
 
-  final ValueNotifier<int> notifier = ValueNotifier(0);
   final ValueNotifier<int> notifierTimeRemaining = ValueNotifier(0);
   int? timeRemaining;
 
@@ -354,10 +353,10 @@ class OrderViewModel extends BaseModel {
       currentCart = await getMart();
       // currentCart?.addProperties(root.isNextDay == true ? 2 : 1);
       // Cart? cart = await getMart();
-      if (currentCart == null) {
-        notifier.value = 0;
-      }
-      notifier.value = currentCart!.itemQuantity();
+      // if (currentCart == null) {
+      //   notifier.value = 0;
+      // }
+      // notifier.value = currentCart!.itemQuantity();
 
       setState(ViewStatus.Completed);
 
