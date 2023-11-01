@@ -88,27 +88,6 @@ class RootViewModel extends BaseModel {
     Get.find<PartyOrderViewModel>().getCoOrderStatus();
   }
 
-  Future<void> getProductRecommend() async {
-    ConfirmCart? cart = await getMart();
-    await deleteMart();
-    if (cart != null) {
-      if (cart.orderDetails!.isNotEmpty) {
-        ConfirmCartItem itemInCart = new ConfirmCartItem(
-            cart.orderDetails![0].productId,
-            cart.orderDetails![0].quantity - 1,
-            null);
-
-        await updateItemFromMart(itemInCart);
-        cart = await getMart();
-        await setMart(cart!);
-        await Get.find<ProductDetailViewModel>()
-            .processCart(cart.orderDetails![0].productId, 1);
-      } else {
-        Get.find<OrderViewModel>().productRecomend = [];
-      }
-    }
-  }
-
   Future<void> changeDay(int index) async {
     final cart = await getCart();
     // final cart = Get.find<OrderViewModel>().currentCart;
@@ -130,8 +109,7 @@ class RootViewModel extends BaseModel {
       // option = 0;
       isOnClick = true;
       deletePartyCode();
-      await deleteCart();
-      Get.find<CartViewModel>().getCurrentCart();
+      Get.find<CartViewModel>().removeCart();
       // await Get.find<OrderViewModel>().removeCart();
       await getListTimeSlot();
     }
@@ -482,9 +460,7 @@ class RootViewModel extends BaseModel {
       if (option == 1) {
         // showLoadingDialog();
         selectedTimeSlot = timeSlot;
-        deleteCart();
-        deleteMart();
-        Get.find<CartViewModel>().getCurrentCart();
+        Get.find<CartViewModel>().removeCart();
         deletePartyCode();
         party.partyOrderDTO = null;
         await refreshMenu();

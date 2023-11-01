@@ -127,8 +127,10 @@ class CartViewModel extends BaseModel {
   Future<void> removeCart() async {
     await deleteCart();
     await deleteMart();
+    total = 0;
+    quantityChecked = 0;
+    isCheckedList = List.generate(0, (index) => false);
     currentCart = await getCart();
-    setState(ViewStatus.Completed);
     notifyListeners();
   }
 

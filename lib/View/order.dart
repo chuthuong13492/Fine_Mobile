@@ -1238,20 +1238,14 @@ class _OrderScreenState extends State<OrderScreen> {
     }
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 12, 8),
-      child: Container(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text("x", style: FineTheme.typograhpy.body2),
-            const SizedBox(
-              width: 2,
-            ),
-            Text(
-              item.quantity.toString(),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+      child: Row(
+        children: [
+          Text("x", style: FineTheme.typograhpy.body2),
+          const SizedBox(
+            width: 2,
+          ),
+          Text(item.quantity.toString(), style: FineTheme.typograhpy.body2),
+        ],
       ),
     );
   }
