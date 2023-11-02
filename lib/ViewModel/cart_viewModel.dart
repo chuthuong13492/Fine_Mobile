@@ -121,7 +121,7 @@ class CartViewModel extends BaseModel {
         reOrderList = await _storeDAO?.getReOrder(currentTimeSlot.id);
       }
 
-      await Future.delayed(const Duration(microseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 500));
       setState(ViewStatus.Completed);
     } catch (e) {
       setState(ViewStatus.Completed);
@@ -131,6 +131,7 @@ class CartViewModel extends BaseModel {
   Future<void> getCurrentCart() async {
     try {
       setState(ViewStatus.Loading);
+      await Future.delayed(const Duration(milliseconds: 500));
       currentCart = await getCart();
       if (isCheckedList.isEmpty) {
         isCheckedList =
@@ -141,7 +142,7 @@ class CartViewModel extends BaseModel {
           isCheckedList.add(false);
         }
       }
-      await Future.delayed(const Duration(microseconds: 500));
+
       setState(ViewStatus.Completed);
       notifyListeners();
     } catch (e) {
