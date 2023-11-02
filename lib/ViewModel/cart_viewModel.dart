@@ -23,6 +23,7 @@ class CartViewModel extends BaseModel {
   List<ReOrderDTO>? reOrderList;
   double total = 0, fixTotal = 0, extraTotal = 0;
   int quantityChecked = 0;
+  bool? isSelected = false;
   final ValueNotifier<int> notifier = ValueNotifier(0);
 
   CartViewModel() {
@@ -145,7 +146,7 @@ class CartViewModel extends BaseModel {
           isCheckedList.add(false);
         }
       }
-
+      isSelected = isCheckedList.any((element) => element == true);
       setState(ViewStatus.Completed);
       notifyListeners();
     } catch (e) {

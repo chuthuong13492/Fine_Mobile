@@ -259,9 +259,9 @@ class OrderViewModel extends BaseModel {
           if (Get.currentRoute == "/party_order_screen") {
             Get.back();
           }
-          final cart = await getCart();
+          final cart = await getMart();
           if (cart != null) {
-            for (var item in result.order!.orderDetails!) {
+            for (var item in cart.orderDetails!) {
               CartItem cartItem =
                   CartItem(item.productId, "", "", "", 0, 0, item.quantity);
               await removeItemFromCart(cartItem);

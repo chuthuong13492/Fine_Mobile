@@ -633,7 +633,6 @@ class _CartScreenState extends State<CartScreen>
   Widget bottomBar() {
     return ScopedModelDescendant<CartViewModel>(
       builder: (context, child, model) {
-        bool isSelected = model.isCheckedList.any((element) => element == true);
         bool hasParty = false;
         if (party.partyCode != null) {
           hasParty = true;
@@ -687,7 +686,7 @@ class _CartScreenState extends State<CartScreen>
                 ],
               ),
               InkWell(
-                onTap: isSelected
+                onTap: model.isSelected!
                     ? hasParty
                         ? () async {
                             await party.addProductToPartyOrder();
@@ -703,13 +702,13 @@ class _CartScreenState extends State<CartScreen>
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: isSelected
+                      color: model.isSelected!
                           ? FineTheme.palettes.primary100
                           : FineTheme.palettes.neutral700,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: isSelected
+                        color: model.isSelected!
                             ? FineTheme.palettes.primary100
                             : FineTheme.palettes.neutral700,
                         offset: const Offset(0, 3),
@@ -718,13 +717,13 @@ class _CartScreenState extends State<CartScreen>
                   ),
                   child: Center(
                     child: Text(
-                      isSelected
+                      model.isSelected!
                           ? hasParty
                               ? "Thêm vào Party"
                               : "Thanh toán"
                           : "Chưa chọn món",
                       style: FineTheme.typograhpy.subtitle1.copyWith(
-                        color: isSelected
+                        color: model.isSelected!
                             ? FineTheme.palettes.primary100
                             : FineTheme.palettes.neutral700,
                       ),
