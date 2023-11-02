@@ -39,6 +39,7 @@ class _CartScreenState extends State<CartScreen>
   final scrollDirection = Axis.vertical;
   bool onInit = true;
   bool onTapBar = true;
+  bool hasParty = false;
 
   @override
   void initState() {
@@ -52,14 +53,22 @@ class _CartScreenState extends State<CartScreen>
         axis: scrollDirection);
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    Get.find<PartyOrderViewModel>().isCartRoute = false;
+  }
+
   void _handleTabChange() async {
     int selectedIndex = _tabController!.index;
     if (selectedIndex == 0) {
+      Get.find<PartyOrderViewModel>().isCartRoute = true;
       await cartViewModel?.getCurrentCart();
       setState(() {
         onTapBar = true;
       });
     } else {
+      Get.find<PartyOrderViewModel>().isCartRoute = false;
       await cartViewModel?.getReOrder();
       setState(() {
         onTapBar = false;
@@ -68,6 +77,15 @@ class _CartScreenState extends State<CartScreen>
   }
 
   void prepareCart() async {
+    if (Get.currentRoute == "/nav_screen") {
+      Get.find<PartyOrderViewModel>().isCartRoute = true;
+    }
+    final partyCode = await getPartyCode();
+    if (partyCode != null) {
+      hasParty = true;
+    } else {
+      hasParty = false;
+    }
     await cartViewModel?.getCurrentCart();
     setState(() {
       onInit = false;
@@ -633,12 +651,6 @@ class _CartScreenState extends State<CartScreen>
   Widget bottomBar() {
     return ScopedModelDescendant<CartViewModel>(
       builder: (context, child, model) {
-        bool hasParty = false;
-        if (party.partyCode != null) {
-          hasParty = true;
-        } else {
-          hasParty = false;
-        }
         return Container(
           height: 180,
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),

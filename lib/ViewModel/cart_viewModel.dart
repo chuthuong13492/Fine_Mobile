@@ -48,7 +48,7 @@ class CartViewModel extends BaseModel {
         isCheckedList[index] = value;
         getTotalQuantity(value, cartItem);
       }
-
+      isSelected = isCheckedList.any((element) => element == true);
       notifyListeners();
     } catch (e) {
       throw e;
@@ -162,6 +162,7 @@ class CartViewModel extends BaseModel {
     total = 0;
     quantityChecked = 0;
     isCheckedList = List.generate(0, (index) => false);
+    notifier.value = 0;
     currentCart = await getCart();
     notifyListeners();
   }

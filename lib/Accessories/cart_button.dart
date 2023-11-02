@@ -61,8 +61,12 @@ class _CartButtonState extends State<CartButton> {
             }
 
             return model.partyCode != null
-                ? Container(
-                    margin: const EdgeInsets.only(bottom: 40, right: 5),
+                ? AnimatedContainer(
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                    margin: model.isCartRoute == false
+                        ? const EdgeInsets.only(bottom: 40, right: 5)
+                        : const EdgeInsets.only(bottom: 120, right: 5),
                     child: FloatingActionButton(
                       backgroundColor: Colors.transparent,
                       elevation: 4,

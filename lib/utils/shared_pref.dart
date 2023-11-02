@@ -110,7 +110,7 @@ Future<void> addItemToMart(ConfirmCartItem item) async {
 }
 
 Future<void> addPartyItem(ConfirmCartItem item, String timeSlotId) async {
-  ConfirmCart? cart = await getMart();
+  ConfirmCart? cart = await getPartyCart();
   if (cart == null) {
     cart = ConfirmCart(timeSlotId: timeSlotId);
   }
@@ -133,6 +133,23 @@ Future<bool> removeItemFromCart(CartItem item) async {
     await setCart(cart);
     return false;
   }
+}
+
+Future<bool> removeItemFromParty(ConfirmCartItem item) async {
+  ConfirmCart? cart = await getPartyCart();
+  if (cart == null) {
+    return false;
+  }
+  cart.removeItem(item);
+  await setPartyCart(cart);
+  return false;
+  // if (cart.orderDetails?.length == 0) {
+  //   await deleteMart();
+  //   return true;
+  // } else {
+  //   await setMart(cart);
+  //   return false;
+  // }
 }
 
 Future<bool> removeItemFromMart(ConfirmCartItem item) async {
