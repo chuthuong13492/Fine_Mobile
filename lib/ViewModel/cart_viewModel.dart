@@ -3,6 +3,7 @@ import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../Constant/view_status.dart';
@@ -22,6 +23,7 @@ class CartViewModel extends BaseModel {
   List<ReOrderDTO>? reOrderList;
   double total = 0, fixTotal = 0, extraTotal = 0;
   int quantityChecked = 0;
+  final ValueNotifier<int> notifier = ValueNotifier(0);
 
   CartViewModel() {
     _storeDAO = StoreDAO();
@@ -133,6 +135,7 @@ class CartViewModel extends BaseModel {
       setState(ViewStatus.Loading);
       await Future.delayed(const Duration(milliseconds: 500));
       currentCart = await getCart();
+      notifier.value = currentCart!.itemQuantity();
       if (isCheckedList.isEmpty) {
         isCheckedList =
             List.generate(currentCart!.items!.length, (index) => false);
@@ -182,7 +185,7 @@ class CartViewModel extends BaseModel {
         ConfirmCartItem(item.productId, item.quantity, "");
     await removeItemFromMart(confirmCartItem);
     currentCart = await getCart();
-
+    notifier.value = currentCart!.itemQuantity();
     notifyListeners();
   }
 
@@ -198,6 +201,9 @@ class CartViewModel extends BaseModel {
       if (currentCart == null) {
         total = 0;
         quantityChecked = 0;
+        notifier.value = 0;
+      } else {
+        notifier.value = currentCart!.itemQuantity();
       }
       isCheckedList = [];
     } else {
@@ -205,10 +211,12 @@ class CartViewModel extends BaseModel {
       if (currentCart == null) {
         total = 0;
         quantityChecked = 0;
+        notifier.value = 0;
+      } else {
+        notifier.value = currentCart!.itemQuantity();
       }
       isCheckedList.removeAt(index);
     }
-
     notifyListeners();
   }
 }

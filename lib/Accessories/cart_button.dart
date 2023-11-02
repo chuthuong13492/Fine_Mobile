@@ -52,296 +52,181 @@ class _CartButtonState extends State<CartButton> {
   @override
   Widget build(BuildContext context) {
     return ScopedModel(
-        model: Get.find<RootViewModel>(),
-        child: ScopedModelDescendant<RootViewModel>(
-          builder: (context, child, model) => ValueListenableBuilder(
-            valueListenable: model.notifier,
-            builder: (context, value, child) {
-              return value == false
-                  ? ScopedModel(
-                      model: Get.find<CartViewModel>(),
-                      child: ScopedModelDescendant<CartViewModel>(
-                        builder: (context, child, model) {
-                          if (model.currentCart == null) {
-                            return const SizedBox.shrink();
-                          }
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 40),
-                            child: FloatingActionButton(
-                              backgroundColor: Colors.transparent,
-                              elevation: 4,
-                              heroTag: CART_TAG,
-                              shape: RoundedRectangleBorder(
+        model: Get.find<PartyOrderViewModel>(),
+        child: ScopedModelDescendant<PartyOrderViewModel>(
+          builder: (context, child, model) {
+            int? quantity;
+            if (model.partyStatus != null) {
+              quantity = model.partyStatus!.numberOfMember!;
+            }
+
+            return model.partyCode != null
+                ? Container(
+                    margin: const EdgeInsets.only(bottom: 40, right: 5),
+                    child: FloatingActionButton(
+                      backgroundColor: Colors.transparent,
+                      elevation: 4,
+                      heroTag: CART_TAG,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(100),
+                        // side: BorderSide(color: Colors.red),
+                      ),
+                      onPressed: () async {
+                        await Get.find<RootViewModel>().navParty();
+                      },
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Container(
+                            width: 56,
+                            height: 56,
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(
+                                  color: FineTheme.palettes.primary100),
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: FineTheme.palettes.primary100,
                                 borderRadius: BorderRadius.circular(100),
-                                // side: BorderSide(color: Colors.red),
                               ),
-                              onPressed: () async {
-                                await Get.find<RootViewModel>().navOrder();
-                              },
-                              child: Stack(
-                                clipBehavior: Clip.none,
-                                children: [
-                                  Container(
-                                    width: 56,
-                                    height: 56,
-                                    padding: const EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(
-                                          color: FineTheme.palettes.primary100),
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: FineTheme.palettes.primary100,
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                      ),
-                                      child: Image.asset(
-                                        "assets/icons/shopping-bag-02.png",
-                                        height: 16,
-                                        width: 16,
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: -8,
-                                    left: 35,
-                                    child: AnimatedContainer(
-                                      duration:
-                                          const Duration(microseconds: 300),
-                                      width: 24,
-                                      height: 24,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(16),
-                                        color: Colors.red,
-                                        //border: Border.all(color: Colors.grey),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          model.currentCart!
-                                              .itemQuantity()
-                                              .toString(),
-                                          style: FineTheme.typograhpy.subtitle1
-                                              .copyWith(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              child: SvgPicture.asset(
+                                "assets/icons/Party.svg",
+                                width: 16,
+                                height: 16,
                               ),
                             ),
-                          );
-                        },
-                      ))
-                  : ScopedModel(
-                      model: Get.find<PartyOrderViewModel>(),
-                      child: ScopedModelDescendant<PartyOrderViewModel>(
-                        builder: (context, child, model) {
-                          int? quantity;
-                          if (model.partyStatus != null) {
-                            quantity = model.partyStatus!.numberOfMember!;
-                          }
-
-                          return model.partyStatus != null
-                              ? Container(
-                                  margin: const EdgeInsets.only(
-                                      bottom: 40, right: 5),
-                                  child: FloatingActionButton(
-                                    backgroundColor: Colors.transparent,
-                                    elevation: 4,
-                                    heroTag: CART_TAG,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(100),
-                                      // side: BorderSide(color: Colors.red),
-                                    ),
-                                    onPressed: () async {
-                                      await Get.find<RootViewModel>()
-                                          .navParty();
-                                    },
-                                    child: Stack(
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        Container(
-                                          width: 56,
-                                          height: 56,
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(
-                                                color: FineTheme
-                                                    .palettes.primary100),
-                                            borderRadius:
-                                                BorderRadius.circular(100),
-                                          ),
-                                          child: Container(
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  FineTheme.palettes.primary100,
-                                              borderRadius:
-                                                  BorderRadius.circular(100),
-                                            ),
-                                            child: SvgPicture.asset(
-                                              "assets/icons/Party.svg",
-                                              width: 16,
-                                              height: 16,
-                                            ),
-                                          ),
+                          ),
+                          Positioned(
+                            top: -10,
+                            left: 35,
+                            child: ValueListenableBuilder(
+                              valueListenable: model.notifier,
+                              builder: (context, cartItem, child) {
+                                return cartItem != 0
+                                    ? AnimatedContainer(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            5, 0, 5, 0),
+                                        duration:
+                                            const Duration(microseconds: 300),
+                                        // width: 24,
+                                        height: 24,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                          color: Colors.red,
+                                          //border: Border.all(color: Colors.grey),
                                         ),
-                                        Positioned(
-                                          top: -10,
-                                          left: 35,
-                                          child: ValueListenableBuilder(
-                                            valueListenable: model.notifier,
-                                            builder:
-                                                (context, cartItem, child) {
-                                              return cartItem != 0
-                                                  ? AnimatedContainer(
-                                                      padding: const EdgeInsets
-                                                          .fromLTRB(5, 0, 5, 0),
-                                                      duration: const Duration(
-                                                          microseconds: 300),
-                                                      // width: 24,
-                                                      height: 24,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(16),
-                                                        color: Colors.red,
-                                                        //border: Border.all(color: Colors.grey),
-                                                      ),
-                                                      child: Center(
-                                                        child: Row(
-                                                          children: [
-                                                            Text(
-                                                              cartItem
-                                                                  .toString(),
-                                                              style: FineTheme
-                                                                  .typograhpy
-                                                                  .subtitle1
-                                                                  .copyWith(
-                                                                      color: Colors
-                                                                          .white),
-                                                            ),
-                                                            const SizedBox(
-                                                              width: 2,
-                                                            ),
-                                                            const Icon(
-                                                              FontAwesome
-                                                                  .shopping_cart,
-                                                              size: 15,
-                                                            )
-                                                            // Image.asset(
-                                                            //   "assets/icons/shopping-bag-02.png",
-                                                            //   height: 15,
-                                                            //   width: 15,
-                                                            // ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    )
-                                                  : const SizedBox.shrink();
-                                            },
-                                          ),
-                                        ),
-                                        Positioned(
-                                          // top: -8,
-                                          bottom: -25,
-                                          right: 40,
-                                          // left: 35,
-                                          child: ClipPath(
-                                            clipper: UpperNipMessageClipper(
-                                                MessageType.send),
-                                            child: AnimatedContainer(
-                                              padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      10, 8, 20, 0),
-                                              duration: const Duration(
-                                                  microseconds: 300),
-                                              // width: 24,
-                                              // alignment: Alignment.center,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                // borderRadius: const BorderRadius.only(
-                                                //     topLeft: Radius.circular(8),
-                                                //     bottomLeft: Radius.circular(8),
-                                                //     bottomRight: Radius.circular(12)),
-
-                                                color: FineTheme
-                                                    .palettes.primary300,
+                                        child: Center(
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                cartItem.toString(),
+                                                style: FineTheme
+                                                    .typograhpy.subtitle1
+                                                    .copyWith(
+                                                        color: Colors.white),
                                               ),
-                                              child: Center(
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                      quantity.toString(),
-                                                      style: FineTheme
-                                                          .typograhpy.subtitle1
-                                                          .copyWith(
-                                                              color:
-                                                                  Colors.white),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 2,
-                                                    ),
-                                                    const Icon(
-                                                      Icons.person,
-                                                      size: 12,
-                                                      color: Colors.white,
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 2,
-                                                    ),
-                                                    Text(
-                                                      '|',
-                                                      style: FineTheme
-                                                          .typograhpy.subtitle1
-                                                          .copyWith(
-                                                              color:
-                                                                  Colors.white),
-                                                    ),
-                                                    const SizedBox(
-                                                      width: 2,
-                                                    ),
-                                                    Text(
-                                                      'Ready: ',
-                                                      style: FineTheme
-                                                          .typograhpy.caption1
-                                                          .copyWith(
-                                                              color:
-                                                                  Colors.white),
-                                                    ),
-                                                    model.partyStatus
-                                                                ?.isReady ==
-                                                            true
-                                                        ? const Icon(
-                                                            Icons
-                                                                .check_circle_rounded,
-                                                            size: 15,
-                                                            color: Colors.green,
-                                                          )
-                                                        : const Icon(
-                                                            Icons.cancel,
-                                                            size: 15,
-                                                            color: Colors.red,
-                                                          )
-                                                  ],
-                                                ),
+                                              const SizedBox(
+                                                width: 2,
                                               ),
-                                            ),
+                                              const Icon(
+                                                FontAwesome.shopping_cart,
+                                                size: 15,
+                                              )
+                                              // Image.asset(
+                                              //   "assets/icons/shopping-bag-02.png",
+                                              //   height: 15,
+                                              //   width: 15,
+                                              // ),
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      )
+                                    : const SizedBox.shrink();
+                              },
+                            ),
+                          ),
+                          Positioned(
+                            // top: -8,
+                            bottom: -25,
+                            right: 40,
+                            // left: 35,
+                            child: ClipPath(
+                              clipper: UpperNipMessageClipper(MessageType.send),
+                              child: AnimatedContainer(
+                                padding:
+                                    const EdgeInsets.fromLTRB(10, 8, 20, 0),
+                                duration: const Duration(microseconds: 300),
+                                // width: 24,
+                                // alignment: Alignment.center,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  // borderRadius: const BorderRadius.only(
+                                  //     topLeft: Radius.circular(8),
+                                  //     bottomLeft: Radius.circular(8),
+                                  //     bottomRight: Radius.circular(12)),
+
+                                  color: FineTheme.palettes.primary300,
+                                ),
+                                child: Center(
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        quantity.toString(),
+                                        style: FineTheme.typograhpy.subtitle1
+                                            .copyWith(color: Colors.white),
+                                      ),
+                                      const SizedBox(
+                                        width: 2,
+                                      ),
+                                      const Icon(
+                                        Icons.person,
+                                        size: 12,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(
+                                        width: 2,
+                                      ),
+                                      Text(
+                                        '|',
+                                        style: FineTheme.typograhpy.subtitle1
+                                            .copyWith(color: Colors.white),
+                                      ),
+                                      const SizedBox(
+                                        width: 2,
+                                      ),
+                                      Text(
+                                        'Ready: ',
+                                        style: FineTheme.typograhpy.caption1
+                                            .copyWith(color: Colors.white),
+                                      ),
+                                      model.partyStatus?.isReady == true
+                                          ? const Icon(
+                                              Icons.check_circle_rounded,
+                                              size: 15,
+                                              color: Colors.green,
+                                            )
+                                          : const Icon(
+                                              Icons.cancel,
+                                              size: 15,
+                                              color: Colors.red,
+                                            )
+                                    ],
                                   ),
-                                )
-                              : const SizedBox.shrink();
-                        },
-                      ));
-            },
-          ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink();
+          },
         ));
   }
 }

@@ -2,12 +2,15 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:fine/Accessories/cart_button.dart';
+import 'package:fine/View/cart_screen.dart';
 import 'package:fine/View/qrcode_screen.dart';
 import 'package:fine/View/box_screen.dart';
 import 'package:fine/View/Home/home.dart';
 import 'package:fine/View/order_history.dart';
 import 'package:fine/View/profile.dart';
 import 'package:fine/Utils/constrant.dart';
+import 'package:fine/ViewModel/cart_viewModel.dart';
+import 'package:fine/ViewModel/orderHistory_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/theme/color.dart';
@@ -132,33 +135,87 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   final screens = [
     const HomeScreen(),
     const OrderHistoryScreen(),
+    const CartScreen(),
     const ProfileScreen()
   ];
   final items = <Widget>[
-    SvgPicture.asset(
-      "assets/icons/Home.svg",
-      width: 32,
-      height: 32,
+    SizedBox(
+      width: 40,
+      height: 40,
+      child: Center(
+        child: SvgPicture.asset(
+          "assets/icons/Home.svg",
+          width: 32,
+          height: 32,
+        ),
+      ),
     ),
-    SvgPicture.asset(
-      "assets/icons/Order.svg",
-      width: 32,
-      height: 32,
+    SizedBox(
+      width: 40,
+      height: 40,
+      child: Center(
+        child: SvgPicture.asset(
+          "assets/icons/Order.svg",
+          width: 32,
+          height: 32,
+        ),
+      ),
     ),
-    // SvgPicture.asset(
-    //   "assets/icons/Scan.svg",
-    //   width: 32,
-    //   height: 32,
-    // ),
-    // SvgPicture.asset(
-    //   "assets/icons/Box.svg",
-    //   width: 32,
-    //   height: 32,
-    // ),
-    SvgPicture.asset(
-      "assets/icons/Profile.svg",
-      width: 32,
-      height: 32,
+    Stack(
+      children: [
+        SizedBox(
+          width: 40,
+          height: 40,
+          child: Center(
+            child: Image.asset(
+              "assets/icons/shopping-bag-02.png",
+              width: 32,
+              height: 32,
+            ),
+          ),
+        ),
+        ValueListenableBuilder(
+          valueListenable: Get.find<CartViewModel>().notifier,
+          builder: (context, value, child) {
+            return value != 0
+                ? Positioned(
+                    top: 2,
+                    left: 25,
+                    child: AnimatedContainer(
+                      duration: const Duration(microseconds: 300),
+                      width: 15,
+                      height: 15,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: FineTheme.palettes.primary50,
+                        //border: Border.all(color: Colors.grey),
+                      ),
+                      child: Center(
+                        child: Text(
+                          value.toString(),
+                          style: TextStyle(
+                              color: FineTheme.palettes.primary100,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700),
+                        ),
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink();
+          },
+        ),
+      ],
+    ),
+    SizedBox(
+      width: 40,
+      height: 40,
+      child: Center(
+        child: SvgPicture.asset(
+          "assets/icons/Profile.svg",
+          width: 32,
+          height: 32,
+        ),
+      ),
     ),
   ];
 

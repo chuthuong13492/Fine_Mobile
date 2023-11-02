@@ -6,6 +6,7 @@ import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/cart_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
+import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -32,6 +33,7 @@ class _CartScreenState extends State<CartScreen>
       new GlobalKey<RefreshIndicatorState>();
   CartViewModel? cartViewModel = Get.find<CartViewModel>();
   final party = Get.find<PartyOrderViewModel>();
+  final root = Get.find<RootViewModel>();
   AutoScrollController? controller;
   TabController? _tabController;
   final scrollDirection = Axis.vertical;
@@ -158,32 +160,40 @@ class _CartScreenState extends State<CartScreen>
             backgroundColor: Colors.white,
             elevation: 0.6,
             centerTitle: true,
-            leading: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(32),
-              ),
-              child: Material(
-                color: Colors.white,
-                child: InkWell(
-                  onTap: () {
-                    Get.back();
-                  },
-                  child: Icon(Icons.arrow_back_ios,
-                      size: 20, color: FineTheme.palettes.primary100),
-                ),
-              ),
-            ),
+            // leading: Container(
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(32),
+            //   ),
+            //   child: Material(
+            //     color: Colors.white,
+            //     child: InkWell(
+            //       onTap: () {
+            //         Get.back();
+            //       },
+            //       child: Icon(Icons.arrow_back_ios,
+            //           size: 20, color: FineTheme.palettes.primary100),
+            //     ),
+            //   ),
+            // ),
             title: Text("Giỏ hàng của bạn".toUpperCase(),
                 style: FineTheme.typograhpy.h2
                     .copyWith(color: FineTheme.palettes.primary100)),
           ),
-          bottomNavigationBar: onInit
-              ? const SizedBox.shrink()
-              : onTapBar == true
-                  ? bottomBar()
-                  : const SizedBox.shrink(),
+          // bottomNavigationBar: onInit
+          //     ? const SizedBox.shrink()
+          //     : onTapBar == true
+          //         ? bottomBar()
+          //         : const SizedBox.shrink(),
           body: ScopedModelDescendant<CartViewModel>(
             builder: (context, child, model) {
+              DateFormat inputFormat = DateFormat('HH:mm:ss');
+              DateTime arrive =
+                  inputFormat.parse(root.selectedTimeSlot!.arriveTime!);
+              DateTime checkout =
+                  inputFormat.parse(root.selectedTimeSlot!.checkoutTime!);
+              DateFormat outputFormat = DateFormat('HH:mm');
+              String arriveTime = outputFormat.format(arrive);
+              String checkoutTime = outputFormat.format(checkout);
               final cart = model.currentCart;
               final reOrderList = model.reOrderList;
               List<CartItem>? items;
@@ -199,228 +209,263 @@ class _CartScreenState extends State<CartScreen>
                   controller: _tabController,
                   children: [
                     items != null
-                        ? ListView.builder(
-                            itemCount: items.length,
-                            itemBuilder: (context, index) {
-                              bool checked = model.isCheckedList[index];
-                              final item = items![index];
-                              Color minusColor = FineTheme.palettes.neutral500;
-                              if (item.quantity >= 1) {
-                                minusColor = FineTheme.palettes.primary300;
-                              }
-                              Color plusColor = FineTheme.palettes.primary300;
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 16),
-                                child: Container(
-                                  color: FineTheme.palettes.shades100,
-                                  padding:
-                                      const EdgeInsets.fromLTRB(0, 12, 16, 12),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Checkbox(
-                                        activeColor:
-                                            FineTheme.palettes.primary100,
-                                        checkColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(100)),
-                                        value: checked,
-                                        onChanged: (value) {
-                                          model.changeValueChecked(
-                                              value!, index, item);
-                                        },
-                                      ),
-                                      const SizedBox(
-                                        width: 4,
-                                      ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                        ),
-                                        width: 90,
-                                        height: 90,
-                                        child: CacheStoreImage(
-                                          imageUrl: item.imgUrl ?? defaultImage,
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        width: 8,
-                                      ),
-                                      Expanded(
-                                        child: SizedBox(
-                                          height: 90,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    item.productName!,
-                                                    style: FineTheme
-                                                        .typograhpy.subtitle2
-                                                        .copyWith(
-                                                      color: FineTheme
-                                                          .palettes.shades200,
-                                                    ),
-                                                    maxLines: 3,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                  const SizedBox(
-                                                    height: 2,
-                                                  ),
-                                                  item.size != null
-                                                      ? Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                      .fromLTRB(
-                                                                  8, 4, 8, 4),
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        12),
-                                                            border: Border.all(
-                                                                width: 1.5,
-                                                                color: FineTheme
-                                                                    .palettes
-                                                                    .primary100),
-                                                          ),
-                                                          child: Text(
-                                                            "Size ${item.size}",
-                                                            style: FineTheme
-                                                                .typograhpy
-                                                                .subtitle2
-                                                                .copyWith(
-                                                                    color: FineTheme
-                                                                        .palettes
-                                                                        .primary100),
-                                                          ),
-                                                        )
-                                                      : Text(
-                                                          "Ngon nhắm, hãy thử ngay nào",
+                        ? Column(
+                            children: [
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: items.length,
+                                  itemBuilder: (context, index) {
+                                    bool checked = model.isCheckedList[index];
+                                    final item = items![index];
+                                    Color minusColor =
+                                        FineTheme.palettes.neutral500;
+                                    if (item.quantity >= 1) {
+                                      minusColor =
+                                          FineTheme.palettes.primary300;
+                                    }
+                                    Color plusColor =
+                                        FineTheme.palettes.primary300;
+                                    return Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: Container(
+                                        color: FineTheme.palettes.shades100,
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 12, 16, 12),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Checkbox(
+                                              activeColor:
+                                                  FineTheme.palettes.primary100,
+                                              checkColor: Colors.white,
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          100)),
+                                              value: checked,
+                                              onChanged: (value) {
+                                                model.changeValueChecked(
+                                                    value!, index, item);
+                                              },
+                                            ),
+                                            const SizedBox(
+                                              width: 4,
+                                            ),
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              width: 90,
+                                              height: 90,
+                                              child: CacheStoreImage(
+                                                imageUrl:
+                                                    item.imgUrl ?? defaultImage,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              width: 8,
+                                            ),
+                                            Expanded(
+                                              child: SizedBox(
+                                                height: 90,
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          item.productName!,
                                                           style: FineTheme
                                                               .typograhpy
-                                                              .caption1
+                                                              .subtitle2
                                                               .copyWith(
                                                             color: FineTheme
                                                                 .palettes
-                                                                .neutral500,
+                                                                .shades200,
                                                           ),
+                                                          maxLines: 3,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                         ),
-                                                ],
-                                              ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    formatPrice(item.fixTotal!),
-                                                    style: const TextStyle(
-                                                      fontFamily: "Montserrat",
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      color: Colors.red,
+                                                        const SizedBox(
+                                                          height: 2,
+                                                        ),
+                                                        item.size != null
+                                                            ? Container(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .fromLTRB(
+                                                                        8,
+                                                                        4,
+                                                                        8,
+                                                                        4),
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              12),
+                                                                  border: Border.all(
+                                                                      width:
+                                                                          1.5,
+                                                                      color: FineTheme
+                                                                          .palettes
+                                                                          .primary100),
+                                                                ),
+                                                                child: Text(
+                                                                  "Size ${item.size}",
+                                                                  style: FineTheme
+                                                                      .typograhpy
+                                                                      .subtitle2
+                                                                      .copyWith(
+                                                                          color: FineTheme
+                                                                              .palettes
+                                                                              .primary100),
+                                                                ),
+                                                              )
+                                                            : Text(
+                                                                "Ngon nhắm, hãy thử ngay nào",
+                                                                style: FineTheme
+                                                                    .typograhpy
+                                                                    .caption1
+                                                                    .copyWith(
+                                                                  color: FineTheme
+                                                                      .palettes
+                                                                      .neutral500,
+                                                                ),
+                                                              ),
+                                                      ],
                                                     ),
-                                                  ),
-                                                  Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      InkWell(
-                                                        child: Icon(
-                                                          Icons
-                                                              .remove_circle_outline,
-                                                          size: 25,
-                                                          color: minusColor,
-                                                        ),
-                                                        onTap: () async {
-                                                          if (item.quantity >=
-                                                              1) {
-                                                            if (item.quantity ==
-                                                                1) {
-                                                              await model
-                                                                  .deleteItem(
-                                                                      item,
-                                                                      index);
-                                                            } else {
-                                                              item.quantity--;
-                                                              await model
-                                                                  .updateItem(
-                                                                      item,
-                                                                      index,
-                                                                      false);
-                                                            }
-                                                          }
-                                                        },
-                                                      ),
-                                                      // SizedBox(
-                                                      //   width: 8,
-                                                      // ),
-                                                      Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                    .fromLTRB(
-                                                                12, 5, 12, 5),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                                // border: Border.all(color: Colors.grey),
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            8)),
-                                                        child: Text(
-                                                          item.quantity
-                                                              .toString(),
-                                                          style: FineTheme
-                                                              .typograhpy.h2
-                                                              .copyWith(
-                                                            color: Colors.black,
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          formatPrice(
+                                                              item.fixTotal!),
+                                                          style:
+                                                              const TextStyle(
+                                                            fontFamily:
+                                                                "Montserrat",
+                                                            fontSize: 14,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            color: Colors.red,
                                                           ),
                                                         ),
-                                                      ),
-                                                      // SizedBox(
-                                                      //   width: 1,
-                                                      // ),
-                                                      InkWell(
-                                                        child: Icon(
-                                                          Icons
-                                                              .add_circle_outline,
-                                                          size: 25,
-                                                          color: plusColor,
-                                                        ),
-                                                        onTap: () async {
-                                                          item.quantity++;
-                                                          await model
-                                                              .updateItem(item,
-                                                                  index, true);
-                                                        },
-                                                      )
-                                                    ],
-                                                  )
-                                                ],
-                                              )
-                                            ],
-                                          ),
+                                                        Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            InkWell(
+                                                              child: Icon(
+                                                                Icons
+                                                                    .remove_circle_outline,
+                                                                size: 25,
+                                                                color:
+                                                                    minusColor,
+                                                              ),
+                                                              onTap: () async {
+                                                                if (item.quantity >=
+                                                                    1) {
+                                                                  if (item.quantity ==
+                                                                      1) {
+                                                                    await model
+                                                                        .deleteItem(
+                                                                            item,
+                                                                            index);
+                                                                  } else {
+                                                                    item.quantity--;
+                                                                    await model
+                                                                        .updateItem(
+                                                                            item,
+                                                                            index,
+                                                                            false);
+                                                                  }
+                                                                }
+                                                              },
+                                                            ),
+                                                            // SizedBox(
+                                                            //   width: 8,
+                                                            // ),
+                                                            Container(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                          .fromLTRB(
+                                                                      12,
+                                                                      5,
+                                                                      12,
+                                                                      5),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                      // border: Border.all(color: Colors.grey),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              8)),
+                                                              child: Text(
+                                                                item.quantity
+                                                                    .toString(),
+                                                                style: FineTheme
+                                                                    .typograhpy
+                                                                    .h2
+                                                                    .copyWith(
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            // SizedBox(
+                                                            //   width: 1,
+                                                            // ),
+                                                            InkWell(
+                                                              child: Icon(
+                                                                Icons
+                                                                    .add_circle_outline,
+                                                                size: 25,
+                                                                color:
+                                                                    plusColor,
+                                                              ),
+                                                              onTap: () async {
+                                                                item.quantity++;
+                                                                await model
+                                                                    .updateItem(
+                                                                        item,
+                                                                        index,
+                                                                        true);
+                                                              },
+                                                            )
+                                                          ],
+                                                        )
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
+                              ),
+                              onTapBar == true
+                                  ? bottomBar()
+                                  : const SizedBox.shrink(),
+                            ],
                           )
                         : Center(
                             child: Text(
@@ -428,7 +473,7 @@ class _CartScreenState extends State<CartScreen>
                               style: FineTheme.typograhpy.subtitle1,
                             ),
                           ),
-                    reOrderList == null
+                    reOrderList != null
                         ? ListView.builder(
                             itemCount: 2,
                             itemBuilder: (context, index) {
@@ -488,7 +533,7 @@ class _CartScreenState extends State<CartScreen>
                                                         width: 4,
                                                       ),
                                                       Text(
-                                                        "12:00 - 12:00",
+                                                        "${arriveTime} - ${checkoutTime}",
                                                         style: FineTheme
                                                             .typograhpy
                                                             .caption1,
@@ -596,8 +641,8 @@ class _CartScreenState extends State<CartScreen>
           hasParty = false;
         }
         return Container(
-          height: 120,
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 60),
+          height: 180,
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 120),
           decoration: BoxDecoration(
             color: FineTheme.palettes.shades100,
             border: Border(

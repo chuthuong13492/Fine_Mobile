@@ -311,12 +311,14 @@ class ReOrderDTO {
   String? id;
   DateTime? checkInDate;
   int? itemQuantity;
+  String? stationName;
   List<ProductInReOrder>? listProductNameInReOrder;
 
   ReOrderDTO({
     this.id,
     this.checkInDate,
     this.itemQuantity,
+    this.stationName,
     this.listProductNameInReOrder,
   });
 
@@ -326,6 +328,7 @@ class ReOrderDTO {
         ? DateTime.parse(json['checkInDate'] as String)
         : null;
     itemQuantity = json["itemQuantity"];
+    stationName = json["stationName"];
     listProductNameInReOrder = json["listProductInReOrder"] == null
         ? null
         : (json["listProductInReOrder"] as List)

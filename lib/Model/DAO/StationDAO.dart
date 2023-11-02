@@ -29,8 +29,8 @@ class StationDAO extends BaseDAO {
     return null;
   }
 
-  Future<Uint8List?> getBoxById(String boxId) async {
-    final response = await request.get('/user-box/qrCode?boxId=$boxId',
+  Future<Uint8List?> getBoxById(String orderId) async {
+    final response = await request.get('/user-box/qrCode?orderId=$orderId',
         // queryParameters: {
         //   "boxId": boxId,
         // },
@@ -55,6 +55,7 @@ class StationDAO extends BaseDAO {
     if (res.data["data"] != null) {
       return true;
     }
+    return false;
   }
 
   Future<void> changeStation(String orderCode, int type,

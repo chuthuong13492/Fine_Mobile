@@ -203,11 +203,21 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
         Padding(
           padding: const EdgeInsets.only(left: 8, bottom: 16),
           child: isToday
-              ? Text(
-                  'Hôm nay 😋',
-                  style: FineTheme.typograhpy.h1,
+              ? Row(
+                  children: [
+                    Text(
+                      'Hôm nay 😋, ',
+                      style: FineTheme.typograhpy.subtitle1,
+                    ),
+                    Text(
+                      DateFormat('HH:mm').format(transaction.createdAt!),
+                      style: FineTheme.typograhpy.subtitle1,
+                    ),
+                  ],
                 )
-              : Text(DateFormat('dd/MM/yyyy').format(transaction.createdAt!),
+              : Text(
+                  DateFormat('dd/MM/yyyy, HH:mm')
+                      .format(transaction.createdAt!),
                   style: FineTheme.typograhpy.subtitle1
                       .copyWith(color: Colors.black)),
         ),

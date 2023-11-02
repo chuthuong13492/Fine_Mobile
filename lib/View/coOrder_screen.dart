@@ -68,7 +68,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     return ScopedModel(
       model: Get.find<PartyOrderViewModel>(),
       child: Scaffold(
-        floatingActionButton: const CartParty(),
+        // floatingActionButton: const CartParty(),
         backgroundColor: FineTheme.palettes.neutral200,
         bottomNavigationBar: bottomBar(),
         // drawer: InviteCoOrderScreen(),

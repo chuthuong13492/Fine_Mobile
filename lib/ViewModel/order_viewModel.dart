@@ -69,12 +69,13 @@ class OrderViewModel extends BaseModel {
         setState(ViewStatus.Loading);
       }
       codeParty = await getPartyCode();
-      if (codeParty!.contains("LPO")) {
-        isLinked = true;
-        if (isLinked == true) {
-          isPartyOrder = false;
+      isLinked = false;
+      if (codeParty != null) {
+        if (codeParty!.contains("LPO")) {
+          isLinked = true;
         }
       }
+
       // if (codeParty != null && codeParty!.contains("LPO")) {
       //   await party.joinPartyOrder(code: codeParty);
       // }
