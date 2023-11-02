@@ -190,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const HomeMenuSection(),
       // interalBanner(),
       buildVoucherSection(),
-      const HomeReOrderSection(),
+      // const HomeReOrderSection(),
       // const SizedBox(height: 10),
       // Container(
       //   color: FineTheme.palettes.primary50,

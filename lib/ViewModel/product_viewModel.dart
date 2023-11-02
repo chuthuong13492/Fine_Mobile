@@ -236,7 +236,6 @@ class ProductDetailViewModel extends BaseModel {
           await _dao!.checkProductToCart(checkCurrentCart!);
       if (result?.code == 4006) {
         Get.back();
-        await Get.find<CartViewModel>().removeCart();
         await showStatusDialog("assets/images/error.png", "Oops!",
             "Bạn chỉ có đặt 2 đơn trong 1 khung giờ thui!!");
         return false;

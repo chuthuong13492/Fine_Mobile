@@ -263,8 +263,6 @@ class OrderViewModel extends BaseModel {
             for (var item in result.order!.orderDetails!) {
               CartItem cartItem =
                   CartItem(item.id, "", "", "", 0, 0, item.quantity);
-              ConfirmCartItem martItem =
-                  ConfirmCartItem(item.id, item.quantity, "");
               await removeItemFromCart(cartItem);
             }
           }
@@ -377,13 +375,4 @@ class OrderViewModel extends BaseModel {
       setState(ViewStatus.Completed);
     }
   }
-
-  // Future<void> removeCart() async {
-  //   notifier.value = 0;
-  //   await deleteCart();
-  //   await deleteMart();
-  //   currentCart = await getCart();
-  //   setState(ViewStatus.Completed);
-  //   notifyListeners();
-  // }
 }

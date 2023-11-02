@@ -7,19 +7,24 @@ import 'package:get/get.dart';
 
 import '../Constant/view_status.dart';
 
+import '../Model/DAO/StoreDAO.dart';
 import '../Model/DTO/ConfirmCartDTO.dart';
+import '../Model/DTO/OrderDTO.dart';
 import '../Service/analytic_service.dart';
 import '../Utils/shared_pref.dart';
 import 'order_viewModel.dart';
 
 class CartViewModel extends BaseModel {
+  StoreDAO? _storeDAO;
   final root = Get.find<RootViewModel>();
   Cart? currentCart;
   List<bool> isCheckedList = List.generate(0, (index) => false);
+  List<ReOrderDTO>? reOrderList;
   double total = 0, fixTotal = 0, extraTotal = 0;
   int quantityChecked = 0;
 
   CartViewModel() {
+    _storeDAO = StoreDAO();
     currentCart = null;
   }
 
@@ -87,7 +92,7 @@ class CartViewModel extends BaseModel {
     ConfirmCart? cart = await getMart();
     if (cart != null) {
       if (cart.orderDetails!.isNotEmpty) {
-        ConfirmCartItem itemInCart = new ConfirmCartItem(
+        ConfirmCartItem itemInCart = ConfirmCartItem(
             cart.orderDetails![0].productId,
             cart.orderDetails![0].quantity - 1,
             null);
@@ -99,6 +104,27 @@ class CartViewModel extends BaseModel {
       } else {
         Get.find<OrderViewModel>().productRecomend = [];
       }
+    }
+  }
+
+  Future<void> getReOrder() async {
+    try {
+      setState(ViewStatus.Loading);
+      RootViewModel root = Get.find<RootViewModel>();
+      var currentTimeSlot = root.selectedTimeSlot;
+      // var currentMenu = root.selectedMenu;
+      if (root.status == ViewStatus.Error) {
+        setState(ViewStatus.Error);
+        return;
+      }
+      if (currentTimeSlot != null) {
+        reOrderList = await _storeDAO?.getReOrder(currentTimeSlot.id);
+      }
+
+      await Future.delayed(const Duration(microseconds: 500));
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      setState(ViewStatus.Completed);
     }
   }
 
@@ -115,6 +141,7 @@ class CartViewModel extends BaseModel {
           isCheckedList.add(false);
         }
       }
+      await Future.delayed(const Duration(microseconds: 500));
       setState(ViewStatus.Completed);
       notifyListeners();
     } catch (e) {

@@ -30,7 +30,7 @@ class _HomeReOrderSectionState extends State<HomeReOrderSection> {
   }
 
   void getReOrderList() async {
-    await _homeViewModel?.getReOrder();
+    // await _homeViewModel?.getReOrder();
   }
 
   @override

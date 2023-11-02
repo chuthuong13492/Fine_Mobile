@@ -65,7 +65,7 @@ class RootViewModel extends BaseModel {
     // fetchStore();
     await Get.find<HomeViewModel>().getMenus();
     await Get.find<HomeViewModel>().getProductListInTimeSlot();
-    await Get.find<HomeViewModel>().getReOrder();
+    await Get.find<CartViewModel>().getReOrder();
   }
 
   Future startUp() async {
@@ -79,7 +79,7 @@ class RootViewModel extends BaseModel {
     await Get.find<HomeViewModel>().getMenus();
     await Get.find<HomeViewModel>().getProductListInTimeSlot();
 
-    Get.find<HomeViewModel>().getReOrder();
+    Get.find<CartViewModel>().getReOrder();
     Get.find<BlogsViewModel>().getBlogs();
     await Get.find<RootViewModel>().checkCartAvailable();
     Get.find<RootViewModel>().checkHasParty();
@@ -327,7 +327,6 @@ class RootViewModel extends BaseModel {
   Future<void> navOrder() async {
     final cart = await getCart();
     if (cart != null) {
-      await Future.delayed(const Duration(microseconds: 500));
       await Get.toNamed(RouteHandler.CART_SCREEN);
     } else {
       showStatusDialog(
@@ -350,7 +349,6 @@ class RootViewModel extends BaseModel {
   Future<void> getListTimeSlot() async {
     DestinationDAO campusDAO = DestinationDAO();
     listTimeSlot = await campusDAO.getTimeSlot(DESTINATIONID);
-    // listAvailableTimeSlot = null;
     if (isNextDay == false) {
       for (int i = 0; i < listTimeSlot!.length; i++) {
         TimeSlotDTO element = listTimeSlot![i];
@@ -364,31 +362,23 @@ class RootViewModel extends BaseModel {
         previousTimeSlotList = listTimeSlot!;
         selectedTimeSlot = previousTimeSlotList![0];
         await refreshMenu();
-        notifyListeners();
       } else {
         if (listsAreEqual(listTimeSlot!, previousTimeSlotList!)) {
           previousTimeSlotList = listTimeSlot!;
           selectedTimeSlot = previousTimeSlotList![0];
           await refreshMenu();
-          // if (Get.currentRoute == "/order") {
-          //   await showStatusDialog("assets/images/error.png", "Oops!",
-          //       "Đã qua khung giờ mất ruìi");
-          //   // await Get.find<OrderViewModel>().removeCart();
-          //   Get.back();
-          // } else {
-          //   final cart = await getCart();
-          //   if (cart != null) {
-          //     // await Get.find<OrderViewModel>().removeCart();
-          //   }
-          // }
-          notifyListeners();
+          final cart = await getCart();
+          bool isCartAvailable = previousTimeSlotList!
+              .any((element) => element.id == cart?.timeSlotId);
+          if (isCartAvailable) {
+            await Get.find<CartViewModel>().removeCart();
+          }
         } else {
           previousTimeSlotList = listTimeSlot;
           if (isOnClick == true) {
             isOnClick = false;
             selectedTimeSlot = previousTimeSlotList![0];
             await refreshMenu();
-            notifyListeners();
           }
         }
       }
@@ -400,9 +390,9 @@ class RootViewModel extends BaseModel {
         previousTimeSlotList?.add(firstTimeSlot);
         selectedTimeSlot = firstTimeSlot;
         await refreshMenu();
-        notifyListeners();
       }
     }
+    notifyListeners();
   }
 
   Future<void> showProductByStore(SupplierDTO? supplierDTO,
