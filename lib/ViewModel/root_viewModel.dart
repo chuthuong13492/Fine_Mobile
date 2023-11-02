@@ -439,13 +439,11 @@ class RootViewModel extends BaseModel {
       }
 
       if (option == 1) {
-        // showLoadingDialog();
         selectedTimeSlot = timeSlot;
         Get.find<CartViewModel>().removeCart();
         deletePartyCode();
         party.partyOrderDTO = null;
         await refreshMenu();
-        // hideDialog();
         notifyListeners();
       }
     }

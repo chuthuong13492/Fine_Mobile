@@ -220,7 +220,10 @@ class _CartScreenState extends State<CartScreen>
               }
 
               if (model.status == ViewStatus.Loading) {
-                return _buildLoading();
+                // return _buildLoading();
+                return const Center(
+                  child: LoadingFine(),
+                );
               }
               if (model.status == ViewStatus.Completed) {
                 return TabBarView(
