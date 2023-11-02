@@ -15,6 +15,7 @@ import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
+import 'package:fine/ViewModel/cart_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/orderHistory_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
@@ -62,19 +63,21 @@ class OrderViewModel extends BaseModel {
   }
 
   Future<void> prepareOrder() async {
-    final party = Get.find<PartyOrderViewModel>();
+    // final party = Get.find<PartyOrderViewModel>();
     try {
       if (!Get.isDialogOpen!) {
         setState(ViewStatus.Loading);
       }
-      isLinked = party.isLinked;
-      if (isLinked == true) {
-        isPartyOrder = false;
-      }
       codeParty = await getPartyCode();
-      if (codeParty != null && codeParty!.contains("LPO")) {
-        await party.joinPartyOrder(code: codeParty);
+      if (codeParty!.contains("LPO")) {
+        isLinked = true;
+        if (isLinked == true) {
+          isPartyOrder = false;
+        }
       }
+      // if (codeParty != null && codeParty!.contains("LPO")) {
+      //   await party.joinPartyOrder(code: codeParty);
+      // }
       await getCurrentCart();
       if (currentCart != null) {
         if (currentCart!.orderDetails!.isEmpty &&
@@ -245,22 +248,30 @@ class OrderViewModel extends BaseModel {
           await delLockBox();
           await fetchStatus(result.order!.id!);
           final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
-          await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
-          await Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
-              arguments: {
-                "order": result.order,
-                // "isFetch": true,
-              });
-          // await showStatusDialog("assets/images/icon-success.png", 'Success',
-          //     'Bạn đã đặt hàng thành công');
-          if (Get.currentRoute == "/party_order_screen" ||
-              Get.currentRoute == "/order") {
+          orderHistoryViewModel.orderDTO = result.order;
+          // await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
+          await showStatusDialog("assets/images/icon-success.png", 'Success',
+              'Bạn đã đặt hàng thành công');
+
+          Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
+              arguments: {"order": result.order});
+          if (Get.currentRoute == "/party_order_screen") {
             Get.back();
           }
-          // removeCart();
+          final cart = await getCart();
+          if (cart != null) {
+            for (var item in result.order!.orderDetails!) {
+              CartItem cartItem =
+                  CartItem(item.id, "", "", "", 0, 0, item.quantity);
+              ConfirmCartItem martItem =
+                  ConfirmCartItem(item.id, item.quantity, "");
+              await removeItemFromCart(cartItem);
+            }
+          }
+          deleteMart();
+          await Get.find<CartViewModel>().getCurrentCart();
           deletePartyCode();
           final partyModel = Get.find<PartyOrderViewModel>();
-
           partyModel.partyOrderDTO = null;
           partyModel.partyCode = null;
           partyModel.isLinked = false;

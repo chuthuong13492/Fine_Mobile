@@ -157,7 +157,7 @@ class PartyOrderViewModel extends BaseModel {
             }
           }
         }
-        final cart = await getMart();
+        final cart = await getPartyCart();
         notifier.value = cart!.itemQuantity();
       }
       setState(ViewStatus.Completed);
@@ -475,13 +475,11 @@ class PartyOrderViewModel extends BaseModel {
         if (success!) {
           await deletePartyCode();
           Get.back();
+          await root.checkHasParty();
           showStatusDialog("assets/images/icon-success.png", "Thành công",
               "Hãy xem thử các món khác bạn nhé 😓");
           partyCode = await getPartyCode();
-          await Get.find<CartViewModel>().removeCart();
-          isLinked = false;
-          _orderViewModel.isPartyOrder = false;
-          partyOrderDTO = null;
+          deleteMart();
         } else {
           await showStatusDialog(
             "assets/images/error.png",

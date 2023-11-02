@@ -1,17 +1,12 @@
-import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Utils/format_phone.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/ViewModel/orderHistory_viewModel.dart';
-import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:scroll_to_index/scroll_to_index.dart';
 
 import '../Accessories/index.dart';
 import '../Model/DTO/index.dart';

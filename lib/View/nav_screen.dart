@@ -38,64 +38,73 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
 
       RemoteNotification notification = event.notification!;
 
-      if (event.data['type'] == 'ForInvitation') {
-        PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
-        int option = await showOptionDialog('${notification.body}');
-        if (option == 1) {
-          await deletePartyCode();
-          String code = event.data['key'];
-          await party.joinPartyOrder(code: code);
-          hideDialog();
-        }
-      } else {
-        await showStatusDialog("assets/images/icon-success.png",
-            notification.title!, notification.body!);
-        // final snackBar = SnackBar(
-        //     elevation: 0,
-        //     behavior: SnackBarBehavior.floating,
-        //     backgroundColor: Colors.transparent,
-        //     content: AwesomeSnackbarContent(
-        //         title: notification.title!,
-        //         message: notification.body!,
-        //         contentType: ContentType.success));
-        // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        // await showFlash(
-        //   context: context,
-        //   duration: const Duration(seconds: 4),
-        //   builder: (context, controller) {
-        //     return FlashBar(
-        //       controller: controller,
-        //       position: FlashPosition.bottom,
-        //       margin: const EdgeInsets.all(8),
-        //       shape: BeveledRectangleBorder(
-        //           borderRadius: BorderRadius.circular(8)),
-        //       dismissDirections: const [
-        //         FlashDismissDirection.startToEnd,
-        //         FlashDismissDirection.endToStart,
-        //         FlashDismissDirection.vertical,
-        //       ],
-        //       forwardAnimationCurve: Curves.easeInOut,
-        //       reverseAnimationCurve: Curves.slowMiddle,
-        //       backgroundColor: Colors.white,
-        //       icon: const Icon(
-        //         Icons.check,
-        //         color: Colors.green,
-        //       ),
-        //       content: Text(
-        //         notification.body!,
-        //         style: FineTheme.typograhpy.subtitle1,
-        //       ),
-        //       title: Text(
-        //         notification.title!,
-        //         style: FineTheme.typograhpy.h2,
-        //       ),
-        //     );
-        //   },
-        // );
+      switch (event.data["type"]) {
+        case 'ForInvitation':
+          PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+          int option = await showOptionDialog('${notification.body}');
+          if (option == 1) {
+            await deletePartyCode();
+            String code = event.data['key'];
+            await party.joinPartyOrder(code: code);
+            hideDialog();
+          }
+          break;
+        case 'ForPopup':
+          await showStatusDialog("assets/images/icon-success.png",
+              notification.title!, notification.body!);
+          break;
+        case 'ForRefund':
+          await showStatusDialog("assets/images/logo2.png", notification.title!,
+              notification.body!);
+          break;
+        case 'ForUsual':
+          await showFlash(
+            context: context,
+            duration: const Duration(seconds: 5),
+            builder: (context, controller) {
+              return FlashBar(
+                controller: controller,
+                position: FlashPosition.bottom,
+                margin: const EdgeInsets.all(8),
+                shape: BeveledRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
+                dismissDirections: const [
+                  FlashDismissDirection.startToEnd,
+                  FlashDismissDirection.endToStart,
+                  FlashDismissDirection.vertical,
+                ],
+                forwardAnimationCurve: Curves.easeInOut,
+                reverseAnimationCurve: Curves.slowMiddle,
+                backgroundColor: FineTheme.palettes.primary100,
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: FineTheme.palettes.shades100,
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: const Icon(
+                    Icons.check_circle_outline,
+                    color: Colors.green,
+                  ),
+                ),
+                content: Text(
+                  notification.body!,
+                  style: FineTheme.typograhpy.subtitle1
+                      .copyWith(color: Colors.white),
+                ),
+                title: Text(
+                  notification.title!,
+                  style: FineTheme.typograhpy.h2.copyWith(color: Colors.white),
+                ),
+              );
+            },
+          );
+          break;
+        default:
+          await showStatusDialog("assets/images/logo2.png", notification.title!,
+              notification.body!);
+          break;
       }
-
-      // await showStatusDialog(
-      //     "assets/images/logo2.png", notification.title!, notification.body!);
       print(event.data);
     });
   }
