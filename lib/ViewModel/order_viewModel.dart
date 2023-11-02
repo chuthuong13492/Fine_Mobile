@@ -262,7 +262,7 @@ class OrderViewModel extends BaseModel {
           if (cart != null) {
             for (var item in result.order!.orderDetails!) {
               CartItem cartItem =
-                  CartItem(item.id, "", "", "", 0, 0, item.quantity);
+                  CartItem(item.productId, "", "", "", 0, 0, item.quantity);
               await removeItemFromCart(cartItem);
             }
           }
