@@ -426,8 +426,8 @@ class RootViewModel extends BaseModel {
     if (timeSlot?.id != selectedTimeSlot?.id) {
       final cart = await getCart();
       PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
-
-      if (party.partyOrderDTO != null) {
+      final partyCode = await getPartyCode();
+      if (partyCode != null) {
         showStatusDialog('assets/images/logo2.png', "Đơn nhóm",
             "Bạn đang trong đơn nhóm nên hong thể đổi được khung giờ nè!");
         option = 0;
