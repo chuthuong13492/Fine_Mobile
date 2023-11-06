@@ -17,7 +17,7 @@ class StationDAO extends BaseDAO {
       queryParameters: {
         "destinationId": destinationId,
         "numberBox": quantity,
-        "orderId": orderId,
+        "orderCode": orderId,
       },
     );
     if (res.statusCode == 200) {
