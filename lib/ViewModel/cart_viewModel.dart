@@ -48,6 +48,7 @@ class CartViewModel extends BaseModel {
         await updateCheckItemFromCart(cartItem, value);
         await getTotalQuantity(value, cartItem);
       }
+      currentCart = await getCart();
       isSelected =
           currentCart!.items!.any((element) => element.isChecked == true);
 
