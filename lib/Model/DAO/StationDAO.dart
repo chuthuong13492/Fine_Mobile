@@ -9,13 +9,15 @@ import '../../Constant/stationList_status.dart';
 import 'index.dart';
 
 class StationDAO extends BaseDAO {
-  Future<StationStatus?> getStationList(String destinationId, int quantity,
+  Future<StationStatus?> getStationList(
+      String destinationId, int quantity, String orderId,
       {int? page, int? size}) async {
     final res = await request.get(
       '/station/order/',
       queryParameters: {
         "destinationId": destinationId,
         "numberBox": quantity,
+        "orderId": orderId,
       },
     );
     if (res.statusCode == 200) {

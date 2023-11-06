@@ -144,7 +144,7 @@ class OrderViewModel extends BaseModel {
     try {
       setState(ViewStatus.Loading);
       StationStatus? station = await _stationDAO?.getStationList(
-          DESTINATIONID, orderDTO!.boxQuantity!);
+          DESTINATIONID, orderDTO!.boxQuantity!, orderDTO!.id!);
       if (station?.listStation != null) {
         stationList = station?.listStation;
       }
