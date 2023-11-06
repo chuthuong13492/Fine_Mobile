@@ -26,6 +26,7 @@ import 'package:fine/View/product_filter_list.dart';
 import 'package:fine/View/profile.dart';
 import 'package:fine/View/qrcode_screen.dart';
 import 'package:fine/View/LoginScreen/sign_in.dart';
+import 'package:fine/View/reOrder_screen.dart';
 import 'package:fine/View/sign_up.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/View/station_picker_screen.dart';
@@ -155,9 +156,13 @@ class MyApp extends StatelessWidget {
                 builder: (context) =>
                     PrepareCoOrderScreen(dto: settings.arguments as dynamic),
                 settings: settings);
+          case RouteHandler.RE_ORDER_SCREEN:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => const ReOrderScreen(),
+                settings: settings);
           case RouteHandler.STATION_PICKER_SCREEN:
             return CupertinoPageRoute<bool>(
-                builder: (context) => StationPickerScreen(),
+                builder: (context) => const StationPickerScreen(),
                 settings: settings);
           case RouteHandler.PARTY_ORDER_SCREEN:
             return CupertinoPageRoute<bool>(
@@ -167,7 +172,8 @@ class MyApp extends StatelessWidget {
                 settings: settings);
           case RouteHandler.CONFIRM_ORDER_SCREEN:
             return CupertinoPageRoute<bool>(
-                builder: (context) => PartyConfirmScreen(), settings: settings);
+                builder: (context) => const PartyConfirmScreen(),
+                settings: settings);
           case RouteHandler.PRODUCT_FILTER_LIST:
             return CupertinoPageRoute<bool>(
                 builder: (context) => ProductsFilterPage(

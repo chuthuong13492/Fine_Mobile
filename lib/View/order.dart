@@ -137,7 +137,8 @@ class _OrderScreenState extends State<OrderScreen> {
                       ViewStatus status = model.status;
                       switch (status) {
                         case ViewStatus.Error:
-                          return ListView(
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Center(
                                 child: Text(
@@ -145,9 +146,13 @@ class _OrderScreenState extends State<OrderScreen> {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              Image.asset(
-                                'assets/images/error.png',
-                                fit: BoxFit.contain,
+                              Center(
+                                child: Image.asset(
+                                  'assets/images/error.png',
+                                  fit: BoxFit.contain,
+                                  height: 50,
+                                  width: 50,
+                                ),
                               ),
                             ],
                           );

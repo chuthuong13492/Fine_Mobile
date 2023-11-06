@@ -68,6 +68,22 @@ class OrderDAO extends BaseDAO {
     return null;
   }
 
+  Future<OrderDTO?> prepareReOrder(String orderId, int orderType) async {
+    if (orderId != null) {
+      // print("Request Note: " + note);
+      final res = await request.post('/order/reOrder', queryParameters: {
+        'orderId': orderId,
+        'orderType': orderType,
+      });
+      if (res.statusCode == 200) {
+        return OrderDTO.fromJson(res.data['data']);
+      }
+
+      return null;
+    }
+    return null;
+  }
+
   Future<OrderStatusDTO?> fetchOrderStatus(String orderId) async {
     final res = await request.get(
       'order/status/$orderId',

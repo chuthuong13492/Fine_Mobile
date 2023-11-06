@@ -32,6 +32,7 @@ class OrderDTO {
   bool? isPartyMode;
   int? itemQuantity;
   String? note;
+  List<String>? boxesCode;
   List<OrderDetails>? orderDetails;
 
   OrderDTO({
@@ -54,6 +55,7 @@ class OrderDTO {
     this.isPartyMode,
     this.itemQuantity,
     this.note,
+    this.boxesCode,
     this.orderDetails,
   });
 
@@ -87,6 +89,8 @@ class OrderDTO {
     isPartyMode = json["isPartyMode"];
     itemQuantity = json["itemQuantity"];
     note = json["note"];
+    boxesCode =
+        json['boxesCode'] != null ? List<String>.from(json['boxesCode']) : null;
     orderDetails = json["orderDetails"] == null
         ? null
         : (json["orderDetails"] as List)
@@ -135,13 +139,13 @@ class OrderDTO {
 
   Map<String, dynamic> toJsonAPi() {
     List<Map<String, dynamic>> listItem = [];
-    orderDetails!.forEach((element) {
+    for (var element in orderDetails!) {
       listItem.add(element.toJson());
-    });
+    }
     List<Map<String, dynamic>> listOtherAmount = [];
-    otherAmounts!.forEach((element) {
+    for (var element in otherAmounts!) {
       listOtherAmount.add(element.toJson());
-    });
+    }
 
     Map<String, dynamic> map = {
       "id": id,

@@ -50,10 +50,11 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
   }
 
   Widget _buildOrderInfo() {
+    String boxCode = widget.order.boxesCode!.map((e) => e).join(', ');
     return Container(
       padding: const EdgeInsets.all(16),
       width: Get.width,
-      height: 160,
+      height: 170,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.all(
@@ -75,17 +76,14 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                       color: FineTheme.palettes.shades200),
                 ),
               ),
-              SizedBox(
-                width: 180,
-                child: Text(
-                  widget.order.orderCode!,
-                  style: const TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                      fontStyle: FontStyle.normal),
-                  overflow: TextOverflow.ellipsis,
-                ),
+              Text(
+                widget.order.orderCode!,
+                style: const TextStyle(
+                    fontFamily: 'Montserrat',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    fontStyle: FontStyle.normal),
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -173,6 +171,30 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.right,
                 ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Mã box:',
+                  style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      fontStyle: FontStyle.normal,
+                      color: FineTheme.palettes.shades200),
+                ),
+              ),
+              Text(
+                boxCode,
+                style: const TextStyle(
+                    fontFamily: 'Montserrat',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    fontStyle: FontStyle.normal),
               ),
             ],
           ),

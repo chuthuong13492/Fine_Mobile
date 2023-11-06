@@ -89,7 +89,11 @@ class CartViewModel extends BaseModel {
       if (confirmCart != null) {
         await getProductRecommend();
         await Future.delayed(const Duration(microseconds: 500));
-        Get.toNamed(RouteHandler.ORDER);
+        await Get.find<OrderViewModel>().prepareOrder();
+        final error = Get.find<OrderViewModel>().errorMessage;
+        if (error == null) {
+          Get.toNamed(RouteHandler.ORDER);
+        }
       }
     } catch (e) {
       throw e;
@@ -144,6 +148,8 @@ class CartViewModel extends BaseModel {
       notifier.value = currentCart!.itemQuantity();
       if (currentCart == null) {
         notifier.value = 0;
+        quantityChecked = 0;
+        total = 0;
       }
       bool hasChecked =
           currentCart!.items!.any((element) => element.isChecked == true);

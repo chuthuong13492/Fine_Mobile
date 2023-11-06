@@ -23,6 +23,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../Accessories/dialog.dart';
+import '../Model/DTO/index.dart';
 import '../Utils/shared_pref.dart';
 import '../ViewModel/partyOrder_viewModel.dart';
 
@@ -55,6 +56,36 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
         case 'ForPopup':
           await showStatusDialog("assets/images/icon-success.png",
               notification.title!, notification.body!);
+          break;
+        case 'ForFinishOrder':
+          OrderDTO? dto;
+          if (event.data["orderId"] != null) {
+            await Get.find<OrderHistoryViewModel>()
+                .getOrderByOrderId(id: event.data["orderId"]);
+            if (Get.find<OrderHistoryViewModel>().orderDTO != null) {
+              if (Get.find<OrderHistoryViewModel>().orderDTO!.id ==
+                  event.data["orderId"]) {
+                dto = Get.find<OrderHistoryViewModel>().orderDTO!;
+              }
+            }
+          }
+          if (Get.currentRoute == "/qrcode_screen") {
+            if (dto != null) {
+              final otherAmounts =
+                  dto.otherAmounts!.firstWhere((element) => element.type == 1);
+              await showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
+                  otherAmounts.amount!, dto.finalAmount!);
+            }
+            Get.back();
+          } else {
+            if (dto != null) {
+              final otherAmounts =
+                  dto.otherAmounts!.firstWhere((element) => element.type == 1);
+              await showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
+                  otherAmounts.amount!, dto.finalAmount!);
+            }
+          }
+
           break;
         case 'ForRefund':
           if (event.data["orderId"] != null) {

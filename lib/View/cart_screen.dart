@@ -1,10 +1,12 @@
 import 'package:fine/Accessories/index.dart';
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/cart_viewModel.dart';
 import 'package:fine/ViewModel/home_viewModel.dart';
+import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
@@ -516,7 +518,7 @@ class _CartScreenState extends State<CartScreen>
   Widget buildReOrder(
       List<ReOrderDTO> list, String arriveTime, String checkoutTime) {
     return ListView.builder(
-      itemCount: 2,
+      itemCount: list.length,
       itemBuilder: (context, index) {
         String dayFormat = DateFormat('dd').format(list[index].checkInDate!);
         String dateFormat =
@@ -593,7 +595,11 @@ class _CartScreenState extends State<CartScreen>
                         ),
                       ),
                       InkWell(
-                          onTap: () async {},
+                          onTap: () async {
+                            await Get.find<OrderViewModel>()
+                                .createReOrder(list[index].id!);
+                            Get.toNamed(RouteHandler.RE_ORDER_SCREEN);
+                          },
                           child: Row(
                             children: [
                               Text(

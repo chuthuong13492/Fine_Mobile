@@ -275,6 +275,14 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         isSuccess = true;
         text = "Đã hoàn thành";
         break;
+      case 12:
+        isSuccess = false;
+        text = "Đã huy";
+        break;
+      case 13:
+        isSuccess = false;
+        text = "Đã huy";
+        break;
       default:
         isSuccess = false;
         text = "Đang thực hiện";
@@ -304,8 +312,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       child: Column(
         children: [
           ListTile(
-              onTap: () {
-                _onTapOrderHistory(orderDTO);
+              onTap: () async {
+                if (status != 12 || status != 13) {
+                  _onTapOrderHistory(orderDTO);
+                } else {
+                  await showStatusDialog("assets/images/logo2.png", "Oops!",
+                      "Đơn này đã bị hủy mất rùi!!");
+                }
               },
               contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               leading: IconButton(

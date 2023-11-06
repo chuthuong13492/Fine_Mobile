@@ -118,6 +118,7 @@ class OrderViewModel extends BaseModel {
       if (e.response?.data["statusCode"] == 400) {
         String errorMsg = e.response?.data["message"];
         errorMessage = errorMsg;
+        Get.back;
         showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
             "Hiện tại khung giờ này đã đóng vào lúc ${root.selectedTimeSlot!.closeTime}, bạn hãy xem khung giờ khác nhé 😃.");
         // await removeCart();
@@ -282,6 +283,8 @@ class OrderViewModel extends BaseModel {
           partyModel.isLinked = false;
         }
         if (result.statusCode == 400) {
+          orderDTO!.stationDTO = null;
+          await delLockBox();
           Get.back();
           String errorMsg = result.message!;
           errorMessage = errorMsg;
@@ -289,6 +292,8 @@ class OrderViewModel extends BaseModel {
               "assets/images/error.png", "Oops!", "Số dư trong ví hong đủ!!");
           setState(ViewStatus.Completed);
         } else if (result.statusCode == 404) {
+          orderDTO!.stationDTO = null;
+          await delLockBox();
           String errorMsg = result.message!;
           errorMessage = errorMsg;
           await showStatusDialog(
@@ -306,13 +311,27 @@ class OrderViewModel extends BaseModel {
     }
   }
 
+  Future<void> createReOrder(String orderId) async {
+    try {
+      setState(ViewStatus.Loading);
+      orderDTO =
+          await _dao?.prepareReOrder(orderId, root!.isNextDay == true ? 2 : 1);
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      setState(ViewStatus.Error);
+    }
+  }
+
   Future<void> fetchStatus(String orderId) async {
     try {
       setState(ViewStatus.Loading);
       orderStatusDTO = await _dao!.fetchOrderStatus(orderId);
       if (orderStatusDTO != null) {
         if (orderStatusDTO?.orderStatus == 13) {
-          Get.back();
+          if (Get.currentRoute == "/checking_order_screen" ||
+              Get.currentRoute == "/order_detail") {
+            Get.back();
+          }
           await showStatusDialog(
               "assets/images/logo2.png", "Oops!", "Đơn hàng đã bị hủy mất rùi");
         }
@@ -374,7 +393,7 @@ class OrderViewModel extends BaseModel {
       setState(ViewStatus.Loading);
       RootViewModel root = Get.find<RootViewModel>();
       currentCart = await getMart();
-      // currentCart?.addProperties(root.isNextDay == true ? 2 : 1);
+      currentCart?.addProperties(root.isNextDay == true ? 2 : 1);
       // Cart? cart = await getMart();
       // if (currentCart == null) {
       //   notifier.value = 0;
