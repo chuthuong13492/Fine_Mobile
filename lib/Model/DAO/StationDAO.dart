@@ -13,11 +13,11 @@ class StationDAO extends BaseDAO {
       String destinationId, int quantity, String orderCode,
       {int? page, int? size}) async {
     final res = await request.get(
-      '/station/order/',
+      '/station/order',
       queryParameters: {
         "destinationId": destinationId,
-        "numberBox": quantity,
         "orderCode": orderCode,
+        "numberBox": quantity,
       },
     );
     if (res.statusCode == 200) {

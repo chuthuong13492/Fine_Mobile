@@ -161,9 +161,9 @@ class CartViewModel extends BaseModel {
           quantityChecked += item.quantity;
         }
       }
-      bool hasChecked =
+      isSelected =
           currentCart!.items!.any((element) => element.isChecked == true);
-      if (hasChecked == false) {
+      if (isSelected == false) {
         await deleteMart();
       }
       setState(ViewStatus.Completed);
