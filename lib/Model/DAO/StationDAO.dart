@@ -47,7 +47,7 @@ class StationDAO extends BaseDAO {
   Future<bool?> lockBoxOrder(
       String stationId, String orderCode, int numberBox) async {
     final res = await request.post(
-      '/station/orderBox/',
+      '/station/orderBox',
       queryParameters: {
         "stationId": stationId,
         "orderCode": orderCode,
@@ -63,7 +63,7 @@ class StationDAO extends BaseDAO {
   Future<void> changeStation(String orderCode, int type,
       {String? stationId}) async {
     final res = await request.put(
-      '/station/orderBox/',
+      '/station/orderBox',
       queryParameters: {
         "stationId": stationId,
         "orderCode": orderCode,
