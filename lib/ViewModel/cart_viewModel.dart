@@ -150,6 +150,16 @@ class CartViewModel extends BaseModel {
         notifier.value = 0;
         quantityChecked = 0;
         total = 0;
+      } else {
+        final listChecked = currentCart?.items
+            ?.where((element) => element.isChecked == true)
+            .toList();
+        quantityChecked = 0;
+        total = 0;
+        for (var item in listChecked!) {
+          total += item.fixTotal!;
+          quantityChecked += item.quantity;
+        }
       }
       bool hasChecked =
           currentCart!.items!.any((element) => element.isChecked == true);
@@ -176,15 +186,15 @@ class CartViewModel extends BaseModel {
   }
 
   Future<void> updateItem(CartItem item, int index, bool isIncrease) async {
-    if (item.isChecked == true) {
-      if (isIncrease == true) {
-        total -= item.fixTotal!;
-        quantityChecked -= (item.quantity - 1);
-      } else {
-        total -= item.fixTotal!;
-        quantityChecked -= (item.quantity + 1);
-      }
-    }
+    // if (item.isChecked == true) {
+    //   if (isIncrease == true) {
+    //     total -= item.fixTotal!;
+    //     quantityChecked -= (item.quantity - 1);
+    //   } else {
+    //     total -= item.fixTotal!;
+    //     quantityChecked -= (item.quantity + 1);
+    //   }
+    // }
 
     fixTotal = item.price! * item.quantity;
     final cartItem = CartItem(item.productId, item.productName, item.imgUrl,
@@ -195,6 +205,21 @@ class CartViewModel extends BaseModel {
     await removeItemFromMart(confirmCartItem);
     currentCart = await getCart();
     notifier.value = currentCart!.itemQuantity();
+    if (currentCart == null) {
+      notifier.value = 0;
+      quantityChecked = 0;
+      total = 0;
+    } else {
+      final listChecked = currentCart?.items
+          ?.where((element) => element.isChecked == true)
+          .toList();
+      quantityChecked = 0;
+      total = 0;
+      for (var item in listChecked!) {
+        total += item.fixTotal!;
+        quantityChecked += item.quantity;
+      }
+    }
     notifyListeners();
   }
 

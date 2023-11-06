@@ -28,7 +28,7 @@ class ReOrderScreen extends StatefulWidget {
 
 class _ReOrderScreenState extends State<ReOrderScreen> {
   OrderViewModel? _orderViewModel = Get.find<OrderViewModel>();
-  bool onInit = true;
+  // bool onInit = true;
   AutoScrollController? controller;
   final scrollDirection = Axis.vertical;
 
@@ -697,183 +697,174 @@ class _ReOrderScreenState extends State<ReOrderScreen> {
               shippingFee = item.amount!;
             }
           }
-          return onInit
-              ? const SizedBox.shrink()
-              : Container(
-                  padding: const EdgeInsets.only(left: 8, right: 8, top: 12),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey,
-                        offset: Offset(0.0, 1.0), //(x,y)
-                        blurRadius: 6.0,
-                      ),
-                    ],
-                    borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(40),
-                        topLeft: Radius.circular(40)),
-                  ),
-                  child: Container(
-                    child: ListView(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
+          return Container(
+            padding: const EdgeInsets.only(left: 8, right: 8, top: 12),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey,
+                  offset: Offset(0.0, 1.0), //(x,y)
+                  blurRadius: 6.0,
+                ),
+              ],
+              borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(40), topLeft: Radius.circular(40)),
+            ),
+            child: Container(
+              child: ListView(
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: InkWell(
-                                      onTap: () {},
-                                      child: Row(
-                                        children: const [
-                                          Text(
-                                            'Thêm Voucher',
-                                            style: TextStyle(
-                                                fontFamily: 'Montserrat',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w700,
-                                                fontStyle: FontStyle.normal),
-                                          ),
-                                          SizedBox(
-                                            width: 20,
-                                          ),
-                                          Icon(
-                                            Icons.keyboard_arrow_up,
-                                            size: 24,
-                                          )
-                                        ],
-                                      ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {},
+                                child: Row(
+                                  children: const [
+                                    Text(
+                                      'Thêm Voucher',
+                                      style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          fontStyle: FontStyle.normal),
                                     ),
-                                  ),
-                                  Container(
-                                    width: 102,
-                                    child: InkWell(
-                                      onTap: () {},
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: const [
-                                          Text(
-                                            'Ví Fine',
-                                            style: TextStyle(
-                                                fontFamily: 'Montserrat',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w700,
-                                                fontStyle: FontStyle.normal),
-                                          ),
-                                          SizedBox(
-                                            width: 20,
-                                          ),
-                                          Icon(
-                                            Icons.keyboard_arrow_up,
-                                            size: 24,
-                                          )
-                                        ],
-                                      ),
+                                    SizedBox(
+                                      width: 20,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 15),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Phí giao hàng',
-                                          style: TextStyle(
-                                              fontFamily: 'Montserrat',
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w700,
-                                              fontStyle: FontStyle.normal),
-                                        ),
-                                        Text(
-                                          formatPrice(shippingFee!),
-                                          style: const TextStyle(
-                                              fontFamily: 'Montserrat',
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w400,
-                                              fontStyle: FontStyle.normal),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 102,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          '',
-                                          style: TextStyle(
-                                              fontFamily: 'Montserrat',
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w700,
-                                              fontStyle: FontStyle.normal),
-                                        ),
-                                        Text(
-                                          formatPrice(
-                                              model.orderDTO!.finalAmount!),
-                                          style: const TextStyle(
-                                              fontFamily: 'Montserrat',
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w700,
-                                              fontStyle: FontStyle.normal),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 18),
-                              Center(
-                                child: InkWell(
-                                  onTap: () async {
-                                    await model.orderCart();
-                                  },
-                                  child: Container(
-                                    width: 190,
-                                    height: 40,
-                                    decoration: const BoxDecoration(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(20)),
-                                        color: Color(0xFF238E9C)),
-                                    child: const Center(
-                                      child: Text("Đặt ngay",
-                                          // isCurrentTimeSlotAvailable
-                                          //     ? "Đặt ngay"
-                                          //     : "Khung giờ đã kết thúc",
-                                          style: TextStyle(
-                                              fontFamily: 'Montserrat',
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w700,
-                                              fontStyle: FontStyle.normal,
-                                              color: Colors.white)),
-                                    ),
-                                  ),
+                                    Icon(
+                                      Icons.keyboard_arrow_up,
+                                      size: 24,
+                                    )
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 18),
-                            ],
+                            ),
+                            Container(
+                              width: 102,
+                              child: InkWell(
+                                onTap: () {},
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: const [
+                                    Text(
+                                      'Ví Fine',
+                                      style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          fontStyle: FontStyle.normal),
+                                    ),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    Icon(
+                                      Icons.keyboard_arrow_up,
+                                      size: 24,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 15),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Phí giao hàng',
+                                    style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        fontStyle: FontStyle.normal),
+                                  ),
+                                  Text(
+                                    formatPrice(shippingFee!),
+                                    style: const TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w400,
+                                        fontStyle: FontStyle.normal),
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              width: 102,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    '',
+                                    style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        fontStyle: FontStyle.normal),
+                                  ),
+                                  Text(
+                                    formatPrice(model.orderDTO!.finalAmount!),
+                                    style: const TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        fontStyle: FontStyle.normal),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 18),
+                        Center(
+                          child: InkWell(
+                            onTap: () async {
+                              await model.orderCart();
+                            },
+                            child: Container(
+                              width: 190,
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20)),
+                                  color: Color(0xFF238E9C)),
+                              child: const Center(
+                                child: Text("Đặt ngay",
+                                    // isCurrentTimeSlotAvailable
+                                    //     ? "Đặt ngay"
+                                    //     : "Khung giờ đã kết thúc",
+                                    style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        fontStyle: FontStyle.normal,
+                                        color: Colors.white)),
+                              ),
+                            ),
                           ),
                         ),
+                        const SizedBox(height: 18),
                       ],
                     ),
                   ),
-                );
+                ],
+              ),
+            ),
+          );
         },
       ),
     );
