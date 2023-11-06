@@ -277,11 +277,11 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         break;
       case 12:
         isSuccess = false;
-        text = "Đã huy";
+        text = "Đã hủy";
         break;
       case 13:
         isSuccess = false;
-        text = "Đã huy";
+        text = "Đã hủy";
         break;
       default:
         isSuccess = false;
