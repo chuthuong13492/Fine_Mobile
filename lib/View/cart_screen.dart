@@ -277,7 +277,7 @@ class _CartScreenState extends State<CartScreen>
                 return TabBarView(
                   controller: _tabController,
                   children: [
-                    cart!.items != null
+                    cart != null
                         ? Column(
                             children: [
                               Expanded(

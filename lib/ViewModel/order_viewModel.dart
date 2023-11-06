@@ -310,6 +310,13 @@ class OrderViewModel extends BaseModel {
     try {
       setState(ViewStatus.Loading);
       orderStatusDTO = await _dao!.fetchOrderStatus(orderId);
+      if (orderStatusDTO != null) {
+        if (orderStatusDTO?.orderStatus == 13) {
+          Get.back();
+          await showStatusDialog(
+              "assets/images/logo2.png", "Oops!", "Đơn hàng đã bị hủy mất rùi");
+        }
+      }
       setState(ViewStatus.Completed);
     } catch (e) {
       // orderStatusDTO = null;

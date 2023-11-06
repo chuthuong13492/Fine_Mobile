@@ -9,6 +9,7 @@ import 'package:fine/Utils/format_price.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/View/station_picker_screen.dart';
+import 'package:fine/ViewModel/cart_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
@@ -586,9 +587,27 @@ class _OrderScreenState extends State<OrderScreen> {
                         // model.master = product;
                         final prodAttributes = ProductAttributes(
                           id: product.id,
+                          size: product.size,
                         );
                         model.selectAttribute = prodAttributes;
+                        model.total = product.price;
+                        model.count = 1;
+                        model.master = ProductDTO(
+                            productName: product.name,
+                            imageUrl: product.imageUrl);
                         await model.addProductToCart();
+                        CartItem cartItem = CartItem(
+                            product.id,
+                            product.name,
+                            product.imageUrl,
+                            product.size,
+                            product.price,
+                            product.price,
+                            1,
+                            true);
+                        await Get.find<CartViewModel>()
+                            .changeValueChecked(true, cartItem);
+                        await _orderViewModel?.prepareOrder();
                       },
                       child: Icon(
                         Icons.add_circle_outline,
