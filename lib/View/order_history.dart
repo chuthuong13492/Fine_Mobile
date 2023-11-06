@@ -146,13 +146,16 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         );
       } else if (status == ViewStatus.Empty ||
           orderSummaryList == null ||
-          orderSummaryList.length == 0) {
+          orderSummaryList.isEmpty) {
         return Center(
           child: Container(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Bạn chưa đặt đơn hàng nào hôm nay 😵'),
+                Text(
+                  'Bạn chưa đặt đơn hàng nào hôm nay 😵',
+                  style: FineTheme.typograhpy.subtitle2,
+                ),
                 MaterialButton(
                   onPressed: () {
                     Get.offAndToNamed(RouteHandler.NAV);

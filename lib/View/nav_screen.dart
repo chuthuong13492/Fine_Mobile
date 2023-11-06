@@ -57,6 +57,11 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
               notification.title!, notification.body!);
           break;
         case 'ForRefund':
+          if (event.data["orderId"] != null) {
+            await Get.find<OrderHistoryViewModel>()
+                .getOrderByOrderId(id: event.data["orderId"]);
+          }
+
           await showStatusDialog("assets/images/logo2.png", notification.title!,
               notification.body!);
           break;
@@ -78,26 +83,30 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
                 ],
                 forwardAnimationCurve: Curves.easeInOut,
                 reverseAnimationCurve: Curves.slowMiddle,
-                backgroundColor: FineTheme.palettes.primary100,
-                icon: Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: FineTheme.palettes.shades100,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: const Icon(
-                    Icons.check_circle_outline,
-                    color: Colors.green,
+                backgroundColor: FineTheme.palettes.primary50,
+                icon: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: FineTheme.palettes.shades100,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: const Icon(
+                      Icons.check_circle_outline,
+                      color: Colors.green,
+                    ),
                   ),
                 ),
                 content: Text(
                   notification.body!,
                   style: FineTheme.typograhpy.subtitle1
-                      .copyWith(color: Colors.white),
+                      .copyWith(color: FineTheme.palettes.primary100),
                 ),
                 title: Text(
                   notification.title!,
-                  style: FineTheme.typograhpy.h2.copyWith(color: Colors.white),
+                  style: FineTheme.typograhpy.h2
+                      .copyWith(color: FineTheme.palettes.primary100),
                 ),
               );
             },
@@ -177,31 +186,40 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
         ValueListenableBuilder(
           valueListenable: Get.find<CartViewModel>().notifier,
           builder: (context, value, child) {
-            return value != 0
-                ? Positioned(
-                    top: 2,
-                    left: 25,
-                    child: AnimatedContainer(
-                      duration: const Duration(microseconds: 300),
-                      width: 15,
-                      height: 15,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: FineTheme.palettes.primary50,
-                        //border: Border.all(color: Colors.grey),
-                      ),
-                      child: Center(
-                        child: Text(
-                          value.toString(),
-                          style: TextStyle(
-                              color: FineTheme.palettes.primary100,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700),
-                        ),
-                      ),
+            bool check = false;
+            if (value as int > 99) {
+              check = true;
+            } else {
+              check = false;
+            }
+            if (value != 0) {
+              return Positioned(
+                top: 2,
+                left: check ? 20 : 25,
+                child: AnimatedContainer(
+                  duration: const Duration(microseconds: 300),
+                  width: check ? 20 : 15,
+                  height: 15,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.red,
+                    //border: Border.all(color: Colors.grey),
+                  ),
+                  child: Center(
+                    child: Text(
+                      check ? "99" : value.toString(),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight:
+                              check ? FontWeight.w500 : FontWeight.w600),
                     ),
-                  )
-                : const SizedBox.shrink();
+                  ),
+                ),
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
           },
         ),
       ],

@@ -66,7 +66,7 @@ class _CartButtonState extends State<CartButton> {
                     curve: Curves.easeInOut,
                     margin: model.isCartRoute == false
                         ? const EdgeInsets.only(bottom: 40, right: 5)
-                        : const EdgeInsets.only(bottom: 120, right: 5),
+                        : const EdgeInsets.only(bottom: 160, right: 5),
                     child: FloatingActionButton(
                       backgroundColor: Colors.transparent,
                       elevation: 4,
@@ -217,7 +217,7 @@ class _CartButtonState extends State<CartButton> {
                                           : const Icon(
                                               Icons.cancel,
                                               size: 15,
-                                              color: Colors.red,
+                                              color: Colors.white,
                                             )
                                     ],
                                   ),

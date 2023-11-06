@@ -246,7 +246,9 @@ class OrderViewModel extends BaseModel {
         }
 
         if (result!.statusCode == 200) {
-          await delLockBox();
+          // await delLockBox();
+          timeRemaining = 0;
+          notifierTimeRemaining.value = 0;
           await fetchStatus(result.order!.id!);
           final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
           orderHistoryViewModel.orderDTO = result.order;
@@ -262,13 +264,17 @@ class OrderViewModel extends BaseModel {
           final cart = await getMart();
           if (cart != null) {
             for (var item in cart.orderDetails!) {
-              CartItem cartItem =
-                  CartItem(item.productId, "", "", "", 0, 0, item.quantity);
+              CartItem cartItem = CartItem(
+                  item.productId, "", "", "", 0, 0, item.quantity, false);
               await removeItemFromCart(cartItem);
             }
           }
           deleteMart();
-          await Get.find<CartViewModel>().getCurrentCart();
+          final cartModel = Get.find<CartViewModel>();
+          cartModel.total = 0;
+          cartModel.quantityChecked = 0;
+          cartModel.notifier.value = 0;
+          await cartModel.getCurrentCart();
           deletePartyCode();
           final partyModel = Get.find<PartyOrderViewModel>();
           partyModel.partyOrderDTO = null;

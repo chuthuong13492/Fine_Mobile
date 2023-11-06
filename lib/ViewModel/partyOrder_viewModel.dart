@@ -127,7 +127,7 @@ class PartyOrderViewModel extends BaseModel {
       if (result!.statusCode == 404 && partyCode != null) {
         Get.back();
         await deletePartyCode();
-        await _cartViewModel.removeCart();
+        await deleteMart();
         partyCode = null;
         partyOrderDTO = null;
       }
@@ -135,7 +135,7 @@ class PartyOrderViewModel extends BaseModel {
         if (result.partyOrderDTO!.isPayment == true) {
           Get.back();
           await deletePartyCode();
-          await _cartViewModel.removeCart();
+          await deleteMart();
           partyCode = null;
           partyOrderDTO = null;
         }
@@ -268,7 +268,13 @@ class PartyOrderViewModel extends BaseModel {
             await _partyDAO?.addProductToParty(partyCode, cart: cart);
       }
       await getPartyOrder();
-      Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+      Get.rawSnackbar(
+          message: "Thêm thành công ✓",
+          duration: const Duration(seconds: 3),
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.only(left: 8, right: 8, bottom: 32),
+          borderRadius: 8);
+      // Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
       setState(ViewStatus.Completed);
       notifyListeners();
     } catch (e) {
@@ -469,8 +475,16 @@ class PartyOrderViewModel extends BaseModel {
             partyCode!, id, isLinked == true ? 2 : 1);
         // await Future.delayed(const Duration(microseconds: 500));
         if (success!) {
+          final cart = await getCart();
+          if (cart != null) {
+            final items = cart.items!
+                .where((element) => element.isChecked == true)
+                .toList();
+            for (var i = 0; i < items.length; i++) {
+              await updateCheckItemFromCart(items[i], false);
+            }
+          }
           notifier.value = 0;
-          _cartViewModel.isCheckedList = [];
           _cartViewModel.total = 0;
           _cartViewModel.quantityChecked = 0;
           await _cartViewModel.getCurrentCart();

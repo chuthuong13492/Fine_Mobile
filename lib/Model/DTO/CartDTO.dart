@@ -80,6 +80,17 @@ class Cart {
     items!.add(item);
   }
 
+  void insertItem(CartItem item) {
+    for (CartItem cart in items!) {
+      if (cart.findCartItem(item)) {
+        cart.quantity += item.quantity;
+
+        return;
+      }
+    }
+    items!.insert(0, item);
+  }
+
   void removeItem(CartItem item) {
     print("Quantity: ${item.quantity}");
     items!.removeWhere((element) => element.findCartItem(item));
@@ -91,6 +102,16 @@ class Cart {
         print("Found item");
         cart.fixTotal = item.fixTotal;
         cart.quantity = item.quantity;
+        cart.isChecked = item.isChecked;
+      }
+    }
+  }
+
+  void updateCheck(CartItem item, bool check) {
+    for (CartItem cart in items!) {
+      if (cart.findCartItem(item)) {
+        print("Check item");
+        cart.isChecked = check;
       }
     }
   }
@@ -104,9 +125,18 @@ class CartItem {
   double? price;
   double? fixTotal;
   int quantity;
+  bool? isChecked;
 
-  CartItem(this.productId, this.productName, this.imgUrl, this.size, this.price,
-      this.fixTotal, this.quantity);
+  CartItem(
+    this.productId,
+    this.productName,
+    this.imgUrl,
+    this.size,
+    this.price,
+    this.fixTotal,
+    this.quantity,
+    this.isChecked,
+  );
 
   bool findCartItem(CartItem item) {
     bool found = true;
@@ -126,6 +156,7 @@ class CartItem {
       json["price"] as double,
       json["fixTotal"] as double,
       json['quantity'] as int,
+      json['isChecked'] as bool,
     );
   }
 
@@ -142,6 +173,7 @@ class CartItem {
     _data["price"] = price;
     _data["fixTotal"] = fixTotal;
     _data["quantity"] = quantity;
+    _data["isChecked"] = isChecked;
     return _data;
   }
 }

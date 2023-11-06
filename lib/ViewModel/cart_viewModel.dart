@@ -19,7 +19,7 @@ class CartViewModel extends BaseModel {
   StoreDAO? _storeDAO;
   final root = Get.find<RootViewModel>();
   Cart? currentCart;
-  List<bool> isCheckedList = List.generate(0, (index) => false);
+  // List<bool> isCheckedList = List.generate(0, (index) => false);
   List<ReOrderDTO>? reOrderList;
   double total = 0, fixTotal = 0, extraTotal = 0;
   int quantityChecked = 0;
@@ -31,32 +31,36 @@ class CartViewModel extends BaseModel {
     currentCart = null;
   }
 
-  Future<void> changeValueChecked(
-      bool value, int index, CartItem cartItem) async {
+  Future<void> changeValueChecked(bool value, CartItem cartItem) async {
     try {
       if (value == true) {
         bool? isAdded = await Get.find<ProductDetailViewModel>()
             .processCart(cartItem.productId, cartItem.quantity);
-        isCheckedList[index] = isAdded!;
-        if (isAdded != false) {
+
+        await updateCheckItemFromCart(cartItem, isAdded!);
+        if (isAdded == true) {
           getTotalQuantity(isAdded, cartItem);
         }
       } else {
         ConfirmCartItem item =
             ConfirmCartItem(cartItem.productId, cartItem.quantity, "");
         await removeItemFromMart(item);
-        isCheckedList[index] = value;
-        getTotalQuantity(value, cartItem);
+        await updateCheckItemFromCart(cartItem, value);
+        await getTotalQuantity(value, cartItem);
       }
-      isSelected = isCheckedList.any((element) => element == true);
+      isSelected =
+          currentCart!.items!.any((element) => element.isChecked == true);
+
       notifyListeners();
     } catch (e) {
       throw e;
     }
   }
 
-  void getTotalQuantity(bool value, CartItem cartItem) {
-    bool isTrue = isCheckedList.any((element) => element == true);
+  Future<void> getTotalQuantity(bool value, CartItem cartItem) async {
+    currentCart = await getCart();
+    bool isTrue =
+        currentCart!.items!.any((element) => element.isChecked == true);
     if (isTrue) {
       if (total == null) {
         quantityChecked = cartItem.quantity;
@@ -137,16 +141,14 @@ class CartViewModel extends BaseModel {
       await Future.delayed(const Duration(milliseconds: 500));
       currentCart = await getCart();
       notifier.value = currentCart!.itemQuantity();
-      if (isCheckedList.isEmpty) {
-        isCheckedList =
-            List.generate(currentCart!.items!.length, (index) => false);
-        await deleteMart();
-      } else {
-        if (currentCart!.items!.length > isCheckedList.length) {
-          isCheckedList.add(false);
-        }
+      if (currentCart == null) {
+        notifier.value = 0;
       }
-      isSelected = isCheckedList.any((element) => element == true);
+      bool hasChecked =
+          currentCart!.items!.any((element) => element.isChecked == true);
+      if (hasChecked == false) {
+        await deleteMart();
+      }
       setState(ViewStatus.Completed);
       notifyListeners();
     } catch (e) {
@@ -161,14 +163,13 @@ class CartViewModel extends BaseModel {
     await deleteMart();
     total = 0;
     quantityChecked = 0;
-    isCheckedList = List.generate(0, (index) => false);
     notifier.value = 0;
     currentCart = await getCart();
     notifyListeners();
   }
 
   Future<void> updateItem(CartItem item, int index, bool isIncrease) async {
-    if (isCheckedList[index] == true) {
+    if (item.isChecked == true) {
       if (isIncrease == true) {
         total -= item.fixTotal!;
         quantityChecked -= (item.quantity - 1);
@@ -177,11 +178,10 @@ class CartViewModel extends BaseModel {
         quantityChecked -= (item.quantity + 1);
       }
     }
-    isCheckedList[index] = false;
 
     fixTotal = item.price! * item.quantity;
     final cartItem = CartItem(item.productId, item.productName, item.imgUrl,
-        item.size, item.price, fixTotal, item.quantity);
+        item.size, item.price, fixTotal, item.quantity, false);
     await updateItemFromCart(cartItem);
     ConfirmCartItem confirmCartItem =
         ConfirmCartItem(item.productId, item.quantity, "");
@@ -207,7 +207,11 @@ class CartViewModel extends BaseModel {
       } else {
         notifier.value = currentCart!.itemQuantity();
       }
-      isCheckedList = [];
+      quantityChecked -= item.quantity;
+      total -= item.fixTotal!;
+      ConfirmCartItem cartItem =
+          ConfirmCartItem(item.productId, item.quantity, "");
+      await removeItemFromMart(cartItem);
     } else {
       currentCart = await getCart();
       if (currentCart == null) {
@@ -217,7 +221,11 @@ class CartViewModel extends BaseModel {
       } else {
         notifier.value = currentCart!.itemQuantity();
       }
-      isCheckedList.removeAt(index);
+      quantityChecked -= item.quantity;
+      total -= item.fixTotal!;
+      ConfirmCartItem cartItem =
+          ConfirmCartItem(item.productId, item.quantity, "");
+      await removeItemFromMart(cartItem);
     }
     notifyListeners();
   }

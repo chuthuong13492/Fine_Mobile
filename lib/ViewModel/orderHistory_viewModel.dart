@@ -146,11 +146,11 @@ class OrderHistoryViewModel extends BaseModel {
     notifyListeners();
   }
 
-  Future<void> getBoxQrCode(String boxId) async {
+  Future<void> getBoxQrCode(String orderId) async {
     try {
       setState(ViewStatus.Loading);
-      if (boxId != null) {
-        final qrcode = await _stationDAO!.getBoxById(boxId);
+      if (orderId != null) {
+        final qrcode = await _stationDAO!.getBoxById(orderId);
         imageBytes = qrcode;
       }
       await Future.delayed(const Duration(milliseconds: 200));

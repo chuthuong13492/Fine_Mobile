@@ -100,13 +100,28 @@ class ProductDetailViewModel extends BaseModel {
 
   Future<void> addProductToCart({bool backToHome = true}) async {
     showLoadingDialog();
-
+    final cart = await getCart();
     CartItem item = CartItem(selectAttribute?.id, master?.productName,
-        master?.imageUrl, selectAttribute!.size, total, total, count);
-    await addItemToCart(item, root.selectedTimeSlot!.id!, root.isNextDay);
-    await AnalyticsService.getInstance()!
-        .logChangeCart(master, item.quantity, true);
-    await Get.find<CartViewModel>().getCurrentCart();
+        master?.imageUrl, selectAttribute!.size, total, total, count, false);
+
+    bool isInCart;
+    if (cart == null) {
+      isInCart = false;
+    } else {
+      isInCart =
+          cart.items!.any((element) => element.productId == item.productId);
+    }
+
+    if (isInCart) {
+      await showStatusDialog("assets/images/logo2.png", "Oops!",
+          "Món này bạn đã thêm vô giỏ rồi!!");
+    } else {
+      await addItemToCart(item, root.selectedTimeSlot!.id!, root.isNextDay);
+      await AnalyticsService.getInstance()!
+          .logChangeCart(master, item.quantity, true);
+      await Get.find<CartViewModel>().getCurrentCart();
+    }
+
     hideDialog();
   }
 

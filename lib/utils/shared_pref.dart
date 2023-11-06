@@ -199,6 +199,15 @@ Future<void> updateItemFromCart(CartItem item) async {
   print("Save");
 }
 
+Future<void> updateCheckItemFromCart(CartItem item, bool check) async {
+  Cart? cart = await getCart();
+  if (cart == null) {
+    return;
+  }
+  cart.updateCheck(item, check);
+  await setCart(cart);
+}
+
 Future<void> updateItemFromMart(ConfirmCartItem item) async {
   ConfirmCart? cart = await getMart();
   if (cart == null) {

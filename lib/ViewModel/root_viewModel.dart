@@ -389,6 +389,7 @@ class RootViewModel extends BaseModel {
         previousTimeSlotList?.clear();
         previousTimeSlotList?.add(firstTimeSlot);
         selectedTimeSlot = firstTimeSlot;
+        await Get.find<CartViewModel>().removeCart();
         await refreshMenu();
       }
     }

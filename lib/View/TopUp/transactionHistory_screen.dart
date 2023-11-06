@@ -247,7 +247,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
         child: Column(
           children: [
             ListTile(
-              contentPadding: EdgeInsets.fromLTRB(16, 8, 16, 8),
+              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
