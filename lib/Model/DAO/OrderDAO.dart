@@ -76,7 +76,7 @@ class OrderDAO extends BaseDAO {
         'orderType': orderType,
       });
       if (res.statusCode == 200) {
-        return OrderDTO.fromJson(res.data['data']);
+        return OrderDTO.fromJson(res.data['data']['orderResponse']);
       }
 
       return null;
