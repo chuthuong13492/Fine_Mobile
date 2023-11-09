@@ -12,7 +12,9 @@ import '../DTO/ConfirmCartDTO.dart';
 class OrderDAO extends BaseDAO {
   Future<OrderDTO?> getOrderById(String? orderId) async {
     // data["destination_location_id"] = destinationId;
-    final res = await request.get('/order/$orderId');
+    final res = await request.get(
+      '/order/$orderId',
+    );
     if (res.data['data'] != null) {
       return OrderDTO.fromJson(res.data['data']);
     }
@@ -34,12 +36,9 @@ class OrderDAO extends BaseDAO {
 
   Future<List<OrderDTO>?> getMoreOrders({int? page, int? size}) async {
     final res = await request.get(
-      '/customer/orders?Page=${page}',
+      '/customer/orders',
       queryParameters: {
-        // "order-status":
-        //     filter == OrderFilter.NEW ? ORDER_NEW_STATUS : ORDER_DONE_STATUS,
-        // "size": size ?? DEFAULT_SIZE,
-        // "page": page ?? 1,
+        "Page": page,
       },
     );
     // List<OrderDTO>? orderSummaryList;
@@ -53,34 +52,26 @@ class OrderDAO extends BaseDAO {
   }
 
   Future<OrderDTO?> prepareOrder(ConfirmCart cart) async {
-    if (cart != null) {
-      // print("Request Note: " + note);
-      final res = await request.post(
-        '/order/preOrder',
-        data: cart.toJsonAPi(),
-      );
-      if (res.statusCode == 200) {
-        return OrderDTO.fromJson(res.data['data']);
-      }
-
-      return null;
+    final res = await request.post(
+      '/order/preOrder',
+      data: cart.toJsonAPi(),
+    );
+    if (res.statusCode == 200) {
+      return OrderDTO.fromJson(res.data['data']);
     }
+
     return null;
   }
 
   Future<OrderDTO?> prepareReOrder(String orderId, int orderType) async {
-    if (orderId != null) {
-      // print("Request Note: " + note);
-      final res = await request.post('/order/reOrder', queryParameters: {
-        'orderId': orderId,
-        'orderType': orderType,
-      });
-      if (res.statusCode == 200) {
-        return OrderDTO.fromJson(res.data['data']['orderResponse']);
-      }
-
-      return null;
+    final res = await request.post('/order/reOrder', queryParameters: {
+      'orderId': orderId,
+      'orderType': orderType,
+    });
+    if (res.statusCode == 200) {
+      return OrderDTO.fromJson(res.data['data']['orderResponse']);
     }
+
     return null;
   }
 
@@ -105,20 +96,18 @@ class OrderDAO extends BaseDAO {
 
   Future<OrderStatus?> createOrders(OrderDTO orderDTO) async {
     try {
-      if (orderDTO != null) {
-        Map data = orderDTO.toJsonAPi();
-        // data["destination_location_id"] = destinationId;
-        final res = await request.post(
-          '/order',
-          data: data,
-        );
-        return OrderStatus(
-          statusCode: res.statusCode,
-          code: res.data['code'],
-          message: res.data['message'],
-          order: OrderDTO.fromJson(res.data['data']),
-        );
-      }
+      Map data = orderDTO.toJsonAPi();
+      // data["destination_location_id"] = destinationId;
+      final res = await request.post(
+        '/order',
+        data: data,
+      );
+      return OrderStatus(
+        statusCode: res.statusCode,
+        code: res.data['code'],
+        message: res.data['message'],
+        order: OrderDTO.fromJson(res.data['data']),
+      );
     } on DioError catch (e) {
       return OrderStatus(
           statusCode: e.response!.data["statusCode"],
@@ -127,6 +116,5 @@ class OrderDAO extends BaseDAO {
     } catch (e) {
       throw e;
     }
-    return null;
   }
 }

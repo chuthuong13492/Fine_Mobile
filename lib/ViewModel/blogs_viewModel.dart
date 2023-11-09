@@ -15,12 +15,7 @@ class BlogsViewModel extends BaseModel {
   Future<void> getBlogs() async {
     try {
       setState(ViewStatus.Loading);
-      // RootViewModel root = Get.find<RootViewModel>();
-      // CampusDTO currentStore = root.currentStore;
-      // if (root.status == ViewStatus.Error) {
-      //   setState(ViewStatus.Error);
-      //   return;
-      // }
+
       // ignore: prefer_conditional_assignment
       if (blogs == null) {
         blogs = await _storeDAO?.getBlogs();

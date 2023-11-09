@@ -248,6 +248,7 @@ class OrderViewModel extends BaseModel {
 
         if (result!.statusCode == 200) {
           // await delLockBox();
+          orderDTO!.stationDTO = null;
           timeRemaining = 0;
           notifierTimeRemaining.value = 0;
           await fetchStatus(result.order!.id!);
@@ -298,6 +299,7 @@ class OrderViewModel extends BaseModel {
           errorMessage = errorMsg;
           await showStatusDialog(
               "assets/images/error.png", "Oops!", errorMessage!);
+          setState(ViewStatus.Completed);
         }
         notifyListeners();
       }

@@ -10,38 +10,30 @@ import '../DTO/ConfirmCartDTO.dart';
 
 class PartyOrderDAO extends BaseDAO {
   Future<PartyStatus?> getPartyStatus(String code) async {
-    if (code != null) {
-      final res = await request.get(
-        '/order/coOrder/status/$code',
-      );
-      if (res.data["data"] != null) {
-        return PartyStatus.fromJson(res.data["data"]);
-      }
+    final res = await request.get(
+      '/order/coOrder/status/$code',
+    );
+    if (res.data["data"] != null) {
+      return PartyStatus.fromJson(res.data["data"]);
     }
+    return null;
   }
 
   Future<PartyOrderDTO?> coOrder(ConfirmCart cart) async {
-    if (cart != null) {
-      // print("Request Note: " + note);
-      final res = await request.post(
-        '/order/coOrder/active',
-        data: cart.toJsonAPi(),
-      );
-      if (res.statusCode == 200) {
-        return PartyOrderDTO.fromJson(res.data['data']);
-      }
-      return null;
+    final res = await request.post(
+      '/order/coOrder/active',
+      data: cart.toJsonAPi(),
+    );
+    if (res.statusCode == 200) {
+      return PartyOrderDTO.fromJson(res.data['data']);
     }
     return null;
   }
 
   Future<AccountDTO?> getCustomerByPhone(String phone) async {
-    if (phone != null) {
-      final res = await request.get('/customer/find?phoneNumber=${phone}');
-      if (res.statusCode == 200) {
-        return AccountDTO.fromJson(res.data['data']);
-      }
-      return null;
+    final res = await request.get('/customer/find?phoneNumber=${phone}');
+    if (res.statusCode == 200) {
+      return AccountDTO.fromJson(res.data['data']);
     }
     return null;
   }

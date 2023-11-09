@@ -74,22 +74,17 @@ class ProductDAO extends BaseDAO {
 
   Future<AddProductToCartStatus?> checkProductToCart(ConfirmCart cart) async {
     try {
-      if (cart != null) {
-        // print("Request Note: " + note);
-        final res = await request.post(
-          '/order/card',
-          data: cart.toCheckCartJsonAPi(),
-        );
-        if (res.statusCode == 200) {
-          return AddProductToCartStatus(
-              statusCode: res.statusCode,
-              code: res.data['status']['errorCode'],
-              message: res.data['status']['message'],
-              addProduct: AddProductToCartResponse.fromJson(res.data['data']));
-          // return AddProductToCartResponse.fromJson(res.data['data']);
-        }
-
-        return null;
+      final res = await request.post(
+        '/order/card',
+        data: cart.toCheckCartJsonAPi(),
+      );
+      if (res.statusCode == 200) {
+        return AddProductToCartStatus(
+            statusCode: res.statusCode,
+            code: res.data['status']['errorCode'],
+            message: res.data['status']['message'],
+            addProduct: AddProductToCartResponse.fromJson(res.data['data']));
+        // return AddProductToCartResponse.fromJson(res.data['data']);
       }
       return null;
     } on DioError catch (e) {

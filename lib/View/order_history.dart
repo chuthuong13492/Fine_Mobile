@@ -130,13 +130,48 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         builder: (context, child, model) {
       final status = model.status;
       final orderSummaryList = model.orderThumbnail
-          .where((element) => element.itemQuantity != 0)
+          .where((element) =>
+              element.itemQuantity != 0 && element.orderStatus != 3)
           .toList();
-      // orderSummaryList.sort((a, b) {
-      //   DateTime aDate = a.checkInDate!;
-      //   DateTime bDate = b.checkInDate!;
-      //   return bDate.compareTo(aDate);
-      // });
+      List<Widget>? listWidget = [];
+      List<DateTime?> _getUniqueCheckInDates() {
+        return orderSummaryList
+            .map((order) => order.checkInDate)
+            .toSet()
+            .toList();
+      }
+
+      for (var i = 0; i < _getUniqueCheckInDates().length; i++) {
+        final isToday = orderSummaryList[i]
+                .checkInDate!
+                .difference(DateTime.now())
+                .inDays ==
+            0;
+        DateTime? checkInDate = _getUniqueCheckInDates()[i];
+        List<OrderDTO> ordersForDate = orderSummaryList
+            .where((order) =>
+                order.checkInDate!.difference(DateTime.now()).inDays == 0)
+            .toList();
+        listWidget.add(Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8, bottom: 16),
+              child: isToday
+                  ? Text(
+                      'Hôm nay 😋',
+                      style: FineTheme.typograhpy.h1,
+                    )
+                  : Text(DateFormat('dd/MM/yyyy').format(checkInDate!),
+                      style: FineTheme.typograhpy.subtitle1
+                          .copyWith(color: Colors.black)),
+            ),
+            ...ordersForDate
+                .map((orderSummary) => _buildOrderItem(orderSummary))
+                .toList(),
+          ],
+        ));
+      }
       if (status == ViewStatus.Loading) {
         return const Padding(
           padding: EdgeInsets.fromLTRB(0, 0, 0, 50),
@@ -195,6 +230,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             controller: Get.find<OrderHistoryViewModel>().scrollController,
             padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
             children: [
+              // ...listWidget.toList(),
               ...orderSummaryList
                   .map((orderSummary) => _buildOrderSummary(orderSummary))
                   .toList(),
@@ -255,9 +291,9 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     String text = "";
     final status = orderDTO.orderStatus;
     switch (status) {
-      case 5:
+      case 4:
         isSuccess = false;
-        text = "Xác nhận đơn hàng";
+        text = "Đang thực hiện";
         break;
       case 6:
         isSuccess = false;
@@ -287,23 +323,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         isSuccess = false;
         text = "Đang thực hiện";
     }
-    // if (orderDTO.orderStatus == 4) {
-    //   isSuccess = false;
-    //   text = "Đang thực hiện";
-    // }
-    // if (orderDTO.orderStatus == 10 || orderDTO.orderStatus == 11) {
-    //   isSuccess = true;
-    //   text = "Hoàn thành";
-    // }
-    // if (orderDTO.orderStatus == 9) {
-    //   isSuccess = false;
-    //   text = "Đang đến station";
-    // }
-    var campus = Get.find<RootViewModel>().currentStore;
-    // final itemQuantity = inverseGeneralOrder.orderDetails!.fold<int>(0,
-    //     (previousValue, element) {
-    //   return previousValue + element.quantity;
-    // }).toString();
+
     return Container(
       color: Colors.white,
       // height: 80,

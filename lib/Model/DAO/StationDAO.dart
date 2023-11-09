@@ -33,9 +33,6 @@ class StationDAO extends BaseDAO {
 
   Future<Uint8List?> getBoxById(String orderId) async {
     final response = await request.get('/user-box/qrCode?orderId=$orderId',
-        // queryParameters: {
-        //   "boxId": boxId,
-        // },
         options: Options(responseType: ResponseType.bytes));
     if (response.statusCode == 200) {
       Uint8List imageBytes = Uint8List.fromList(response.data);
@@ -62,14 +59,26 @@ class StationDAO extends BaseDAO {
 
   Future<void> changeStation(String orderCode, int type,
       {String? stationId}) async {
-    final res = await request.put(
-      '/station/orderBox',
-      queryParameters: {
-        "stationId": stationId,
-        "orderCode": orderCode,
-        "type": type,
-      },
-    );
+    Response? res;
+    if (stationId == null) {
+      res = await request.put(
+        '/station/orderBox?type=${type}&orderCode=${orderCode}',
+        // queryParameters: {
+        //   "type": type,
+        //   "orderCode": orderCode,
+        // },
+      );
+    } else {
+      res = await request.put(
+        '/station/orderBox?type=${type}&orderCode=${orderCode}&stationId=${stationId}',
+        // queryParameters: {
+        //   "type": type,
+        //   "orderCode": orderCode,
+        //   "stationId": stationId,
+        // },
+      );
+    }
+
     if (res.statusCode == 200) {
       return;
     }

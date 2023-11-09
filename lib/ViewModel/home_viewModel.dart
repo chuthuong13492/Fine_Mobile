@@ -87,16 +87,7 @@ class HomeViewModel extends BaseModel {
   Future<void> createReOrder(String id) async {
     try {
       RootViewModel root = Get.find<RootViewModel>();
-
-      // ConfirmCart? cart = await getCart();
       List<ConfirmCartItem> listCartItem = [];
-      // if (cart != null) {
-      //   int option = await showOptionDialog(
-      //       "Bạn đang có giỏ hàng kìa. Bạn có muốn tiếp tục hông");
-      //   if (option != 1) {
-      //     return;
-      //   }
-      // }
       await deleteCart();
       orderDTO =
           await _storeDAO?.createReOrder(id, root.isNextDay == true ? 2 : 1);
@@ -105,18 +96,6 @@ class HomeViewModel extends BaseModel {
           listCartItem
               .add(ConfirmCartItem(item.productId, item.quantity, null));
         }
-        // cart = ConfirmCart.get(
-        //   timeSlotId: orderDTO?.timeSlot?.id,
-        //   orderType: orderDTO?.orderType,
-        //   orderDetails: listCartItem,
-        // );
-        // await setCart(cart);
-        // await setMart(cart);
-        // await Get.find<OrderViewModel>().getCurrentCart();
-        // if (cart != null) {
-        //   await Get.find<OrderViewModel>().prepareOrder();
-        //   Get.toNamed(RouteHandler.ORDER);
-        // }
       }
       notifyListeners();
     } catch (e) {

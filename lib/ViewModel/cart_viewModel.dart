@@ -145,12 +145,13 @@ class CartViewModel extends BaseModel {
       setState(ViewStatus.Loading);
       await Future.delayed(const Duration(milliseconds: 500));
       currentCart = await getCart();
-      notifier.value = currentCart!.itemQuantity();
+
       if (currentCart == null) {
         notifier.value = 0;
         quantityChecked = 0;
         total = 0;
       } else {
+        notifier.value = currentCart!.itemQuantity();
         final listChecked = currentCart?.items
             ?.where((element) => element.isChecked == true)
             .toList();

@@ -238,6 +238,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
   }
 
   Widget layoutOrderDetails(List<OrderDetails>? orderDetails) {
+    orderDetails!.where((element) => element.quantity != 0).toList();
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
@@ -250,7 +251,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
               Row(
                 children: [
                   Text(
-                    '${orderDetails![index].quantity}x',
+                    '${orderDetails[index].quantity}x',
                     style: TextStyle(
                       fontFamily: 'Montserrat',
                       fontSize: 15,

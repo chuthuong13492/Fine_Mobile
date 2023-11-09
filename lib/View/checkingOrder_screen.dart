@@ -322,10 +322,13 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                         Expanded(
                           child: InkWell(
                             onTap: () async {
+                              await orderHistory.getOrderByOrderId(
+                                  id: widget.order.id);
+                              final orderDTO = orderHistory.orderDTO;
                               if (hasBox) {
                                 Get.toNamed(
                                   RouteHandler.QRCODE_SCREEN,
-                                  arguments: widget.order,
+                                  arguments: orderDTO,
                                 );
                               } else {
                                 await showStatusDialog(
