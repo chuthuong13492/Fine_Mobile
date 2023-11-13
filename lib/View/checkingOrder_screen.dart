@@ -330,6 +330,11 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                                   RouteHandler.QRCODE_SCREEN,
                                   arguments: orderDTO,
                                 );
+                              } else if (status == 11) {
+                                await showStatusDialog(
+                                    "assets/images/logo2.png",
+                                    'Đã lấy hàng',
+                                    'Bạn đã nhận đơn hàng này rùi nè');
                               } else {
                                 await showStatusDialog(
                                     "assets/images/error-loading.gif",

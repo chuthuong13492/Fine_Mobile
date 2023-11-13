@@ -15,7 +15,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import '../Accessories/index.dart';
+import '../../Accessories/index.dart';
 
 class OrderHistoryScreen extends StatefulWidget {
   const OrderHistoryScreen({super.key});
@@ -343,11 +343,17 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
               contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               leading: IconButton(
                   onPressed: () async {
-                    await _orderHistoryViewModel.getOrderByOrderId(
-                        id: orderDTO.id);
-                    await Get.find<OrderViewModel>().fetchStatus(orderDTO.id!);
-                    await Get.toNamed(RouteHandler.QRCODE_SCREEN,
-                        arguments: _orderHistoryViewModel.orderDTO);
+                    if (status != 11) {
+                      await _orderHistoryViewModel.getOrderByOrderId(
+                          id: orderDTO.id);
+                      await Get.find<OrderViewModel>()
+                          .fetchStatus(orderDTO.id!);
+                      await Get.toNamed(RouteHandler.QRCODE_SCREEN,
+                          arguments: _orderHistoryViewModel.orderDTO);
+                    } else {
+                      await showStatusDialog("assets/images/logo2.png",
+                          'Đã lấy hàng', 'Bạn đã nhận đơn hàng này rùi nè');
+                    }
                   },
                   icon: Icon(
                     FontAwesomeIcons.qrcode,

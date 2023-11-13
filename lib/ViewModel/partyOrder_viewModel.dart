@@ -424,7 +424,7 @@ class PartyOrderViewModel extends BaseModel {
     }
     if (isDelete == false) {
       if (listCustomer!.isEmpty) {
-        await cancelCoOrder();
+        await cancelCoOrder(true);
       } else {
         await showMemberDialog("Chọn new Leader!!!", false);
       }
@@ -465,10 +465,16 @@ class PartyOrderViewModel extends BaseModel {
   //   await addProductToPartyOrder();
   // }
 
-  Future<void> cancelCoOrder({String? id}) async {
+  Future<void> cancelCoOrder(bool isOrder, {String? id}) async {
     hideDialog();
     try {
-      int option = await showOptionDialog("Hãy thử những món khác bạn nhé 😥.");
+      int? option;
+      if (isOrder == true) {
+        option = await showOptionDialog(
+            "Bạn có chắc mún xóa mã khuyến mãi hong 😥.");
+      } else {
+        option = await showOptionDialog("Hãy thử những món khác bạn nhé 😥.");
+      }
       if (option == 1) {
         partyCode = await getPartyCode();
         final success = await _partyDAO?.logoutCoOrder(
@@ -484,11 +490,15 @@ class PartyOrderViewModel extends BaseModel {
               await updateCheckItemFromCart(items[i], false);
             }
           }
+
           notifier.value = 0;
           _cartViewModel.total = 0;
           _cartViewModel.quantityChecked = 0;
           await _cartViewModel.getCurrentCart();
-          Get.back();
+          if (isOrder == true) {
+          } else {
+            Get.back();
+          }
           deleteMart();
           deletePartCart();
           await deletePartyCode();

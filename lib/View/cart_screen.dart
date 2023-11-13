@@ -38,12 +38,14 @@ class _CartScreenState extends State<CartScreen>
   CartViewModel? cartViewModel = Get.find<CartViewModel>();
   final party = Get.find<PartyOrderViewModel>();
   final root = Get.find<RootViewModel>();
+  final orderViewModel = Get.find<OrderViewModel>();
   AutoScrollController? controller;
   TabController? _tabController;
   final scrollDirection = Axis.vertical;
   bool onInit = true;
   bool onTapBar = true;
   bool hasParty = false;
+  String? partyCode;
 
   @override
   void initState() {
@@ -84,9 +86,11 @@ class _CartScreenState extends State<CartScreen>
     if (Get.currentRoute == "/nav_screen") {
       Get.find<PartyOrderViewModel>().isCartRoute = true;
     }
-    final partyCode = await getPartyCode();
+    partyCode = await getPartyCode();
     if (partyCode != null) {
-      hasParty = true;
+      if (partyCode!.contains("CPO")) {
+        hasParty = true;
+      }
     } else {
       hasParty = false;
     }
@@ -266,6 +270,13 @@ class _CartScreenState extends State<CartScreen>
                 }
               }
 
+              bool hasVoucher = false;
+              if (model.code != null) {
+                if (model.code!.contains("LPO")) {
+                  hasVoucher = true;
+                }
+              }
+
               if (model.status == ViewStatus.Loading) {
                 // return _buildLoading();
                 return const Padding(
@@ -282,6 +293,24 @@ class _CartScreenState extends State<CartScreen>
                     cart != null
                         ? Column(
                             children: [
+                              hasVoucher
+                                  ? Container(
+                                      width: Get.width,
+                                      color: FineTheme.palettes.primary50,
+                                      padding: const EdgeInsets.only(
+                                          top: 8, bottom: 8),
+                                      child: Center(
+                                        child: Text(
+                                          "Mã voucher nhóm: ${model.code}",
+                                          style: FineTheme.typograhpy.subtitle2
+                                              .copyWith(
+                                                  color: FineTheme
+                                                      .palettes.primary100),
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                              const SizedBox(height: 4),
                               Expanded(
                                 child: ListView(
                                   children: [
@@ -292,7 +321,7 @@ class _CartScreenState extends State<CartScreen>
                                             children: [
                                               Padding(
                                                 padding: const EdgeInsets.only(
-                                                    left: 8, top: 16),
+                                                    left: 8, top: 0),
                                                 child: Text(
                                                   "Đang chọn...",
                                                   style: FineTheme

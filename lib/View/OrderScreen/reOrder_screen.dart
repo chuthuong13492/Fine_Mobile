@@ -8,16 +8,16 @@ import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-import '../Accessories/index.dart';
-import '../Constant/route_constraint.dart';
-import '../Constant/view_status.dart';
-import '../Model/DTO/index.dart';
-import '../Utils/constrant.dart';
-import '../Utils/format_price.dart';
-import '../ViewModel/order_viewModel.dart';
-import '../ViewModel/root_viewModel.dart';
-import '../theme/FineTheme/index.dart';
-import '../widgets/cache_image.dart';
+import '../../Accessories/index.dart';
+import '../../Constant/route_constraint.dart';
+import '../../Constant/view_status.dart';
+import '../../Model/DTO/index.dart';
+import '../../Utils/constrant.dart';
+import '../../Utils/format_price.dart';
+import '../../ViewModel/order_viewModel.dart';
+import '../../ViewModel/root_viewModel.dart';
+import '../../theme/FineTheme/index.dart';
+import '../../widgets/cache_image.dart';
 
 class ReOrderScreen extends StatefulWidget {
   const ReOrderScreen({super.key});
@@ -41,7 +41,27 @@ class _ReOrderScreenState extends State<ReOrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: FineTheme.palettes.shades100,
-      appBar: DefaultAppBar(title: "Trang thanh toán"),
+      appBar: DefaultAppBar(
+        title: "Trang thanh toán",
+        backButton: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(32),
+          ),
+          child: Material(
+            color: Colors.white,
+            child: InkWell(
+              onTap: () async {
+                if (_orderViewModel?.notifierTimeRemaining.value != 0) {
+                  await _orderViewModel?.delLockBox();
+                }
+                Get.back();
+              },
+              child: Icon(Icons.arrow_back_ios,
+                  size: 20, color: FineTheme.palettes.primary100),
+            ),
+          ),
+        ),
+      ),
       bottomNavigationBar: bottomBar(),
       body: ListView(
         children: [
@@ -129,11 +149,7 @@ class _ReOrderScreenState extends State<ReOrderScreen> {
                         child: Container(
                           color: FineTheme.palettes.primary50,
                         )),
-                    AutoScrollTag(
-                      index: 1,
-                      key: const ValueKey(1),
-                      controller: controller!,
-                      highlightColor: Colors.black.withOpacity(0.1),
+                    Container(
                       child: timeRecieve(),
                     ),
                     SizedBox(
@@ -329,7 +345,7 @@ class _ReOrderScreenState extends State<ReOrderScreen> {
             ],
           ),
         ),
-        list.length != 0
+        list.isNotEmpty
             ? ListView.separated(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
@@ -479,39 +495,11 @@ class _ReOrderScreenState extends State<ReOrderScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              height: 18,
-              width: 18,
-              child: IconButton(
-                padding: const EdgeInsets.all(0.0),
-                icon: Icon(
-                  AntDesign.minuscircleo,
-                  size: 16,
-                  color: FineTheme.palettes.neutral500,
-                ),
-                onPressed: () async {},
-              ),
+            Text("x", style: FineTheme.typograhpy.body2),
+            const SizedBox(
+              width: 2,
             ),
-            Container(
-              width: 30,
-              child: Text(
-                item.quantity.toString(),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            SizedBox(
-              height: 18,
-              width: 18,
-              child: IconButton(
-                padding: const EdgeInsets.all(0.0),
-                icon: Icon(
-                  AntDesign.pluscircleo,
-                  size: 16,
-                  color: FineTheme.palettes.neutral500,
-                ),
-                onPressed: () async {},
-              ),
-            ),
+            Text(item.quantity.toString(), style: FineTheme.typograhpy.body2),
           ],
         ),
       ),

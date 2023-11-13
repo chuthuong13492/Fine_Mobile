@@ -27,10 +27,10 @@ import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-import '../Accessories/index.dart';
-import '../ViewModel/home_viewModel.dart';
-import '../ViewModel/product_viewModel.dart';
-import '../widgets/touchopacity.dart';
+import '../../Accessories/index.dart';
+import '../../ViewModel/home_viewModel.dart';
+import '../../ViewModel/product_viewModel.dart';
+import '../../widgets/touchopacity.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key});
@@ -88,6 +88,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     if (_orderViewModel?.notifierTimeRemaining.value != 0) {
                       await _orderViewModel?.delLockBox();
                     }
+                    Get.find<CartViewModel>().getCurrentCart();
                     Get.back();
                   },
                   child: Icon(Icons.arrow_back_ios,
@@ -95,34 +96,34 @@ class _OrderScreenState extends State<OrderScreen> {
                 ),
               ),
             ),
-            actionButton: [
-              onInit
-                  ? const SizedBox.shrink()
-                  : ScopedModelDescendant<OrderViewModel>(
-                      builder: (context, child, model) {
-                        if (model.isLinked == false) {
-                          return const SizedBox.shrink();
-                        }
-                        return InkWell(
-                          onTap: () async {
-                            await Get.find<PartyOrderViewModel>()
-                                .cancelCoOrder();
-                          },
-                          child: Center(
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 16, right: 16),
-                              child: Text(
-                                'THOÁT',
-                                style: FineTheme.typograhpy.subtitle1
-                                    .copyWith(color: Colors.red),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-            ],
+            // actionButton: [
+            //   onInit
+            //       ? const SizedBox.shrink()
+            //       : ScopedModelDescendant<OrderViewModel>(
+            //           builder: (context, child, model) {
+            //             if (model.isLinked == false) {
+            //               return const SizedBox.shrink();
+            //             }
+            //             return InkWell(
+            //               onTap: () async {
+            //                 await Get.find<PartyOrderViewModel>()
+            //                     .cancelCoOrder();
+            //               },
+            //               child: Center(
+            //                 child: Padding(
+            //                   padding:
+            //                       const EdgeInsets.only(left: 16, right: 16),
+            //                   child: Text(
+            //                     'THOÁT',
+            //                     style: FineTheme.typograhpy.subtitle1
+            //                         .copyWith(color: Colors.red),
+            //                   ),
+            //                 ),
+            //               ),
+            //             );
+            //           },
+            //         ),
+            // ],
           ),
           bottomNavigationBar: onInit ? const SizedBox.shrink() : bottomBar(),
           body: onInit
@@ -587,32 +588,7 @@ class _OrderScreenState extends State<OrderScreen> {
                     ),
                     InkWell(
                       onTap: () async {
-                        ProductDetailViewModel model =
-                            Get.find<ProductDetailViewModel>();
-                        // model.master = product;
-                        final prodAttributes = ProductAttributes(
-                          id: product.id,
-                          size: product.size,
-                        );
-                        model.selectAttribute = prodAttributes;
-                        model.total = product.price;
-                        model.count = 1;
-                        model.master = ProductDTO(
-                            productName: product.name,
-                            imageUrl: product.imageUrl);
-                        await model.addProductToCart();
-                        CartItem cartItem = CartItem(
-                            product.id,
-                            product.name,
-                            product.imageUrl,
-                            product.size,
-                            product.price,
-                            product.price,
-                            1,
-                            true);
-                        await Get.find<CartViewModel>()
-                            .changeValueChecked(true, cartItem);
-                        await _orderViewModel?.prepareOrder();
+                        await _orderViewModel?.addProductRecommend(product);
                       },
                       child: Icon(
                         Icons.add_circle_outline,
@@ -987,7 +963,7 @@ class _OrderScreenState extends State<OrderScreen> {
             ],
           ),
         ),
-        list.length != 0
+        list.isNotEmpty
             ? ListView.separated(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
@@ -1016,116 +992,6 @@ class _OrderScreenState extends State<OrderScreen> {
     );
   }
 
-  // Widget layoutStore(OrderDetails inverseGeneralOrder) {
-  //   // SupplierNoteDTO supplierNote = orderViewModel.currentCart.notes?.firstWhere(
-  //   //   (element) => element.supplierId == list[0].master.supplierId,
-  //   //   orElse: () => null,
-  //   // );
-
-  //   List<Widget> card = [];
-  //   List<OrderDetails> orderDetailList = inverseGeneralOrder.orderDetails!;
-
-  //   for (OrderDetails item in orderDetailList) {
-  //     card.add(productCard(item));
-  //   }
-
-  //   for (int i = 0; i < orderDetailList.length; i++) {
-  //     if (i % 2 != 0) {
-  //       card.insert(
-  //           i,
-  //           Container(
-  //               color: FineTheme.palettes.shades100,
-  //               child: MySeparator(
-  //                 color: FineTheme.palettes.neutral500,
-  //               )));
-  //     }
-  //   }
-
-  //   return Container(
-  //     margin: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-  //           Padding(
-  //             padding: const EdgeInsets.only(left: 0, right: 4),
-  //             child: Row(
-  //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //               children: [
-  //                 Text(
-  //                   inverseGeneralOrder.storeName!,
-  //                   style: FineTheme.typograhpy.subtitle2
-  //                       .copyWith(color: FineTheme.palettes.primary300),
-  //                 ),
-  //                 Text(
-  //                   // ignore: prefer_interpolation_to_compose_strings
-  //                   inverseGeneralOrder.orderDetails!.fold<int>(0,
-  //                           (previousValue, element) {
-  //                         return previousValue + element.quantity;
-  //                       }).toString() +
-  //                       " món",
-  //                   style: FineTheme.typograhpy.subtitle2
-  //                       .copyWith(color: FineTheme.palettes.primary300),
-  //                 )
-  //               ],
-  //             ),
-  //           ),
-  //           // Container(
-  //           //     padding: const EdgeInsets.fromLTRB(0, 4, 8, 0),
-  //           //     width: Get.width,
-  //           //     child: Column(
-  //           //       children: [
-  //           //         Divider(
-  //           //           height: 4,
-  //           //           color: FineTheme.palettes.neutral600,
-  //           //         ),
-  //           //         Padding(
-  //           //           padding: const EdgeInsets.fromLTRB(0, 2, 0, 2),
-  //           //           child: Row(
-  //           //             children: [
-  //           //               const Icon(
-  //           //                 Icons.note_alt_outlined,
-  //           //                 color: Colors.black,
-  //           //                 size: 18,
-  //           //               ),
-  //           //               Flexible(
-  //           //                 child: Material(
-  //           //                   color: Colors.transparent,
-  //           //                   child: InkWell(
-  //           //                       onTap: () {
-  //           //                         orderViewModel.addSupplierNote(
-  //           //                             list[0].master.supplierId);
-  //           //                       },
-  //           //                       child: Padding(
-  //           //                         padding: EdgeInsets.only(left: 8, right: 8),
-  //           //                         child: Text(
-  //           //                             (supplierNote == null)
-  //           //                                 ? "Ghi chú cho nhà hàng"
-  //           //                                 : supplierNote.content,
-  //           //                             overflow: TextOverflow.ellipsis,
-  //           //                             style: BeanOiTheme.typography.caption1
-  //           //                                 .copyWith(
-  //           //                                     color: BeanOiTheme
-  //           //                                         .palettes.neutral700)),
-  //           //                       )),
-  //           //                 ),
-  //           //               ),
-  //           //             ],
-  //           //           ),
-  //           //         ),
-  //           //         Divider(
-  //           //           height: 4,
-  //           //           color: BeanOiTheme.palettes.neutral600,
-  //           //         ),
-  //           //       ],
-  //           //     ))
-  //         ]),
-  //         ...card
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Widget productCard(OrderDetails orderDetails) {
     List<Widget> list = [];
     double price = 0;
@@ -1146,22 +1012,6 @@ class _OrderScreenState extends State<OrderScreen> {
           style: FineTheme.typograhpy.overline));
       price += orderDetailList[i].unitPrice! * orderDetails.quantity;
     }
-
-    // item.description = "Test đơn hàng";
-
-    // if (item.description != null && item.description.isNotEmpty) {
-    //   list.add(SizedBox(
-    //     height: 4,
-    //   ));
-    //   list.add(Text(
-    //     item.description,
-    //   ));
-    // }
-
-    // bool isGift = false;
-    // if (item.master.type == ProductType.GIFT_PRODUCT) {
-    //   isGift = true;
-    // }
 
     return Container(
       color: FineTheme.palettes.shades100,
@@ -1466,6 +1316,9 @@ class _OrderScreenState extends State<OrderScreen> {
                                     onTap: () async {
                                       if (model.isLinked != true) {
                                         await showInputVoucherDialog();
+                                      } else {
+                                        await Get.find<PartyOrderViewModel>()
+                                            .cancelCoOrder(true);
                                       }
                                     },
                                     child: model.isLinked == true
@@ -1475,15 +1328,26 @@ class _OrderScreenState extends State<OrderScreen> {
                                                 direction: Direction.horizontal,
                                                 delayStart: const Duration(
                                                     milliseconds: 100),
-                                                child: Text(
-                                                  "Voucher:  ${model.codeParty!}",
-                                                  style: const TextStyle(
-                                                      fontFamily: 'Montserrat',
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w700,
-                                                      fontStyle:
-                                                          FontStyle.normal),
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      "Voucher:  ${model.codeParty!}",
+                                                      style: const TextStyle(
+                                                          fontFamily:
+                                                              'Montserrat',
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w700,
+                                                          fontStyle:
+                                                              FontStyle.normal),
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                    const Icon(
+                                                      Icons.cancel,
+                                                      size: 15,
+                                                      color: Colors.red,
+                                                    )
+                                                  ],
                                                 ),
                                               )
                                             : Row(

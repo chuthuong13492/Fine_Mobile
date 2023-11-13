@@ -24,6 +24,7 @@ class CartViewModel extends BaseModel {
   double total = 0, fixTotal = 0, extraTotal = 0;
   int quantityChecked = 0;
   bool? isSelected = false;
+  String? code;
   final ValueNotifier<int> notifier = ValueNotifier(0);
 
   CartViewModel() {
@@ -162,6 +163,7 @@ class CartViewModel extends BaseModel {
           quantityChecked += item.quantity;
         }
       }
+      code = await getPartyCode();
       isSelected =
           currentCart!.items!.any((element) => element.isChecked == true);
       if (isSelected == false) {

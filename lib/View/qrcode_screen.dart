@@ -27,7 +27,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
   @override
   void initState() {
     super.initState();
-    order.getBoxQrCode(_orderViewModel.orderDTO!.id!);
+    order.getBoxQrCode(widget.order.id!);
   }
 
   @override

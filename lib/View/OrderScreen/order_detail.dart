@@ -8,8 +8,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import '../Accessories/index.dart';
-import '../Model/DTO/index.dart';
+import '../../Accessories/index.dart';
+import '../../Model/DTO/index.dart';
 
 class OrderHistoryDetail extends StatefulWidget {
   final OrderDTO order;

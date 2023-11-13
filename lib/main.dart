@@ -13,20 +13,19 @@ import 'package:fine/View/checkingOrder_screen.dart';
 import 'package:fine/View/coOrder_screen.dart';
 import 'package:fine/View/confirm_party_screen.dart';
 import 'package:fine/View/Home/home.dart';
-import 'package:fine/View/invite_coOrder_screen.dart';
 import 'package:fine/View/nav_screen.dart';
 import 'package:fine/View/notFoundScreen.dart';
 import 'package:fine/View/onboard.dart';
-import 'package:fine/View/order.dart';
-import 'package:fine/View/order_detail.dart';
-import 'package:fine/View/order_history.dart';
-import 'package:fine/View/prepareCoOrder_screen.dart';
+import 'package:fine/View/OrderScreen/order.dart';
+import 'package:fine/View/OrderScreen/order_detail.dart';
+import 'package:fine/View/OrderScreen/order_history.dart';
+import 'package:fine/View/OrderScreen/prepareCoOrder_screen.dart';
 import 'package:fine/View/product_detail.dart';
 import 'package:fine/View/product_filter_list.dart';
 import 'package:fine/View/profile.dart';
 import 'package:fine/View/qrcode_screen.dart';
 import 'package:fine/View/LoginScreen/sign_in.dart';
-import 'package:fine/View/reOrder_screen.dart';
+import 'package:fine/View/OrderScreen/reOrder_screen.dart';
 import 'package:fine/View/sign_up.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/View/station_picker_screen.dart';
@@ -126,11 +125,7 @@ class MyApp extends StatelessWidget {
                 builder: (context) =>
                     QRCodeScreen(order: settings.arguments as dynamic),
                 settings: settings);
-          case RouteHandler.INVITE_SCREEN:
-            return CupertinoPageRoute<bool>(
-                builder: (context) => InviteCoOrderScreen(
-                    durationInSeconds: settings.arguments as int),
-                settings: settings);
+
           case RouteHandler.CHECKING_ORDER_SCREEN:
             Map map = settings.arguments as Map;
             return CupertinoPageRoute<bool>(

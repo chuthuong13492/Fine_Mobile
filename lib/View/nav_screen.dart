@@ -6,7 +6,7 @@ import 'package:fine/View/cart_screen.dart';
 import 'package:fine/View/qrcode_screen.dart';
 import 'package:fine/View/box_screen.dart';
 import 'package:fine/View/Home/home.dart';
-import 'package:fine/View/order_history.dart';
+import 'package:fine/View/OrderScreen/order_history.dart';
 import 'package:fine/View/profile.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/ViewModel/cart_viewModel.dart';
@@ -39,13 +39,15 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   Future listenFireBaseMessages() async {
     FirebaseMessaging.onMessage.listen((event) async {
       hideSnackbar();
-
-      RemoteNotification notification = event.notification!;
+      RemoteNotification? notification;
+      if (event.notification != null) {
+        notification = event.notification!;
+      }
 
       switch (event.data["type"]) {
         case 'ForInvitation':
           PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
-          int option = await showOptionDialog('${notification.body}');
+          int option = await showOptionDialog('${notification!.body}');
           if (option == 1) {
             await deletePartyCode();
             String code = event.data['key'];
@@ -55,7 +57,7 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
           break;
         case 'ForPopup':
           await showStatusDialog("assets/images/icon-success.png",
-              notification.title!, notification.body!);
+              notification!.title!, notification.body!);
           break;
         case 'ForFinishOrder':
           OrderDTO? dto;
@@ -69,22 +71,28 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
               }
             }
           }
-          if (Get.currentRoute == "/qrcode_screen") {
-            if (dto != null) {
-              final otherAmounts =
-                  dto.otherAmounts!.firstWhere((element) => element.type == 1);
-              await showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
-                  otherAmounts.amount!, dto.finalAmount!);
-            }
-            Get.back();
-          } else {
-            if (dto != null) {
-              final otherAmounts =
-                  dto.otherAmounts!.firstWhere((element) => element.type == 1);
-              await showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
-                  otherAmounts.amount!, dto.finalAmount!);
-            }
+          if (dto != null) {
+            final otherAmounts =
+                dto.otherAmounts!.firstWhere((element) => element.type == 1);
+            showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
+                otherAmounts.amount!, dto.finalAmount!);
           }
+          // if (Get.currentRoute == "/qrcode_screen") {
+          //   if (dto != null) {
+          //     final otherAmounts =
+          //         dto.otherAmounts!.firstWhere((element) => element.type == 1);
+          //     await showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
+          //         otherAmounts.amount!, dto.finalAmount!);
+          //   }
+          //   Get.back();
+          // } else {
+          //   if (dto != null) {
+          //     final otherAmounts =
+          //         dto.otherAmounts!.firstWhere((element) => element.type == 1);
+          //     await showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
+          //         otherAmounts.amount!, dto.finalAmount!);
+          //   }
+          // }
 
           break;
         case 'ForRefund':
@@ -93,8 +101,8 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
                 .getOrderByOrderId(id: event.data["orderId"]);
           }
 
-          await showStatusDialog("assets/images/logo2.png", notification.title!,
-              notification.body!);
+          await showStatusDialog("assets/images/logo2.png",
+              notification!.title!, notification.body!);
           break;
         case 'ForUsual':
           await showFlash(
@@ -130,7 +138,7 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
                   ),
                 ),
                 content: Text(
-                  notification.body!,
+                  notification!.body!,
                   style: FineTheme.typograhpy.subtitle1
                       .copyWith(color: FineTheme.palettes.primary100),
                 ),
@@ -144,8 +152,8 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
           );
           break;
         default:
-          await showStatusDialog("assets/images/logo2.png", notification.title!,
-              notification.body!);
+          await showStatusDialog("assets/images/logo2.png",
+              notification!.title!, notification.body!);
           break;
       }
       print(event.data);

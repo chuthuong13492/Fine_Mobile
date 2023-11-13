@@ -8,7 +8,6 @@ import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/Utils/shared_pref.dart';
-import 'package:fine/View/invite_coOrder_screen.dart';
 import 'package:fine/View/start_up.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
@@ -71,7 +70,6 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
         // floatingActionButton: const CartParty(),
         backgroundColor: FineTheme.palettes.neutral200,
         bottomNavigationBar: bottomBar(),
-        // drawer: InviteCoOrderScreen(),
         appBar: DefaultAppBar(
           title: "Đơn nhóm",
           backButton: Container(
@@ -577,7 +575,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                           if (isAdmin == true) {
                             await _partyViewModel?.getCustomerInParty();
                           } else {
-                            await _partyViewModel!.cancelCoOrder();
+                            await _partyViewModel!.cancelCoOrder(false);
                           }
                         },
                         child: Container(

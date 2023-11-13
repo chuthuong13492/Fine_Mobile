@@ -205,9 +205,7 @@ class OrderViewModel extends BaseModel {
       timeRemaining = 0;
       notifierTimeRemaining.value = 0;
       orderDTO!.stationDTO = null;
-      await _stationDAO?.changeStation(orderDTO!.orderCode!, 1,
-          stationId:
-              orderDTO!.stationDTO != null ? orderDTO!.stationDTO?.id : null);
+      await _stationDAO?.changeStation(orderDTO!.orderCode!, 1);
       notifyListeners();
     } catch (e) {
       orderDTO!.stationDTO = null;
@@ -255,8 +253,8 @@ class OrderViewModel extends BaseModel {
           final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
           orderHistoryViewModel.orderDTO = result.order;
           // await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
-          await showStatusDialog("assets/images/icon-success.png", 'Success',
-              'Bạn đã đặt hàng thành công');
+          // await showStatusDialog("assets/images/icon-success.png", 'Success',
+          //     'Bạn đã đặt hàng thành công');
 
           Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
               arguments: {"order": result.order});
@@ -313,6 +311,30 @@ class OrderViewModel extends BaseModel {
     }
   }
 
+  Future<void> addProductRecommend(ProductInCart product) async {
+    ProductDetailViewModel prodModel = Get.find<ProductDetailViewModel>();
+    // model.master = product;
+    final prodAttributes = ProductAttributes(
+      id: product.id,
+      size: product.size,
+    );
+    prodModel.selectAttribute = prodAttributes;
+    prodModel.total = product.price;
+    prodModel.count = 1;
+    prodModel.master =
+        ProductDTO(productName: product.name, imageUrl: product.imageUrl);
+    bool? isAdded = await prodModel.addProductToCart();
+    if (isAdded == true) {
+      CartItem cartItem = CartItem(product.id, product.name, product.imageUrl,
+          product.size, product.price, product.price, 1, true);
+      await Get.find<CartViewModel>().changeValueChecked(true, cartItem);
+      if (notifierTimeRemaining.value > 0) {
+        await delLockBox();
+      }
+      await prepareOrder();
+    }
+  }
+
   Future<void> createReOrder(String orderId) async {
     try {
       setState(ViewStatus.Loading);
@@ -336,6 +358,9 @@ class OrderViewModel extends BaseModel {
           }
           await showStatusDialog(
               "assets/images/logo2.png", "Oops!", "Đơn hàng đã bị hủy mất rùi");
+        } else if (orderStatusDTO?.orderStatus == 11 &&
+            Get.currentRoute == '/qrcode_screen') {
+          Get.back();
         }
       }
       setState(ViewStatus.Completed);

@@ -11,14 +11,14 @@ import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 
-import '../Constant/route_constraint.dart';
-import '../Constant/view_status.dart';
-import '../Utils/constrant.dart';
-import '../Utils/format_price.dart';
-import '../ViewModel/order_viewModel.dart';
-import '../ViewModel/root_viewModel.dart';
-import '../theme/FineTheme/index.dart';
-import '../widgets/cache_image.dart';
+import '../../Constant/route_constraint.dart';
+import '../../Constant/view_status.dart';
+import '../../Utils/constrant.dart';
+import '../../Utils/format_price.dart';
+import '../../ViewModel/order_viewModel.dart';
+import '../../ViewModel/root_viewModel.dart';
+import '../../theme/FineTheme/index.dart';
+import '../../widgets/cache_image.dart';
 
 class PrepareCoOrderScreen extends StatefulWidget {
   final OrderDTO? dto;
@@ -57,7 +57,27 @@ class _PrepareCoOrderScreenState extends State<PrepareCoOrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: FineTheme.palettes.shades100,
-      appBar: DefaultAppBar(title: "Đơn nhóm"),
+      appBar: DefaultAppBar(
+        title: "Đơn nhóm",
+        backButton: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(32),
+          ),
+          child: Material(
+            color: Colors.white,
+            child: InkWell(
+              onTap: () async {
+                if (_orderViewModel?.notifierTimeRemaining.value != 0) {
+                  await _orderViewModel?.delLockBox();
+                }
+                Get.back();
+              },
+              child: Icon(Icons.arrow_back_ios,
+                  size: 20, color: FineTheme.palettes.primary100),
+            ),
+          ),
+        ),
+      ),
       bottomNavigationBar: onInit ? const SizedBox.shrink() : bottomBar(),
       body: onInit
           ? const SizedBox.shrink()

@@ -98,7 +98,7 @@ class _RadioListState extends State<RadioList> {
                       if (id != null) {
                         if (widget.isRemove == false) {
                           await Get.find<PartyOrderViewModel>()
-                              .cancelCoOrder(id: id);
+                              .cancelCoOrder(false, id: id);
                           id = null;
                         } else {
                           await Get.find<PartyOrderViewModel>()
