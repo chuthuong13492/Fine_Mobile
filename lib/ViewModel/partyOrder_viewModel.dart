@@ -424,7 +424,7 @@ class PartyOrderViewModel extends BaseModel {
     }
     if (isDelete == false) {
       if (listCustomer!.isEmpty) {
-        await cancelCoOrder(true);
+        await cancelCoOrder(false);
       } else {
         await showMemberDialog("Chọn new Leader!!!", false);
       }

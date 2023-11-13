@@ -154,77 +154,87 @@ class _CartButtonState extends State<CartButton> {
                               },
                             ),
                           ),
-                          Positioned(
-                            // top: -8,
-                            bottom: -25,
-                            right: 40,
-                            // left: 35,
-                            child: ClipPath(
-                              clipper: UpperNipMessageClipper(MessageType.send),
-                              child: AnimatedContainer(
-                                padding:
-                                    const EdgeInsets.fromLTRB(10, 8, 20, 0),
-                                duration: const Duration(microseconds: 300),
-                                // width: 24,
-                                // alignment: Alignment.center,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  // borderRadius: const BorderRadius.only(
-                                  //     topLeft: Radius.circular(8),
-                                  //     bottomLeft: Radius.circular(8),
-                                  //     bottomRight: Radius.circular(12)),
+                          model.partyStatus != null
+                              ? Positioned(
+                                  // top: -8,
+                                  bottom: -25,
+                                  right: 40,
+                                  // left: 35,
+                                  child: ClipPath(
+                                    clipper: UpperNipMessageClipper(
+                                        MessageType.send),
+                                    child: AnimatedContainer(
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 8, 20, 0),
+                                      duration:
+                                          const Duration(microseconds: 300),
+                                      // width: 24,
+                                      // alignment: Alignment.center,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        // borderRadius: const BorderRadius.only(
+                                        //     topLeft: Radius.circular(8),
+                                        //     bottomLeft: Radius.circular(8),
+                                        //     bottomRight: Radius.circular(12)),
 
-                                  color: FineTheme.palettes.primary300,
-                                ),
-                                child: Center(
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        quantity.toString(),
-                                        style: FineTheme.typograhpy.subtitle1
-                                            .copyWith(color: Colors.white),
+                                        color: FineTheme.palettes.primary300,
                                       ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      const Icon(
-                                        Icons.person,
-                                        size: 12,
-                                        color: Colors.white,
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      Text(
-                                        '|',
-                                        style: FineTheme.typograhpy.subtitle1
-                                            .copyWith(color: Colors.white),
-                                      ),
-                                      const SizedBox(
-                                        width: 2,
-                                      ),
-                                      Text(
-                                        'Ready: ',
-                                        style: FineTheme.typograhpy.caption1
-                                            .copyWith(color: Colors.white),
-                                      ),
-                                      model.partyStatus?.isReady == true
-                                          ? const Icon(
-                                              Icons.check_circle_rounded,
-                                              size: 15,
-                                              color: Colors.green,
-                                            )
-                                          : const Icon(
-                                              Icons.cancel,
-                                              size: 15,
+                                      child: Center(
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              quantity.toString(),
+                                              style: FineTheme
+                                                  .typograhpy.subtitle1
+                                                  .copyWith(
+                                                      color: Colors.white),
+                                            ),
+                                            const SizedBox(
+                                              width: 2,
+                                            ),
+                                            const Icon(
+                                              Icons.person,
+                                              size: 12,
                                               color: Colors.white,
-                                            )
-                                    ],
+                                            ),
+                                            const SizedBox(
+                                              width: 2,
+                                            ),
+                                            Text(
+                                              '|',
+                                              style: FineTheme
+                                                  .typograhpy.subtitle1
+                                                  .copyWith(
+                                                      color: Colors.white),
+                                            ),
+                                            const SizedBox(
+                                              width: 2,
+                                            ),
+                                            Text(
+                                              'Ready: ',
+                                              style: FineTheme
+                                                  .typograhpy.caption1
+                                                  .copyWith(
+                                                      color: Colors.white),
+                                            ),
+                                            model.partyStatus?.isReady == true
+                                                ? const Icon(
+                                                    Icons.check_circle_rounded,
+                                                    size: 15,
+                                                    color: Colors.green,
+                                                  )
+                                                : const Icon(
+                                                    Icons.cancel,
+                                                    size: 15,
+                                                    color: Colors.white,
+                                                  )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          ),
+                                )
+                              : const SizedBox.shrink(),
                         ],
                       ),
                     ),
