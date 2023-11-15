@@ -1015,82 +1015,55 @@ class _OrderScreenState extends State<OrderScreen> {
 
     return Container(
       color: FineTheme.palettes.shades100,
-      padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-      child: InkWell(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(0, 0, 8, 0),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(4),
-                                        child: Container(
-                                          width: 31,
-                                          height: 31,
-                                          child: CacheImage(
-                                              imageUrl: orderDetails.imageUrl ??
-                                                  defaultImage),
-                                        ),
-                                      ),
-                                    ),
-                                    Text(orderDetails.productName!,
-                                        style: FineTheme.typograhpy.subtitle2),
-                                  ],
-                                ),
-                                Row(children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      text: formatPrice(price),
-                                      style: FineTheme.typograhpy.subtitle2
-                                          .copyWith(color: Colors.black),
-                                      // children: [
-                                      //   WidgetSpan(
-                                      //     alignment:
-                                      //         PlaceholderAlignment.bottom,
-                                      //     child: Container(),
-                                      //   )
-                                      // ],
-                                    ),
-                                  ),
-                                ]),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  SizedBox(
+                    width: 25,
+                    child: Text("x${orderDetails.quantity}",
+                        style: FineTheme.typograhpy.subtitle2),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ...list,
-                      const SizedBox(width: 8),
-                      selectQuantity(orderDetails),
-                    ],
-                  )
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: SizedBox(
+                        width: 31,
+                        height: 31,
+                        child: CacheImage(
+                            imageUrl: orderDetails.imageUrl ?? defaultImage),
+                      ),
+                    ),
+                  ),
+                  Text(orderDetails.productName!,
+                      style: FineTheme.typograhpy.subtitle2),
                 ],
               ),
-            ),
-          ],
-        ),
+              RichText(
+                text: TextSpan(
+                  text: formatPrice(price),
+                  style: FineTheme.typograhpy.subtitle2
+                      .copyWith(color: Colors.black),
+                ),
+              ),
+            ],
+          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   children: [
+          //     ...list,
+          //     const SizedBox(width: 8),
+          //     selectQuantity(orderDetails),
+          //   ],
+          // )
+        ],
       ),
     );
   }
@@ -1315,7 +1288,10 @@ class _OrderScreenState extends State<OrderScreen> {
                                   child: InkWell(
                                     onTap: () async {
                                       if (model.isLinked != true) {
-                                        await showInputVoucherDialog();
+                                        if (model.isPartyOrder == false ||
+                                            model.isPartyOrder == null) {
+                                          await showInputVoucherDialog();
+                                        }
                                       } else {
                                         await Get.find<PartyOrderViewModel>()
                                             .cancelCoOrder(true);

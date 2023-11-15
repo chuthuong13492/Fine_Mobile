@@ -60,24 +60,19 @@ class StationDAO extends BaseDAO {
   Future<void> changeStation(String orderCode, int type,
       {String? stationId}) async {
     Response? res;
-    if (stationId == null) {
-      res = await request.put(
-        '/station/orderBox?type=${type}&orderCode=${orderCode}',
-        // queryParameters: {
-        //   "type": type,
-        //   "orderCode": orderCode,
-        // },
-      );
-    } else {
-      res = await request.put(
-        '/station/orderBox?type=${type}&orderCode=${orderCode}&stationId=${stationId}',
-        // queryParameters: {
-        //   "type": type,
-        //   "orderCode": orderCode,
-        //   "stationId": stationId,
-        // },
-      );
-    }
+    res = await request.put(
+      '/station/orderBox',
+      queryParameters: stationId != null
+          ? {
+              "type": type,
+              "orderCode": orderCode,
+              "stationId": stationId,
+            }
+          : {
+              "type": type,
+              "orderCode": orderCode,
+            },
+    );
 
     if (res.statusCode == 200) {
       return;

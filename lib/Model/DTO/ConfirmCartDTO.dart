@@ -16,6 +16,7 @@ class ConfirmCart {
   int? partyType;
   String? timeSlotId;
   String? productId;
+  String? partyCode;
   int? quantity;
 
   ConfirmCart.get({
@@ -23,6 +24,7 @@ class ConfirmCart {
     this.quantity,
     this.orderType,
     this.partyType,
+    this.partyCode,
     this.timeSlotId,
     this.orderDetails,
   });
@@ -33,6 +35,7 @@ class ConfirmCart {
     this.orderType,
     this.partyType,
     this.timeSlotId,
+    this.partyCode,
   }) {
     orderDetails = [];
   }
@@ -102,6 +105,7 @@ class ConfirmCart {
     Map<String, dynamic> map = {
       "orderType": orderType,
       "partyType": partyType ?? null,
+      "partyCode": partyCode ?? "",
       "timeSlotId": timeSlotId,
       "orderDetails": listCartItem ?? null,
     };

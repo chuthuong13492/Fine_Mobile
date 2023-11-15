@@ -100,7 +100,7 @@ class _CartScreenState extends State<CartScreen>
     });
   }
 
-  Future<void> refreshFetchOrder() async {
+  Future<void> refreshFetch() async {
     await cartViewModel?.getCurrentCart();
     await cartViewModel?.getReOrder();
   }
@@ -205,11 +205,6 @@ class _CartScreenState extends State<CartScreen>
                 style: FineTheme.typograhpy.h2
                     .copyWith(color: FineTheme.palettes.primary100)),
           ),
-          // bottomNavigationBar: onInit
-          //     ? const SizedBox.shrink()
-          //     : onTapBar == true
-          //         ? bottomBar()
-          //         : const SizedBox.shrink(),
           body: ScopedModelDescendant<CartViewModel>(
             builder: (context, child, model) {
               DateFormat inputFormat = DateFormat('HH:mm:ss');
@@ -274,6 +269,8 @@ class _CartScreenState extends State<CartScreen>
               if (model.code != null) {
                 if (model.code!.contains("LPO")) {
                   hasVoucher = true;
+                } else {
+                  hasParty = true;
                 }
               }
 
@@ -830,58 +827,6 @@ class _CartScreenState extends State<CartScreen>
                 ),
               ),
             ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildLoading() {
-    return ListView.builder(
-      itemCount: 4,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 16),
-          child: Container(
-            color: FineTheme.palettes.shades100,
-            padding: const EdgeInsets.fromLTRB(0, 12, 16, 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  child: const ShimmerBlock(
-                    width: 20,
-                    height: 20,
-                    borderRadius: 100,
-                  ),
-                ),
-                const SizedBox(
-                  width: 4,
-                ),
-                const ShimmerBlock(
-                  width: 90,
-                  height: 90,
-                  borderRadius: 10,
-                ),
-                const SizedBox(
-                  width: 8,
-                ),
-                Expanded(
-                  child: SizedBox(
-                    height: 90,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        ShimmerBlock(height: 10, width: 100),
-                        ShimmerBlock(height: 10, width: 40),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
           ),
         );
       },

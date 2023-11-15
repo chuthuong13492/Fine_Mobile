@@ -24,7 +24,6 @@ class RouteHandler {
   static const String INVITE_SCREEN = "/invite_screen";
   static const String TOP_UP_SCREEN = "/top_up_screen";
   static const String TRANSACTION_HISTORY = "/transaction_history";
-  static const String PREPARE_CO_ORDER = "/prepare_coOrder";
   static const String CART_SCREEN = "/cart_screen";
   static const String RE_ORDER_SCREEN = "/reOrder_screen";
 }

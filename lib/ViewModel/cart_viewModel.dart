@@ -162,13 +162,14 @@ class CartViewModel extends BaseModel {
           total += item.fixTotal!;
           quantityChecked += item.quantity;
         }
+        isSelected =
+            currentCart!.items!.any((element) => element.isChecked == true);
+        if (isSelected == false) {
+          await deleteMart();
+        }
       }
       code = await getPartyCode();
-      isSelected =
-          currentCart!.items!.any((element) => element.isChecked == true);
-      if (isSelected == false) {
-        await deleteMart();
-      }
+
       setState(ViewStatus.Completed);
       notifyListeners();
     } catch (e) {

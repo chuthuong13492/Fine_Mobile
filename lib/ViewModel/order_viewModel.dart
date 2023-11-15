@@ -38,9 +38,9 @@ class OrderViewModel extends BaseModel {
   PartyOrderDAO? _partyDAO;
   List<StationDTO>? stationList;
   List<ProductInCart>? productRecomend;
-  bool? loadingUpsell;
   bool? isPartyOrder;
   bool? isLinked;
+  bool? isCreate;
   String? codeParty;
   String? errorMessage;
   List<String> listError = <String>[];
@@ -54,9 +54,6 @@ class OrderViewModel extends BaseModel {
     _stationDAO = StationDAO();
     _partyDAO = PartyOrderDAO();
     _productDAO = ProductDAO();
-    // promoDao = new PromotionDAO();
-    // _collectionDAO = CollectionDAO();
-    loadingUpsell = false;
     // isPartyOrder = false;
     currentCart = null;
     codeParty = null;
@@ -70,15 +67,15 @@ class OrderViewModel extends BaseModel {
       }
       codeParty = await getPartyCode();
       isLinked = false;
+      isCreate = false;
       if (codeParty != null) {
         if (codeParty!.contains("LPO")) {
           isLinked = true;
+        } else {
+          isPartyOrder = true;
+          isLinked = false;
         }
       }
-
-      // if (codeParty != null && codeParty!.contains("LPO")) {
-      //   await party.joinPartyOrder(code: codeParty);
-      // }
       await getCurrentCart();
       if (currentCart != null) {
         if (currentCart!.orderDetails!.isEmpty &&
@@ -155,8 +152,10 @@ class OrderViewModel extends BaseModel {
           notifierTimeRemaining.value--;
         } else {
           timer.cancel();
-          if (orderDTO?.stationDTO != null) {
-            await delLockBox();
+          if (isCreate == false) {
+            if (orderDTO?.stationDTO != null) {
+              await delLockBox();
+            }
           }
           if (Get.currentRoute == "/station_picker_screen") {
             Get.back();
@@ -245,14 +244,12 @@ class OrderViewModel extends BaseModel {
         }
 
         if (result!.statusCode == 200) {
-          // await delLockBox();
-          orderDTO!.stationDTO = null;
+          isCreate = true;
           timeRemaining = 0;
           notifierTimeRemaining.value = 0;
           await fetchStatus(result.order!.id!);
           final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
           orderHistoryViewModel.orderDTO = result.order;
-          // await orderHistoryViewModel.getOrderByOrderId(id: result.order!.id);
           // await showStatusDialog("assets/images/icon-success.png", 'Success',
           //     'Bạn đã đặt hàng thành công');
 
@@ -360,7 +357,7 @@ class OrderViewModel extends BaseModel {
               "assets/images/logo2.png", "Oops!", "Đơn hàng đã bị hủy mất rùi");
         } else if (orderStatusDTO?.orderStatus == 11 &&
             Get.currentRoute == '/qrcode_screen') {
-          Get.back();
+          Get.offAndToNamed(RouteHandler.NAV);
         }
       }
       setState(ViewStatus.Completed);
@@ -419,13 +416,10 @@ class OrderViewModel extends BaseModel {
     try {
       setState(ViewStatus.Loading);
       RootViewModel root = Get.find<RootViewModel>();
-      currentCart = await getMart();
-      currentCart?.addProperties(root.isNextDay == true ? 2 : 1);
-      // Cart? cart = await getMart();
-      // if (currentCart == null) {
-      //   notifier.value = 0;
-      // }
-      // notifier.value = currentCart!.itemQuantity();
+      if (isPartyOrder == false || isPartyOrder == null) {
+        currentCart = await getMart();
+        currentCart?.addProperties(root.isNextDay == true ? 2 : 1);
+      }
 
       setState(ViewStatus.Completed);
 

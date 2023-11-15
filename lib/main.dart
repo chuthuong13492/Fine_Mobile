@@ -19,7 +19,6 @@ import 'package:fine/View/onboard.dart';
 import 'package:fine/View/OrderScreen/order.dart';
 import 'package:fine/View/OrderScreen/order_detail.dart';
 import 'package:fine/View/OrderScreen/order_history.dart';
-import 'package:fine/View/OrderScreen/prepareCoOrder_screen.dart';
 import 'package:fine/View/product_detail.dart';
 import 'package:fine/View/product_filter_list.dart';
 import 'package:fine/View/profile.dart';
@@ -146,11 +145,6 @@ class MyApp extends StatelessWidget {
           case RouteHandler.CART_SCREEN:
             return CupertinoPageRoute<bool>(
                 builder: (context) => CartScreen(), settings: settings);
-          case RouteHandler.PREPARE_CO_ORDER:
-            return CupertinoPageRoute<bool>(
-                builder: (context) =>
-                    PrepareCoOrderScreen(dto: settings.arguments as dynamic),
-                settings: settings);
           case RouteHandler.RE_ORDER_SCREEN:
             return CupertinoPageRoute<bool>(
                 builder: (context) => const ReOrderScreen(),

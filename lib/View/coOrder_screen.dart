@@ -23,6 +23,8 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 
+import '../ViewModel/cart_viewModel.dart';
+
 class PartyOrderScreen extends StatefulWidget {
   final PartyOrderDTO? dto;
   const PartyOrderScreen({super.key, this.dto});
@@ -82,6 +84,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                 onTap: () async {
                   // await Get.find<RootViewModel>().checkHasParty();
                   // await _partyViewModel?.getCoOrderStatus();
+                  Get.find<CartViewModel>().getCurrentCart();
                   Get.back();
                 },
                 child: Icon(Icons.arrow_back_ios,
