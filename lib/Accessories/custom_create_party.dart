@@ -180,9 +180,12 @@ class _CustomeCreatePartyState extends State<CustomeCreateParty> {
                           if (model.partyOrderDTO!.partyType == 1) {
                             if (widget.isHome == true) {
                               hideDialog();
+                              await model.getPartyOrder();
                               Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
                             } else {
                               hideDialog();
+                              await model.getPartyOrder();
+
                               Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
                             }
                           } else {

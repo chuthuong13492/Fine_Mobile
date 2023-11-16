@@ -77,7 +77,7 @@ class PartyOrderViewModel extends BaseModel {
           partyOrderDTO = await _partyDAO?.coOrder(cart);
           // partyCode = partyOrderDTO!.partyCode;
           await setPartyCode(partyOrderDTO!.partyCode!);
-          await Get.find<RootViewModel>().checkHasParty();
+          // await Get.find<RootViewModel>().checkHasParty();
         } else {
           ConfirmCart cart = ConfirmCart.get(
               orderType: 1,
@@ -86,7 +86,7 @@ class PartyOrderViewModel extends BaseModel {
               orderDetails: null);
           partyOrderDTO = await _partyDAO?.coOrder(cart);
           await setPartyCode(partyOrderDTO!.partyCode!);
-          await Get.find<RootViewModel>().checkHasParty();
+          // await Get.find<RootViewModel>().checkHasParty();
           errorMessage = null;
           hideDialog();
         }
@@ -244,6 +244,7 @@ class PartyOrderViewModel extends BaseModel {
             case 0:
               Get.find<CartViewModel>().getCurrentCart();
               await getPartyOrder();
+              root.checkCartAvailable();
               Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
               break;
             case 4001:
@@ -259,6 +260,7 @@ class PartyOrderViewModel extends BaseModel {
             case 4003:
               Get.find<CartViewModel>().getCurrentCart();
               await getPartyOrder();
+              root.checkCartAvailable();
               Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
               break;
             case 4004:
@@ -528,6 +530,8 @@ class PartyOrderViewModel extends BaseModel {
             partyCode!, id, isLinked == true ? 2 : 1);
         // await Future.delayed(const Duration(microseconds: 500));
         if (success!) {
+          await deletePartyCode();
+          partyCode = await getPartyCode();
           final cart = await getCart();
           if (cart != null) {
             final items = cart.items!
@@ -537,7 +541,8 @@ class PartyOrderViewModel extends BaseModel {
               await updateCheckItemFromCart(items[i], false);
             }
           }
-
+          deleteMart();
+          deletePartCart();
           notifier.value = 0;
           _cartViewModel.total = 0;
           _cartViewModel.quantityChecked = 0;
@@ -546,14 +551,8 @@ class PartyOrderViewModel extends BaseModel {
           } else {
             Get.back();
           }
-          deleteMart();
-          deletePartCart();
-          await deletePartyCode();
-          await root.checkHasParty();
-
-          await showStatusDialog("assets/images/icon-success.png", "Thành công",
+          showStatusDialog("assets/images/icon-success.png", "Thành công",
               "Hãy xem thử các món khác bạn nhé 😓");
-          partyCode = await getPartyCode();
         } else {
           await showStatusDialog(
             "assets/images/error.png",

@@ -1,5 +1,6 @@
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
+import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
@@ -10,8 +11,10 @@ import '../Constant/view_status.dart';
 
 import '../Model/DAO/StoreDAO.dart';
 import '../Model/DTO/ConfirmCartDTO.dart';
+import '../Model/DTO/CubeModel.dart';
 import '../Model/DTO/OrderDTO.dart';
 import '../Service/analytic_service.dart';
+import '../Utils/constrant.dart';
 import '../Utils/shared_pref.dart';
 import 'order_viewModel.dart';
 
@@ -264,5 +267,332 @@ class CartViewModel extends BaseModel {
       await removeItemFromMart(cartItem);
     }
     notifyListeners();
+  }
+
+  Future<FixBoxResponse?> checkProductFixTheBox(List<CheckFixBoxRequest> card,
+      ProductAttributes product, int quantity) async {
+    FixBoxResponse fillBoxResponse = FixBoxResponse(quantitySuccess: 0);
+
+    var boxSize = CubeDTO(height: 25, width: 35, length: 20);
+
+    var spaceInBox = SpaceInBoxMode(
+        remainingSpaceBox: boxSize,
+        remainingLengthSpace: boxSize,
+        remainingWidthSpace: boxSize,
+        volumeOccupied: null);
+
+    card.sort((a, b) =>
+        (b.product!.length! * b.product!.width! * b.product!.height!).compareTo(
+            a.product!.length! * a.product!.width! * a.product!.height!));
+    for (var item in card) {
+      ProductParingResponse? pairingCardResult =
+          await productPairing(item.quantity!, item.product!, boxSize);
+
+      var turnCard =
+          (item.quantity! / pairingCardResult!.quantityCanAdd!).ceilToDouble();
+      for (var successCase = 0; successCase <= turnCard; successCase++) {
+        // đem đi bỏ vào tủ
+        final calculateCardResult = await calculateRemainingSpace(
+            boxSize, spaceInBox, pairingCardResult.productSupplanted!);
+
+        if (calculateCardResult!.success == true) {
+          spaceInBox = SpaceInBoxMode(
+            remainingSpaceBox: calculateCardResult.remainingSpaceBox,
+            volumeOccupied: calculateCardResult.volumeOccupied,
+            remainingLengthSpace: calculateCardResult.remainingLengthSpace,
+            remainingWidthSpace: calculateCardResult.remainingWidthSpace,
+            volumeLengthOccupied: calculateCardResult.volumeLengthOccupied,
+            volumeWidthOccupied: calculateCardResult.volumeWidthOccupied,
+          );
+
+          if (product != null) {
+            if (item.product!.id == product.id) {
+              if (successCase == turnCard) {
+                fillBoxResponse.quantitySuccess = quantity;
+              } else {
+                fillBoxResponse.quantitySuccess =
+                    pairingCardResult.quantityCanAdd! * successCase;
+              }
+            }
+          }
+        } else {
+          break;
+        }
+      }
+    }
+    fillBoxResponse.remainingWidthSpace = spaceInBox.remainingWidthSpace;
+    fillBoxResponse.remainingLengthSpace = spaceInBox.remainingLengthSpace;
+    return fillBoxResponse;
+  }
+
+  Future<ProductParingResponse?> productPairing(
+      int quantity, ProductAttributes product, CubeDTO boxSize) async {
+    ProductParingResponse paringResponse =
+        ProductParingResponse(productSupplanted: null, quantityCanAdd: 1);
+    switch (product.rotationType) {
+      case ProductRotationTypeEnum.BOTH:
+        if (product.length! < boxSize.height!) {
+          if (product.width! < product.height!) {
+            paringResponse.productSupplanted = CubeDTO(
+              height: product.length,
+              width: product.width,
+              length: product.height,
+            );
+          } else {
+            paringResponse.productSupplanted = CubeDTO(
+              height: product.length,
+              width: product.height,
+              length: product.width,
+            );
+          }
+        }
+        break;
+      // nếu product mặc định nằm ngang => product nằm chồng lên nhau => số lượng có thể add * product.h < product.h (tùy thuộc có thể chồng hay ko)
+      case ProductRotationTypeEnum.HORIZONTAL:
+        // if (product.Product.IsStackable is true)
+        // {
+        //     paringResponse.QuantityCanAdd = (int)Math.Floor(boxSize.Height / product.Height);
+        //     if(paringResponse.QuantityCanAdd > quantity) paringResponse.QuantityCanAdd = quantity;
+
+        //     paringResponse.ProductSupplanted = new CubeModel()
+        //     {
+        //         Height = product.Height * paringResponse.QuantityCanAdd,
+        //         Width = product.Width,
+        //         Length = product.Length
+        //     };
+        // }
+        // else
+        // {
+        //     paringResponse.ProductSupplanted = new CubeModel()
+        //     {
+        //         Height = product.Height,
+        //         Width = product.Width,
+        //         Length = product.Length
+        //     };
+        // }
+        break;
+      default:
+    }
+    return paringResponse;
+  }
+
+  Future<SpaceInBoxMode?> calculateRemainingSpace(
+      CubeDTO box, SpaceInBoxMode space, CubeDTO productOccupied) async {
+    var response = SpaceInBoxMode(
+        success: true,
+        remainingSpaceBox: space.remainingSpaceBox,
+        remainingLengthSpace: space.remainingLengthSpace,
+        remainingWidthSpace: space.remainingWidthSpace,
+        volumeOccupied: space.volumeOccupied);
+    if (space.volumeOccupied == null) {
+      response.volumeOccupied = CubeDTO(
+        height: productOccupied.height,
+        width: productOccupied.width,
+        length: productOccupied.length,
+      );
+      response.remainingLengthSpace = CubeDTO(
+        height: box.height,
+        width: box.width! - response.volumeOccupied!.length!,
+        length: box.length,
+      );
+      response.remainingWidthSpace = CubeDTO(
+        height: box.height,
+        width: box.width,
+        length: box.length! - response.volumeOccupied!.width!,
+      );
+    } else if (space.remainingSpaceBox != null) {
+      if (space.volumeOccupied!.width! + productOccupied.width! <=
+          box.length!) {
+        response.volumeOccupied = CubeDTO(
+          height: space.volumeOccupied!.height! < productOccupied.height!
+              ? productOccupied.height
+              : space.volumeOccupied!.height,
+          width: space.volumeOccupied!.width! + productOccupied.width!,
+          length: space.volumeOccupied!.length! < productOccupied.length!
+              ? productOccupied.length
+              : space.volumeOccupied!.length,
+        );
+
+        response.remainingLengthSpace = CubeDTO(
+          height: box.height,
+          width: box.width! - response.volumeOccupied!.length!,
+          length: box.length,
+        );
+
+        response.remainingWidthSpace = CubeDTO(
+          height: box.height,
+          width: box.width,
+          length: box.length! - response.volumeOccupied!.width!,
+        );
+      } else if (space.volumeOccupied!.width! + productOccupied.width! >
+              box.length! &&
+          space.volumeOccupied!.length! + productOccupied.length! <=
+              box.width!) {
+        response.remainingLengthSpace = CubeDTO(
+          height: box.height,
+          width: box.width! - space.volumeOccupied!.length!,
+          length: box.length,
+        );
+
+        response.remainingWidthSpace = CubeDTO(
+          height: box.height,
+          width: box.width,
+          length: box.length! - space.volumeOccupied!.length!,
+        );
+
+        if (productOccupied.width! < response.remainingWidthSpace!.length!) {
+          response.volumeWidthOccupied = CubeDTO(
+            height: productOccupied.height,
+            width: productOccupied.width,
+            length: productOccupied.length,
+          );
+
+          response.remainingWidthSpace = CubeDTO(
+            height: box.height,
+            width: response.remainingWidthSpace!.width,
+            length: response.remainingWidthSpace!.length! -
+                response.volumeWidthOccupied!.width!,
+          );
+          response.volumeLengthOccupied = CubeDTO();
+        } else if (productOccupied.width! <
+            response.remainingLengthSpace!.width!) {
+          response.volumeLengthOccupied = CubeDTO(
+            height: productOccupied.height,
+            width: productOccupied.width,
+            length: productOccupied.length,
+          );
+
+          response.remainingLengthSpace = CubeDTO(
+            height: box.height,
+            width: response.remainingLengthSpace!.width! -
+                response.volumeLengthOccupied!.width!,
+            length: response.remainingLengthSpace!.length,
+          );
+
+          response.volumeWidthOccupied = CubeDTO();
+        } else {
+          response.success = false;
+        }
+
+        //disable thể tích box
+        response.remainingSpaceBox = null;
+      } else {
+        response.success = false;
+      }
+    } else if (space.remainingSpaceBox == null) {
+      var recoveryRemainingLengthSpace = CubeDTO();
+      var recoveryRemainingWidthSpace = CubeDTO();
+      //khôi phục lại remainingWidth và length space
+      //ưu tiên đặt phần remainingWidth trước
+
+      if (space.volumeWidthOccupied != null &&
+          space.volumeWidthOccupied!.length != 0) {
+        recoveryRemainingWidthSpace = CubeDTO(
+          height: box.height,
+          width: space.remainingWidthSpace!.width,
+          length: space.remainingWidthSpace!.length! +
+              space.volumeWidthOccupied!.width!,
+        );
+
+        if (space.volumeWidthOccupied!.length! + productOccupied.length! <=
+            response.remainingWidthSpace!.width!) {
+          response.volumeWidthOccupied = CubeDTO(
+            height: space.volumeWidthOccupied!.height! < productOccupied.height!
+                ? productOccupied.height
+                : space.volumeWidthOccupied!.height,
+            width: space.volumeWidthOccupied!.width! < productOccupied.width!
+                ? productOccupied.width
+                : space.volumeWidthOccupied!.width,
+            length:
+                space.volumeWidthOccupied!.length! + productOccupied.length!,
+          );
+
+          response.remainingWidthSpace = CubeDTO(
+            height: box.height,
+            width: recoveryRemainingWidthSpace.width,
+            length: recoveryRemainingWidthSpace.length! -
+                response.volumeWidthOccupied!.width!,
+          );
+        } else if (space.volumeWidthOccupied!.width! + productOccupied.width! <=
+            response.remainingWidthSpace!.length!) {
+          response.volumeWidthOccupied = CubeDTO(
+            height: space.volumeWidthOccupied!.height! < productOccupied.height!
+                ? productOccupied.height
+                : space.volumeWidthOccupied!.height,
+            width: space.volumeWidthOccupied!.width! + productOccupied.width!,
+            length: space.volumeWidthOccupied!.length! < productOccupied.length!
+                ? productOccupied.length
+                : space.volumeWidthOccupied!.length,
+          );
+
+          response.remainingWidthSpace = CubeDTO(
+            height: box.height,
+            width: recoveryRemainingWidthSpace.width,
+            length: recoveryRemainingWidthSpace.length! -
+                response.volumeWidthOccupied!.width!,
+          );
+        }
+      }
+      if (space.volumeLengthOccupied != null &&
+          space.volumeLengthOccupied!.length != 0) {
+        recoveryRemainingLengthSpace = CubeDTO(
+          height: box.height,
+          width: space.remainingLengthSpace!.width! +
+              space.volumeLengthOccupied!.length!,
+          length: space.remainingLengthSpace!.length,
+        );
+
+        if (space.volumeLengthOccupied != null &&
+            (space.volumeLengthOccupied!.width! + productOccupied.width! <=
+                response.remainingLengthSpace!.width!)) {
+          response.volumeLengthOccupied = CubeDTO(
+            height:
+                space.volumeLengthOccupied!.height! < productOccupied.height!
+                    ? productOccupied.height
+                    : space.volumeLengthOccupied!.height,
+            width: space.volumeLengthOccupied!.width! + productOccupied.width!,
+            length:
+                space.volumeLengthOccupied!.length! < productOccupied.length!
+                    ? productOccupied.length
+                    : space.volumeLengthOccupied!.length!,
+          );
+
+          response.remainingLengthSpace = CubeDTO(
+            height: box.height,
+            width: recoveryRemainingLengthSpace.width,
+            length: recoveryRemainingLengthSpace.length! -
+                response.volumeLengthOccupied!.length!,
+          );
+        } else if (space.volumeLengthOccupied != null &&
+            (space.volumeLengthOccupied!.length! + productOccupied.length! <=
+                response.remainingLengthSpace!.length!)) {
+          response.volumeLengthOccupied = CubeDTO(
+            height:
+                space.volumeLengthOccupied!.height! < productOccupied.height!
+                    ? productOccupied.height
+                    : space.volumeLengthOccupied!.height,
+            width: space.volumeLengthOccupied!.width! < productOccupied.width!
+                ? productOccupied.width
+                : space.volumeLengthOccupied!.width,
+            length:
+                space.volumeLengthOccupied!.length! + productOccupied.length!,
+          );
+
+          recoveryRemainingLengthSpace = CubeDTO(
+            height: box.height,
+            width: recoveryRemainingLengthSpace.width,
+            length: recoveryRemainingLengthSpace.length! -
+                response.volumeLengthOccupied!.length!,
+          );
+        } else {
+          response.success = false;
+        }
+      } else {
+        response.success = false;
+      }
+    } else {
+      response.success = false;
+    }
+    return response;
   }
 }

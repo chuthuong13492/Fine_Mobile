@@ -82,7 +82,7 @@ class RootViewModel extends BaseModel {
     Get.find<CartViewModel>().getReOrder();
     Get.find<BlogsViewModel>().getBlogs();
     await Get.find<RootViewModel>().checkCartAvailable();
-    Get.find<RootViewModel>().checkHasParty();
+    // Get.find<RootViewModel>().checkHasParty();
     Get.find<PartyOrderViewModel>().getCoOrderStatus();
   }
 
@@ -114,26 +114,26 @@ class RootViewModel extends BaseModel {
     }
   }
 
-  Future<void> checkHasParty() async {
-    final party = Get.find<PartyOrderViewModel>();
-    final partyCode = await getPartyCode();
-    if (partyCode != null) {
-      if (partyCode.contains("LPO")) {
-        party.isLinked = true;
-      } else {
-        if (party.partyOrderDTO != null) {
-          notifier.value = true;
-          await Get.find<PartyOrderViewModel>().getCoOrderStatus();
-        } else {
-          notifier.value = false;
-        }
-      }
-    } else {
-      party.isLinked = false;
-      notifier.value = false;
-    }
-    notifyListeners();
-  }
+  // Future<void> checkHasParty() async {
+  //   final party = Get.find<PartyOrderViewModel>();
+  //   final partyCode = await getPartyCode();
+  //   if (partyCode != null) {
+  //     if (partyCode.contains("LPO")) {
+  //       party.isLinked = true;
+  //     } else {
+  //       if (party.partyOrderDTO != null) {
+  //         notifier.value = true;
+  //         await Get.find<PartyOrderViewModel>().getCoOrderStatus();
+  //       } else {
+  //         notifier.value = false;
+  //       }
+  //     }
+  //   } else {
+  //     party.isLinked = false;
+  //     notifier.value = false;
+  //   }
+  //   notifyListeners();
+  // }
 
   Future<ProductDTO?> openProductShowSheet(String productId) async {
     ProductDTO? item;
@@ -274,16 +274,19 @@ class RootViewModel extends BaseModel {
             if (selectedTimeSlot == partyDTO.timeSlotDTO) {
               selectedTimeSlot = previousTimeSlotList?.firstWhere(
                   (element) => element.id == partyDTO.timeSlotDTO?.id);
+              // await refreshMenu();
             } else {
               bool isCartTimeSlotAvailable = previousTimeSlotList!
                   .any((element) => element.id == partyDTO.timeSlotDTO?.id);
               if (isCartTimeSlotAvailable) {
                 selectedTimeSlot = previousTimeSlotList?.firstWhere(
                     (element) => element.id == partyDTO.timeSlotDTO?.id);
+                await refreshMenu();
               } else {
                 selectedTimeSlot = previousTimeSlotList![0];
                 await deletePartyCode();
                 await _cartViewModel.removeCart();
+                await refreshMenu();
               }
             }
           }

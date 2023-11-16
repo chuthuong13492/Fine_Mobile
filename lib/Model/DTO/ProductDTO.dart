@@ -267,6 +267,10 @@ class ProductAttributes {
   String? name;
   String? code;
   String? size;
+  int? rotationType;
+  double? height;
+  double? width;
+  double? length;
   double? price;
   bool? isActive;
   DateTime? createAt;
@@ -278,6 +282,10 @@ class ProductAttributes {
     this.name,
     this.code,
     this.size,
+    this.rotationType,
+    this.height,
+    this.width,
+    this.length,
     this.price,
     this.isActive,
     this.createAt,
@@ -290,6 +298,10 @@ class ProductAttributes {
     name = json["name"];
     code = json["code"];
     size = json["size"] ?? null;
+    rotationType = json["rotationType"];
+    height = json["height"];
+    width = json["width"];
+    length = json["length"];
     price = json["price"];
     isActive = json["isActive"];
     createAt = json['createAt'] as String != null

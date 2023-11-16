@@ -101,8 +101,15 @@ class ProductDetailViewModel extends BaseModel {
   Future<bool?> addProductToCart({bool backToHome = true}) async {
     showLoadingDialog();
     final cart = await getCart();
-    CartItem item = CartItem(selectAttribute?.id, master?.productName,
-        master?.imageUrl, selectAttribute!.size, total, total, count, false);
+    CartItem item = CartItem(
+        selectAttribute?.id,
+        master?.productName,
+        master?.imageUrl,
+        selectAttribute!.size,
+        selectAttribute!.price,
+        total,
+        count,
+        false);
 
     bool isInCart;
     if (cart == null) {

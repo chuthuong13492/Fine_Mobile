@@ -54,7 +54,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
     return Scaffold(
       backgroundColor: FineTheme.palettes.shades100,
       body: CustomScrollView(
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         slivers: [
           SliverAppBar(
             leading: Container(
@@ -69,7 +69,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                   child: IconButton(
                       padding: const EdgeInsets.all(0),
                       onPressed: () async {
-                        await Get.find<RootViewModel>().checkHasParty();
+                        // await Get.find<RootViewModel>().checkHasParty();
                         Get.back();
                       },
                       icon: const Icon(

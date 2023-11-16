@@ -272,6 +272,8 @@ class _CartScreenState extends State<CartScreen>
                 } else {
                   hasParty = true;
                 }
+              } else {
+                hasParty = false;
               }
 
               if (model.status == ViewStatus.Loading) {

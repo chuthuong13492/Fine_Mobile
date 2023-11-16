@@ -14,3 +14,15 @@ class ProductType {
   static const int COMPLEX_PRODUCT = 10;
   static const int GIFT_PRODUCT = 12;
 }
+
+// enum ProductRotationTypeEnum {
+//   vertical = 1,
+//   horizontal,
+//   both,
+// }
+
+class ProductRotationTypeEnum {
+  static const int VERTICAL = 1;
+  static const int HORIZONTAL = 2;
+  static const int BOTH = 3;
+}

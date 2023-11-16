@@ -38,15 +38,10 @@ class _CartButtonState extends State<CartButton> {
   @override
   void initState() {
     super.initState();
-    // root = Get.find<RootViewModel>();
-    _timer = Timer.periodic(const Duration(seconds: 1),
-        (timer) async => await root?.checkHasParty());
-    // getRoot();
-  }
-
-  void getRoot() async {
-    // await root?.checkHasParty();
-    if (root?.notifier.value == true) {}
+    _timer = Timer.periodic(
+        const Duration(seconds: 1),
+        (timer) async =>
+            await Get.find<PartyOrderViewModel>().getCoOrderStatus());
   }
 
   @override
