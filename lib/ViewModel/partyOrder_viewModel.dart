@@ -341,7 +341,7 @@ class PartyOrderViewModel extends BaseModel {
         orderDetails: detailList,
       );
       _orderViewModel.currentCart = cart;
-      Get.toNamed(RouteHandler.ORDER);
+      Get.offAndToNamed(RouteHandler.ORDER);
       // _orderViewModel.orderDTO = orderDTO;
 
       notifyListeners();
