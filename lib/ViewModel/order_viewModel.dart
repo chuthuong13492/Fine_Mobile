@@ -261,8 +261,8 @@ class OrderViewModel extends BaseModel {
           final cart = await getMart();
           if (cart != null) {
             for (var item in cart.orderDetails!) {
-              CartItem cartItem = CartItem(
-                  item.productId, "", "", "", 0, 0, item.quantity, false);
+              CartItem cartItem = CartItem(item.productId, "", "", "", 0, 0, 0,
+                  0, 0, 0, item.quantity, false, false);
               await removeItemFromCart(cartItem);
             }
           }
@@ -322,8 +322,20 @@ class OrderViewModel extends BaseModel {
         ProductDTO(productName: product.name, imageUrl: product.imageUrl);
     bool? isAdded = await prodModel.addProductToCart();
     if (isAdded == true) {
-      CartItem cartItem = CartItem(product.id, product.name, product.imageUrl,
-          product.size, product.price, product.price, 1, true);
+      CartItem cartItem = CartItem(
+          product.id,
+          product.name,
+          product.imageUrl,
+          product.size,
+          0,
+          0,
+          0,
+          0,
+          product.price,
+          product.price,
+          1,
+          false,
+          true);
       await Get.find<CartViewModel>().changeValueChecked(true, cartItem);
       if (notifierTimeRemaining.value > 0) {
         await delLockBox();
@@ -351,18 +363,19 @@ class OrderViewModel extends BaseModel {
         if (orderStatusDTO?.orderStatus == 13) {
           if (Get.currentRoute == "/checking_order_screen" ||
               Get.currentRoute == "/order_detail") {
+            await Get.find<OrderHistoryViewModel>().getOrders();
             Get.back();
           }
-          await showStatusDialog(
+          showStatusDialog(
               "assets/images/logo2.png", "Oops!", "Đơn hàng đã bị hủy mất rùi");
         } else if (orderStatusDTO?.orderStatus == 11 &&
             Get.currentRoute == '/qrcode_screen') {
+          await Get.find<OrderHistoryViewModel>().getOrders();
           Get.offAndToNamed(RouteHandler.NAV);
         }
       }
       setState(ViewStatus.Completed);
     } catch (e) {
-      // orderStatusDTO = null;
       setState(ViewStatus.Completed);
     }
   }

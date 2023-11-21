@@ -102,14 +102,20 @@ class ProductDetailViewModel extends BaseModel {
     showLoadingDialog();
     final cart = await getCart();
     CartItem item = CartItem(
-        selectAttribute?.id,
-        master?.productName,
-        master?.imageUrl,
-        selectAttribute!.size,
-        selectAttribute!.price,
-        total,
-        count,
-        false);
+      selectAttribute?.id,
+      master?.productName,
+      master?.imageUrl,
+      selectAttribute!.size,
+      selectAttribute?.rotationType,
+      selectAttribute!.height,
+      selectAttribute!.width,
+      selectAttribute!.length,
+      selectAttribute!.price,
+      total,
+      count,
+      selectAttribute?.isStackable,
+      false,
+    );
 
     bool isInCart;
     if (cart == null) {

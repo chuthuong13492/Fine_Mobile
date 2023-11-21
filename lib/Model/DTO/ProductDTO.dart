@@ -161,22 +161,14 @@ import 'package:flutter/foundation.dart';
 
 class ProductDTO {
   String? id;
-  // int? generalProductId;
   String? productCode;
   String? productName;
   String? categoryId;
-  // String? categoryName;
   String? storeId;
-  // String? storeName;
   int? productType;
   String? imageUrl;
-  // double? price;
-  // bool? isAvailable;
-  // int? status;
-  // DateTime? createdAt;
-  // DateTime? updatedAt;
-
   bool? isActive;
+  bool? isStackable;
   DateTime? createAt;
   DateTime? updateAt;
   List<ProductAttributes>? attributes;
@@ -185,51 +177,77 @@ class ProductDTO {
     this.id,
     this.productName,
     this.productCode,
-    // this.generalProductId,
     this.categoryId,
-    // this.categoryName,
     this.storeId,
-    // this.storeName,
     this.productType,
     this.imageUrl,
     this.isActive,
-    // this.isAvailable,
-    // this.status,
+    this.isStackable,
     this.createAt,
     this.updateAt,
-    this.attributes,
-  });
+    List<ProductAttributes>? attributes,
+  }) : attributes = attributes?.map((attr) {
+          return ProductAttributes(
+            id: attr.id,
+            productId: attr.productId,
+            name: attr.name,
+            code: attr.code,
+            size: attr.size,
+            rotationType: attr.rotationType,
+            height: attr.height,
+            width: attr.width,
+            length: attr.length,
+            price: attr.price,
+            isActive: attr.isActive,
+            isStackable: isStackable,
+            createAt: attr.createAt,
+            updateAt: attr.updateAt,
+          );
+        }).toList();
 
-  ProductDTO.fromJson(Map<String, dynamic> json) {
-    id = json["id"] as String;
-    productName = json["productName"];
-    productCode = json["code"];
-    // generalProductId = json["generalProductId"];
-    // productCode = json["productCode"];
+  factory ProductDTO.fromJson(Map<String, dynamic> json) {
+    return ProductDTO(
+      id: json["id"] as String,
+      productName: json["productName"],
+      productCode: json["code"],
+      categoryId: json["categoryId"],
+      storeId: json["storeId"],
+      productType: json["productType"],
+      imageUrl: json["imageUrl"],
+      isActive: json["isActive"],
+      isStackable: json["isStackable"],
+      createAt: json['createAt'] as String != null
+          ? DateTime.parse(json['createAt'] as String)
+          : null,
+      updateAt: json['updateAt'] as String != null
+          ? DateTime.parse(json['updateAt'] as String)
+          : null,
+      attributes: json["productAttributes"] == null
+          ? null
+          : (json["productAttributes"] as List)
+              .map((e) => ProductAttributes.fromJson(e))
+              .toList(),
+    );
+    // id = json["id"] as String;
     // productName = json["productName"];
-    categoryId = json["categoryId"];
-    // categoryName = json["categoryName"];
-    storeId = json["storeId"];
-    productType = json["productType"];
-    // storeName = json["storeName"];
-    imageUrl = json["imageUrl"];
-    isActive = json["isActive"];
-    // isAvailable = json["isAvailable"];
-    // status = json["status"];
-    // createdAt = json['createdAt'] as String != null
-    //     ? DateTime.parse(json['createdAt'] as String)
+    // productCode = json["code"];
+    // categoryId = json["categoryId"];
+    // storeId = json["storeId"];
+    // productType = json["productType"];
+    // imageUrl = json["imageUrl"];
+    // isActive = json["isActive"];
+    // isStackable = json["isStackable"];
+    // createAt = json['createAt'] as String != null
+    //     ? DateTime.parse(json['createAt'] as String)
     //     : null;
-    createAt = json['createAt'] as String != null
-        ? DateTime.parse(json['createAt'] as String)
-        : null;
-    updateAt = json['updateAt'] as String != null
-        ? DateTime.parse(json['updateAt'] as String)
-        : null;
-    attributes = json["productAttributes"] == null
-        ? null
-        : (json["productAttributes"] as List)
-            .map((e) => ProductAttributes.fromJson(e))
-            .toList();
+    // updateAt = json['updateAt'] as String != null
+    //     ? DateTime.parse(json['updateAt'] as String)
+    //     : null;
+    // attributes = json["productAttributes"] == null
+    //     ? null
+    //     : (json["productAttributes"] as List)
+    //         .map((e) => ProductAttributes.fromJson(e))
+    //         .toList();
   }
 
   static List<ProductDTO> fromList(List<Map<String, dynamic>> list) {
@@ -273,6 +291,7 @@ class ProductAttributes {
   double? length;
   double? price;
   bool? isActive;
+  bool? isStackable;
   DateTime? createAt;
   DateTime? updateAt;
 
@@ -288,6 +307,7 @@ class ProductAttributes {
     this.length,
     this.price,
     this.isActive,
+    this.isStackable,
     this.createAt,
     this.updateAt,
   });

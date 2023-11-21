@@ -137,8 +137,8 @@ class PartyOrderViewModel extends BaseModel {
         for (var item in list) {
           if (item.orderDetails != null) {
             for (var item in item.orderDetails!) {
-              CartItem cartItem = CartItem(
-                  item.productId, null, null, null, null, null, 0, false);
+              CartItem cartItem = CartItem(item.productId, null, null, null,
+                  null, null, null, null, null, null, 0, false, false);
               await updateCheckItemFromCart(cartItem, false);
             }
           }
@@ -161,8 +161,8 @@ class PartyOrderViewModel extends BaseModel {
           for (var item in list) {
             if (item.orderDetails != null) {
               for (var item in item.orderDetails!) {
-                CartItem cartItem = CartItem(
-                    item.productId, null, null, null, null, null, 0, false);
+                CartItem cartItem = CartItem(item.productId, null, null, null,
+                    null, null, null, null, null, null, 0, false, false);
                 await updateCheckItemFromCart(cartItem, false);
               }
             }
@@ -600,6 +600,9 @@ class PartyOrderViewModel extends BaseModel {
     try {
       setState(ViewStatus.Loading);
       partyCode = await getPartyCode();
+      if (partyCode == null) {
+        return;
+      }
       partyStatus = await _partyDAO?.getPartyStatus(partyCode!);
       if (partyStatus != null) {
         if (partyStatus?.isFinish == true) {

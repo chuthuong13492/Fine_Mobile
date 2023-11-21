@@ -1,5 +1,7 @@
 import 'package:fine/Model/DTO/index.dart';
 
+import 'CartDTO.dart';
+
 class CubeDTO {
   double? height;
   double? width;
@@ -10,16 +12,19 @@ class CubeDTO {
     this.width,
     this.length,
   });
+
+  CubeDTO.fromJson(Map<String, dynamic> json) {
+    height = json["height"];
+    width = json["width"];
+    length = json["length"];
+  }
 }
 
 class CheckFixBoxRequest {
-  ProductAttributes? product;
+  CartItem? product;
   int? quantity;
 
-  CheckFixBoxRequest({
-    this.product,
-    this.quantity,
-  });
+  CheckFixBoxRequest({this.product, this.quantity});
 }
 
 class ProductParingResponse {

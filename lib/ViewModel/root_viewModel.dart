@@ -65,7 +65,7 @@ class RootViewModel extends BaseModel {
     // fetchStore();
     await Get.find<HomeViewModel>().getMenus();
     await Get.find<HomeViewModel>().getProductListInTimeSlot();
-    await Get.find<CartViewModel>().getReOrder();
+    // await Get.find<CartViewModel>().getReOrder();
   }
 
   Future startUp() async {
@@ -81,6 +81,7 @@ class RootViewModel extends BaseModel {
 
     Get.find<CartViewModel>().getReOrder();
     Get.find<BlogsViewModel>().getBlogs();
+    await Get.find<CartViewModel>().getBoxes();
     await Get.find<RootViewModel>().checkCartAvailable();
     // Get.find<RootViewModel>().checkHasParty();
     Get.find<PartyOrderViewModel>().getCoOrderStatus();
@@ -113,27 +114,6 @@ class RootViewModel extends BaseModel {
       await getListTimeSlot();
     }
   }
-
-  // Future<void> checkHasParty() async {
-  //   final party = Get.find<PartyOrderViewModel>();
-  //   final partyCode = await getPartyCode();
-  //   if (partyCode != null) {
-  //     if (partyCode.contains("LPO")) {
-  //       party.isLinked = true;
-  //     } else {
-  //       if (party.partyOrderDTO != null) {
-  //         notifier.value = true;
-  //         await Get.find<PartyOrderViewModel>().getCoOrderStatus();
-  //       } else {
-  //         notifier.value = false;
-  //       }
-  //     }
-  //   } else {
-  //     party.isLinked = false;
-  //     notifier.value = false;
-  //   }
-  //   notifyListeners();
-  // }
 
   Future<ProductDTO?> openProductShowSheet(String productId) async {
     ProductDTO? item;
@@ -209,53 +189,6 @@ class RootViewModel extends BaseModel {
     hideDialog();
     Get.toNamed(RouteHandler.NAV);
   }
-
-  // Future<void> navParty() async {
-  //   OrderViewModel orderViewModel = Get.find<OrderViewModel>();
-
-  //   PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
-  //   await party.getPartyOrder();
-  //   if (party.partyOrderDTO != null &&
-  //       party.partyOrderDTO!.timeSlotDTO!.id == selectedTimeSlot!.id) {
-  //     await party.getPartyOrder();
-  //     await Future.delayed(const Duration(microseconds: 500));
-  //     // if (party.isPreCoOrder == true && party.orderDTO != null) {
-  //     //   Get.toNamed(RouteHandler.PREPARE_CO_ORDER, arguments: party.orderDTO);
-  //     // } else {
-  //     Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
-  //     // }
-
-  //     // hideDialog();
-  //   } else {
-  //     if (party.partyOrderDTO != null) {
-  //       if (party.partyOrderDTO!.timeSlotDTO!.id != selectedTimeSlot!.id) {
-  //         int option = 0;
-  //         if (isCurrentTimeSlotAvailable()) {
-  //           option = await showOptionDialog(
-  //               "Đơn nhóm của bạn đang ở khung giờ ${party.partyOrderDTO!.timeSlotDTO!.arriveTime} Bạn vui lòng đổi sang khung giờ này để tham gia đơn nhóm nhé");
-  //         } else {
-  //           await deletePartyCode();
-  //           party.partyOrderDTO = null;
-  //           // await orderViewModel.removeCart();
-  //         }
-  //         await Future.delayed(const Duration(microseconds: 500));
-
-  //         if (option != 1) {
-  //           return;
-  //         }
-  //         selectedTimeSlot = party.partyOrderDTO!.timeSlotDTO!;
-  //         await refreshMenu();
-  //         // if (party.isPreCoOrder == true && party.orderDTO != null) {
-  //         //   Get.toNamed(RouteHandler.PREPARE_CO_ORDER,
-  //         //       arguments: party.orderDTO);
-  //         // } else {
-  //         Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
-  //         // }
-  //         notifyListeners();
-  //       }
-  //     }
-  //   }
-  // }
 
   Future<void> checkCartAvailable() async {
     DestinationDAO campusDAO = DestinationDAO();

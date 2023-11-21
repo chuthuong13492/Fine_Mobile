@@ -2,6 +2,9 @@ import 'package:fine/Model/DAO/index.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/request.dart';
 
+import '../../Constant/boxes_response.dart';
+import '../DTO/CubeModel.dart';
+
 class DestinationDAO extends BaseDAO {
   Future<List<TimeSlotDTO>?> getTimeSlot(String destinationId,
       {int? page, int? size}) async {
@@ -10,9 +13,23 @@ class DestinationDAO extends BaseDAO {
       // queryParameters: {"page": page, "size": size ?? 20},
     );
     if (res.data['data'] != null) {
-      var listJson = res.data['data'] as List;
+      var listTimeSlotJson = res.data['data']["listTimeslotResponse"] as List;
       // metaDataDTO = MetaDataDTO.fromJson(res.data['metadata']);
-      return listJson.map((e) => TimeSlotDTO.fromJson(e)).toList();
+      return listTimeSlotJson.map((e) => TimeSlotDTO.fromJson(e)).toList();
+    }
+    return null;
+  }
+
+  Future<BoxesResponse?> getBoxesResponse(String destinationId,
+      {int? page, int? size}) async {
+    final res = await request.get(
+      "/timeslot/destination/$destinationId",
+    );
+    if (res.data['data'] != null) {
+      return BoxesResponse(
+        cube: CubeDTO.fromJson(res.data["data"]["boxSize"]),
+        maxQuantityInBox: res.data["data"]["maxQuantityInBox"],
+      );
     }
     return null;
   }

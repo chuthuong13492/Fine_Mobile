@@ -231,6 +231,21 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   }
 
   Widget _buildTransactionItem(TransactionDTO item) {
+    String text = '';
+    switch (item.type) {
+      case 1:
+        text = 'Nạp tìen';
+        break;
+      case 2:
+        text = 'Thanh toán';
+
+        break;
+      case 3:
+        text = 'Hoàn tiền';
+
+        break;
+      default:
+    }
     return Container(
       // height: 80,
       margin: const EdgeInsets.fromLTRB(8, 0, 8, 16),
@@ -255,7 +270,8 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                   Row(
                     children: [
                       Text(
-                        item.isIncrease == true ? "Nạp tiền" : "Thanh toán",
+                        // item.isIncrease == true ? "Nạp tiền" : "Thanh toán",
+                        text,
                         style: FineTheme.typograhpy.subtitle2
                             .copyWith(color: FineTheme.palettes.shades200),
                       ),

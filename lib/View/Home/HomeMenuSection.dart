@@ -32,17 +32,14 @@ class HomeMenuSection extends StatefulWidget {
 class _HomeMenuSectionState extends State<HomeMenuSection> {
   ScrollController scrollController = ScrollController();
   RootViewModel? _rootViewModel;
-  Timer? _timer;
+  // Timer? _timer;
   DateTime? now;
 
   @override
   void initState() {
     super.initState();
-    // scrollController.dispose();
     _rootViewModel = Get.find<RootViewModel>();
-    // Get.find<CategoryViewModel>().getCategories();
-    _timer = Timer.periodic(
-        const Duration(seconds: 1), (timer) => now = DateTime.now());
+    Timer.periodic(const Duration(seconds: 1), (timer) => now = DateTime.now());
 
     Get.find<RootViewModel>().getListTimeSlot();
   }

@@ -122,9 +122,14 @@ class CartItem {
   String? productName;
   String? imgUrl;
   String? size;
+  int? rotationType;
+  double? height;
+  double? width;
+  double? length;
   double? price;
   double? fixTotal;
   int quantity;
+  bool? isStackable;
   bool? isChecked;
 
   CartItem(
@@ -132,9 +137,14 @@ class CartItem {
     this.productName,
     this.imgUrl,
     this.size,
+    this.rotationType,
+    this.height,
+    this.width,
+    this.length,
     this.price,
     this.fixTotal,
     this.quantity,
+    this.isStackable,
     this.isChecked,
   );
 
@@ -153,9 +163,14 @@ class CartItem {
       json["productName"] as String,
       json["imgUrl"] as String,
       json["size"] as String,
+      json["rotationType"] as int,
+      json["height"] as double,
+      json["width"] as double,
+      json["length"] as double,
       json["price"] as double,
       json["fixTotal"] as double,
       json['quantity'] as int,
+      json['isStackable'] as bool,
       json['isChecked'] as bool,
     );
   }
@@ -166,13 +181,19 @@ class CartItem {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
+    _data["id"] = productId;
     _data["productId"] = productId;
     _data["productName"] = productName;
     _data["imgUrl"] = imgUrl;
     _data["size"] = size;
+    _data["rotationType"] = rotationType;
+    _data["height"] = height;
+    _data["width"] = width;
+    _data["length"] = length;
     _data["price"] = price;
     _data["fixTotal"] = fixTotal;
     _data["quantity"] = quantity;
+    _data["isStackable"] = isStackable;
     _data["isChecked"] = isChecked;
     return _data;
   }

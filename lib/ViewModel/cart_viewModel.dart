@@ -7,9 +7,11 @@ import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../Constant/boxes_response.dart';
 import '../Constant/view_status.dart';
 
 import '../Model/DAO/StoreDAO.dart';
+import '../Model/DAO/index.dart';
 import '../Model/DTO/ConfirmCartDTO.dart';
 import '../Model/DTO/CubeModel.dart';
 import '../Model/DTO/OrderDTO.dart';
@@ -22,16 +24,19 @@ class CartViewModel extends BaseModel {
   StoreDAO? _storeDAO;
   final root = Get.find<RootViewModel>();
   Cart? currentCart;
-  // List<bool> isCheckedList = List.generate(0, (index) => false);
   List<ReOrderDTO>? reOrderList;
+  List<CheckFixBoxRequest>? card;
   double total = 0, fixTotal = 0, extraTotal = 0;
   int quantityChecked = 0;
   bool? isSelected = false;
   String? code;
+  BoxesResponse? boxes;
+  DestinationDAO? _destinationDAO;
   final ValueNotifier<int> notifier = ValueNotifier(0);
 
   CartViewModel() {
     _storeDAO = StoreDAO();
+    _destinationDAO = DestinationDAO();
     currentCart = null;
   }
 
@@ -45,12 +50,19 @@ class CartViewModel extends BaseModel {
         if (isAdded == true) {
           getTotalQuantity(isAdded, cartItem);
         }
+        // final mart = await getMart();
+        // if (mart == null) {
+        //   // await checkProductFixTheBox(card, attr, quantity);
+        // }
+        // await updateCheckItemFromCart(cartItem, value);
       } else {
         ConfirmCartItem item =
             ConfirmCartItem(cartItem.productId, cartItem.quantity, "");
         await removeItemFromMart(item);
         await updateCheckItemFromCart(cartItem, value);
         await getTotalQuantity(value, cartItem);
+
+        // await updateCheckItemFromCart(cartItem, value);
       }
       currentCart = await getCart();
       isSelected =
@@ -204,8 +216,20 @@ class CartViewModel extends BaseModel {
     // }
 
     fixTotal = item.price! * item.quantity;
-    final cartItem = CartItem(item.productId, item.productName, item.imgUrl,
-        item.size, item.price, fixTotal, item.quantity, false);
+    final cartItem = CartItem(
+        item.productId,
+        item.productName,
+        item.imgUrl,
+        item.size,
+        item.rotationType,
+        item.height,
+        item.width,
+        item.length,
+        item.price,
+        fixTotal,
+        item.quantity,
+        item.isStackable,
+        false);
     await updateItemFromCart(cartItem);
     ConfirmCartItem confirmCartItem =
         ConfirmCartItem(item.productId, item.quantity, "");
@@ -269,110 +293,151 @@ class CartViewModel extends BaseModel {
     notifyListeners();
   }
 
-  Future<FixBoxResponse?> checkProductFixTheBox(List<CheckFixBoxRequest> card,
-      ProductAttributes product, int quantity) async {
-    FixBoxResponse fillBoxResponse = FixBoxResponse(quantitySuccess: 0);
+  Future<void> getBoxes() async {
+    try {
+      setState(ViewStatus.Loading);
+      boxes = await _destinationDAO?.getBoxesResponse(DESTINATIONID);
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      setState(ViewStatus.Error);
+    }
+  }
 
-    var boxSize = CubeDTO(height: 25, width: 35, length: 20);
+  Future<FixBoxResponse?> checkProductFixTheBox(
+      CartItem attr, int quantity) async {
+    try {
+      FixBoxResponse fillBoxResponse = FixBoxResponse(quantitySuccess: 0);
 
-    var spaceInBox = SpaceInBoxMode(
+      var boxSize = CubeDTO(
+        height: boxes?.cube?.height,
+        width: boxes?.cube?.width,
+        length: boxes?.cube?.length,
+      );
+
+      var spaceInBox = SpaceInBoxMode(
         remainingSpaceBox: boxSize,
         remainingLengthSpace: boxSize,
         remainingWidthSpace: boxSize,
-        volumeOccupied: null);
+        volumeOccupied: null,
+      );
+      if (card == null) {
+        card?.add(CheckFixBoxRequest(product: attr, quantity: quantity));
+      }
+      // tính thể tích bị chiếm bởi các product trong card trước
+      card?.sort((a, b) =>
+          (b.product!.length! * b.product!.width! * b.product!.height!)
+              .compareTo(
+                  a.product!.length! * a.product!.width! * a.product!.height!));
+      for (var item in card!) {
+        // ghép product lên cho vừa họp dựa trên quantity yêu cầu
+        ProductParingResponse? pairingCardResult =
+            await productPairing(item.quantity!, item.product!, boxSize);
 
-    card.sort((a, b) =>
-        (b.product!.length! * b.product!.width! * b.product!.height!).compareTo(
-            a.product!.length! * a.product!.width! * a.product!.height!));
-    for (var item in card) {
-      ProductParingResponse? pairingCardResult =
-          await productPairing(item.quantity!, item.product!, boxSize);
+        var turnCard = (item.quantity! / pairingCardResult!.quantityCanAdd!)
+            .ceilToDouble();
+        for (var successCase = 1; successCase <= turnCard; successCase++) {
+          // đem đi bỏ vào tủ
+          final calculateCardResult = await calculateRemainingSpace(
+              boxSize, spaceInBox, pairingCardResult.productSupplanted!);
 
-      var turnCard =
-          (item.quantity! / pairingCardResult!.quantityCanAdd!).ceilToDouble();
-      for (var successCase = 0; successCase <= turnCard; successCase++) {
-        // đem đi bỏ vào tủ
-        final calculateCardResult = await calculateRemainingSpace(
-            boxSize, spaceInBox, pairingCardResult.productSupplanted!);
+          if (calculateCardResult!.success == true) {
+            spaceInBox = SpaceInBoxMode(
+              remainingSpaceBox: calculateCardResult.remainingSpaceBox,
+              volumeOccupied: calculateCardResult.volumeOccupied,
+              remainingLengthSpace: calculateCardResult.remainingLengthSpace,
+              remainingWidthSpace: calculateCardResult.remainingWidthSpace,
+              volumeLengthOccupied: calculateCardResult.volumeLengthOccupied,
+              volumeWidthOccupied: calculateCardResult.volumeWidthOccupied,
+            );
 
-        if (calculateCardResult!.success == true) {
-          spaceInBox = SpaceInBoxMode(
-            remainingSpaceBox: calculateCardResult.remainingSpaceBox,
-            volumeOccupied: calculateCardResult.volumeOccupied,
-            remainingLengthSpace: calculateCardResult.remainingLengthSpace,
-            remainingWidthSpace: calculateCardResult.remainingWidthSpace,
-            volumeLengthOccupied: calculateCardResult.volumeLengthOccupied,
-            volumeWidthOccupied: calculateCardResult.volumeWidthOccupied,
-          );
-
-          if (product != null) {
-            if (item.product!.id == product.id) {
-              if (successCase == turnCard) {
-                fillBoxResponse.quantitySuccess = quantity;
-              } else {
-                fillBoxResponse.quantitySuccess =
-                    pairingCardResult.quantityCanAdd! * successCase;
+            if (attr != null) {
+              if (item.product!.productId == attr.productId) {
+                if (successCase == turnCard) {
+                  fillBoxResponse.quantitySuccess = quantity;
+                } else {
+                  fillBoxResponse.quantitySuccess =
+                      pairingCardResult.quantityCanAdd! * successCase;
+                }
               }
             }
+          } else {
+            break;
           }
-        } else {
-          break;
         }
       }
+      fillBoxResponse.remainingWidthSpace = spaceInBox.remainingWidthSpace;
+      fillBoxResponse.remainingLengthSpace = spaceInBox.remainingLengthSpace;
+      return fillBoxResponse;
+    } catch (e) {
+      throw e;
     }
-    fillBoxResponse.remainingWidthSpace = spaceInBox.remainingWidthSpace;
-    fillBoxResponse.remainingLengthSpace = spaceInBox.remainingLengthSpace;
-    return fillBoxResponse;
   }
 
   Future<ProductParingResponse?> productPairing(
-      int quantity, ProductAttributes product, CubeDTO boxSize) async {
+      int quantity, CartItem attr, CubeDTO boxSize) async {
     ProductParingResponse paringResponse =
         ProductParingResponse(productSupplanted: null, quantityCanAdd: 1);
-    switch (product.rotationType) {
+    switch (attr.rotationType) {
       case ProductRotationTypeEnum.BOTH:
-        if (product.length! < boxSize.height!) {
-          if (product.width! < product.height!) {
+        if (attr.length! < boxSize.height!) {
+          if (attr.width! < attr.height!) {
             paringResponse.productSupplanted = CubeDTO(
-              height: product.length,
-              width: product.width,
-              length: product.height,
+              height: attr.length,
+              width: attr.width,
+              length: attr.height,
             );
           } else {
             paringResponse.productSupplanted = CubeDTO(
-              height: product.length,
-              width: product.height,
-              length: product.width,
+              height: attr.length,
+              width: attr.height,
+              length: attr.width,
             );
           }
         }
         break;
       // nếu product mặc định nằm ngang => product nằm chồng lên nhau => số lượng có thể add * product.h < product.h (tùy thuộc có thể chồng hay ko)
       case ProductRotationTypeEnum.HORIZONTAL:
-        // if (product.Product.IsStackable is true)
-        // {
-        //     paringResponse.QuantityCanAdd = (int)Math.Floor(boxSize.Height / product.Height);
-        //     if(paringResponse.QuantityCanAdd > quantity) paringResponse.QuantityCanAdd = quantity;
+        if (attr.isStackable == true) {
+          paringResponse.quantityCanAdd =
+              (boxSize.height! / attr.height!).floor();
+          if (paringResponse.quantityCanAdd! > quantity) {
+            paringResponse.quantityCanAdd = quantity;
+          }
 
-        //     paringResponse.ProductSupplanted = new CubeModel()
-        //     {
-        //         Height = product.Height * paringResponse.QuantityCanAdd,
-        //         Width = product.Width,
-        //         Length = product.Length
-        //     };
-        // }
-        // else
-        // {
-        //     paringResponse.ProductSupplanted = new CubeModel()
-        //     {
-        //         Height = product.Height,
-        //         Width = product.Width,
-        //         Length = product.Length
-        //     };
-        // }
+          paringResponse.productSupplanted = CubeDTO(
+            height: attr.height! * paringResponse.quantityCanAdd!,
+            width: attr.width,
+            length: attr.length,
+          );
+        } else {
+          paringResponse.productSupplanted = CubeDTO(
+            height: attr.height,
+            width: attr.width,
+            length: attr.length,
+          );
+        }
+        break;
+      case ProductRotationTypeEnum.VERTICAL:
+        paringResponse.productSupplanted = CubeDTO(
+          height: attr.height,
+          width: attr.width,
+          length: attr.length,
+        );
         break;
       default:
     }
+    var temp = paringResponse.productSupplanted!.length;
+    paringResponse.productSupplanted!.length =
+        paringResponse.productSupplanted!.length! >
+                paringResponse.productSupplanted!.width!
+            ? paringResponse.productSupplanted!.length
+            : paringResponse.productSupplanted!.width;
+    paringResponse.productSupplanted!.width =
+        paringResponse.productSupplanted!.length! >
+                paringResponse.productSupplanted!.width!
+            ? paringResponse.productSupplanted!.width
+            : temp;
+
     return paringResponse;
   }
 
