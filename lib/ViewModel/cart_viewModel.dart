@@ -7,6 +7,7 @@ import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../Accessories/dialog.dart';
 import '../Constant/boxes_response.dart';
 import '../Constant/view_status.dart';
 
@@ -24,8 +25,9 @@ class CartViewModel extends BaseModel {
   StoreDAO? _storeDAO;
   final root = Get.find<RootViewModel>();
   Cart? currentCart;
+  Cart? checkCart;
   List<ReOrderDTO>? reOrderList;
-  List<CheckFixBoxRequest>? card;
+  // List<CheckFixBoxRequest>? card;
   double total = 0, fixTotal = 0, extraTotal = 0;
   int quantityChecked = 0;
   bool? isSelected = false;
@@ -38,14 +40,15 @@ class CartViewModel extends BaseModel {
     _storeDAO = StoreDAO();
     _destinationDAO = DestinationDAO();
     currentCart = null;
+    checkCart = null;
   }
 
   Future<void> changeValueChecked(bool value, CartItem cartItem) async {
     try {
       if (value == true) {
-        bool? isAdded = await Get.find<ProductDetailViewModel>()
-            .processCart(cartItem.productId, cartItem.quantity);
-
+        // bool? isAdded = await Get.find<ProductDetailViewModel>()
+        //     .processCart(cartItem.productId, cartItem.quantity);
+        bool? isAdded = await processCart(cartItem);
         await updateCheckItemFromCart(cartItem, isAdded!);
         if (isAdded == true) {
           getTotalQuantity(isAdded, cartItem);
@@ -61,7 +64,8 @@ class CartViewModel extends BaseModel {
         await removeItemFromMart(item);
         await updateCheckItemFromCart(cartItem, value);
         await getTotalQuantity(value, cartItem);
-
+        checkCart!.items!
+            .removeWhere((element) => element.productId == cartItem.productId);
         // await updateCheckItemFromCart(cartItem, value);
       }
       currentCart = await getCart();
@@ -161,7 +165,23 @@ class CartViewModel extends BaseModel {
       setState(ViewStatus.Loading);
       await Future.delayed(const Duration(milliseconds: 500));
       currentCart = await getCart();
-
+      final mart = await getMart();
+      if (mart != null &&
+          mart.orderDetails!.isNotEmpty &&
+          currentCart != null) {
+        for (var item in mart.orderDetails!) {
+          checkCart = Cart(timeSlotId: root.selectedTimeSlot!.id);
+          bool check = currentCart!.items!
+              .any((element) => element.productId == item.productId);
+          if (check == true) {
+            final cart = currentCart!.items!
+                .firstWhere((element) => element.productId == item.productId);
+            checkCart!.items!.add(cart);
+          }
+        }
+      } else {
+        checkCart = Cart(timeSlotId: root.selectedTimeSlot!.id);
+      }
       if (currentCart == null) {
         notifier.value = 0;
         quantityChecked = 0;
@@ -205,16 +225,6 @@ class CartViewModel extends BaseModel {
   }
 
   Future<void> updateItem(CartItem item, int index, bool isIncrease) async {
-    // if (item.isChecked == true) {
-    //   if (isIncrease == true) {
-    //     total -= item.fixTotal!;
-    //     quantityChecked -= (item.quantity - 1);
-    //   } else {
-    //     total -= item.fixTotal!;
-    //     quantityChecked -= (item.quantity + 1);
-    //   }
-    // }
-
     fixTotal = item.price! * item.quantity;
     final cartItem = CartItem(
         item.productId,
@@ -234,6 +244,10 @@ class CartViewModel extends BaseModel {
     ConfirmCartItem confirmCartItem =
         ConfirmCartItem(item.productId, item.quantity, "");
     await removeItemFromMart(confirmCartItem);
+    if (checkCart != null && checkCart!.items!.isNotEmpty) {
+      checkCart!.items!
+          .removeWhere((element) => element.productId == item.productId);
+    }
     currentCart = await getCart();
     notifier.value = currentCart!.itemQuantity();
     if (currentCart == null) {
@@ -303,8 +317,70 @@ class CartViewModel extends BaseModel {
     }
   }
 
-  Future<FixBoxResponse?> checkProductFixTheBox(
-      CartItem attr, int quantity) async {
+  Future<bool?> processCart(CartItem cartItem) async {
+    final mart = await getMart();
+    if (mart == null) {
+      ConfirmCart preMart = ConfirmCart(timeSlotId: root.selectedTimeSlot!.id);
+      await setMart(preMart);
+    }
+    if (checkCart!.items!.isEmpty) {
+      checkCart!.items!.add(cartItem);
+    } else {
+      bool? hasItem = checkCart!.items!
+          .any((element) => element.productId == cartItem.productId);
+      if (hasItem == false) {
+        checkCart!.items!.add(cartItem);
+      }
+    }
+
+    if (checkCart!.itemQuantity() == 6) {
+      checkCart!.items!
+          .removeWhere((element) => element.productId == cartItem.productId);
+      await showStatusDialog("assets/images/error.png", "Box đã đầy",
+          "Box đã đầy ùi, Box chỉ chứa tối đa 5 món thui nè");
+      return false;
+    }
+
+    final addToBoxResult = await checkProductFixTheBox(cartItem);
+    if (addToBoxResult!.quantitySuccess == cartItem.quantity) {
+      ConfirmCartItem martItem = ConfirmCartItem(
+          cartItem.productId, addToBoxResult.quantitySuccess!, "");
+      await addItemToMart(martItem);
+      return true;
+    } else if (addToBoxResult.quantitySuccess! < cartItem.quantity &&
+        addToBoxResult.quantitySuccess != 0) {
+      CartItem resultItem = CartItem(
+          cartItem.productId,
+          cartItem.productName,
+          cartItem.imgUrl,
+          cartItem.size,
+          cartItem.rotationType,
+          cartItem.height,
+          cartItem.width,
+          cartItem.length,
+          cartItem.price,
+          cartItem.fixTotal,
+          addToBoxResult.quantitySuccess!,
+          cartItem.isStackable,
+          cartItem.isChecked);
+      ConfirmCartItem martItem = ConfirmCartItem(
+          cartItem.productId, addToBoxResult.quantitySuccess!, "");
+      checkCart?.updateQuantity(resultItem);
+      await updateItemFromCart(resultItem);
+      await addItemToMart(martItem);
+      await showStatusDialog("assets/images/error.png", "Box đã đầy",
+          "Box đã đầy rùi, bạn chỉ có thể thêm ${addToBoxResult.quantitySuccess} phần ${cartItem.productName}");
+      return true;
+    } else {
+      checkCart!.items!
+          .removeWhere((element) => element.productId == cartItem.productId);
+      await showStatusDialog("assets/images/error.png", "Box đã đầy",
+          "Box đã đầy mất ùi, bạn hong thể thêm ${cartItem.productName}");
+      return false;
+    }
+  }
+
+  Future<FixBoxResponse?> checkProductFixTheBox(CartItem cartItem) async {
     try {
       FixBoxResponse fillBoxResponse = FixBoxResponse(quantitySuccess: 0);
 
@@ -320,21 +396,16 @@ class CartViewModel extends BaseModel {
         remainingWidthSpace: boxSize,
         volumeOccupied: null,
       );
-      if (card == null) {
-        card?.add(CheckFixBoxRequest(product: attr, quantity: quantity));
-      }
       // tính thể tích bị chiếm bởi các product trong card trước
-      card?.sort((a, b) =>
-          (b.product!.length! * b.product!.width! * b.product!.height!)
-              .compareTo(
-                  a.product!.length! * a.product!.width! * a.product!.height!));
-      for (var item in card!) {
+      checkCart!.items!.sort((a, b) => (b.length! * b.width! * b.height!)
+          .compareTo(a.length! * a.width! * a.height!));
+      for (var item in checkCart!.items!) {
         // ghép product lên cho vừa họp dựa trên quantity yêu cầu
         ProductParingResponse? pairingCardResult =
-            await productPairing(item.quantity!, item.product!, boxSize);
+            await productPairing(item.quantity, item, boxSize);
 
-        var turnCard = (item.quantity! / pairingCardResult!.quantityCanAdd!)
-            .ceilToDouble();
+        var turnCard =
+            (item.quantity / pairingCardResult!.quantityCanAdd!).ceilToDouble();
         for (var successCase = 1; successCase <= turnCard; successCase++) {
           // đem đi bỏ vào tủ
           final calculateCardResult = await calculateRemainingSpace(
@@ -350,10 +421,10 @@ class CartViewModel extends BaseModel {
               volumeWidthOccupied: calculateCardResult.volumeWidthOccupied,
             );
 
-            if (attr != null) {
-              if (item.product!.productId == attr.productId) {
+            if (cartItem != null) {
+              if (item.productId == cartItem.productId) {
                 if (successCase == turnCard) {
-                  fillBoxResponse.quantitySuccess = quantity;
+                  fillBoxResponse.quantitySuccess = cartItem.quantity;
                 } else {
                   fillBoxResponse.quantitySuccess =
                       pairingCardResult.quantityCanAdd! * successCase;
@@ -374,54 +445,54 @@ class CartViewModel extends BaseModel {
   }
 
   Future<ProductParingResponse?> productPairing(
-      int quantity, CartItem attr, CubeDTO boxSize) async {
+      int quantity, CartItem cartItem, CubeDTO boxSize) async {
     ProductParingResponse paringResponse =
         ProductParingResponse(productSupplanted: null, quantityCanAdd: 1);
-    switch (attr.rotationType) {
+    switch (cartItem.rotationType) {
       case ProductRotationTypeEnum.BOTH:
-        if (attr.length! < boxSize.height!) {
-          if (attr.width! < attr.height!) {
+        if (cartItem.length! < boxSize.height!) {
+          if (cartItem.width! < cartItem.height!) {
             paringResponse.productSupplanted = CubeDTO(
-              height: attr.length,
-              width: attr.width,
-              length: attr.height,
+              height: cartItem.length,
+              width: cartItem.width,
+              length: cartItem.height,
             );
           } else {
             paringResponse.productSupplanted = CubeDTO(
-              height: attr.length,
-              width: attr.height,
-              length: attr.width,
+              height: cartItem.length,
+              width: cartItem.height,
+              length: cartItem.width,
             );
           }
         }
         break;
       // nếu product mặc định nằm ngang => product nằm chồng lên nhau => số lượng có thể add * product.h < product.h (tùy thuộc có thể chồng hay ko)
       case ProductRotationTypeEnum.HORIZONTAL:
-        if (attr.isStackable == true) {
+        if (cartItem.isStackable == true) {
           paringResponse.quantityCanAdd =
-              (boxSize.height! / attr.height!).floor();
+              (boxSize.height! / cartItem.height!).floor();
           if (paringResponse.quantityCanAdd! > quantity) {
             paringResponse.quantityCanAdd = quantity;
           }
 
           paringResponse.productSupplanted = CubeDTO(
-            height: attr.height! * paringResponse.quantityCanAdd!,
-            width: attr.width,
-            length: attr.length,
+            height: cartItem.height! * paringResponse.quantityCanAdd!,
+            width: cartItem.width,
+            length: cartItem.length,
           );
         } else {
           paringResponse.productSupplanted = CubeDTO(
-            height: attr.height,
-            width: attr.width,
-            length: attr.length,
+            height: cartItem.height,
+            width: cartItem.width,
+            length: cartItem.length,
           );
         }
         break;
       case ProductRotationTypeEnum.VERTICAL:
         paringResponse.productSupplanted = CubeDTO(
-          height: attr.height,
-          width: attr.width,
-          length: attr.length,
+          height: cartItem.height,
+          width: cartItem.width,
+          length: cartItem.length,
         );
         break;
       default:
@@ -444,11 +515,12 @@ class CartViewModel extends BaseModel {
   Future<SpaceInBoxMode?> calculateRemainingSpace(
       CubeDTO box, SpaceInBoxMode space, CubeDTO productOccupied) async {
     var response = SpaceInBoxMode(
-        success: true,
-        remainingSpaceBox: space.remainingSpaceBox,
-        remainingLengthSpace: space.remainingLengthSpace,
-        remainingWidthSpace: space.remainingWidthSpace,
-        volumeOccupied: space.volumeOccupied);
+      success: true,
+      remainingSpaceBox: space.remainingSpaceBox,
+      remainingLengthSpace: space.remainingLengthSpace,
+      remainingWidthSpace: space.remainingWidthSpace,
+      volumeOccupied: space.volumeOccupied,
+    );
     if (space.volumeOccupied == null) {
       response.volumeOccupied = CubeDTO(
         height: productOccupied.height,
@@ -502,9 +574,9 @@ class CartViewModel extends BaseModel {
         response.remainingWidthSpace = CubeDTO(
           height: box.height,
           width: box.width,
-          length: box.length! - space.volumeOccupied!.length!,
+          length: box.length! - space.volumeOccupied!.width!,
         );
-
+        //ưu tiên RemainingWidthSpace
         if (productOccupied.width! < response.remainingWidthSpace!.length!) {
           response.volumeWidthOccupied = CubeDTO(
             height: productOccupied.height,
@@ -518,7 +590,8 @@ class CartViewModel extends BaseModel {
             length: response.remainingWidthSpace!.length! -
                 response.volumeWidthOccupied!.width!,
           );
-          response.volumeLengthOccupied = CubeDTO();
+          response.volumeLengthOccupied =
+              CubeDTO(height: 0, width: 0, length: 0);
         } else if (productOccupied.width! <
             response.remainingLengthSpace!.width!) {
           response.volumeLengthOccupied = CubeDTO(
@@ -534,7 +607,8 @@ class CartViewModel extends BaseModel {
             length: response.remainingLengthSpace!.length,
           );
 
-          response.volumeWidthOccupied = CubeDTO();
+          response.volumeWidthOccupied =
+              CubeDTO(height: 0, width: 0, length: 0);
         } else {
           response.success = false;
         }
@@ -545,8 +619,9 @@ class CartViewModel extends BaseModel {
         response.success = false;
       }
     } else if (space.remainingSpaceBox == null) {
-      var recoveryRemainingLengthSpace = CubeDTO();
-      var recoveryRemainingWidthSpace = CubeDTO();
+      var recoveryRemainingLengthSpace =
+          CubeDTO(height: 0, width: 0, length: 0);
+      var recoveryRemainingWidthSpace = CubeDTO(height: 0, width: 0, length: 0);
       //khôi phục lại remainingWidth và length space
       //ưu tiên đặt phần remainingWidth trước
 
