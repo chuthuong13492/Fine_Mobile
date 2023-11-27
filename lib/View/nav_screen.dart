@@ -100,7 +100,7 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
             await Get.find<OrderHistoryViewModel>()
                 .getOrderByOrderId(id: event.data["orderId"]);
           }
-
+          await Get.find<RootViewModel>().refreshMenu();
           await showStatusDialog("assets/images/logo2.png",
               notification!.title!, notification.body!);
           break;

@@ -107,6 +107,14 @@ class Cart {
     }
   }
 
+  void updateIsAdded(CartItem item, bool isAdd) {
+    for (CartItem cart in items!) {
+      if (cart.findCartItem(item)) {
+        cart.isAddParty = isAdd;
+      }
+    }
+  }
+
   void updateCheck(CartItem item, bool check) {
     for (CartItem cart in items!) {
       if (cart.findCartItem(item)) {
@@ -131,6 +139,7 @@ class CartItem {
   int quantity;
   bool? isStackable;
   bool? isChecked;
+  bool? isAddParty;
 
   CartItem(
     this.productId,
@@ -146,6 +155,7 @@ class CartItem {
     this.quantity,
     this.isStackable,
     this.isChecked,
+    this.isAddParty,
   );
 
   bool findCartItem(CartItem item) {
@@ -172,6 +182,7 @@ class CartItem {
       json['quantity'] as int,
       json['isStackable'] as bool,
       json['isChecked'] as bool,
+      json['isAddParty'] as bool,
     );
   }
 
@@ -195,6 +206,8 @@ class CartItem {
     _data["quantity"] = quantity;
     _data["isStackable"] = isStackable;
     _data["isChecked"] = isChecked;
+    _data["isAddParty"] = isAddParty;
+
     return _data;
   }
 }

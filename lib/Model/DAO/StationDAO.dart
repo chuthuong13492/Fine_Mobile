@@ -6,9 +6,25 @@ import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/request.dart';
 
 import '../../Constant/stationList_status.dart';
+import '../DTO/MetaDataDTO.dart';
 import 'index.dart';
 
 class StationDAO extends BaseDAO {
+  Future<List<BoxDTO>?> getAllBoxByStation({String? stationId}) async {
+    final res = await request.get(
+      '/station/boxes/$stationId',
+      queryParameters: {
+        "PageSize": 100,
+      },
+    );
+    if (res.data['data'] != null) {
+      var listJson = res.data['data'] as List;
+      // orderSummaryList = OrderDTO.fromList(res.data['data']);
+      return listJson.map((e) => BoxDTO.fromJson(e)).toList();
+    }
+    return null;
+  }
+
   Future<StationStatus?> getStationList(
       String destinationId, int quantity, String orderCode,
       {int? page, int? size}) async {
@@ -60,19 +76,15 @@ class StationDAO extends BaseDAO {
   Future<void> changeStation(String orderCode, int type,
       {String? stationId}) async {
     Response? res;
-    res = await request.put(
-      '/station/orderBox',
-      queryParameters: stationId != null
-          ? {
-              "type": type,
-              "orderCode": orderCode,
-              "stationId": stationId,
-            }
-          : {
-              "type": type,
-              "orderCode": orderCode,
-            },
-    );
+    if (stationId == null) {
+      res = await request.put(
+        '/station/orderBox?type=${type}&orderCode=${orderCode}',
+      );
+    } else {
+      res = await request.put(
+        '/station/orderBox?type=${type}&orderCode=${orderCode}&stationId=${stationId}',
+      );
+    }
 
     if (res.statusCode == 200) {
       return;

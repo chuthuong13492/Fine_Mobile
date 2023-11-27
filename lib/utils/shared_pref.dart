@@ -208,6 +208,15 @@ Future<void> updateCheckItemFromCart(CartItem item, bool check) async {
   await setCart(cart);
 }
 
+Future<void> updateAddedItemtoCart(CartItem item, bool add) async {
+  Cart? cart = await getCart();
+  if (cart == null) {
+    return;
+  }
+  cart.updateIsAdded(item, add);
+  await setCart(cart);
+}
+
 Future<void> updateItemFromMart(ConfirmCartItem item) async {
   ConfirmCart? cart = await getMart();
   if (cart == null) {

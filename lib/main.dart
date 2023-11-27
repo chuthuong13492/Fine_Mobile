@@ -8,6 +8,7 @@ import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/View/LoginScreen/login_byPhone.dart';
 import 'package:fine/View/LoginScreen/login_byPhoneOTP.dart';
 import 'package:fine/View/TopUp/transactionHistory_screen.dart';
+import 'package:fine/View/box_screen.dart';
 import 'package:fine/View/cart_screen.dart';
 import 'package:fine/View/checkingOrder_screen.dart';
 import 'package:fine/View/coOrder_screen.dart';
@@ -152,6 +153,12 @@ class MyApp extends StatelessWidget {
           case RouteHandler.STATION_PICKER_SCREEN:
             return CupertinoPageRoute<bool>(
                 builder: (context) => const StationPickerScreen(),
+                settings: settings);
+          case RouteHandler.BOX_SCREEN:
+            return CupertinoPageRoute<bool>(
+                builder: (context) => BoxScreen(
+                      order: settings.arguments as dynamic,
+                    ),
                 settings: settings);
           case RouteHandler.PARTY_ORDER_SCREEN:
             return CupertinoPageRoute<bool>(

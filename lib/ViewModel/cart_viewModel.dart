@@ -1,16 +1,17 @@
+import 'package:dio/dio.dart';
+import 'package:fine/Constant/productRecommend_status.dart';
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/ViewModel/base_model.dart';
+import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../Accessories/dialog.dart';
 import '../Constant/boxes_response.dart';
 import '../Constant/view_status.dart';
-
 import '../Model/DAO/StoreDAO.dart';
 import '../Model/DAO/index.dart';
 import '../Model/DTO/ConfirmCartDTO.dart';
@@ -27,6 +28,7 @@ class CartViewModel extends BaseModel {
   Cart? currentCart;
   Cart? checkCart;
   List<ReOrderDTO>? reOrderList;
+  List<ProductInCart>? listRecommend;
   // List<CheckFixBoxRequest>? card;
   double total = 0, fixTotal = 0, extraTotal = 0;
   int quantityChecked = 0;
@@ -34,11 +36,15 @@ class CartViewModel extends BaseModel {
   String? code;
   BoxesResponse? boxes;
   DestinationDAO? _destinationDAO;
+  ProductDAO? _productDAO;
+  PartyOrderDAO? _partyDAO;
   final ValueNotifier<int> notifier = ValueNotifier(0);
 
   CartViewModel() {
     _storeDAO = StoreDAO();
     _destinationDAO = DestinationDAO();
+    _productDAO = ProductDAO();
+    _partyDAO = PartyOrderDAO();
     currentCart = null;
     checkCart = null;
   }
@@ -66,6 +72,11 @@ class CartViewModel extends BaseModel {
         await getTotalQuantity(value, cartItem);
         checkCart!.items!
             .removeWhere((element) => element.productId == cartItem.productId);
+        if (checkCart!.items!.isEmpty) {
+          listRecommend = null;
+        } else {
+          await getProductRecommend();
+        }
         // await updateCheckItemFromCart(cartItem, value);
       }
       currentCart = await getCart();
@@ -107,7 +118,7 @@ class CartViewModel extends BaseModel {
     try {
       ConfirmCart? confirmCart = await getMart();
       if (confirmCart != null) {
-        await getProductRecommend();
+        // await getProductRecommend();
         await Future.delayed(const Duration(microseconds: 500));
         await Get.find<OrderViewModel>().prepareOrder();
         final error = Get.find<OrderViewModel>().errorMessage;
@@ -117,25 +128,6 @@ class CartViewModel extends BaseModel {
       }
     } catch (e) {
       throw e;
-    }
-  }
-
-  Future<void> getProductRecommend() async {
-    ConfirmCart? cart = await getMart();
-    if (cart != null) {
-      if (cart.orderDetails!.isNotEmpty) {
-        ConfirmCartItem itemInCart = ConfirmCartItem(
-            cart.orderDetails![0].productId,
-            cart.orderDetails![0].quantity - 1,
-            null);
-
-        await updateItemFromMart(itemInCart);
-        cart = await getMart();
-        await Get.find<ProductDetailViewModel>()
-            .processCart(cart!.orderDetails![0].productId, 1);
-      } else {
-        Get.find<OrderViewModel>().productRecomend = [];
-      }
     }
   }
 
@@ -169,8 +161,8 @@ class CartViewModel extends BaseModel {
       if (mart != null &&
           mart.orderDetails!.isNotEmpty &&
           currentCart != null) {
+        checkCart = Cart(timeSlotId: root.selectedTimeSlot!.id);
         for (var item in mart.orderDetails!) {
-          checkCart = Cart(timeSlotId: root.selectedTimeSlot!.id);
           bool check = currentCart!.items!
               .any((element) => element.productId == item.productId);
           if (check == true) {
@@ -179,6 +171,10 @@ class CartViewModel extends BaseModel {
             checkCart!.items!.add(cart);
           }
         }
+        if (checkCart!.items!.length == 5) {
+          listRecommend = [];
+        }
+        await getProductRecommend();
       } else {
         checkCart = Cart(timeSlotId: root.selectedTimeSlot!.id);
       }
@@ -214,6 +210,79 @@ class CartViewModel extends BaseModel {
     }
   }
 
+  Future<void> addProductToPartyOrder() async {
+    try {
+      // setState(ViewStatus.Loading);
+      final partyCode = await getPartyCode();
+      final cart = await getMart();
+      if (cart != null) {
+        final partyOrderDTO =
+            await _partyDAO?.addProductToParty(partyCode, cart: cart);
+        Get.rawSnackbar(
+            message: "Thêm thành công ✓",
+            duration: const Duration(seconds: 3),
+            snackPosition: SnackPosition.BOTTOM,
+            margin: const EdgeInsets.only(left: 8, right: 8, bottom: 32),
+            borderRadius: 8);
+        for (var item in cart.orderDetails!) {
+          CartItem cartItem = CartItem(item.productId, "", "", "", 0, 0, 0, 0,
+              0, 0, 0, false, false, true);
+          await updateAddedItemtoCart(cartItem, true);
+        }
+        currentCart = await getCart();
+      }
+      await Get.find<PartyOrderViewModel>().getPartyOrder();
+      // setState(ViewStatus.Completed);
+      notifyListeners();
+    } catch (e) {
+      Get.rawSnackbar(
+          message: "Thêm thất bại",
+          duration: const Duration(seconds: 3),
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.only(left: 8, right: 8, bottom: 32),
+          borderRadius: 8);
+      // setState(ViewStatus.Error);
+    }
+  }
+
+  Future<void> removeProductInPartyOrder(String productId) async {
+    try {
+      // setState(ViewStatus.Loading);
+      final partyCode = await getPartyCode();
+      final cart = await getMart();
+      if (cart != null) {
+        bool hasProduct =
+            cart.orderDetails!.any((element) => element.productId == productId);
+        if (hasProduct == true) {
+          ConfirmCartItem item = ConfirmCartItem(productId, 0, "");
+          CartItem cartItem = CartItem(item.productId, "", "", "", 0, 0, 0, 0,
+              0, 0, 0, false, false, false);
+          await changeValueChecked(false, cartItem);
+          // await removeItemFromMart(item);
+          await removeItemFromParty(item);
+          await updateAddedItemtoCart(cartItem, false);
+        }
+        final mart = await getMart();
+        final partyOrderDTO =
+            await _partyDAO?.addProductToParty(partyCode, cart: mart);
+        currentCart = await getCart();
+        await Get.find<PartyOrderViewModel>().getPartyOrder();
+      }
+      // await Get.find<PartyOrderViewModel>().getPartyOrder();
+
+      // setState(ViewStatus.Completed);
+      notifyListeners();
+    } catch (e) {
+      Get.rawSnackbar(
+          message: "Xóa thất bại",
+          duration: const Duration(seconds: 3),
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.only(left: 8, right: 8, bottom: 32),
+          borderRadius: 8);
+      // setState(ViewStatus.Error);
+    }
+  }
+
   Future<void> removeCart() async {
     await deleteCart();
     await deleteMart();
@@ -227,27 +296,35 @@ class CartViewModel extends BaseModel {
   Future<void> updateItem(CartItem item, int index, bool isIncrease) async {
     fixTotal = item.price! * item.quantity;
     final cartItem = CartItem(
-        item.productId,
-        item.productName,
-        item.imgUrl,
-        item.size,
-        item.rotationType,
-        item.height,
-        item.width,
-        item.length,
-        item.price,
-        fixTotal,
-        item.quantity,
-        item.isStackable,
-        false);
+      item.productId,
+      item.productName,
+      item.imgUrl,
+      item.size,
+      item.rotationType,
+      item.height,
+      item.width,
+      item.length,
+      item.price,
+      fixTotal,
+      item.quantity,
+      item.isStackable,
+      false,
+      item.isAddParty,
+    );
     await updateItemFromCart(cartItem);
     ConfirmCartItem confirmCartItem =
         ConfirmCartItem(item.productId, item.quantity, "");
     await removeItemFromMart(confirmCartItem);
     if (checkCart != null && checkCart!.items!.isNotEmpty) {
-      checkCart!.items!
-          .removeWhere((element) => element.productId == item.productId);
+      bool? hasCheckProd = checkCart?.items
+          ?.any((element) => element.productId == item.productId);
+      if (hasCheckProd == true) {
+        checkCart!.items!
+            .removeWhere((element) => element.productId == item.productId);
+        await getProductRecommend();
+      }
     }
+
     currentCart = await getCart();
     notifier.value = currentCart!.itemQuantity();
     if (currentCart == null) {
@@ -346,7 +423,8 @@ class CartViewModel extends BaseModel {
       ConfirmCartItem martItem = ConfirmCartItem(
           cartItem.productId, addToBoxResult.quantitySuccess!, "");
       await addItemToMart(martItem);
-      return true;
+      bool? isChecked = await getProductRecommend(cartItem: cartItem);
+      return isChecked;
     } else if (addToBoxResult.quantitySuccess! < cartItem.quantity &&
         addToBoxResult.quantitySuccess != 0) {
       CartItem resultItem = CartItem(
@@ -362,22 +440,109 @@ class CartViewModel extends BaseModel {
           cartItem.fixTotal,
           addToBoxResult.quantitySuccess!,
           cartItem.isStackable,
-          cartItem.isChecked);
+          cartItem.isChecked,
+          false);
       ConfirmCartItem martItem = ConfirmCartItem(
           cartItem.productId, addToBoxResult.quantitySuccess!, "");
       checkCart?.updateQuantity(resultItem);
       await updateItemFromCart(resultItem);
       await addItemToMart(martItem);
+      bool? isChecked = await getProductRecommend(cartItem: cartItem);
       await showStatusDialog("assets/images/error.png", "Box đã đầy",
           "Box đã đầy rùi, bạn chỉ có thể thêm ${addToBoxResult.quantitySuccess} phần ${cartItem.productName}");
-      return true;
+      return isChecked;
     } else {
       checkCart!.items!
           .removeWhere((element) => element.productId == cartItem.productId);
       await showStatusDialog("assets/images/error.png", "Box đã đầy",
           "Box đã đầy mất ùi, bạn hong thể thêm ${cartItem.productName}");
+      listRecommend = [];
+      Get.find<OrderViewModel>().productRecomend = listRecommend;
       return false;
     }
+  }
+
+  Future<bool?> getProductRecommend({CartItem? cartItem}) async {
+    var boxSize = CubeDTO(
+      height: boxes?.cube?.height,
+      width: boxes?.cube?.width,
+      length: boxes?.cube?.length,
+    );
+
+    var spaceInBox = SpaceInBoxMode(
+      remainingSpaceBox: boxSize,
+      remainingLengthSpace: boxSize,
+      remainingWidthSpace: boxSize,
+      volumeOccupied: null,
+    );
+    // tính thể tích bị chiếm bởi các product trong card trước
+    if (checkCart != null && checkCart!.items!.isNotEmpty) {
+      checkCart!.items!.sort((a, b) => (b.length! * b.width! * b.height!)
+          .compareTo(a.length! * a.width! * a.height!));
+      for (var item in checkCart!.items!) {
+        // ghép product lên cho vừa họp dựa trên quantity yêu cầu
+        ProductParingResponse? pairingCardResult =
+            await productPairing(item.quantity, item, boxSize);
+
+        var turnCard =
+            (item.quantity / pairingCardResult!.quantityCanAdd!).ceilToDouble();
+        for (var successCase = 1; successCase <= turnCard; successCase++) {
+          // đem đi bỏ vào tủ
+          final calculateCardResult = await calculateRemainingSpace(
+              boxSize, spaceInBox, pairingCardResult.productSupplanted!);
+
+          if (calculateCardResult!.success == true) {
+            spaceInBox = SpaceInBoxMode(
+              remainingSpaceBox: calculateCardResult.remainingSpaceBox,
+              volumeOccupied: calculateCardResult.volumeOccupied,
+              remainingLengthSpace: calculateCardResult.remainingLengthSpace,
+              remainingWidthSpace: calculateCardResult.remainingWidthSpace,
+              volumeLengthOccupied: calculateCardResult.volumeLengthOccupied,
+              volumeWidthOccupied: calculateCardResult.volumeWidthOccupied,
+            );
+          } else {
+            break;
+          }
+        }
+      }
+      if (checkCart!.itemQuantity() == 5) {
+        listRecommend = [];
+        Get.find<OrderViewModel>().productRecomend = listRecommend;
+        return true;
+      } else {
+        ProductRecommendStatus? recommendStatus =
+            await _productDAO?.getProductRecommend(
+                root.isNextDay == true ? 2 : 1,
+                root.selectedTimeSlot!.id!,
+                spaceInBox,
+                productId: cartItem != null ? cartItem.productId! : null);
+
+        if (recommendStatus?.statusCode == 200) {
+          listRecommend = recommendStatus?.recommend;
+          Get.find<OrderViewModel>().productRecomend = listRecommend;
+          return true;
+        }
+        switch (recommendStatus?.code) {
+          case 4006:
+            await showStatusDialog("assets/images/error.png", "Oops!!",
+                "1 khung giờ chỉ được đặt tối đa 2 đơn thui nè!");
+            return false;
+          case 4002:
+            await showStatusDialog("assets/images/error.png", "Oops!!",
+                "Món này đã hết mất rùi 😢");
+            await removeItemFromCart(cartItem!);
+            ConfirmCartItem martItem =
+                ConfirmCartItem(cartItem.productId, cartItem.quantity, "");
+            await removeItemFromMart(martItem);
+            checkCart?.removeItem(cartItem);
+            currentCart = await getCart();
+            return false;
+          default:
+            return false;
+        }
+      }
+    }
+    return false;
   }
 
   Future<FixBoxResponse?> checkProductFixTheBox(CartItem cartItem) async {

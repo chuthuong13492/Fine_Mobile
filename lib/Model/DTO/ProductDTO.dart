@@ -390,6 +390,7 @@ class AddProductToCartResponse {
 class ProductInCart {
   // StatusProductInCart? status;
   String? id;
+  String? productId;
   String? name;
   String? code;
   String? size;
@@ -400,6 +401,7 @@ class ProductInCart {
   ProductInCart({
     // this.status,
     this.id,
+    this.productId,
     this.name,
     this.code,
     this.size,
@@ -413,6 +415,7 @@ class ProductInCart {
     //     ? null
     //     : StatusProductInCart.fromJson(json["status"]);
     id = json["id"] as String;
+    productId = json["productId"] as String;
     name = json["name"];
     code = json["code"];
     size = json["size"] ?? null;
@@ -428,6 +431,7 @@ class ProductInCart {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
     _data["id"] = id;
+    _data["productId"] = productId;
     _data["name"] = name;
     _data["code"] = code;
     _data["size"] = size;

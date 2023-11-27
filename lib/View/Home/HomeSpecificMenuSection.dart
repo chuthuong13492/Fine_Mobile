@@ -331,11 +331,6 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                   RootViewModel root = Get.find<RootViewModel>();
                   ProductDTO? item =
                       await root.openProductShowSheet(product.id!);
-                  // ProductDetailViewModel model =
-                  //     Get.find<ProductDetailViewModel>();
-                  // // model.master = product;
-                  // model.selectAttribute = product.attributes![0];
-                  // await model.addProductToCart();
                   if (item != null) {
                     // ignore: use_build_context_synchronously
                     await showModalBottomSheet(
@@ -346,11 +341,6 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                               topRight: Radius.circular(12))),
                       builder: (context) => buidProductPicker(item),
                     );
-                    // Utils.showSheet(
-                    //   context,
-                    //   child: buidProductPicker(item),
-                    //   onClicked: () async {},
-                    // );
                   }
                 },
                 child: Container(

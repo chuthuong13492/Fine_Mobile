@@ -1,4 +1,5 @@
 import 'package:fine/Accessories/index.dart';
+import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/format_price.dart';
@@ -54,7 +55,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       width: Get.width,
-      height: 170,
+      // height: 170,
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.all(
@@ -197,6 +198,34 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                     fontStyle: FontStyle.normal),
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+          InkWell(
+            onTap: () async {
+              Get.toNamed(RouteHandler.BOX_SCREEN, arguments: widget.order);
+            },
+            child: Container(
+              width: 160,
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: FineTheme.palettes.primary100),
+                boxShadow: [
+                  BoxShadow(
+                    color: FineTheme.palettes.primary100,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Text(
+                  "Xem vị trí box",
+                  style: FineTheme.typograhpy.subtitle1
+                      .copyWith(color: FineTheme.palettes.primary100),
+                ),
+              ),
+            ),
           ),
         ],
       ),

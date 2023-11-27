@@ -60,8 +60,20 @@ class _CartButtonState extends State<CartButton> {
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeInOut,
                     margin: model.isCartRoute == false
-                        ? const EdgeInsets.only(bottom: 40, right: 5)
-                        : const EdgeInsets.only(bottom: 160, right: 5),
+                        ? EdgeInsets.only(
+                            bottom: 40,
+                            right: model.isAdmin == false
+                                ? 5
+                                : model.notifier.value == 0
+                                    ? 5
+                                    : 20)
+                        : EdgeInsets.only(
+                            bottom: 160,
+                            right: model.isAdmin == false
+                                ? 5
+                                : model.notifier.value == 0
+                                    ? 5
+                                    : 20),
                     child: FloatingActionButton(
                       backgroundColor: Colors.transparent,
                       elevation: 4,
@@ -122,13 +134,22 @@ class _CartButtonState extends State<CartButton> {
                                         child: Center(
                                           child: Row(
                                             children: [
-                                              Text(
-                                                cartItem.toString(),
-                                                style: FineTheme
-                                                    .typograhpy.subtitle1
-                                                    .copyWith(
-                                                        color: Colors.white),
-                                              ),
+                                              model.isAdmin == false
+                                                  ? Text(
+                                                      cartItem.toString(),
+                                                      style: FineTheme
+                                                          .typograhpy.subtitle1
+                                                          .copyWith(
+                                                              color:
+                                                                  Colors.white),
+                                                    )
+                                                  : Text(
+                                                      "${cartItem.toString()}/${model.adminQuantity}",
+                                                      style: FineTheme
+                                                          .typograhpy.subtitle1
+                                                          .copyWith(
+                                                              color: Colors
+                                                                  .white)),
                                               const SizedBox(
                                                 width: 2,
                                               ),

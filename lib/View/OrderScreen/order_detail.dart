@@ -59,82 +59,104 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
               if (model.status == ViewStatus.Loading) {
                 return const SizedBox.shrink();
               }
-              return Column(
+              List<Widget> refundWidgetList = [];
+              final refundProduct = orderDTO?.otherAmounts
+                  ?.where((element) => element.type == 3)
+                  .toList();
+              if (refundProduct != null) {
+                for (var item in refundProduct) {
+                  List<String> parts = item.note!.split('-');
+                  refundWidgetList.add(
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              "${parts[1]}x",
+                              style: FineTheme.typograhpy.subtitle2.copyWith(
+                                  color: FineTheme.palettes.shades200),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(
+                              Icons.circle,
+                              size: 4,
+                              color: FineTheme.palettes.primary100,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              parts[2],
+                              style: FineTheme.typograhpy.subtitle2.copyWith(
+                                  color: FineTheme.palettes.shades200),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          formatPrice(double.parse(parts[0])),
+                          style: FineTheme.typograhpy.subtitle2
+                              .copyWith(color: FineTheme.palettes.shades200),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              } else {
+                refundWidgetList = [];
+              }
+              return ListView(
                 children: [
                   SizedBox(
                       height: 8,
                       child: Container(
                         color: FineTheme.palettes.primary50,
                       )),
-                  InkWell(
-                    onTap: () async {
-                      // Get.find<OrderViewModel>().fetchStatus(orderDTO!.id!);
-                      // Get.toNamed(RouteHandler.QRCODE_SCREEN,
-                      //     arguments: orderDTO);
-                    },
+                  Container(
+                    padding: const EdgeInsets.only(
+                        right: 16, left: 16, top: 10, bottom: 10),
                     child: Container(
-                      padding: const EdgeInsets.only(
-                          right: 16, left: 16, top: 10, bottom: 10),
-                      child: Container(
-                        height: 50,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Center(
-                              child: SvgPicture.asset(
-                                "assets/icons/box_icon.svg",
-                                height: 30,
-                                width: 30,
-                              ),
+                      height: 50,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Center(
+                            child: SvgPicture.asset(
+                              "assets/icons/box_icon.svg",
+                              height: 30,
+                              width: 30,
                             ),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.only(left: 16),
-                                    width: Get.width,
-                                    child: Text(
-                                      'Giao đến',
-                                      style: FineTheme.typograhpy.caption1,
-                                    ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.only(left: 16),
+                                  width: Get.width,
+                                  child: Text(
+                                    'Giao đến',
+                                    style: FineTheme.typograhpy.caption1,
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.only(left: 16),
-                                    width: Get.width,
-                                    child: Text(
-                                      orderDTO!.stationDTO!.name!,
-                                      style: FineTheme.typograhpy.subtitle2,
-                                    ),
-                                  )
-                                ],
-                              ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.only(left: 16),
+                                  width: Get.width,
+                                  child: Text(
+                                    orderDTO!.stationDTO!.name!,
+                                    style: FineTheme.typograhpy.subtitle2,
+                                  ),
+                                )
+                              ],
                             ),
-                            Center(
-                              child: Icon(
-                                Icons.chevron_right_outlined,
-                                color: FineTheme.palettes.shades200,
-                                size: 30,
-                              ),
-                              // child: IconButton(
-                              //   padding: const EdgeInsets.all(0),
-                              //   onPressed: () async {
-                              //     Get.find<OrderViewModel>()
-                              //         .fetchStatus(orderDTO.id!);
-                              //     Get.toNamed(RouteHandler.QRCODE_SCREEN,
-                              //         arguments: orderDTO);
-                              //   },
-                              //   icon: const Icon(
-                              //     Icons.chevron_right_outlined,
-                              //     color: Colors.black,
-                              //     size: 30,
-                              //   ),
-                              // ),
+                          ),
+                          Center(
+                            child: Icon(
+                              Icons.chevron_right_outlined,
+                              color: FineTheme.palettes.shades100,
+                              size: 30,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -201,7 +223,12 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                       )),
                   Container(
                     // padding: const EdgeInsets.only(bottom: 0),
-                    child: layoutOrderDetails(orderDTO.orderDetails),
+                    child: Column(
+                      children: [
+                        layoutOrderDetails(orderDTO.orderDetails),
+                        // ...refundWidgetList.toList(),
+                      ],
+                    ),
                   ),
                   SizedBox(
                       height: 8,
@@ -212,20 +239,76 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                     padding: const EdgeInsets.all(16),
                     child: layoutOrderAmount(orderDTO),
                   ),
-                  SizedBox(
-                      height: 8,
-                      child: Container(
-                        color: FineTheme.palettes.neutral200,
-                      )),
+                  refundProduct != null && refundProduct.isNotEmpty
+                      ? Container(
+                          color: FineTheme.palettes.primary50,
+                          padding: const EdgeInsets.all(16),
+                          // height: 30,
+
+                          child: Container(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                            decoration: BoxDecoration(
+                                color: FineTheme.palettes.shades100,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                    color: FineTheme.palettes.primary100)),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Hoàn tiền",
+                                  style: FineTheme.typograhpy.subtitle2
+                                      .copyWith(
+                                          color: FineTheme.palettes.primary400),
+                                ),
+                                ...refundWidgetList.toList(),
+                              ],
+                            ),
+                          ))
+                      : SizedBox(
+                          height: 8,
+                          child: Container(
+                            color: FineTheme.palettes.primary50,
+                          )),
                   Container(
                     padding: const EdgeInsets.all(16),
                     child: layoutFinePoint(orderDTO),
                   ),
-                  SizedBox(
-                      height: 8,
-                      child: Container(
-                        color: FineTheme.palettes.primary50,
-                      )),
+                  orderDTO.refundLinkedOrder != 0
+                      ? SizedBox(
+                          height: 30,
+                          child: Container(
+                            color: FineTheme.palettes.primary50,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Bạn được hoàn tiền vào ví",
+                                  style: FineTheme.typograhpy.subtitle1
+                                      .copyWith(
+                                          color: FineTheme.palettes.primary100),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.circle,
+                                  size: 4,
+                                  color: FineTheme.palettes.primary300,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  formatPrice(orderDTO.refundLinkedOrder!),
+                                  style: FineTheme.typograhpy.subtitle1
+                                      .copyWith(
+                                          color: FineTheme.palettes.primary300),
+                                ),
+                              ],
+                            ),
+                          ))
+                      : SizedBox(
+                          height: 8,
+                          child: Container(
+                            color: FineTheme.palettes.primary50,
+                          )),
                   Container(
                     padding: const EdgeInsets.all(16),
                     child: layoutCustomer(orderDTO),
@@ -240,11 +323,12 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
   Widget layoutOrderDetails(List<OrderDetails>? orderDetails) {
     orderDetails!.where((element) => element.quantity != 0).toList();
     return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       itemBuilder: (context, index) {
         return Container(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -277,7 +361,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                   child: Container(
                 alignment: Alignment.topRight,
                 child: Text(
-                  '${formatPrice(orderDetails[index].totalAmount!)}',
+                  formatPrice(orderDetails[index].totalAmount!),
                   style: TextStyle(
                     fontFamily: 'Montserrat',
                     fontSize: 15,
@@ -291,7 +375,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
           ),
         );
       },
-      itemCount: orderDetails!.length,
+      itemCount: orderDetails.length,
     );
   }
 

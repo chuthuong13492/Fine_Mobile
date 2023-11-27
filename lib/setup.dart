@@ -20,6 +20,8 @@ import 'package:fine/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 
+import 'ViewModel/station_viewModel.dart';
+
 Future setup() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -43,4 +45,5 @@ void createRouteBindings() async {
   Get.put(ProductDetailViewModel());
   Get.put(TopUpViewModel());
   Get.put(TimeCheckViewModel());
+  Get.put(StationViewModel());
 }

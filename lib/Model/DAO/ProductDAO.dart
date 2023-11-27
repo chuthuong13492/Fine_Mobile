@@ -6,7 +6,9 @@ import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/request.dart';
 
+import '../../Constant/productRecommend_status.dart';
 import '../DTO/ConfirmCartDTO.dart';
+import '../DTO/CubeModel.dart';
 
 class ProductDAO extends BaseDAO {
   Future<ProductDTO?> getProductDetail(
@@ -25,6 +27,64 @@ class ProductDAO extends BaseDAO {
       var listJson = res.data['data'];
       final product = ProductDTO.fromJson(listJson);
       return product;
+    }
+    return null;
+  }
+
+  Future<ProductRecommendStatus?> getProductRecommend(
+      int orderType, String timeSlotId, SpaceInBoxMode space,
+      {String? productId}) async {
+    Map map;
+    if (productId != null) {
+      map = {
+        "orderType": orderType,
+        "timeSlotId": timeSlotId,
+        "productId": productId,
+        "remainingLengthSpace": {
+          "height": space.remainingLengthSpace!.height,
+          "width": space.remainingLengthSpace!.width,
+          "length": space.remainingLengthSpace!.length,
+        },
+        "remainingWidthSpace": {
+          "height": space.remainingWidthSpace!.height,
+          "width": space.remainingWidthSpace!.width,
+          "length": space.remainingWidthSpace!.length,
+        },
+      };
+    } else {
+      map = {
+        "orderType": orderType,
+        "timeSlotId": timeSlotId,
+        "remainingLengthSpace": {
+          "height": space.remainingLengthSpace!.height,
+          "width": space.remainingLengthSpace!.width,
+          "length": space.remainingLengthSpace!.length,
+        },
+        "remainingWidthSpace": {
+          "height": space.remainingWidthSpace!.height,
+          "width": space.remainingWidthSpace!.width,
+          "length": space.remainingWidthSpace!.length,
+        },
+      };
+    }
+    try {
+      final res = await request.post("/order/cardV2", data: map);
+      if (res.data["data"] != null) {
+        var jsonList = res.data['data']['productsRecommend'] as List;
+        // return jsonList.map((e) => ProductInCart.fromJson(e)).toList();
+        return ProductRecommendStatus(
+          statusCode: res.statusCode,
+          code: res.data['status']['errorCode'],
+          message: res.data['status']['message'],
+          recommend: jsonList.map((e) => ProductInCart.fromJson(e)).toList(),
+        );
+      }
+    } on DioError catch (e) {
+      return ProductRecommendStatus(
+        statusCode: e.response!.data["statusCode"],
+        code: e.response!.data['errorCode'],
+        message: e.response!.data['message'],
+      );
     }
     return null;
   }

@@ -481,20 +481,28 @@ class _OrderScreenState extends State<OrderScreen> {
             child: Container(
               color: FineTheme.palettes.shades100,
               width: Get.width,
-              height: 130,
+              height: 155,
               child: ListView.separated(
                 itemBuilder: (context, index) {
                   var product = list![index];
                   return Material(
                     color: Colors.white,
                     child: TouchOpacity(
-                      onTap: () {
-                        // Get.find<RootViewModel>()
-                        //     .openProductDetail(product.id!, fetchDetail: true);
-                        // Utils.showSheet(
-                        //   context,
-                        //   child: buidProductPicker(),
-                        // );
+                      onTap: () async {
+                        RootViewModel root = Get.find<RootViewModel>();
+                        ProductDTO? item =
+                            await root.openProductShowSheet(product.productId!);
+                        if (item != null) {
+                          // ignore: use_build_context_synchronously
+                          await showModalBottomSheet(
+                            context: context,
+                            shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(12),
+                                    topRight: Radius.circular(12))),
+                            builder: (context) => buidProductPicker(item),
+                          );
+                        }
                       },
                       child: _buildProduct(product),
                     ),
@@ -513,101 +521,14 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   Widget _buildProduct(ProductInCart product) {
-    return Container(
-      width: 300,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: FineTheme.palettes.primary100),
-      ),
-      child: Row(
-        children: [
-          Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  width: 90,
-                  height: 90,
-                  child: CacheStoreImage(
-                    imageUrl: product.imageUrl ?? defaultImage,
-                  ),
-                ),
-              ),
-              Positioned(
-                  top: 0,
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(8, 2, 8, 2),
-                    width: 46,
-                    height: 13,
-                    decoration: BoxDecoration(
-                      color: FineTheme.palettes.primary300,
-                      borderRadius: const BorderRadius.only(
-                          bottomRight: Radius.circular(10)),
-                    ),
-                    child: Text(
-                      "PROMO".toUpperCase(),
-                      style: const TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontSize: 7,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white),
-                    ),
-                  )),
-            ],
-          ),
-          const SizedBox(
-            width: 18,
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    product.name!,
-                    style: FineTheme.typograhpy.subtitle2.copyWith(
-                      color: FineTheme.palettes.shades200,
-                    ),
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      formatPrice(15000),
-                      style: FineTheme.typograhpy.caption1.copyWith(
-                        color: FineTheme.palettes.primary300,
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () async {
-                        await _orderViewModel?.addProductRecommend(product);
-                      },
-                      child: Icon(
-                        Icons.add_circle_outline,
-                        color: FineTheme.palettes.primary100,
-                      ),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          )
-        ],
-      ),
-    );
     // return Container(
-    //   width: 110,
-    //   height: 200,
-    //   child: Column(
-    //     crossAxisAlignment: CrossAxisAlignment.center,
+    //   width: 300,
+    //   padding: const EdgeInsets.all(16),
+    //   decoration: BoxDecoration(
+    //     borderRadius: BorderRadius.circular(10),
+    //     border: Border.all(color: FineTheme.palettes.primary100),
+    //   ),
+    //   child: Row(
     //     children: [
     //       Stack(
     //         children: [
@@ -617,8 +538,8 @@ class _OrderScreenState extends State<OrderScreen> {
     //               decoration: BoxDecoration(
     //                 borderRadius: BorderRadius.circular(10),
     //               ),
-    //               width: 110,
-    //               height: 110,
+    //               width: 90,
+    //               height: 90,
     //               child: CacheStoreImage(
     //                 imageUrl: product.imageUrl ?? defaultImage,
     //               ),
@@ -646,63 +567,294 @@ class _OrderScreenState extends State<OrderScreen> {
     //               )),
     //         ],
     //       ),
-    //       SizedBox(height: FineTheme.spacing.xxs),
-    //       Text(
-    //         product.name!,
-    //         style: FineTheme.typograhpy.subtitle2,
-    //         overflow: TextOverflow.ellipsis,
+    //       const SizedBox(
+    //         width: 18,
     //       ),
-    //       const SizedBox(height: 4),
-    //       Container(
-    //         // height: 40,
-    //         child: Text(
-    //           formatPrice(15000),
-    //           style: FineTheme.typograhpy.caption1
-    //               .copyWith(color: FineTheme.palettes.primary100),
-    //           textAlign: TextAlign.center,
-    //           maxLines: 2,
-    //           overflow: TextOverflow.ellipsis,
+    //       Expanded(
+    //         child: Column(
+    //           crossAxisAlignment: CrossAxisAlignment.start,
+    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //           children: [
+    //             Expanded(
+    //               child: Text(
+    //                 product.name!,
+    //                 style: FineTheme.typograhpy.subtitle2.copyWith(
+    //                   color: FineTheme.palettes.shades200,
+    //                 ),
+    //                 maxLines: 3,
+    //                 overflow: TextOverflow.ellipsis,
+    //               ),
+    //             ),
+    //             Row(
+    //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //               children: [
+    //                 Text(
+    //                   formatPrice(15000),
+    //                   style: FineTheme.typograhpy.caption1.copyWith(
+    //                     color: FineTheme.palettes.primary300,
+    //                   ),
+    //                 ),
+    //                 InkWell(
+    //                   onTap: () async {
+    //                     // await _orderViewModel?.addProductRecommend(product);
+    //                   },
+    //                   child: Icon(
+    //                     Icons.add_circle_outline,
+    //                     color: FineTheme.palettes.primary100,
+    //                   ),
+    //                 ),
+    //               ],
+    //             )
+    //           ],
     //         ),
-    //       ),
+    //       )
     //     ],
     //   ),
     // );
-  }
-
-  Widget buidProductPicker() {
     return Container(
-      height: 240,
-      decoration: BoxDecoration(
-        color: FineTheme.palettes.shades100,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(8),
-          topRight: Radius.circular(8),
-        ),
-      ),
-      padding: const EdgeInsets.only(top: 8),
+      width: 110,
+      height: 200,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            child: Text(
-              '',
-              style: FineTheme.typograhpy.h2.copyWith(
-                color: FineTheme.palettes.primary100,
-                // fontWeight: FontWeight.bold,
+          Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 5),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  width: 110,
+                  height: 110,
+                  child: CacheStoreImage(
+                    imageUrl: product.imageUrl ?? defaultImage,
+                  ),
+                ),
               ),
-            ),
+              Positioned(
+                  top: 0,
+                  child: Container(
+                    padding: const EdgeInsets.fromLTRB(8, 2, 8, 2),
+                    width: 46,
+                    height: 13,
+                    decoration: BoxDecoration(
+                      color: FineTheme.palettes.primary300,
+                      borderRadius: const BorderRadius.only(
+                          bottomRight: Radius.circular(10)),
+                    ),
+                    child: Text(
+                      "PROMO".toUpperCase(),
+                      style: const TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 7,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white),
+                    ),
+                  )),
+            ],
           ),
-          Expanded(
-            child: Container(
-              color: Colors.white,
-              child: SizedBox(
-                height: 180,
-              ),
+          SizedBox(height: FineTheme.spacing.xxs),
+          Text(
+            product.name!,
+            style: FineTheme.typograhpy.subtitle2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Container(
+            // height: 40,
+            child: Text(
+              formatPrice(15000),
+              style: FineTheme.typograhpy.caption1
+                  .copyWith(color: FineTheme.palettes.primary400),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
       ),
     );
+  }
+
+  Widget buidProductPicker(ProductDTO prod) {
+    return ScopedModel(
+        model: ProductDetailViewModel(dto: prod),
+        child: ScopedModelDescendant<ProductDetailViewModel>(
+          builder: (context, child, model) {
+            bool? isSelect;
+
+            List<Widget> listWidget = [];
+            List<ProductAttributes>? attributeList = model.master!.attributes;
+            if (prod.attributes!.length > 1) {
+              model.isExtra = true;
+            }
+            if (model.isExtra == true) {
+              for (var i = 0; i < attributeList!.length; i++) {
+                isSelect = model.selectAttribute!.id == attributeList[i].id;
+                listWidget.add(
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          model.selectedAttribute(attributeList[i]);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(16, 5, 16, 5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                                color: isSelect
+                                    ? FineTheme.palettes.primary100
+                                    : FineTheme.palettes.neutral700,
+                                width: 1.5),
+                          ),
+                          child: Text(
+                            "Size ${attributeList[i].size!}",
+                            style: FineTheme.typograhpy.subtitle1.copyWith(
+                                color: isSelect
+                                    ? FineTheme.palettes.primary100
+                                    : FineTheme.palettes.neutral700),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                  ),
+                );
+              }
+            }
+            return Container(
+              height: Get.height * 0.15,
+              // width: Get.width,
+
+              // color: FineTheme.palettes.shades100,
+              padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 90,
+                    height: 90,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: CacheImage(
+                          imageUrl: prod.imageUrl == null
+                              ? 'https://firebasestorage.googleapis.com/v0/b/finedelivery-880b6.appspot.com/o/no-image.png?alt=media&token=b3efcf6b-b4b6-498b-aad7-2009389dd908'
+                              : prod.imageUrl!),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(0, 4, 0, 4),
+                          child: Text(
+                            formatPrice(model.total!),
+                            style: TextStyle(
+                              fontFamily: "Montserrat",
+                              fontWeight: FontWeight.w600,
+                              fontSize: 24,
+                              color: FineTheme.palettes.primary300,
+                            ),
+                          ),
+                        ),
+                        model.isExtra == true
+                            ? Row(
+                                children: [
+                                  ...listWidget.toList(),
+                                ],
+                              )
+                            : Text(
+                                "Ngon nhắm, hãy thử ngay nào",
+                                style: FineTheme.typograhpy.body2,
+                              ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Row(
+                        // mainAxisSize: MainAxisSize.min,
+                        children: [
+                          InkWell(
+                            child: Icon(
+                              Icons.remove_circle_outline,
+                              size: 30,
+                              color: model.minusColor,
+                            ),
+                            onTap: () {
+                              model.minusQuantity();
+                            },
+                          ),
+                          // SizedBox(
+                          //   width: 8,
+                          // ),
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(8, 5, 8, 5),
+                            decoration: BoxDecoration(
+                                // border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Text(
+                              model.count.toString(),
+                              style: FineTheme.typograhpy.h2.copyWith(
+                                color: Colors.black,
+                              ),
+                            ),
+                          ),
+                          // SizedBox(
+                          //   width: 1,
+                          // ),
+                          InkWell(
+                            child: Icon(
+                              Icons.add_circle_outline,
+                              size: 30,
+                              color: model.addColor,
+                            ),
+                            onTap: () {
+                              model.addQuantity();
+                            },
+                          )
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: () async {
+                          bool? isAdded = await model.addProductToCart();
+                          await _orderViewModel!.addProductRecommend(
+                              model.selectAttribute!, isAdded!);
+
+                          Get.back();
+                        },
+                        child: Container(
+                          width: 100,
+                          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: FineTheme.palettes.primary100,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Thêm",
+                              style: FineTheme.typograhpy.subtitle1
+                                  .copyWith(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            );
+          },
+        ));
   }
 
   Widget layoutPartyCode() {

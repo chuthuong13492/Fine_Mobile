@@ -53,6 +53,9 @@ class RootViewModel extends BaseModel {
   bool isNextDay = false;
   bool isOnClick = false;
   final ValueNotifier<bool> notifier = ValueNotifier(false);
+  // DateTime? now;
+  final ValueNotifier<DateTime> now = ValueNotifier(DateTime(0));
+
   // final ValueNotifier<List<TimeSlotDTO>> notifier = ValueNotifier([]);
 
   RootViewModel() {
@@ -283,6 +286,8 @@ class RootViewModel extends BaseModel {
   }
 
   Future<void> getListTimeSlot() async {
+    Timer.periodic(
+        const Duration(seconds: 1), (timer) => now.value = DateTime.now());
     DestinationDAO campusDAO = DestinationDAO();
     listTimeSlot = await campusDAO.getTimeSlot(DESTINATIONID);
     if (isNextDay == false) {

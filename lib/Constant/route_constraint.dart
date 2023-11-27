@@ -26,4 +26,5 @@ class RouteHandler {
   static const String TRANSACTION_HISTORY = "/transaction_history";
   static const String CART_SCREEN = "/cart_screen";
   static const String RE_ORDER_SCREEN = "/reOrder_screen";
+  static const String BOX_SCREEN = "/box_screen";
 }

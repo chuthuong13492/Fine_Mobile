@@ -33,16 +33,17 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
   ScrollController scrollController = ScrollController();
   RootViewModel? _rootViewModel;
   // Timer? _timer;
-  DateTime? now;
+  // DateTime? now;
 
   @override
   void initState() {
     super.initState();
     _rootViewModel = Get.find<RootViewModel>();
-    Timer.periodic(const Duration(seconds: 1), (timer) => now = DateTime.now());
-
+    // getNow();
     Get.find<RootViewModel>().getListTimeSlot();
   }
+
+  void getNow() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -80,13 +81,18 @@ class _HomeMenuSectionState extends State<HomeMenuSection> {
                           // ),
                         ],
                       ),
-                      Text(
-                        now != null
-                            ? DateFormat('dd-MM HH:mm:ss').format(now!)
-                            : 'Loading...',
-                        style: FineTheme.typograhpy.buttonLg
-                            .copyWith(color: FineTheme.palettes.primary100),
-                      )
+                      ValueListenableBuilder<DateTime>(
+                        valueListenable: model.now,
+                        builder: (context, value, child) {
+                          return Text(
+                            value != null
+                                ? DateFormat('dd-MM HH:mm:ss').format(value)
+                                : 'Loading...',
+                            style: FineTheme.typograhpy.buttonLg
+                                .copyWith(color: FineTheme.palettes.primary100),
+                          );
+                        },
+                      ),
                       // StreamBuilder<DateTime>(
                       //   stream: Stream.periodic(
                       //       const Duration(seconds: 1), (i) => DateTime.now()),

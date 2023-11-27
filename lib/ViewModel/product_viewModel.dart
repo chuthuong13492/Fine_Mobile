@@ -115,6 +115,7 @@ class ProductDetailViewModel extends BaseModel {
       count,
       selectAttribute?.isStackable,
       false,
+      false,
     );
 
     bool isInCart;

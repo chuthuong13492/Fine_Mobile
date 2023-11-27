@@ -20,6 +20,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -37,11 +38,13 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   PartyOrderViewModel? _partyViewModel = Get.find<PartyOrderViewModel>();
   Timer? _timer;
   int index = 0;
+  bool? checkAdmin;
   @override
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(seconds: 1),
         (timer) async => await _partyViewModel!.getPartyOrder());
+    _coOrder();
   }
 
   @override
@@ -50,6 +53,11 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     _timer?.cancel();
   }
 
+  void _coOrder() {
+    setState(() {
+      checkAdmin = _partyViewModel?.isAdmin;
+    });
+  }
   // void _stopTimer() {
   //   _timer?.cancel();
   // }
@@ -58,8 +66,6 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   Widget build(BuildContext context) {
     // List<Party> listParty = _partyViewModel!.partyOrderDTO!.partyOrder!;
     AccountViewModel acc = Get.find<AccountViewModel>();
-
-    // bool? isAdmin = false;
 
     // for (var item in user) {
     //   if (item.customer!.isAdmin == true) {
@@ -93,18 +99,20 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
             ),
           ),
           actionButton: [
-            Container(
-              padding: const EdgeInsets.only(right: 8),
-              child: IconButton(
-                  onPressed: () async {
-                    await showInviteDialog('text');
-                  },
-                  icon: Icon(
-                    Icons.group_add_rounded,
-                    color: FineTheme.palettes.primary100,
-                    size: 30,
-                  )),
-            )
+            checkAdmin == true
+                ? Container(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: IconButton(
+                        onPressed: () async {
+                          await showInviteDialog('text');
+                        },
+                        icon: Icon(
+                          Icons.group_add_rounded,
+                          color: FineTheme.palettes.primary100,
+                          size: 30,
+                        )),
+                  )
+                : const SizedBox.shrink()
           ],
         ),
         body: SafeArea(
@@ -186,11 +194,13 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                             );
                           }
                         }
+                        // checkAdmin = true;
                       } else {
                         user;
                         for (var item in user) {
                           card.add(_buildPartyList(item));
                         }
+                        // checkAdmin = false;
                       }
                     }
                   }
@@ -418,80 +428,50 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     return Container(
       color: FineTheme.palettes.shades100,
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
-      child: InkWell(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(0, 0, 8, 0),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(4),
-                                        child: Container(
-                                          width: 31,
-                                          height: 28,
-                                          child: CacheImage(
-                                              imageUrl: defaultImage),
-                                        ),
-                                      ),
-                                    ),
-                                    Text(orderDetails.productName!,
-                                        style: FineTheme.typograhpy.subtitle2),
-                                  ],
-                                ),
-                                Row(children: [
-                                  RichText(
-                                    text: TextSpan(
-                                      text: formatPrice(price),
-                                      style: FineTheme.typograhpy.subtitle2
-                                          .copyWith(color: Colors.black),
-                                      // children: [
-                                      //   WidgetSpan(
-                                      //     alignment:
-                                      //         PlaceholderAlignment.bottom,
-                                      //     child: Container(),
-                                      //   )
-                                      // ],
-                                    ),
-                                  ),
-                                ]),
-                              ],
-                            ),
-                          ),
-                        ],
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: const SizedBox(
+                        width: 31,
+                        height: 28,
+                        child: CacheImage(imageUrl: defaultImage),
                       ),
-                    ],
+                    ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ...list,
-                      const SizedBox(width: 8),
-                      selectQuantity(orderDetails, isYou!),
-                    ],
-                  )
+                  Text(orderDetails.productName!,
+                      style: FineTheme.typograhpy.subtitle2),
                 ],
               ),
-            ),
-          ],
-        ),
+              Row(children: [
+                RichText(
+                  text: TextSpan(
+                    text: formatPrice(price),
+                    style: FineTheme.typograhpy.subtitle2
+                        .copyWith(color: Colors.black),
+                  ),
+                ),
+              ]),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ...list,
+              const SizedBox(width: 8),
+              selectQuantity(orderDetails, isYou!),
+            ],
+          )
+        ],
       ),
     );
   }
@@ -589,8 +569,12 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                           ),
                         ),
                       ),
-                      Text(
-                          '${userConfirm?.length}/${customer} thành viên đã xác nhận'),
+                      checkAdmin == true
+                          ? Text(
+                              '${userConfirm?.length}/${customer} thành viên đã xác nhận')
+                          : Text(isUserConfirm == false
+                              ? "Chưa xác nhận"
+                              : "Đã xác nhận"),
                       isAdmin == true
                           ? InkWell(
                               onTap: () async {
@@ -645,7 +629,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                                 ? 'Thanh toán'
                                 : 'Chưa đủ người xác nhận'
                             : isUserConfirm! == false
-                                ? 'Xác nhận đơn hàng'
+                                ? 'Chốt đơn'
                                 : 'Đã xác nhận',
                         style: TextStyle(
                             fontFamily: 'Montserrat',

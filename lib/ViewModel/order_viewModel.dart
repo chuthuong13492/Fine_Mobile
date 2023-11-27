@@ -113,12 +113,17 @@ class OrderViewModel extends BaseModel {
       RootViewModel root = Get.find<RootViewModel>();
       print(stacktra.toString());
       if (e.response?.data["statusCode"] == 400) {
-        String errorMsg = e.response?.data["message"];
-        errorMessage = errorMsg;
-        Get.back;
-        showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
-            "Hiện tại khung giờ này đã đóng vào lúc ${root.selectedTimeSlot!.closeTime}, bạn hãy xem khung giờ khác nhé 😃.");
-        // await removeCart();
+        if (e.response?.data["errorCode"] == 4002) {
+          errorMessage = e.response?.data["message"];
+          showStatusDialog("assets/images/error.png", "Hết món!!",
+              "Món này đã hết mất rồiii");
+        } else {
+          String errorMsg = e.response?.data["message"];
+          errorMessage = errorMsg;
+          Get.back;
+          showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
+              "Hiện tại khung giờ này đã đóng vào lúc ${root.selectedTimeSlot!.closeTime}, bạn hãy xem khung giờ khác nhé 😃.");
+        }
 
         setState(ViewStatus.Completed);
       } else if (e.response?.data["statusCode"] == 404) {
@@ -229,7 +234,7 @@ class OrderViewModel extends BaseModel {
         if (option != 1) {
           return;
         }
-        // showLoadingDialog();
+
         final code = await getPartyCode();
         if (code != null) {
           orderDTO!.addProperties(code);
@@ -262,7 +267,7 @@ class OrderViewModel extends BaseModel {
           if (cart != null) {
             for (var item in cart.orderDetails!) {
               CartItem cartItem = CartItem(item.productId, "", "", "", 0, 0, 0,
-                  0, 0, 0, item.quantity, false, false);
+                  0, 0, 0, item.quantity, false, false, false);
               await removeItemFromCart(cartItem);
             }
           }
@@ -308,35 +313,12 @@ class OrderViewModel extends BaseModel {
     }
   }
 
-  Future<void> addProductRecommend(ProductInCart product) async {
-    ProductDetailViewModel prodModel = Get.find<ProductDetailViewModel>();
-    // model.master = product;
-    final prodAttributes = ProductAttributes(
-      id: product.id,
-      size: product.size,
-    );
-    prodModel.selectAttribute = prodAttributes;
-    prodModel.total = product.price;
-    prodModel.count = 1;
-    prodModel.master =
-        ProductDTO(productName: product.name, imageUrl: product.imageUrl);
-    bool? isAdded = await prodModel.addProductToCart();
+  Future<void> addProductRecommend(ProductAttributes attr, bool isAdded) async {
     if (isAdded == true) {
-      CartItem cartItem = CartItem(
-          product.id,
-          product.name,
-          product.imageUrl,
-          product.size,
-          0,
-          0,
-          0,
-          0,
-          product.price,
-          product.price,
-          1,
-          false,
-          true);
-      await Get.find<CartViewModel>().changeValueChecked(true, cartItem);
+      final cart = await getCart();
+      final itemCart =
+          cart!.items!.firstWhere((element) => element.productId == attr.id);
+      await Get.find<CartViewModel>().changeValueChecked(true, itemCart);
       if (notifierTimeRemaining.value > 0) {
         await delLockBox();
       }
@@ -379,51 +361,6 @@ class OrderViewModel extends BaseModel {
       setState(ViewStatus.Completed);
     }
   }
-
-  // Future<void> deleteItem(OrderDetails item) async {
-  //   print("Delete item...");
-  //   bool result;
-  //   ProductDTO product =
-  //       new ProductDTO(id: item.productId, productName: item.productName);
-  //   ConfirmCartItem cartItem =
-  //       new ConfirmCartItem(item.productId, item.quantity, null);
-  //   result = await removeItemFromCart(cartItem);
-  //   await removeItemFromMart(cartItem);
-  //   print("Result: $result");
-  //   if (result) {
-  //     await AnalyticsService.getInstance()
-  //         ?.logChangeCart(product, item.quantity, false);
-
-  //     await prepareOrder();
-  //   } else {
-  //     await removeItemFromCart(cartItem);
-  //     currentCart = await getCart();
-  //     await prepareOrder();
-  //   }
-  // }
-
-  // Future<void> updateQuantity(OrderDetails item) async {
-  //   final productViewModel = Get.find<ProductDetailViewModel>();
-  //   ConfirmCart? mart = await getMart();
-  //   final itemInCart = mart!.orderDetails!
-  //       .firstWhere((element) => element.productId == item.productId);
-  //   if (itemInCart.quantity > item.quantity) {
-  //     ConfirmCartItem cartItem =
-  //         new ConfirmCartItem(item.productId, item.quantity - 1, null);
-
-  //     await updateItemFromMart(cartItem);
-  //     // await updateItemFromCart(cartItem);
-  //     await productViewModel.processCart(
-  //         item.productId, 1, root!.selectedTimeSlot!.id);
-  //   } else {
-  //     await productViewModel.processCart(
-  //         item.productId, 1, root!.selectedTimeSlot!.id);
-  //   }
-
-  //   // await updateItemFromCart(cartItem);
-  //   await prepareOrder();
-  //   notifyListeners();
-  // }
 
   Future<void> getCurrentCart() async {
     try {
