@@ -60,38 +60,22 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
               notification!.title!, notification.body!);
           break;
         case 'ForFinishOrder':
-          OrderDTO? dto;
-          if (event.data["orderId"] != null) {
-            await Get.find<OrderHistoryViewModel>()
-                .getOrderByOrderId(id: event.data["orderId"]);
-            if (Get.find<OrderHistoryViewModel>().orderDTO != null) {
-              if (Get.find<OrderHistoryViewModel>().orderDTO!.id ==
-                  event.data["orderId"]) {
-                dto = Get.find<OrderHistoryViewModel>().orderDTO!;
-              }
-            }
-          }
-          if (dto != null) {
-            final otherAmounts =
-                dto.otherAmounts!.firstWhere((element) => element.type == 1);
-            showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
-                otherAmounts.amount!, dto.finalAmount!);
-          }
-          // if (Get.currentRoute == "/qrcode_screen") {
-          //   if (dto != null) {
-          //     final otherAmounts =
-          //         dto.otherAmounts!.firstWhere((element) => element.type == 1);
-          //     await showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
-          //         otherAmounts.amount!, dto.finalAmount!);
+          // OrderDTO? dto;
+          // if (event.data["orderId"] != null) {
+          //   await Get.find<OrderHistoryViewModel>()
+          //       .getOrderByOrderId(id: event.data["orderId"]);
+          //   if (Get.find<OrderHistoryViewModel>().orderDTO != null) {
+          //     if (Get.find<OrderHistoryViewModel>().orderDTO!.id ==
+          //         event.data["orderId"]) {
+          //       dto = Get.find<OrderHistoryViewModel>().orderDTO!;
+          //     }
           //   }
-          //   Get.back();
-          // } else {
-          //   if (dto != null) {
-          //     final otherAmounts =
-          //         dto.otherAmounts!.firstWhere((element) => element.type == 1);
-          //     await showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
-          //         otherAmounts.amount!, dto.finalAmount!);
-          //   }
+          // }
+          // if (dto != null) {
+          //   final otherAmounts =
+          //       dto.otherAmounts!.firstWhere((element) => element.type == 1);
+          //   showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
+          //       otherAmounts.amount!, dto.finalAmount!);
           // }
 
           break;

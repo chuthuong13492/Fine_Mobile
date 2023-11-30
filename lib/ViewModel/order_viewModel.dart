@@ -218,6 +218,9 @@ class OrderViewModel extends BaseModel {
   }
 
   Future<void> orderCart() async {
+    final partyModel = Get.find<PartyOrderViewModel>();
+    final cartModel = Get.find<CartViewModel>();
+    final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
     try {
       if (orderDTO!.stationDTO == null) {
         showStatusDialog("assets/icons/box_icon.png", "Opps",
@@ -248,59 +251,62 @@ class OrderViewModel extends BaseModel {
           return;
         }
 
-        if (result!.statusCode == 200) {
-          isCreate = true;
-          timeRemaining = 0;
-          notifierTimeRemaining.value = 0;
-          await fetchStatus(result.order!.id!);
-          final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
-          orderHistoryViewModel.orderDTO = result.order;
-          // await showStatusDialog("assets/images/icon-success.png", 'Success',
-          //     'Bạn đã đặt hàng thành công');
+        if (result != null) {
+          if (result.statusCode == 200) {
+            isCreate = true;
+            timeRemaining = 0;
+            notifierTimeRemaining.value = 0;
+            await fetchStatus(result.order!.id!);
+            orderHistoryViewModel.orderDTO = result.order;
+            // await showStatusDialog("assets/images/icon-success.png", 'Success',
+            //     'Bạn đã đặt hàng thành công');
 
-          Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
-              arguments: {"order": result.order});
-          if (Get.currentRoute == "/party_order_screen") {
-            Get.back();
-          }
-          final cart = await getMart();
-          if (cart != null) {
-            for (var item in cart.orderDetails!) {
-              CartItem cartItem = CartItem(item.productId, "", "", "", 0, 0, 0,
-                  0, 0, 0, item.quantity, false, false, false);
-              await removeItemFromCart(cartItem);
+            await Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
+                arguments: {"order": result.order});
+            final cart = await getMart();
+            if (cart != null) {
+              for (var item in cart.orderDetails!) {
+                CartItem cartItem = CartItem(item.productId, "", "", "", 0, 0,
+                    0, 0, 0, 0, item.quantity, false, false, false);
+                await removeItemFromCart(cartItem);
+              }
             }
+            await deleteMart();
+            // cartModel.total = 0;
+            // cartModel.quantityChecked = 0;
+            // cartModel.notifier.value = 0;
+            await cartModel.getCurrentCart();
+            await deletePartyCode();
+            partyModel.partyOrderDTO = null;
+            partyModel.partyCode = null;
+            partyModel.isLinked = false;
+          } else if (result.statusCode == 400) {
+            orderDTO!.stationDTO = null;
+            await delLockBox();
+            Get.back();
+            String errorMsg = result.message!;
+            errorMessage = errorMsg;
+            await showStatusDialog(
+                "assets/images/error.png", "Oops!", "Số dư trong ví hong đủ!!");
+            setState(ViewStatus.Completed);
+          } else if (result.statusCode == 404) {
+            orderDTO!.stationDTO = null;
+            await delLockBox();
+            String errorMsg = result.message!;
+            errorMessage = errorMsg;
+            await showStatusDialog(
+                "assets/images/error.png", "Oops!", errorMessage!);
+            setState(ViewStatus.Completed);
           }
-          deleteMart();
-          final cartModel = Get.find<CartViewModel>();
-          cartModel.total = 0;
-          cartModel.quantityChecked = 0;
-          cartModel.notifier.value = 0;
-          await cartModel.getCurrentCart();
-          deletePartyCode();
-          final partyModel = Get.find<PartyOrderViewModel>();
-          partyModel.partyOrderDTO = null;
-          partyModel.partyCode = null;
-          partyModel.isLinked = false;
+        } else {
+          bool result = await showErrorDialog();
+          if (result) {
+            await prepareOrder();
+          } else {
+            setState(ViewStatus.Error);
+          }
         }
-        if (result.statusCode == 400) {
-          orderDTO!.stationDTO = null;
-          await delLockBox();
-          Get.back();
-          String errorMsg = result.message!;
-          errorMessage = errorMsg;
-          await showStatusDialog(
-              "assets/images/error.png", "Oops!", "Số dư trong ví hong đủ!!");
-          setState(ViewStatus.Completed);
-        } else if (result.statusCode == 404) {
-          orderDTO!.stationDTO = null;
-          await delLockBox();
-          String errorMsg = result.message!;
-          errorMessage = errorMsg;
-          await showStatusDialog(
-              "assets/images/error.png", "Oops!", errorMessage!);
-          setState(ViewStatus.Completed);
-        }
+
         notifyListeners();
       }
     } catch (e) {
@@ -352,8 +358,15 @@ class OrderViewModel extends BaseModel {
               "assets/images/logo2.png", "Oops!", "Đơn hàng đã bị hủy mất rùi");
         } else if (orderStatusDTO?.orderStatus == 11 &&
             Get.currentRoute == '/qrcode_screen') {
-          await Get.find<OrderHistoryViewModel>().getOrders();
-          Get.offAndToNamed(RouteHandler.NAV);
+          final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
+          await orderHistoryViewModel.getOrders();
+          await orderHistoryViewModel.getOrderByOrderId(id: orderId);
+          if (orderHistoryViewModel.orderDTO != null) {
+            Get.offAndToNamed(RouteHandler.ORDER_HISTORY_DETAIL,
+                arguments: orderHistoryViewModel.orderDTO);
+            await showStatusDialog("assets/images/icon-success.png",
+                "Lấy hàng thành công", "Bạn đã lấy hàng thành công rùi nè");
+          }
         }
       }
       setState(ViewStatus.Completed);

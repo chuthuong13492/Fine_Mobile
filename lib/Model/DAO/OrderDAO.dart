@@ -102,19 +102,20 @@ class OrderDAO extends BaseDAO {
         '/order',
         data: data,
       );
-      return OrderStatus(
-        statusCode: res.statusCode,
-        code: res.data['code'],
-        message: res.data['message'],
-        order: OrderDTO.fromJson(res.data['data']),
-      );
+      if (res.statusCode == 200) {
+        return OrderStatus(
+          statusCode: res.statusCode,
+          code: res.data['status']['errorCode'],
+          message: res.data['status']['message'],
+          order: OrderDTO.fromJson(res.data['data']),
+        );
+      }
+      return null;
     } on DioError catch (e) {
       return OrderStatus(
           statusCode: e.response!.data["statusCode"],
           code: e.response!.data['errorCode'],
           message: e.response!.data['message']);
-    } catch (e) {
-      throw e;
     }
   }
 }

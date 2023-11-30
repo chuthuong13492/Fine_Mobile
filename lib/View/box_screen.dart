@@ -106,6 +106,7 @@ class _BoxScreenState extends State<BoxScreen> {
                           color: FineTheme.palettes.neutral600,
                           height: Get.height,
                           child: GridView.count(
+                            physics: const NeverScrollableScrollPhysics(),
                             crossAxisCount: 5,
                             children: [
                               ...model.boxList!.map((box) => _buildBoxes(box))

@@ -30,6 +30,7 @@ class CheckingOrderScreen extends StatefulWidget {
 class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
   OrderViewModel _orderViewModel = Get.find<OrderViewModel>();
   Timer? _timer;
+
   @override
   void initState() {
     super.initState();
@@ -381,7 +382,9 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                                           child: Text(
                                             hasBox
                                                 ? 'Chi tiết QR Code'
-                                                : 'Đang xử lý...',
+                                                : status == 11
+                                                    ? 'Đang xử lý...'
+                                                    : "Đã lấy hàng",
                                             style: TextStyle(
                                                 fontFamily: 'Montserrat',
                                                 fontWeight: FontWeight.w500,

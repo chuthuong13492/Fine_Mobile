@@ -409,14 +409,14 @@ class _CartScreenState extends State<CartScreen>
                                             ],
                                           )
                                         : const SizedBox.shrink(),
-                                    model.listRecommend != null &&
-                                            model.listRecommend!.isNotEmpty
-                                        ? Container(
-                                            padding: const EdgeInsets.fromLTRB(
-                                                0, 10, 0, 0),
-                                            child: _buidProductRecomend(
-                                                model.listRecommend))
-                                        : const SizedBox.shrink(),
+                                    // model.listRecommend != null &&
+                                    //         model.listRecommend!.isNotEmpty
+                                    //     ? Container(
+                                    //         padding: const EdgeInsets.fromLTRB(
+                                    //             0, 10, 0, 0),
+                                    //         child: _buidProductRecomend(
+                                    //             model.listRecommend))
+                                    //     : const SizedBox.shrink(),
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,

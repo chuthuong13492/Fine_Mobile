@@ -2,6 +2,7 @@ import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Utils/format_phone.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/ViewModel/orderHistory_viewModel.dart';
+import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -9,6 +10,7 @@ import 'package:get/get.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../../Accessories/index.dart';
+import '../../Constant/route_constraint.dart';
 import '../../Model/DTO/index.dart';
 
 class OrderHistoryDetail extends StatefulWidget {
@@ -110,53 +112,64 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                       child: Container(
                         color: FineTheme.palettes.primary50,
                       )),
-                  Container(
-                    padding: const EdgeInsets.only(
-                        right: 16, left: 16, top: 10, bottom: 10),
+                  InkWell(
+                    onTap: () async {
+                      final orderModel = Get.find<OrderViewModel>();
+                      _orderDetailModel = Get.find<OrderHistoryViewModel>();
+                      if (orderModel.orderStatusDTO!.orderStatus == 10) {
+                        Get.toNamed(RouteHandler.BOX_SCREEN,
+                            arguments: _orderDetailModel!.orderDTO);
+                      }
+                    },
                     child: Container(
-                      height: 50,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Center(
-                            child: SvgPicture.asset(
-                              "assets/icons/box_icon.svg",
-                              height: 30,
-                              width: 30,
+                      padding: const EdgeInsets.only(
+                          right: 16, left: 16, top: 10, bottom: 10),
+                      child: Container(
+                        height: 50,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Center(
+                              child: SvgPicture.asset(
+                                "assets/icons/box_icon.svg",
+                                height: 30,
+                                width: 30,
+                              ),
                             ),
-                          ),
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.only(left: 16),
-                                  width: Get.width,
-                                  child: Text(
-                                    'Giao đến',
-                                    style: FineTheme.typograhpy.caption1,
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.only(left: 16),
+                                    width: Get.width,
+                                    child: Text(
+                                      'Giao đến',
+                                      style: FineTheme.typograhpy.caption1,
+                                    ),
                                   ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.only(left: 16),
-                                  width: Get.width,
-                                  child: Text(
-                                    orderDTO!.stationDTO!.name!,
-                                    style: FineTheme.typograhpy.subtitle2,
-                                  ),
-                                )
-                              ],
+                                  Container(
+                                    padding: const EdgeInsets.only(left: 16),
+                                    width: Get.width,
+                                    child: Text(
+                                      orderDTO!.stationDTO!.name!,
+                                      style: FineTheme.typograhpy.subtitle2,
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                          Center(
-                            child: Icon(
-                              Icons.chevron_right_outlined,
-                              color: FineTheme.palettes.shades100,
-                              size: 30,
+                            Center(
+                              child: Icon(
+                                Icons.chevron_right_outlined,
+                                color: FineTheme.palettes.shades200,
+                                size: 30,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
