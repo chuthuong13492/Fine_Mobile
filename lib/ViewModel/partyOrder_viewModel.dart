@@ -179,30 +179,42 @@ class PartyOrderViewModel extends BaseModel {
         }
       }
       if (result.statusCode == 200) {
-        partyOrderDTO = result.partyOrderDTO;
+        bool? hasUser = result.partyOrderDTO?.partyOrder
+            ?.any((element) => element.customer?.id == acc.currentUser?.id);
+        if (hasUser == false) {
+          deletePartCart();
+          deletePartyCode();
+          partyOrderDTO = null;
+          partyCode = null;
+          notifier.value = 0;
+          await showStatusDialog("images/assets/error.png", "Oops!",
+              "Bạn hong có trong party này!!");
+        } else {
+          partyOrderDTO = result.partyOrderDTO;
 
-        final userParty = partyOrderDTO?.partyOrder?.firstWhere(
-            (element) => element.customer!.id == acc.currentUser!.id);
-        await deletePartCart();
-        if (userParty != null) {
-          if (userParty.customer!.isAdmin == true) {
-            isAdmin = true;
-            adminQuantity = 0;
-            for (var partyList in partyOrderDTO!.partyOrder!) {
-              for (var item in partyList.orderDetails!) {
-                adminQuantity += item.quantity;
+          final userParty = partyOrderDTO?.partyOrder?.firstWhere(
+              (element) => element.customer!.id == acc.currentUser!.id);
+          await deletePartCart();
+          if (userParty != null) {
+            if (userParty.customer!.isAdmin == true) {
+              isAdmin = true;
+              adminQuantity = 0;
+              for (var partyList in partyOrderDTO!.partyOrder!) {
+                for (var item in partyList.orderDetails!) {
+                  adminQuantity += item.quantity;
+                }
               }
             }
+            for (var item in userParty.orderDetails!) {
+              ConfirmCartItem cartItem =
+                  ConfirmCartItem(item.productId, item.quantity, null);
+              await addPartyItem(cartItem, root.selectedTimeSlot!.id!);
+            }
           }
-          for (var item in userParty.orderDetails!) {
-            ConfirmCartItem cartItem =
-                ConfirmCartItem(item.productId, item.quantity, null);
-            await addPartyItem(cartItem, root.selectedTimeSlot!.id!);
-          }
-        }
-        final cart = await getPartyCart();
+          final cart = await getPartyCart();
 
-        notifier.value = cart == null ? 0 : cart.itemQuantity();
+          notifier.value = cart == null ? 0 : cart.itemQuantity();
+        }
       }
       setState(ViewStatus.Completed);
       notifyListeners();

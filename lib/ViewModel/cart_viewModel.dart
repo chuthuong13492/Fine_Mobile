@@ -52,9 +52,9 @@ class CartViewModel extends BaseModel {
   Future<void> changeValueChecked(bool value, CartItem cartItem) async {
     try {
       if (value == true) {
-        bool? isAdded = await Get.find<ProductDetailViewModel>()
-            .processCart(cartItem.productId, cartItem.quantity);
-        // bool? isAdded = await processCart(cartItem);
+        // bool? isAdded = await Get.find<ProductDetailViewModel>()
+        //     .processCart(cartItem.productId, cartItem.quantity);
+        bool? isAdded = await processCart(cartItem);
         await updateCheckItemFromCart(cartItem, isAdded!);
         if (isAdded == true) {
           getTotalQuantity(isAdded, cartItem);
