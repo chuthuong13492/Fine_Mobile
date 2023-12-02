@@ -43,7 +43,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   void initState() {
     super.initState();
     _timer = Timer.periodic(const Duration(seconds: 1),
-        (timer) async => await _partyViewModel!.getPartyOrder());
+        (timer) => _partyViewModel!.getPartyOrder());
     _coOrder();
   }
 
@@ -281,11 +281,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  isAdmin
-                      ? '(Trưởng nhóm)'
-                      : isYou
-                          ? 'Bạn'
-                          : '',
+                  isAdmin ? '(Trưởng nhóm)' : '',
                   style: isAdmin
                       ? TextStyle(
                           fontFamily: 'Montserrat',
@@ -575,22 +571,23 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                           : Text(isUserConfirm == false
                               ? "Chưa xác nhận"
                               : "Đã xác nhận"),
-                      isAdmin == true
-                          ? InkWell(
-                              onTap: () async {
+                      InkWell(
+                        onTap: isAdmin == true
+                            ? () async {
                                 await _partyViewModel?.getCustomerInParty(
                                     isDelete: true);
-                              },
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                                child: Icon(
-                                  Icons.group_remove,
-                                  color: FineTheme.palettes.primary300,
-                                ),
-                              ),
-                            )
-                          : const SizedBox.shrink(),
+                              }
+                            : null,
+                        child: Container(
+                          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                          child: Icon(
+                            Icons.group_remove,
+                            color: isAdmin == true
+                                ? FineTheme.palettes.primary300
+                                : Colors.white,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 5),
@@ -604,7 +601,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                         )),
                     child: InkWell(
                       onTap: () async {
-                        if (!isAllConfirm!) {
+                        if (!isUserConfirm!) {
                           await model.confirmationParty();
                           // _stopTimer();
                         } else {

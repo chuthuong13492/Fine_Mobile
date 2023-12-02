@@ -36,6 +36,7 @@ class RootScreen extends StatefulWidget {
 }
 
 class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
+  PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
   Future listenFireBaseMessages() async {
     FirebaseMessaging.onMessage.listen((event) async {
       hideSnackbar();
@@ -46,7 +47,6 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
 
       switch (event.data["type"]) {
         case 'ForInvitation':
-          PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
           int option = await showOptionDialog('${notification!.body}');
           if (option == 1) {
             await deletePartyCode();
@@ -58,6 +58,24 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
         case 'ForPopup':
           await showStatusDialog("assets/images/icon-success.png",
               notification!.title!, notification.body!);
+          break;
+        case "ForCoOrderRemove":
+          deletePartCart();
+          deletePartyCode();
+          party.partyCode = null;
+          party.partyOrderDTO = null;
+          final cart = await getCart();
+          if (cart != null) {
+            final listItem = cart.items!
+                .where((element) => element.isAddParty == true)
+                .toList();
+            for (var item in listItem) {
+              await updateAddedItemtoCart(item, false);
+            }
+          }
+          Get.find<CartViewModel>().getCurrentCart();
+          await showStatusDialog("assets/images/error.png", "Oops!",
+              "Bạn hong có trong party này!!");
           break;
         case 'ForFinishOrder':
           // OrderDTO? dto;

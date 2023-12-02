@@ -64,8 +64,8 @@ class _CustomInvitePartyState extends State<CustomInviteParty> {
       } else {
         timer.cancel();
         if (isCancled == false) {
-          _partyOrderViewModel.inviteParty(
-              _partyOrderViewModel.acc!.id!, _partyOrderViewModel.partyCode!);
+          _partyOrderViewModel.inviteParty(_partyOrderViewModel.acount!.id!,
+              _partyOrderViewModel.partyCode!);
         }
         setState(() {
           isCountdown = false;
@@ -283,7 +283,7 @@ class _CustomInvitePartyState extends State<CustomInviteParty> {
           ),
           ScopedModelDescendant<PartyOrderViewModel>(
             builder: (context, child, model) {
-              if (model.acc == null) {
+              if (model.acount == null) {
                 return const SizedBox.shrink();
               }
 
@@ -298,7 +298,7 @@ class _CustomInvitePartyState extends State<CustomInviteParty> {
                           child: Row(
                             children: [
                               Text(
-                                model.acc!.name!,
+                                model.acount!.name!,
                                 style: FineTheme.typograhpy.subtitle1,
                               ),
                               const SizedBox(
@@ -313,7 +313,7 @@ class _CustomInvitePartyState extends State<CustomInviteParty> {
                                 width: 4,
                               ),
                               Text(
-                                model.acc!.phone!,
+                                model.acount!.phone!,
                                 style: FineTheme.typograhpy.subtitle1,
                               ),
                             ],

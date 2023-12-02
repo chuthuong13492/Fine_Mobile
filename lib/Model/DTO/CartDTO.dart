@@ -111,6 +111,9 @@ class Cart {
     for (CartItem cart in items!) {
       if (cart.findCartItem(item)) {
         cart.isAddParty = isAdd;
+        if (isAdd == false) {
+          cart.isChecked = false;
+        }
       }
     }
   }

@@ -29,7 +29,7 @@ class PartyOrderViewModel extends BaseModel {
   PartyOrderDTO? partyOrderDTO;
   OrderDTO? orderDTO;
   PartyOrderDAO? _partyDAO;
-  AccountDTO? acc;
+  AccountDTO? acount;
   Customer? customer;
   // Cart? currentCart;
   String? errorMessage;
@@ -42,6 +42,7 @@ class PartyOrderViewModel extends BaseModel {
   bool? isInvited = false;
   bool? isCartRoute = false;
   bool? isAdmin = false;
+  bool? isConfirm = false;
   int adminQuantity = 0;
 
   final ValueNotifier<int> notifier = ValueNotifier(0);
@@ -66,6 +67,7 @@ class PartyOrderViewModel extends BaseModel {
       listError.clear();
       final cart = await getMart();
       if (root.isNextDay == false) {
+        isConfirm = false;
         if (isLinkedMode == true) {
           isLinked = isLinkedMode;
         }
@@ -130,55 +132,8 @@ class PartyOrderViewModel extends BaseModel {
     try {
       partyCode = await getPartyCode();
       PartyOrderStatus? result = await _partyDAO?.getPartyOrder(partyCode);
-      if (result!.statusCode == 404 && partyCode != null) {
-        if (Get.currentRoute == "/party_order_screen") {
-          Get.back();
-        }
-        await deletePartyCode();
-        await deleteMart();
-        final list = partyOrderDTO!.partyOrder!
-            .where((element) => element.customer!.id == acc.currentUser!.id)
-            .toList();
-        for (var item in list) {
-          if (item.orderDetails != null) {
-            for (var item in item.orderDetails!) {
-              CartItem cartItem = CartItem(item.productId, null, null, null,
-                  null, null, null, null, null, null, 0, false, false, false);
-              await updateCheckItemFromCart(cartItem, false);
-            }
-          }
-        }
-        partyCode = null;
-        partyOrderDTO = null;
-        await showStatusDialog("assets/images/error.png", "Oops!",
-            "Đã có lỗi xảy ra, hãy thử lại nè 🥹!!");
-      }
-      if (result.partyOrderDTO != null) {
-        if (result.partyOrderDTO!.isPayment == true) {
-          // if (Get.currentRoute == "/party_order_screen") {
-          //   Get.back();
-          // }
-          await deletePartyCode();
-          await deleteMart();
-          final list = partyOrderDTO!.partyOrder!
-              .where((element) => element.customer!.id == acc.currentUser!.id)
-              .toList();
-          for (var item in list) {
-            if (item.orderDetails != null) {
-              for (var item in item.orderDetails!) {
-                CartItem cartItem = CartItem(item.productId, null, null, null,
-                    null, null, null, null, null, null, 0, false, false, false);
-                await updateCheckItemFromCart(cartItem, false);
-              }
-            }
-          }
-          partyCode = null;
-          partyOrderDTO = null;
-          await showStatusDialog("assets/images/logo2.png", "Đã thanh toán",
-              "Đơn nhóm đã được thanh toán thành công");
-        }
-      }
-      if (result.statusCode == 200) {
+
+      if (result != null && result.statusCode == 200) {
         bool? hasUser = result.partyOrderDTO?.partyOrder
             ?.any((element) => element.customer?.id == acc.currentUser?.id);
         if (hasUser == false) {
@@ -187,7 +142,17 @@ class PartyOrderViewModel extends BaseModel {
           partyOrderDTO = null;
           partyCode = null;
           notifier.value = 0;
-          await showStatusDialog("images/assets/error.png", "Oops!",
+          final cart = await getCart();
+          if (cart != null) {
+            final listItem = cart.items!
+                .where((element) => element.isAddParty == true)
+                .toList();
+            for (var item in listItem) {
+              await updateAddedItemtoCart(item, false);
+            }
+          }
+          _cartViewModel.getCurrentCart();
+          await showStatusDialog("assets/images/error.png", "Oops!",
               "Bạn hong có trong party này!!");
         } else {
           partyOrderDTO = result.partyOrderDTO;
@@ -204,17 +169,36 @@ class PartyOrderViewModel extends BaseModel {
                   adminQuantity += item.quantity;
                 }
               }
+            } else {
+              isAdmin = false;
             }
-            for (var item in userParty.orderDetails!) {
-              ConfirmCartItem cartItem =
-                  ConfirmCartItem(item.productId, item.quantity, null);
-              await addPartyItem(cartItem, root.selectedTimeSlot!.id!);
+            if (userParty.orderDetails != null) {
+              for (var item in userParty.orderDetails!) {
+                ConfirmCartItem cartItem =
+                    ConfirmCartItem(item.productId, item.quantity, null);
+                await addPartyItem(cartItem, root.selectedTimeSlot!.id!);
+              }
             }
           }
           final cart = await getPartyCart();
 
           notifier.value = cart == null ? 0 : cart.itemQuantity();
         }
+      } else if (result!.statusCode == 404) {
+        deletePartCart();
+        deletePartyCode();
+        partyCode = null;
+        partyOrderDTO = null;
+        final cart = await getCart();
+        if (cart != null) {
+          final listItem = cart.items!
+              .where((element) => element.isAddParty == true)
+              .toList();
+          for (var item in listItem) {
+            await updateAddedItemtoCart(item, false);
+          }
+        }
+        _cartViewModel.getCurrentCart();
       }
       setState(ViewStatus.Completed);
       notifyListeners();
@@ -230,6 +214,7 @@ class PartyOrderViewModel extends BaseModel {
       hideDialog();
       if (root.isNextDay == false) {
         isJoinParty = true;
+        isConfirm = false;
         await setPartyCode(code!);
         partyCode = await getPartyCode();
         PartyOrderStatus? result = await _partyDAO?.joinPartyOrder(
@@ -267,9 +252,9 @@ class PartyOrderViewModel extends BaseModel {
         } else {
           switch (result?.code) {
             case 0:
-              Get.find<CartViewModel>().getCurrentCart();
-              await getPartyOrder();
               root.checkCartAvailable();
+              await Get.find<CartViewModel>().removeCart();
+              await getPartyOrder();
               Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
               break;
             case 4001:
@@ -283,9 +268,9 @@ class PartyOrderViewModel extends BaseModel {
                   "Nhóm này đã đóng mất rùi!!!");
               break;
             case 4003:
-              Get.find<CartViewModel>().getCurrentCart();
-              await getPartyOrder();
               root.checkCartAvailable();
+              await Get.find<CartViewModel>().removeCart();
+              await getPartyOrder();
               Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
               break;
             case 4004:
@@ -354,15 +339,10 @@ class PartyOrderViewModel extends BaseModel {
   Future<void> confirmationParty() async {
     try {
       setState(ViewStatus.Loading);
-      AccountViewModel acc = Get.find<AccountViewModel>();
-      // final listParty = partyOrderDTO!.partyOrder!
-      //     .where((element) => element.customer!.id == acc.currentUser!.id)
-      //     .toList();
-      // final listOrderDetail =
       int? option;
-      // await _orderViewModel.getCurrentCart();
       final cart = await getMart();
       if (cart == null) {
+        option = 0;
         await showStatusDialog("assets/images/logo2.png", 'Oops!!',
             'Giỏ hàng bạn đang trống ruìi!!');
       } else {
@@ -373,13 +353,11 @@ class PartyOrderViewModel extends BaseModel {
       if (option != 1) {
         return;
       }
+      isConfirm = true;
       final orderDetails = await _partyDAO?.confirmPartyOrder(partyCode);
-      // CartItem item =
-      //     new CartItem(orderDetails!.productId, orderDetails.quantity, null);
-      // await addItemToCart(item);
-      // listOrderDetail!.add(orderDetails!);
+
       await getPartyOrder();
-      Get.toNamed(RouteHandler.CONFIRM_ORDER_SCREEN);
+      // Get.toNamed(RouteHandler.CONFIRM_ORDER_SCREEN);
       setState(ViewStatus.Completed);
     } catch (e) {
       // partyOrderDTO = null;
@@ -391,10 +369,10 @@ class PartyOrderViewModel extends BaseModel {
     try {
       setState(ViewStatus.Loading);
       String numericPhoneNumber = Uri.encodeComponent(phone);
-      acc = await _partyDAO?.getCustomerByPhone(numericPhoneNumber);
+      acount = await _partyDAO?.getCustomerByPhone(numericPhoneNumber);
       setState(ViewStatus.Completed);
     } catch (e) {
-      acc = null;
+      acount = null;
       int option = await showOptionDialog(
           "Hiện sđt này chưa đăng ký app. Bạn có muốn gửi lời mời tiếp hong 😚");
 
@@ -429,40 +407,6 @@ class PartyOrderViewModel extends BaseModel {
     }
   }
 
-  // Future<void> deleteItem(OrderDetails item) async {
-  //   final _productViewModel = Get.find<ProductDetailViewModel>();
-  //   // showLoadingDialog();
-  //   print("Delete item...");
-  //   bool result;
-  //   ProductDTO product =
-  //       ProductDTO(id: item.productId, productName: item.productName);
-  //   ConfirmCartItem cartItem =
-  //       ConfirmCartItem(item.productId, item.quantity, null);
-  //   result = await removeItemFromCart(cartItem);
-  //   await removeItemFromMart(cartItem);
-
-  //   print("Result: $result");
-  //   if (result) {
-  //     await AnalyticsService.getInstance()
-  //         ?.logChangeCart(product, item.quantity, false);
-  //     // Get.back(result: true);
-  //     _orderViewModel.currentCart = await getCart();
-  //     ConfirmCartItem itemInCart = new ConfirmCartItem(
-  //         _orderViewModel.currentCart!.orderDetails![0].productId,
-  //         _orderViewModel.currentCart!.orderDetails![0].quantity - 1,
-  //         null);
-  //     await _productViewModel.processCart(
-  //         _orderViewModel.currentCart!.orderDetails![0].productId,
-  //         1,
-  //         root.selectedTimeSlot!.id);
-  //     await addProductToPartyOrder();
-  //   } else {
-  //     await removeItemFromCart(cartItem);
-  //     _orderViewModel.currentCart = await getCart();
-  //     await addProductToPartyOrder();
-  //   }
-  // }
-
   Future<void> getCustomerInParty({bool? isDelete = false}) async {
     if (partyOrderDTO != null) {
       List<Party> party = partyOrderDTO?.partyOrder
@@ -487,33 +431,6 @@ class PartyOrderViewModel extends BaseModel {
     }
   }
 
-  // Future<void> updateQuantity(OrderDetails item) async {
-  //   final _productViewModel = Get.find<ProductDetailViewModel>();
-  //   _orderViewModel.currentCart = await getCart();
-  //   var checkCart = _orderViewModel.currentCart;
-  //   // await deleteMart();
-  //   final itemInCart = checkCart!.orderDetails!
-  //       .firstWhere((element) => element.productId == item.productId);
-  //   if (itemInCart.quantity > item.quantity) {
-  //     ConfirmCartItem cartItem =
-  //         new ConfirmCartItem(item.productId, item.quantity - 1, null);
-
-  //     // await updateItemFromMart(cartItem);
-  //     await updateItemFromMart(cartItem);
-  //     // checkCart = await getCart();
-  //     // await setMart(checkCart!);
-  //     await _productViewModel.processCart(
-  //         item.productId, 1, root.selectedTimeSlot!.id);
-  //   } else {
-  //     await setMart(checkCart);
-  //     await _productViewModel.processCart(
-  //         item.productId, 1, root.selectedTimeSlot!.id);
-  //   }
-  //   // CartItem cartItem = new CartItem(item.productId, item.quantity, null);
-  //   // await updateItemFromCart(cartItem);
-  //   await addProductToPartyOrder();
-  // }
-
   Future<void> cancelCoOrder(bool isOrder, {String? id}) async {
     hideDialog();
     try {
@@ -534,19 +451,13 @@ class PartyOrderViewModel extends BaseModel {
           partyCode = await getPartyCode();
           final cart = await getCart();
           if (cart != null) {
-            final items = cart.items!
-                .where((element) => element.isChecked == true)
+            final listItem = cart.items!
+                .where((element) => element.isAddParty == true)
                 .toList();
-            for (var i = 0; i < items.length; i++) {
-              await updateCheckItemFromCart(items[i], false);
-              await updateAddedItemtoCart(items[i], false);
+            for (var item in listItem) {
+              await updateAddedItemtoCart(item, false);
             }
           }
-          deleteMart();
-          deletePartCart();
-          notifier.value = 0;
-          _cartViewModel.total = 0;
-          _cartViewModel.quantityChecked = 0;
           await _cartViewModel.getCurrentCart();
           if (isOrder == true) {
           } else {
@@ -607,14 +518,25 @@ class PartyOrderViewModel extends BaseModel {
       partyStatus = await _partyDAO?.getPartyStatus(partyCode!);
       if (partyStatus != null) {
         if (partyStatus?.isFinish == true) {
-          // Get.back();
-          await deletePartyCode();
+          deletePartCart();
+          deletePartyCode();
           partyCode = null;
-        }
-        if (partyStatus?.isDelete == true) {
-          // Get.back();
-          await deletePartyCode();
-          partyCode = null;
+          partyOrderDTO = null;
+          final cart = await getCart();
+          if (cart != null) {
+            final listItem = cart.items!
+                .where((element) => element.isAddParty == true)
+                .toList();
+            for (var item in listItem) {
+              await updateAddedItemtoCart(item, false);
+            }
+          }
+          await _cartViewModel.getCurrentCart();
+          await showStatusDialog("assets/images/logo2.png", "Đã thanh toán",
+              "Đơn nhóm đã được thanh toán thành công");
+          if (Get.currentRoute == "party_order_screen") {
+            Get.back();
+          }
         }
       }
       notifyListeners();

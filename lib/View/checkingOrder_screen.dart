@@ -382,7 +382,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                                           child: Text(
                                             hasBox
                                                 ? 'Chi tiết QR Code'
-                                                : status == 11
+                                                : status != 11
                                                     ? 'Đang xử lý...'
                                                     : "Đã lấy hàng",
                                             style: TextStyle(

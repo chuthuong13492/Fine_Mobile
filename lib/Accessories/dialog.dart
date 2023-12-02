@@ -4,6 +4,7 @@ import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Utils/format_price.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
+import 'package:fine/ViewModel/cart_viewModel.dart';
 import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
@@ -13,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:get/get.dart';
 
+import '../Model/DTO/CartDTO.dart';
 import '../Model/DTO/index.dart';
 
 Future<void> showStatusDialog(
@@ -337,6 +339,144 @@ Future<int> showOptionDialog(String text,
   return option!;
 }
 
+Future<void> editProduct(BuildContext context, CartItem product) {
+  int quantity = product.quantity;
+  double price = product.price!;
+  // int productIndex = model.pendingProductList!
+  //     .indexWhere((e) => e.productId == product.productId);
+  return showDialog<void>(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(builder: (context, setState) {
+        return AlertDialog(
+          title: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Text('${product.productName}',
+                        textAlign: TextAlign.center,
+                        style: FineTheme.typograhpy.h2
+                            .copyWith(color: FineTheme.palettes.emerald25)),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Tổng: ",
+                          style: TextStyle(
+                            fontFamily: "Montserrat",
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            overflow: TextOverflow.ellipsis,
+                            color: FineTheme.palettes.shades200,
+                          ),
+                        ),
+                        Text(
+                          formatPrice(price * quantity),
+                          style: TextStyle(
+                            fontFamily: "Montserrat",
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            overflow: TextOverflow.ellipsis,
+                            color: FineTheme.palettes.primary300,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                top: -20,
+                right: -15,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                      splashFactory: NoSplash.splashFactory,
+                      textStyle: Theme.of(context).textTheme.labelLarge,
+                      alignment: Alignment.centerRight),
+                  child: Icon(Icons.close_outlined,
+                      color: FineTheme.palettes.error300),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            height: 80,
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      splashRadius: 24,
+                      icon: const Icon(
+                        Icons.remove,
+                        size: 32,
+                      ),
+                      onPressed: () {
+                        if (quantity > 1) {
+                          quantity--;
+                        }
+                        setState(() {});
+                      },
+                      color: FineTheme.palettes.emerald25,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16, right: 16),
+                      child: Text(
+                        '$quantity',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w400,
+                            fontStyle: FontStyle.normal),
+                      ),
+                    ),
+                    IconButton(
+                      splashRadius: 24,
+                      icon: const Icon(Icons.add, size: 32),
+                      onPressed: () {
+                        quantity++;
+                        setState(() {});
+                      },
+                      color: FineTheme.palettes.emerald25,
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(
+                splashFactory: NoSplash.splashFactory,
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: Text('Đồng ý',
+                  textAlign: TextAlign.center,
+                  style: FineTheme.typograhpy.body1
+                      .copyWith(color: FineTheme.palettes.emerald25)),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await Get.find<CartViewModel>()
+                    .editProductParty(product, quantity, price);
+              },
+            ),
+          ],
+        );
+      });
+    },
+  );
+}
+
 Future<int> showInputVoucherDialog(
     {String? firstOption, String? secondOption}) async {
   TextEditingController controller = TextEditingController(text: '');
@@ -384,7 +524,7 @@ Future<int> showInputVoucherDialog(
                       option = 0;
                       PartyOrderViewModel party =
                           Get.find<PartyOrderViewModel>();
-                      party.acc = null;
+                      party.acount = null;
                       hideDialog();
                     },
                   ),
@@ -544,7 +684,7 @@ Future<int> showInviteDialog(String text,
                       PartyOrderViewModel party =
                           Get.find<PartyOrderViewModel>();
                       party.isInvited = false;
-                      party.acc = null;
+                      party.acount = null;
                       hideDialog();
                     },
                   ),
@@ -621,7 +761,7 @@ Future<int> showMemberDialog(String text, bool? isDelete,
                       option = 0;
                       PartyOrderViewModel party =
                           Get.find<PartyOrderViewModel>();
-                      party.acc = null;
+                      party.acount = null;
                       hideDialog();
                     },
                   ),
