@@ -514,87 +514,62 @@ class _CartScreenState extends State<CartScreen>
           ),
           Expanded(
             child: SizedBox(
-              height: 90,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              // height: 90,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
+                  Expanded(
+                    child: SizedBox(
+                      height: 90,
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            item.productName!,
-                            style: FineTheme.typograhpy.subtitle2.copyWith(
-                              color: FineTheme.palettes.shades200,
-                            ),
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(
-                            height: 2,
-                          ),
-                          item.size != null
-                              ? Container(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(8, 4, 8, 4),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                        width: 1.5,
-                                        color: FineTheme.palettes.primary100),
-                                  ),
-                                  child: Text(
-                                    "Size ${item.size}",
-                                    style: FineTheme.typograhpy.subtitle2
-                                        .copyWith(
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                item.productName!,
+                                style: FineTheme.typograhpy.subtitle2.copyWith(
+                                  color: FineTheme.palettes.shades200,
+                                ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(
+                                height: 2,
+                              ),
+                              item.size != null
+                                  ? Container(
+                                      padding:
+                                          const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                            width: 1.5,
                                             color:
                                                 FineTheme.palettes.primary100),
-                                  ),
-                                )
-                              : Text(
-                                  "Hãy thử ngay nào",
-                                  style: FineTheme.typograhpy.caption1.copyWith(
-                                    color: FineTheme.palettes.neutral500,
-                                  ),
-                                ),
-                        ],
-                      ),
-                      item.isAddParty == true
-                          ? InkWell(
-                              onTap: () async {
-                                await editProduct(context, item);
-                              },
-                              child: Text(
-                                "Thay đổi",
-                                style: FineTheme.typograhpy.caption1.copyWith(
-                                    color: FineTheme.palettes.primary400),
-                              ),
-                            )
-                          : const SizedBox.shrink(),
-                    ],
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        formatPrice(item.price!),
-                        style: const TextStyle(
-                          fontFamily: "Montserrat",
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          overflow: TextOverflow.ellipsis,
-                          color: Colors.red,
-                        ),
-                      ),
-                      Column(
-                        children: [
+                                      ),
+                                      child: Text(
+                                        "Size ${item.size}",
+                                        style: FineTheme.typograhpy.subtitle2
+                                            .copyWith(
+                                                color: FineTheme
+                                                    .palettes.primary100),
+                                      ),
+                                    )
+                                  : Text(
+                                      "Hãy thử ngay nào",
+                                      style: FineTheme.typograhpy.caption1
+                                          .copyWith(
+                                        color: FineTheme.palettes.neutral500,
+                                      ),
+                                    ),
+                            ],
+                          ),
                           Text(
-                            formatPrice(item.fixTotal!),
+                            formatPrice(item.price!),
                             style: TextStyle(
                               fontFamily: "Montserrat",
                               fontSize: 14,
@@ -603,66 +578,99 @@ class _CartScreenState extends State<CartScreen>
                               color: FineTheme.palettes.primary100,
                             ),
                           ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              InkWell(
-                                onTap: item.isAddParty == false
-                                    ? () async {
-                                        if (item.quantity >= 1) {
-                                          if (item.quantity == 1) {
-                                            await cartViewModel!
-                                                .deleteItem(item, i);
-                                          } else {
-                                            item.quantity--;
-                                            await cartViewModel!
-                                                .updateItem(item, i, false);
-                                          }
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 90,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: item.isAddParty == true
+                              ? () async {
+                                  await editProduct(context, item);
+                                }
+                              : null,
+                          child: Text(
+                            "Thay đổi",
+                            style: FineTheme.typograhpy.caption1.copyWith(
+                                color: item.isAddParty == true
+                                    ? FineTheme.palettes.primary400
+                                    : FineTheme.palettes.shades100),
+                          ),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          // mainAxisSize: MainAxisSize.min,
+                          children: [
+                            InkWell(
+                              onTap: item.isAddParty == false
+                                  ? () async {
+                                      if (item.quantity >= 1) {
+                                        if (item.quantity == 1) {
+                                          await cartViewModel!
+                                              .deleteItem(item, i);
+                                        } else {
+                                          item.quantity--;
+                                          await cartViewModel!
+                                              .updateItem(item, i, false);
                                         }
                                       }
-                                    : null,
-                                child: Icon(
-                                  Icons.remove_circle_outline,
-                                  size: 25,
-                                  color: item.isAddParty == true
-                                      ? FineTheme.palettes.shades100
-                                      : minusColor,
+                                    }
+                                  : null,
+                              child: Icon(
+                                Icons.remove_circle_outline,
+                                size: 25,
+                                color: item.isAddParty == true
+                                    ? FineTheme.palettes.shades100
+                                    : minusColor,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+                              decoration: BoxDecoration(
+                                  // border: Border.all(color: Colors.grey),
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: Text(
+                                item.quantity.toString(),
+                                style: FineTheme.typograhpy.h2.copyWith(
+                                  color: Colors.black,
                                 ),
                               ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.fromLTRB(12, 5, 12, 5),
-                                decoration: BoxDecoration(
-                                    // border: Border.all(color: Colors.grey),
-                                    borderRadius: BorderRadius.circular(8)),
-                                child: Text(
-                                  item.quantity.toString(),
-                                  style: FineTheme.typograhpy.h2.copyWith(
-                                    color: Colors.black,
-                                  ),
-                                ),
+                            ),
+                            InkWell(
+                              onTap: item.isAddParty == false
+                                  ? () async {
+                                      item.quantity++;
+                                      await cartViewModel!
+                                          .updateItem(item, i, true);
+                                    }
+                                  : null,
+                              child: Icon(
+                                Icons.add_circle_outline,
+                                size: 25,
+                                color: item.isAddParty == true
+                                    ? FineTheme.palettes.shades100
+                                    : plusColor,
                               ),
-                              InkWell(
-                                onTap: item.isAddParty == false
-                                    ? () async {
-                                        item.quantity++;
-                                        await cartViewModel!
-                                            .updateItem(item, i, true);
-                                      }
-                                    : null,
-                                child: Icon(
-                                  Icons.add_circle_outline,
-                                  size: 25,
-                                  color: item.isAddParty == true
-                                      ? FineTheme.palettes.shades100
-                                      : plusColor,
-                                ),
-                              )
-                            ],
+                            )
+                          ],
+                        ),
+                        // const SizedBox(height: 16),
+                        Text(
+                          formatPrice(item.fixTotal!),
+                          style: const TextStyle(
+                            fontFamily: "Montserrat",
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            overflow: TextOverflow.ellipsis,
+                            color: Colors.red,
                           ),
-                        ],
-                      )
-                    ],
+                        ),
+                      ],
+                    ),
                   )
                 ],
               ),

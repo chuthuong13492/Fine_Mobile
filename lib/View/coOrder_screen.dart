@@ -366,7 +366,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16,
                                 fontStyle: FontStyle.normal,
-                                color: FineTheme.palettes.shades200),
+                                color: FineTheme.palettes.primary400),
                           ),
                         ],
                       ),
@@ -401,8 +401,9 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
           height: 4,
         ),
       );
-      list.add(Text(orderDetailList[i].productName!,
-          style: FineTheme.typograhpy.overline));
+      list.add(Text(formatPrice(orderDetailList[i].unitPrice!),
+          style: FineTheme.typograhpy.caption1
+              .copyWith(color: FineTheme.palettes.primary100)));
       price += orderDetailList[i].unitPrice! * orderDetails.quantity;
     }
     // item.description = "Test đơn hàng";
@@ -450,9 +451,9 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
               Row(children: [
                 RichText(
                   text: TextSpan(
-                    text: formatPrice(price),
+                    text: formatPrice(orderDetails.totalAmount!),
                     style: FineTheme.typograhpy.subtitle2
-                        .copyWith(color: Colors.black),
+                        .copyWith(color: FineTheme.palettes.primary400),
                   ),
                 ),
               ]),
@@ -485,12 +486,13 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(0, 0, 0, 8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text("x", style: FineTheme.typograhpy.body2),
-          const SizedBox(
-            width: 2,
-          ),
-          Text(item.quantity.toString(), style: FineTheme.typograhpy.body2),
+          Text(item.quantity.toString(), style: FineTheme.typograhpy.subtitle2),
+          // const SizedBox(
+          //   width: 2,
+          // ),
+          Text("x", style: FineTheme.typograhpy.subtitle2),
         ],
       ),
     );

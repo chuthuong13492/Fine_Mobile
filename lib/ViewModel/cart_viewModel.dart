@@ -68,15 +68,20 @@ class CartViewModel extends BaseModel {
           cartItem.isChecked,
           cartItem.isAddParty);
       bool? isAdded = await processCart(item);
-      await updateItemFromCart(item);
-      // await updateCheckItemFromCart(cartItem, isAdded!);
+
       if (isAdded == true) {
-        getTotalQuantity(isAdded!, cartItem);
+        await updateItemFromCart(item);
+        quantityChecked -= cartItem.quantity;
+        total -= cartItem.fixTotal!;
+        quantityChecked += quantity;
+        total += editTotal;
+        // getTotalQuantity(isAdded!, cartItem);
       }
       currentCart = await getCart();
       notifyListeners();
     } catch (e) {
-      throw e;
+      print(e);
+      rethrow;
     }
   }
 
@@ -111,7 +116,7 @@ class CartViewModel extends BaseModel {
 
       notifyListeners();
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -430,11 +435,12 @@ class CartViewModel extends BaseModel {
   }
 
   Future<bool?> processCart(CartItem cartItem) async {
-    final mart = await getMart();
+    ConfirmCart? mart = await getMart();
     if (mart == null) {
       ConfirmCart preMart = ConfirmCart(timeSlotId: root.selectedTimeSlot!.id);
       await setMart(preMart);
     }
+    mart = await getMart();
     if (checkCart!.items!.isEmpty) {
       checkCart!.items!.add(cartItem);
     } else {
@@ -448,8 +454,7 @@ class CartViewModel extends BaseModel {
         checkCart!.items!.add(cartItem);
       }
     }
-
-    if (checkCart!.itemQuantity() == 6) {
+    if (checkCart!.itemQuantity() > 5) {
       checkCart!.items!
           .removeWhere((element) => element.productId == cartItem.productId);
       await showStatusDialog("assets/images/error.png", "Box đã đầy",
@@ -459,18 +464,17 @@ class CartViewModel extends BaseModel {
 
     final addToBoxResult = await checkProductFixTheBox(cartItem);
     if (addToBoxResult!.quantitySuccess == cartItem.quantity) {
-      ConfirmCartItem martItem = ConfirmCartItem(
-          cartItem.productId, addToBoxResult.quantitySuccess!, "");
+      ConfirmCartItem martItem =
+          ConfirmCartItem(cartItem.productId, cartItem.quantity, "");
 
-      bool? hasMartItem;
       if (mart!.orderDetails != null || mart.orderDetails!.isNotEmpty) {
-        hasMartItem = mart.orderDetails!
+        bool hasMartItem = mart.orderDetails!
             .any((element) => element.productId == martItem.productId);
-      }
-      if (hasMartItem == false) {
-        await addItemToMart(martItem);
-      } else {
-        await updateItemFromMart(martItem);
+        if (hasMartItem == false) {
+          await addItemToMart(martItem);
+        } else {
+          await updateItemFromMart(martItem);
+        }
       }
 
       bool? isChecked = await getProductRecommend(cartItem: cartItem);

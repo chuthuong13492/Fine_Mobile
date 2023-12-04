@@ -108,8 +108,14 @@ class PartyOrderViewModel extends BaseModel {
       if (e.response?.statusCode == 400) {
         String errorMsg = e.response?.data["message"];
         errorMessage = errorMsg;
-        showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
-            "Hiện tại khung giờ này đã đóng vào lúc ${root.selectedTimeSlot!.checkoutTime}, bạn hãy xem khung giờ khác nhé 😃.");
+        if (e.response!.data['errorCode'] == 4002) {
+          showStatusDialog("assets/images/error.png", "Hết món!!",
+              "Món này đã hết mất rồiii");
+        } else {
+          showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
+              "Hiện tại khung giờ này đã đóng vào lúc ${root.selectedTimeSlot!.checkoutTime}, bạn hãy xem khung giờ khác nhé 😃.");
+        }
+
         setState(ViewStatus.Completed);
       } else if (e.response?.statusCode == 404) {
         if (e.response?.data["error"] != null) {

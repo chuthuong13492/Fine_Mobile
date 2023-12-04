@@ -467,7 +467,7 @@ Future<void> editProduct(BuildContext context, CartItem product) {
               onPressed: () async {
                 Navigator.of(context).pop();
                 await Get.find<CartViewModel>()
-                    .editProductParty(product, quantity, price);
+                    .editProductParty(product, quantity, price * quantity);
               },
             ),
           ],
