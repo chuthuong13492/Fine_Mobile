@@ -106,39 +106,39 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  SvgPicture.asset(
-                    "assets/icons/box_icon.svg",
-                    width: 20,
-                    height: 20,
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    "Giao tại box",
-                    style: FineTheme.typograhpy.body1,
-                  ),
-                ],
-              ),
-              InkWell(
-                onTap: () {},
-                child: Text(
-                  "Thay đổi",
-                  style: FineTheme.typograhpy.body2
-                      .copyWith(color: FineTheme.palettes.primary100),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(
-            height: 8,
-          ),
+          // Row(
+          //   crossAxisAlignment: CrossAxisAlignment.start,
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     Row(
+          //       children: [
+          //         SvgPicture.asset(
+          //           "assets/icons/box_icon.svg",
+          //           width: 20,
+          //           height: 20,
+          //         ),
+          //         const SizedBox(
+          //           width: 10,
+          //         ),
+          //         Text(
+          //           "Giao tại box",
+          //           style: FineTheme.typograhpy.body1,
+          //         ),
+          //       ],
+          //     ),
+          //     InkWell(
+          //       onTap: () {},
+          //       child: Text(
+          //         "Thay đổi",
+          //         style: FineTheme.typograhpy.body2
+          //             .copyWith(color: FineTheme.palettes.primary100),
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          // const SizedBox(
+          //   height: 8,
+          // ),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
