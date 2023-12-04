@@ -236,12 +236,7 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                       )),
                   Container(
                     // padding: const EdgeInsets.only(bottom: 0),
-                    child: Column(
-                      children: [
-                        layoutOrderDetails(orderDTO.orderDetails),
-                        // ...refundWidgetList.toList(),
-                      ],
-                    ),
+                    child: layoutOrderDetails(orderDTO.orderDetails),
                   ),
                   SizedBox(
                       height: 8,
@@ -334,61 +329,129 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
   }
 
   Widget layoutOrderDetails(List<OrderDetails>? orderDetails) {
-    orderDetails!.where((element) => element.quantity != 0).toList();
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemBuilder: (context, index) {
-        return Container(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
+    List<OrderDetails>? productList =
+        orderDetails!.where((element) => element.quantity != 0).toList();
+    List<OrderDetails>? productEmptyList =
+        orderDetails.where((element) => element.quantity == 0).toList();
+    return Column(
+      children: [
+        ListView.builder(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            return Container(
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text(
-                    '${orderDetails[index].quantity}x',
-                    style: TextStyle(
-                      fontFamily: 'Montserrat',
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      fontStyle: FontStyle.normal,
-                      color: FineTheme.palettes.shades200,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        '${productList[index].quantity}x',
+                        style: TextStyle(
+                          fontFamily: 'Montserrat',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          fontStyle: FontStyle.normal,
+                          color: FineTheme.palettes.shades200,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${productList[index].productName}',
+                        style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            fontStyle: FontStyle.normal,
+                            color: FineTheme.palettes.shades200,
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    '${orderDetails[index].productName}',
-                    style: TextStyle(
+                  Expanded(
+                      child: Container(
+                    alignment: Alignment.topRight,
+                    child: Text(
+                      formatPrice(productList[index].totalAmount!),
+                      style: TextStyle(
                         fontFamily: 'Montserrat',
                         fontSize: 15,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w700,
                         fontStyle: FontStyle.normal,
                         color: FineTheme.palettes.shades200,
-                        overflow: TextOverflow.ellipsis),
-                  ),
+                      ),
+                    ),
+                  )),
                 ],
               ),
-              Expanded(
-                  child: Container(
-                alignment: Alignment.topRight,
-                child: Text(
-                  formatPrice(orderDetails[index].totalAmount!),
-                  style: TextStyle(
-                    fontFamily: 'Montserrat',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    fontStyle: FontStyle.normal,
-                    color: FineTheme.palettes.shades200,
-                  ),
-                ),
-              )),
-            ],
-          ),
-        );
-      },
-      itemCount: orderDetails.length,
+            );
+          },
+          itemCount: productList.length,
+        ),
+        // Padding(
+        //   padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+        //   child: MySeparator(),
+        // ),
+        productEmptyList.isNotEmpty
+            ? ListView.builder(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                physics: const NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return Container(
+                    padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              '${productEmptyList[index].quantity}x',
+                              style: TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                fontStyle: FontStyle.normal,
+                                color: FineTheme.palettes.shades200,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${productEmptyList[index].productName}',
+                              style: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  fontStyle: FontStyle.normal,
+                                  color: FineTheme.palettes.shades200,
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                            child: Container(
+                          alignment: Alignment.topRight,
+                          child: Text(
+                            formatPrice(productEmptyList[index].totalAmount!),
+                            style: TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              fontStyle: FontStyle.normal,
+                              color: FineTheme.palettes.shades200,
+                            ),
+                          ),
+                        )),
+                      ],
+                    ),
+                  );
+                },
+                itemCount: productEmptyList.length,
+              )
+            : const SizedBox.shrink()
+      ],
     );
   }
 

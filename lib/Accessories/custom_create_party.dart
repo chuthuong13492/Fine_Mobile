@@ -171,41 +171,24 @@ class _CustomeCreatePartyState extends State<CustomeCreateParty> {
                 InkWell(
                   onTap: () async {
                     model.partyCode = await getPartyCode();
-                    final cart = await getMart();
-                    // order.currentCart = await getCart();
-                    if (cart != null) {
-                      if (cart.orderDetails!.isNotEmpty) {
-                        if (model.partyCode == null) {
-                          await model.createCoOrder(isLinked!);
-                          if (model.partyOrderDTO!.partyType == 1) {
-                            if (widget.isHome == true) {
-                              hideDialog();
-                              await model.getPartyOrder();
-                              Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
-                            } else {
-                              hideDialog();
-                              await model.getPartyOrder();
 
-                              Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
-                            }
-                          } else {
-                            hideDialog();
-                            await Get.find<OrderViewModel>().prepareOrder();
-                          }
+                    if (model.partyCode == null) {
+                      await model.createCoOrder(isLinked!);
+                      if (model.partyOrderDTO!.partyType == 1) {
+                        if (widget.isHome == true) {
+                          hideDialog();
+                          await model.getPartyOrder();
+                          Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                        } else {
+                          hideDialog();
+                          await model.getPartyOrder();
+
+                          Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
                         }
                       } else {
                         hideDialog();
-                        await showStatusDialog(
-                            'assets/images/logo2.png',
-                            "Xin lũi nhe 🥹",
-                            "Bạn phải chọn ít nhất 1 món trong 🛒 mới tạo đc Party nè");
+                        await Get.find<OrderViewModel>().prepareOrder();
                       }
-                    } else {
-                      hideDialog();
-                      await showStatusDialog(
-                          'assets/images/logo2.png',
-                          "Xin lũi nhe 🥹",
-                          "Bạn phải chọn ít nhất 1 món trong 🛒 mới tạo đc Party nè");
                     }
                   },
                   child: Container(

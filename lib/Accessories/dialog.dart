@@ -275,7 +275,9 @@ Future<int> showOptionDialog(String text,
                               child: Text(
                                 firstOption ?? "Hủy",
                                 style: FineTheme.typograhpy.subtitle1.copyWith(
-                                  color: Colors.red,
+                                  color: firstOption == null
+                                      ? Colors.red
+                                      : FineTheme.palettes.primary100,
                                 ),
                               ),
                             ),
@@ -290,7 +292,9 @@ Future<int> showOptionDialog(String text,
                         child: ElevatedButton(
                           // color: kPrimary,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: FineTheme.palettes.primary200,
+                            backgroundColor: secondOption == null
+                                ? FineTheme.palettes.primary100
+                                : Colors.white,
                             shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.only(
                                 bottomRight: Radius.circular(16),
@@ -305,7 +309,9 @@ Future<int> showOptionDialog(String text,
                               child: Text(
                                 secondOption ?? "Đồng ý",
                                 style: FineTheme.typograhpy.subtitle1.copyWith(
-                                  color: Colors.white,
+                                  color: secondOption == null
+                                      ? Colors.white
+                                      : FineTheme.palettes.primary100,
                                 ),
                               ),
                             ),

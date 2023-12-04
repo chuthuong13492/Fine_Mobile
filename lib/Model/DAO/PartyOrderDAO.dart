@@ -91,7 +91,7 @@ class PartyOrderDAO extends BaseDAO {
         statusCode: res.statusCode,
         code: res.data['status']['errorCode'],
         message: res.data['status']['message'],
-        partyOrderDTO: null,
+        partyOrderDTO: res.data['data'],
       );
     } on DioError catch (e) {
       return PartyOrderStatus(

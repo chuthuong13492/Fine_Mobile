@@ -133,45 +133,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
           .where((element) =>
               element.itemQuantity != 0 && element.orderStatus != 3)
           .toList();
-      List<Widget>? listWidget = [];
-      List<DateTime?> _getUniqueCheckInDates() {
-        return orderSummaryList
-            .map((order) => order.checkInDate)
-            .toSet()
-            .toList();
-      }
 
-      for (var i = 0; i < _getUniqueCheckInDates().length; i++) {
-        final isToday = orderSummaryList[i]
-                .checkInDate!
-                .difference(DateTime.now())
-                .inDays ==
-            0;
-        DateTime? checkInDate = _getUniqueCheckInDates()[i];
-        List<OrderDTO> ordersForDate = orderSummaryList
-            .where((order) =>
-                order.checkInDate!.difference(DateTime.now()).inDays == 0)
-            .toList();
-        listWidget.add(Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8, bottom: 16),
-              child: isToday
-                  ? Text(
-                      'Hôm nay 😋',
-                      style: FineTheme.typograhpy.h1,
-                    )
-                  : Text(DateFormat('dd/MM/yyyy').format(checkInDate!),
-                      style: FineTheme.typograhpy.subtitle1
-                          .copyWith(color: Colors.black)),
-            ),
-            ...ordersForDate
-                .map((orderSummary) => _buildOrderItem(orderSummary))
-                .toList(),
-          ],
-        ));
-      }
       if (status == ViewStatus.Loading) {
         return const Padding(
           padding: EdgeInsets.fromLTRB(0, 0, 0, 50),
@@ -289,6 +251,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   Widget _buildOrderItem(OrderDTO orderDTO) {
     bool isSuccess = false;
     String text = "";
+    int priceFormat = (orderDTO.finalAmount! / 1000).floor();
     final status = orderDTO.orderStatus;
     switch (status) {
       case 4:
@@ -416,7 +379,8 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       Row(
                         children: [
                           Text(
-                            formatPrice(orderDTO.finalAmount!),
+                            // formatPrice(orderDTO.finalAmount!),
+                            "${priceFormat}k",
                             style: FineTheme.typograhpy.subtitle2
                                 .copyWith(color: FineTheme.palettes.neutral500),
                           ),

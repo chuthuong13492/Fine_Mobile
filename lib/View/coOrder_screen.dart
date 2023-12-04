@@ -156,11 +156,11 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                       ))
                 ],
               ),
-              SizedBox(
-                  height: 8,
-                  child: Container(
-                    color: FineTheme.palettes.neutral200,
-                  )),
+              // SizedBox(
+              //     height: 8,
+              //     child: Container(
+              //       color: FineTheme.palettes.neutral200,
+              //     )),
               ScopedModelDescendant<PartyOrderViewModel>(
                 builder: (context, child, model) {
                   List<Widget> card = [];
@@ -183,17 +183,17 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                         for (var item in list!) {
                           card.add(_buildPartyList(item));
                         }
-                        for (int i = 0; i < list.length; i++) {
-                          if (i % 2 != 0) {
-                            card.insert(
-                              i,
-                              Container(
-                                height: 24,
-                                color: FineTheme.palettes.neutral200,
-                              ),
-                            );
-                          }
-                        }
+                        // for (int i = 0; i < list.length; i++) {
+                        //   if (i % 2 != 0) {
+                        //     card.insert(
+                        //       i,
+                        //       Container(
+                        //         height: 24,
+                        //         color: FineTheme.palettes.neutral200,
+                        //       ),
+                        //     );
+                        //   }
+                        // }
                         // checkAdmin = true;
                       } else {
                         user;
@@ -250,131 +250,139 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     if (party.customer!.isConfirm == true) {
       isConfirm = true;
     }
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
-      child: SlideFadeTransition(
-        offset: -1,
-        delayStart: const Duration(milliseconds: 20),
-        child: Column(
-          children: [
-            Row(
+    return Column(
+      children: [
+        Container(
+          height: 24,
+          color: FineTheme.palettes.neutral200,
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
+          child: SlideFadeTransition(
+            offset: -1,
+            delayStart: const Duration(milliseconds: 20),
+            child: Column(
               children: [
-                Container(
-                  width: 140,
-                  child: Text(
-                    party.customer!.name!,
-                    style: isAdmin
-                        ? TextStyle(
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
-                            fontStyle: FontStyle.normal,
-                            color: FineTheme.palettes.primary100)
-                        : TextStyle(
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.w500,
-                            fontSize: 13,
-                            fontStyle: FontStyle.normal,
-                            color: FineTheme.palettes.neutral600),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  isAdmin ? '(Trưởng nhóm)' : '',
-                  style: isAdmin
-                      ? TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
-                          fontStyle: FontStyle.normal,
-                          color: FineTheme.palettes.primary100)
-                      : TextStyle(
-                          fontFamily: 'Montserrat',
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13,
-                          fontStyle: FontStyle.normal,
-                          color: FineTheme.palettes.neutral500),
-                ),
-                const SizedBox(width: 8),
-                !isAdmin
-                    ? isConfirm
-                        ? Container(
-                            height: 20,
-                            width: 90,
-                            decoration: BoxDecoration(
-                                color: FineTheme.palettes.primary100,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(10))),
-                            child: Center(
-                              child: Text(
-                                'Đã xác nhận',
-                                style: TextStyle(
-                                    fontFamily: 'Montserrat',
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12,
-                                    fontStyle: FontStyle.normal,
-                                    color: FineTheme.palettes.shades100),
-                              ),
-                            ),
-                          )
-                        : const SizedBox.shrink()
-                    : const SizedBox.shrink(),
-              ],
-            ),
-            const SizedBox(height: 8),
-            MySeparator(color: FineTheme.palettes.neutral500),
-            const SizedBox(height: 8),
-            !hasProduct
-                ? Text(
-                    'Đang chọn món... ',
-                    style: TextStyle(
-                        fontFamily: 'Montserrat',
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                        fontStyle: FontStyle.normal,
-                        color: FineTheme.palettes.neutral700),
-                  )
-                : Column(
-                    children: [
-                      Column(
-                        children: listProduct!
-                            .map((e) => productCard(e, isYou))
-                            .toList(),
-                      ),
-                      const SizedBox(height: 8),
-                      MySeparator(color: FineTheme.palettes.neutral500),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Tạm tính',
-                              style: TextStyle(
-                                  fontFamily: 'Montserrat',
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 16,
-                                  fontStyle: FontStyle.normal,
-                                  color: FineTheme.palettes.shades200),
-                            ),
-                          ),
-                          Text(
-                            formatPrice(party.totalAmount!),
-                            style: TextStyle(
+                Row(
+                  children: [
+                    Container(
+                      width: 140,
+                      child: Text(
+                        party.customer!.name!,
+                        style: isAdmin
+                            ? TextStyle(
                                 fontFamily: 'Montserrat',
                                 fontWeight: FontWeight.w500,
-                                fontSize: 16,
+                                fontSize: 13,
                                 fontStyle: FontStyle.normal,
-                                color: FineTheme.palettes.primary400),
+                                color: FineTheme.palettes.primary100)
+                            : TextStyle(
+                                fontFamily: 'Montserrat',
+                                fontWeight: FontWeight.w500,
+                                fontSize: 13,
+                                fontStyle: FontStyle.normal,
+                                color: FineTheme.palettes.neutral600),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      isAdmin ? '(Trưởng nhóm)' : '',
+                      style: isAdmin
+                          ? TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                              fontStyle: FontStyle.normal,
+                              color: FineTheme.palettes.primary100)
+                          : TextStyle(
+                              fontFamily: 'Montserrat',
+                              fontWeight: FontWeight.w500,
+                              fontSize: 13,
+                              fontStyle: FontStyle.normal,
+                              color: FineTheme.palettes.neutral500),
+                    ),
+                    const SizedBox(width: 8),
+                    !isAdmin
+                        ? isConfirm
+                            ? Container(
+                                height: 20,
+                                width: 90,
+                                decoration: BoxDecoration(
+                                    color: FineTheme.palettes.primary100,
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(10))),
+                                child: Center(
+                                  child: Text(
+                                    'Đã xác nhận',
+                                    style: TextStyle(
+                                        fontFamily: 'Montserrat',
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                        fontStyle: FontStyle.normal,
+                                        color: FineTheme.palettes.shades100),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink()
+                        : const SizedBox.shrink(),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                MySeparator(color: FineTheme.palettes.neutral500),
+                const SizedBox(height: 8),
+                !hasProduct
+                    ? Text(
+                        'Đang chọn món... ',
+                        style: TextStyle(
+                            fontFamily: 'Montserrat',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            fontStyle: FontStyle.normal,
+                            color: FineTheme.palettes.neutral700),
+                      )
+                    : Column(
+                        children: [
+                          Column(
+                            children: listProduct!
+                                .map((e) => productCard(e, isYou))
+                                .toList(),
+                          ),
+                          const SizedBox(height: 8),
+                          MySeparator(color: FineTheme.palettes.neutral500),
+                          const SizedBox(height: 8),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Tạm tính',
+                                  style: TextStyle(
+                                      fontFamily: 'Montserrat',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      fontStyle: FontStyle.normal,
+                                      color: FineTheme.palettes.shades200),
+                                ),
+                              ),
+                              Text(
+                                formatPrice(party.totalAmount!),
+                                style: TextStyle(
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                    fontStyle: FontStyle.normal,
+                                    color: FineTheme.palettes.primary400),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-          ],
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -556,14 +564,18 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                           if (isAdmin == true) {
                             await _partyViewModel?.getCustomerInParty();
                           } else {
-                            await _partyViewModel!.cancelCoOrder(false);
+                            if (model.isFinished == false) {
+                              await _partyViewModel!.cancelCoOrder(false);
+                            }
                           }
                         },
                         child: Container(
                           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                          child: const Icon(
+                          child: Icon(
                             Icons.logout_outlined,
-                            color: Colors.red,
+                            color: model.isFinished == false
+                                ? Colors.red
+                                : Colors.white,
                           ),
                         ),
                       ),
@@ -572,7 +584,9 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                               '${userConfirm?.length}/${customer} thành viên đã xác nhận')
                           : Text(isUserConfirm == false
                               ? "Chưa xác nhận"
-                              : "Đã xác nhận"),
+                              : model.isFinished == false
+                                  ? "Đã xác nhận"
+                                  : "Thanh toán thành công"),
                       InkWell(
                         onTap: isAdmin == true
                             ? () async {
@@ -603,21 +617,21 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                         )),
                     child: InkWell(
                       onTap: () async {
-                        if (!isUserConfirm!) {
-                          await model.confirmationParty();
-                          // _stopTimer();
+                        if (isAdmin == true && isAllConfirm == true) {
+                          final cart = await getCart();
+                          if (cart != null) {
+                            await model.preCoOrder();
+                            // _stopTimer();
+                          } else {
+                            showStatusDialog(
+                                "assets/images/error.png",
+                                "Giỏ hàng đang trống kìaa",
+                                "Bạn chọn thêm đồ ăn vào giỏ hàng nhe 😃.");
+                          }
                         } else {
-                          if (isAdmin == true) {
-                            final cart = await getCart();
-                            if (cart != null) {
-                              await model.preCoOrder();
-                              // _stopTimer();
-                            } else {
-                              showStatusDialog(
-                                  "assets/images/error.png",
-                                  "Giỏ hàng đang trống kìaa",
-                                  "Bạn chọn thêm đồ ăn vào giỏ hàng nhe 😃.");
-                            }
+                          if (!isUserConfirm!) {
+                            await model.confirmationParty();
+                            // _stopTimer();
                           }
                         }
                       },
@@ -629,7 +643,9 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                                 : 'Chưa đủ người xác nhận'
                             : isUserConfirm! == false
                                 ? 'Chốt đơn'
-                                : 'Đã xác nhận',
+                                : model.isFinished == false
+                                    ? 'Đã xác nhận'
+                                    : "Đơn hàng đã thanh toán",
                         style: TextStyle(
                             fontFamily: 'Montserrat',
                             fontWeight: FontWeight.w500,
