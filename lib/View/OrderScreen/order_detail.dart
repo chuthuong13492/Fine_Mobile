@@ -12,6 +12,7 @@ import 'package:scoped_model/scoped_model.dart';
 import '../../Accessories/index.dart';
 import '../../Constant/route_constraint.dart';
 import '../../Model/DTO/index.dart';
+import '../../ViewModel/station_viewModel.dart';
 
 class OrderHistoryDetail extends StatefulWidget {
   final OrderDTO order;
@@ -116,7 +117,9 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                     onTap: () async {
                       final orderModel = Get.find<OrderViewModel>();
                       _orderDetailModel = Get.find<OrderHistoryViewModel>();
-                      if (orderModel.orderStatusDTO!.orderStatus == 10) {
+                      if (orderModel.orderStatusDTO!.orderStatus! > 10) {
+                        await Get.find<StationViewModel>().getBoxListByStation(
+                            _orderDetailModel!.orderDTO!.id!);
                         Get.toNamed(RouteHandler.BOX_SCREEN,
                             arguments: _orderDetailModel!.orderDTO);
                       }
@@ -341,7 +344,8 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
           shrinkWrap: true,
           itemBuilder: (context, index) {
             return Container(
-              padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+              padding: EdgeInsets.fromLTRB(
+                  0, 10, 0, productEmptyList.isNotEmpty ? 0 : 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

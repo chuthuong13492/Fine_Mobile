@@ -55,7 +55,7 @@ class _CartButtonState extends State<CartButton> {
               quantity = model.partyStatus!.numberOfMember!;
             }
 
-            return model.partyCode != null
+            return model.partyCode != null && model.partyCode!.contains("CPO")
                 ? AnimatedContainer(
                     duration: const Duration(milliseconds: 500),
                     curve: Curves.easeInOut,

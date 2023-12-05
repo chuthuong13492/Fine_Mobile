@@ -253,7 +253,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     return Column(
       children: [
         Container(
-          height: 24,
+          height: 16,
           color: FineTheme.palettes.neutral200,
         ),
         Container(
@@ -617,16 +617,18 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                         )),
                     child: InkWell(
                       onTap: () async {
-                        if (isAdmin == true && isAllConfirm == true) {
-                          final cart = await getCart();
-                          if (cart != null) {
-                            await model.preCoOrder();
-                            // _stopTimer();
-                          } else {
-                            showStatusDialog(
-                                "assets/images/error.png",
-                                "Giỏ hàng đang trống kìaa",
-                                "Bạn chọn thêm đồ ăn vào giỏ hàng nhe 😃.");
+                        if (isAdmin == true) {
+                          if (isAllConfirm == true) {
+                            final cart = await getCart();
+                            if (cart != null) {
+                              await model.preCoOrder();
+                              // _stopTimer();
+                            } else {
+                              showStatusDialog(
+                                  "assets/images/error.png",
+                                  "Giỏ hàng đang trống kìaa",
+                                  "Bạn chọn thêm đồ ăn vào giỏ hàng nhe 😃.");
+                            }
                           }
                         } else {
                           if (!isUserConfirm!) {

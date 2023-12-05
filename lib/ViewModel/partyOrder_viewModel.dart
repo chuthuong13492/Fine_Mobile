@@ -153,6 +153,7 @@ class PartyOrderViewModel extends BaseModel {
           partyOrderDTO = null;
           partyCode = null;
           notifier.value = 0;
+          Get.back();
           final cart = await getCart();
           if (cart != null) {
             final listItem = cart.items!
@@ -233,6 +234,7 @@ class PartyOrderViewModel extends BaseModel {
             partyCode, root.selectedTimeSlot?.id);
         if (partyCode!.contains("LPO")) {
           if (result?.code == 4007) {
+            isLinked = true;
             RegExp regex = RegExp(r'\b\w{8}-\w{4}-\w{4}-\w{4}-\w{12}\b');
             Match? match = regex.firstMatch(result!.message!);
             String linkedTimeSlot = match!.group(0)!;
@@ -257,6 +259,7 @@ class PartyOrderViewModel extends BaseModel {
               }
             }
           } else {
+            isLinked = true;
             await Get.find<OrderViewModel>().prepareOrder();
             hideDialog();
             notifyListeners();
@@ -272,8 +275,9 @@ class PartyOrderViewModel extends BaseModel {
                 }
               }
               root.checkCartAvailable();
+              Get.find<CartViewModel>().getCurrentCart();
               await getPartyOrder();
-              Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+              await Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
               break;
             case 4001:
               await deletePartyCode();
@@ -309,8 +313,10 @@ class PartyOrderViewModel extends BaseModel {
                 }
               } else {
                 root.checkCartAvailable();
-                await Get.find<CartViewModel>().removeCart();
-                Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                Get.find<CartViewModel>().removeCart();
+                Get.find<CartViewModel>().getCurrentCart();
+                await getPartyOrder();
+                await Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
               }
 
               break;
@@ -394,7 +400,7 @@ class PartyOrderViewModel extends BaseModel {
       if (option != 1) {
         return;
       }
-      isFinished = true;
+      // isFinished = true;
       isConfirm = true;
       final orderDetails = await _partyDAO?.confirmPartyOrder(partyCode);
 
@@ -489,24 +495,28 @@ class PartyOrderViewModel extends BaseModel {
             partyCode!, id, isLinked == true ? 2 : 1);
         // await Future.delayed(const Duration(microseconds: 500));
         if (success!) {
-          await deletePartyCode();
-          partyCode = await getPartyCode();
-          final cart = await getCart();
-          if (cart != null) {
-            final listItem = cart.items!
-                .where((element) => element.isAddParty == true)
-                .toList();
-            for (var item in listItem) {
-              await updateAddedItemtoCart(item, false);
+          if (isOrder == false) {
+            await deletePartyCode();
+            partyCode = await getPartyCode();
+            final cart = await getCart();
+            if (cart != null) {
+              final listItem = cart.items!
+                  .where((element) => element.isAddParty == true)
+                  .toList();
+              for (var item in listItem) {
+                await updateAddedItemtoCart(item, false);
+              }
             }
-          }
-          await _cartViewModel.getCurrentCart();
-          if (isOrder == true) {
+            await _cartViewModel.getCurrentCart();
+            if (isOrder == true) {
+            } else {
+              Get.back();
+            }
+            showStatusDialog("assets/images/icon-success.png", "Thành công",
+                "Hãy xem thử các món khác bạn nhé 😓");
           } else {
-            Get.back();
+            await _orderViewModel.prepareOrder();
           }
-          showStatusDialog("assets/images/icon-success.png", "Thành công",
-              "Hãy xem thử các món khác bạn nhé 😓");
         } else {
           await showStatusDialog(
             "assets/images/error.png",
@@ -557,7 +567,10 @@ class PartyOrderViewModel extends BaseModel {
       if (partyCode == null) {
         return;
       }
-      partyStatus = await _partyDAO?.getPartyStatus(partyCode!);
+      if (partyCode!.contains("CPO")) {
+        partyStatus = await _partyDAO?.getPartyStatus(partyCode!);
+      }
+
       if (partyStatus != null) {
         if (partyStatus?.isFinish == true) {
           isFinished = true;
@@ -576,11 +589,11 @@ class PartyOrderViewModel extends BaseModel {
           partyCode = null;
           partyOrderDTO = null;
           if (isAdmin == false) {
-            showStatusDialog("assets/images/logo2.png", "Đã thanh toán",
-                "Đơn nhóm đã được thanh toán thành công");
-            if (Get.currentRoute == "party_order_screen") {
+            if (Get.currentRoute == "/party_order_screen") {
               Get.back();
             }
+            showStatusDialog("assets/images/logo2.png", "Đã thanh toán",
+                "Đơn nhóm đã được thanh toán thành công");
           }
         }
       }

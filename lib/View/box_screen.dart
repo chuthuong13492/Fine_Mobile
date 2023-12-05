@@ -24,7 +24,14 @@ class _BoxScreenState extends State<BoxScreen> {
   @override
   void initState() {
     super.initState();
-    stationModel.getBoxListByStation(widget.order.stationDTO!.id!);
+    Get.find<StationViewModel>()
+        .getBoxListByStation(widget.order.stationDTO!.id!);
+    // getList();
+  }
+
+  void getList() async {
+    await Get.find<StationViewModel>()
+        .getBoxListByStation(widget.order.stationDTO!.id!);
   }
 
   @override
@@ -40,13 +47,27 @@ class _BoxScreenState extends State<BoxScreen> {
         child: ScopedModelDescendant<StationViewModel>(
           builder: (context, child, model) {
             final list = model.boxList;
-            int customSort(BoxDTO a, BoxDTO b) {
-              int aNumber = int.parse(a.value!.split('_')[0]);
-              int bNumber = int.parse(b.value!.split('_')[0]);
-              return aNumber.compareTo(bNumber);
-            }
+            list!.sort((a, b) {
+              var aValues =
+                  a.value!.split('-').map((str) => int.parse(str)).toList();
+              var bValues =
+                  b.value!.split('-').map((str) => int.parse(str)).toList();
 
-            list?.sort(customSort);
+              if (aValues[0] == bValues[0]) {
+                return aValues[1]
+                    .compareTo(bValues[1]); // Sort by row if columns are equal
+              } else {
+                return aValues[0].compareTo(bValues[0]); // Sort by column
+              }
+            });
+            //  list!.sort((a, b) {
+            //   if (int.parse(a.value!.split('-')[1]) <
+            //       int.parse(b.value!.split('-')[1])) {
+            //     return 1;
+            //   }
+            //   return -1;
+            // });
+
             switch (model.status) {
               case ViewStatus.Loading:
                 return const Center(
@@ -108,9 +129,7 @@ class _BoxScreenState extends State<BoxScreen> {
                           child: GridView.count(
                             physics: const NeverScrollableScrollPhysics(),
                             crossAxisCount: 5,
-                            children: [
-                              ...model.boxList!.map((box) => _buildBoxes(box))
-                            ],
+                            children: [...list.map((box) => _buildBoxes(box))],
                           )),
                     )
                   ],

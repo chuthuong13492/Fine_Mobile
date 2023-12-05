@@ -1048,7 +1048,7 @@ class _CartScreenState extends State<CartScreen>
   }
 
   Widget _buildProduct(ProductInCart product) {
-    return Container(
+    return SizedBox(
       width: 110,
       height: 200,
       child: Column(
