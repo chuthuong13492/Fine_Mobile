@@ -78,6 +78,7 @@ class CartViewModel extends BaseModel {
         // getTotalQuantity(isAdded!, cartItem);
       }
       currentCart = await getCart();
+      await addProductToPartyOrder();
       notifyListeners();
     } catch (e) {
       print(e);

@@ -317,17 +317,17 @@ class RootViewModel extends BaseModel {
         } else {
           previousTimeSlotList = listTimeSlot;
           final cart = await getCart();
-          if (cart == null) {
-            selectedTimeSlot = previousTimeSlotList![0];
-            await refreshMenu();
-          } else {
-            bool? isCartAvailable = previousTimeSlotList
-                ?.any((element) => element.id == cart.timeSlotId);
-            if (isCartAvailable == false) {
-              selectedTimeSlot = previousTimeSlotList![0];
-              await refreshMenu();
-            }
-          }
+          // if (cart == null) {
+          //   selectedTimeSlot = previousTimeSlotList![0];
+          //   await refreshMenu();
+          // } else {
+          //   bool? isCartAvailable = previousTimeSlotList
+          //       ?.any((element) => element.id == cart.timeSlotId);
+          //   if (isCartAvailable == false) {
+          //     selectedTimeSlot = previousTimeSlotList![0];
+          //     await refreshMenu();
+          //   }
+          // }
           if (isOnClick == true) {
             isOnClick = false;
             selectedTimeSlot = previousTimeSlotList![0];

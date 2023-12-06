@@ -117,9 +117,9 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
                     onTap: () async {
                       final orderModel = Get.find<OrderViewModel>();
                       _orderDetailModel = Get.find<OrderHistoryViewModel>();
-                      if (orderModel.orderStatusDTO!.orderStatus! > 10) {
-                        await Get.find<StationViewModel>().getBoxListByStation(
-                            _orderDetailModel!.orderDTO!.id!);
+                      if (orderModel.orderStatusDTO!.orderStatus! >= 10) {
+                        // await Get.find<StationViewModel>().getBoxListByStation(
+                        //     _orderDetailModel!.orderDTO!.id!);
                         Get.toNamed(RouteHandler.BOX_SCREEN,
                             arguments: _orderDetailModel!.orderDTO);
                       }

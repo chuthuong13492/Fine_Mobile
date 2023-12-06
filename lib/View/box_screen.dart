@@ -47,26 +47,28 @@ class _BoxScreenState extends State<BoxScreen> {
         child: ScopedModelDescendant<StationViewModel>(
           builder: (context, child, model) {
             final list = model.boxList;
-            list!.sort((a, b) {
-              var aValues =
-                  a.value!.split('-').map((str) => int.parse(str)).toList();
-              var bValues =
-                  b.value!.split('-').map((str) => int.parse(str)).toList();
+            if (list != null) {
+              list.sort((a, b) {
+                var aValues =
+                    a.value!.split('-').map((str) => int.parse(str)).toList();
+                var bValues =
+                    b.value!.split('-').map((str) => int.parse(str)).toList();
 
-              if (aValues[0] == bValues[0]) {
-                return aValues[1]
-                    .compareTo(bValues[1]); // Sort by row if columns are equal
-              } else {
-                return aValues[0].compareTo(bValues[0]); // Sort by column
-              }
-            });
-            //  list!.sort((a, b) {
-            //   if (int.parse(a.value!.split('-')[1]) <
-            //       int.parse(b.value!.split('-')[1])) {
-            //     return 1;
-            //   }
-            //   return -1;
-            // });
+                if (aValues[0] == bValues[0]) {
+                  return aValues[1].compareTo(
+                      bValues[1]); // Sort by row if columns are equal
+                } else {
+                  return aValues[0].compareTo(bValues[0]); // Sort by column
+                }
+              });
+              list.sort((a, b) {
+                if (int.parse(a.value!.split('-')[1]) <
+                    int.parse(b.value!.split('-')[1])) {
+                  return 1;
+                }
+                return -1;
+              });
+            }
 
             switch (model.status) {
               case ViewStatus.Loading:
@@ -75,7 +77,7 @@ class _BoxScreenState extends State<BoxScreen> {
                 );
               case ViewStatus.Error:
                 return Center(
-                  child: Container(
+                  child: SizedBox(
                     width: 300,
                     height: 300,
                     child: Image.asset(
@@ -129,7 +131,7 @@ class _BoxScreenState extends State<BoxScreen> {
                           child: GridView.count(
                             physics: const NeverScrollableScrollPhysics(),
                             crossAxisCount: 5,
-                            children: [...list.map((box) => _buildBoxes(box))],
+                            children: [...list!.map((box) => _buildBoxes(box))],
                           )),
                     )
                   ],
