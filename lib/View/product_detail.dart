@@ -272,14 +272,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ],
               ),
-              InkWell(
-                onTap: () {},
-                child: Text(
-                  "Xem đánh giá",
-                  style: FineTheme.typograhpy.body2
-                      .copyWith(color: FineTheme.palettes.primary100),
-                ),
-              ),
+              // InkWell(
+              //   onTap: () {},
+              //   child: Text(
+              //     "Xem đánh giá",
+              //     style: FineTheme.typograhpy.body2
+              //         .copyWith(color: FineTheme.palettes.primary100),
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(

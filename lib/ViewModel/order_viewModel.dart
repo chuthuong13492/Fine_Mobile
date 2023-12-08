@@ -75,6 +75,8 @@ class OrderViewModel extends BaseModel {
           isPartyOrder = true;
           isLinked = false;
         }
+      } else {
+        isPartyOrder = false;
       }
       await getCurrentCart();
       if (currentCart != null) {

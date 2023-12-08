@@ -159,7 +159,7 @@ class CartViewModel extends BaseModel {
         }
       }
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 

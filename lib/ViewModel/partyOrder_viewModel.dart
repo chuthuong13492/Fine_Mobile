@@ -508,13 +508,18 @@ class PartyOrderViewModel extends BaseModel {
               }
             }
             await _cartViewModel.getCurrentCart();
-            if (isOrder == true) {
-            } else {
-              Get.back();
-            }
+            Get.back();
+
+            // if (isOrder == true) {
+            // } else {
+            //   Get.back();
+            // }
             showStatusDialog("assets/images/icon-success.png", "Thành công",
                 "Hãy xem thử các món khác bạn nhé 😓");
           } else {
+            await deletePartyCode();
+            partyCode = await getPartyCode();
+
             await _orderViewModel.prepareOrder();
           }
         } else {
