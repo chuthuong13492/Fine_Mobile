@@ -48,6 +48,8 @@ class PartyOrderViewModel extends BaseModel {
   int adminQuantity = 0;
 
   final ValueNotifier<int> notifier = ValueNotifier(0);
+  final ValueNotifier<int> notifierMemberTimeout = ValueNotifier(0);
+
   // bool? isPreCoOrder = false;
   late TwilioFlutter twilioFlutter;
   // bool? isPreCoOrder = false;
@@ -96,7 +98,7 @@ class PartyOrderViewModel extends BaseModel {
               orderDetails: null);
           partyOrderDTO = await _partyDAO?.coOrder(cart);
           await setPartyCode(partyOrderDTO!.partyCode!);
-          // await Get.find<RootViewModel>().checkHasParty();
+          notifierMemberTimeout.value = 0;
           errorMessage = null;
           hideDialog();
         }
@@ -183,6 +185,33 @@ class PartyOrderViewModel extends BaseModel {
               }
             } else {
               isAdmin = false;
+              if (notifierMemberTimeout.value > 0) {
+                notifierMemberTimeout.value--;
+              } else {
+                if (userParty.customer?.isConfirm == false) {
+                  // await cancelCoOrder(false);
+                  final success = await _partyDAO?.logoutCoOrder(
+                      partyCode!, null, isLinked == true ? 2 : 1);
+                  if (success!) {
+                    await deletePartyCode();
+                    partyCode = await getPartyCode();
+                    final cart = await getCart();
+                    if (cart != null) {
+                      final listItem = cart.items!
+                          .where((element) => element.isAddParty == true)
+                          .toList();
+                      for (var item in listItem) {
+                        await updateAddedItemtoCart(item, false);
+                      }
+                    }
+                    await _cartViewModel.getCurrentCart();
+                    Get.back();
+                    showStatusDialog("assets/images/logo2.png", "Oops!",
+                        "Đã hết thời gian xác nhận mất rồi!");
+                    return;
+                  }
+                }
+              }
             }
             if (userParty.orderDetails != null) {
               for (var item in userParty.orderDetails!) {
@@ -276,8 +305,18 @@ class PartyOrderViewModel extends BaseModel {
               }
               root.checkCartAvailable();
               Get.find<CartViewModel>().getCurrentCart();
+              notifierMemberTimeout.value = 300;
               await getPartyOrder();
+              // Timer.periodic(const Duration(seconds: 1), (timer) async {
+              //   if (notifierMemberTimeout.value > 0) {
+              //     notifierMemberTimeout.value--;
+              //   } else {
+              //     timer.cancel();
+
+              //   }
+              // });
               await Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+
               break;
             case 4001:
               await deletePartyCode();
@@ -509,11 +548,6 @@ class PartyOrderViewModel extends BaseModel {
             }
             await _cartViewModel.getCurrentCart();
             Get.back();
-
-            // if (isOrder == true) {
-            // } else {
-            //   Get.back();
-            // }
             showStatusDialog("assets/images/icon-success.png", "Thành công",
                 "Hãy xem thử các món khác bạn nhé 😓");
           } else {

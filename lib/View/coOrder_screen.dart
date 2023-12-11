@@ -582,11 +582,54 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                       checkAdmin == true
                           ? Text(
                               '${userConfirm?.length}/${customer} thành viên đã xác nhận')
-                          : Text(isUserConfirm == false
-                              ? "Chưa xác nhận"
-                              : model.isFinished == false
-                                  ? "Đã xác nhận"
-                                  : "Thanh toán thành công"),
+                          : isUserConfirm == false
+                              ? ValueListenableBuilder<int>(
+                                  valueListenable: model.notifierMemberTimeout,
+                                  builder: (context, value, child) {
+                                    Duration duration =
+                                        Duration(seconds: value);
+                                    String formatDuration(Duration duration) {
+                                      int minutes = duration.inMinutes;
+                                      int remainingSeconds =
+                                          duration.inSeconds % 60;
+
+                                      String minutesStr =
+                                          minutes.toString().padLeft(2, '0');
+                                      String secondsStr = remainingSeconds
+                                          .toString()
+                                          .padLeft(2, '0');
+
+                                      return '$minutesStr:$secondsStr';
+                                    }
+
+                                    String formattedDuration =
+                                        formatDuration(duration);
+
+                                    if (value == 0) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    return Row(
+                                      children: [
+                                        Text(
+                                          formattedDuration,
+                                          style: FineTheme.typograhpy.body1
+                                              .copyWith(
+                                                  color: FineTheme
+                                                      .palettes.primary100),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          "Xác nhận đơn hàng",
+                                          style: FineTheme.typograhpy.body1,
+                                        )
+                                      ],
+                                    );
+                                  },
+                                )
+                              : Text(
+                                  "Đã chốt đơn",
+                                  style: FineTheme.typograhpy.body1,
+                                ),
                       InkWell(
                         onTap: isAdmin == true
                             ? () async {

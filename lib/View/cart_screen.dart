@@ -479,42 +479,54 @@ class _CartScreenState extends State<CartScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Checkbox(
-            activeColor: item.isAddParty == false
-                ? FineTheme.palettes.primary100
-                : FineTheme.palettes.neutral500,
-            checkColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(100)),
-            value: item.isChecked,
-            onChanged: item.isAddParty == true
-                ? (value) {
-                    showStatusDialog("assets/images/logo2.png", "Oops!!",
-                        "Bạn phải xóa món trong đơn nhóm đã nè thì mới chỉnh món thêm vô nhaa");
-                  }
-                : (value) {
-                    cartViewModel!.changeValueChecked(value!, item);
-                  },
+          Transform.scale(
+            scale: 1.2,
+            child: Checkbox(
+              activeColor: item.isAddParty == false
+                  ? FineTheme.palettes.primary100
+                  : FineTheme.palettes.neutral500,
+              checkColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100)),
+              value: item.isChecked,
+              onChanged: item.isAddParty == true
+                  ? (value) {
+                      showStatusDialog("assets/images/logo2.png", "Oops!!",
+                          "Bạn phải xóa món trong đơn nhóm đã nè thì mới chỉnh món thêm vô nhaa");
+                    }
+                  : (value) {
+                      cartViewModel!.changeValueChecked(value!, item);
+                    },
+            ),
           ),
           const SizedBox(
             width: 4,
           ),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            width: 90,
-            height: 90,
-            child: CacheStoreImage(
-              imageUrl: item.imgUrl ?? defaultImage,
+          GestureDetector(
+            onTap: () {
+              cartViewModel!.changeValueChecked(
+                  item.isChecked == false ? true : false, item);
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              width: 90,
+              height: 90,
+              child: CacheStoreImage(
+                imageUrl: item.imgUrl ?? defaultImage,
+              ),
             ),
           ),
           const SizedBox(
             width: 8,
           ),
           Expanded(
-            child: SizedBox(
-              // height: 90,
+            child: GestureDetector(
+              onTap: () {
+                cartViewModel!.changeValueChecked(
+                    item.isChecked == false ? true : false, item);
+              },
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1172,12 +1184,12 @@ class _CartScreenState extends State<CartScreen>
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 20, 0),
-                    child: InkWell(
-                      onTap: () async {
-                        await showPartyDialog(isHome: true);
-                      },
+                  InkWell(
+                    onTap: () async {
+                      await showPartyDialog(false, isHome: true);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -1198,14 +1210,20 @@ class _CartScreenState extends State<CartScreen>
                             size: 8,
                             color: FineTheme.palettes.primary100,
                           ),
+                          const SizedBox(width: 2),
+                          Icon(
+                            Icons.circle,
+                            size: 8,
+                            color: FineTheme.palettes.primary100,
+                          ),
                         ],
                       ),
-                      // child: Text(
-                      //   "Tạo phòng",
-                      //   style: FineTheme.typograhpy.body2
-                      //       .copyWith(color: FineTheme.palettes.primary100),
-                      // ),
                     ),
+                    // child: Text(
+                    //   "Tạo phòng",
+                    //   style: FineTheme.typograhpy.body2
+                    //       .copyWith(color: FineTheme.palettes.primary100),
+                    // ),
                   ),
                 ],
               ),
@@ -1273,17 +1291,21 @@ class _CartScreenState extends State<CartScreen>
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
                               color: model.isSelected!
-                                  ? party.isConfirm == false
+                                  ? hasParty == false
                                       ? FineTheme.palettes.primary100
-                                      : FineTheme.palettes.neutral700
+                                      : party.isConfirm == false
+                                          ? FineTheme.palettes.primary100
+                                          : FineTheme.palettes.neutral700
                                   : FineTheme.palettes.neutral700,
                             ),
                             boxShadow: [
                               BoxShadow(
                                 color: model.isSelected!
-                                    ? party.isConfirm == false
+                                    ? hasParty == false
                                         ? FineTheme.palettes.primary100
-                                        : FineTheme.palettes.neutral700
+                                        : party.isConfirm == false
+                                            ? FineTheme.palettes.primary100
+                                            : FineTheme.palettes.neutral700
                                     : FineTheme.palettes.neutral700,
                                 offset: const Offset(0, 3),
                               ),
@@ -1300,9 +1322,11 @@ class _CartScreenState extends State<CartScreen>
                                   : "Chưa chọn món",
                               style: FineTheme.typograhpy.subtitle1.copyWith(
                                 color: model.isSelected!
-                                    ? party.isConfirm == false
+                                    ? hasParty == false
                                         ? FineTheme.palettes.primary100
-                                        : FineTheme.palettes.neutral700
+                                        : party.isConfirm == false
+                                            ? FineTheme.palettes.primary100
+                                            : FineTheme.palettes.neutral700
                                     : FineTheme.palettes.neutral700,
                               ),
                             ),

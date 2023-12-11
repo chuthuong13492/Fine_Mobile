@@ -246,7 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Container(
                           alignment: Alignment.center,
                           child: Text(
-                            "Tạo đơn nhóm để được hưởng nhiều ưu đãiii !",
+                            "Tạo party để hưởng nhiều ưu đãi !",
                             style: FineTheme.typograhpy.subtitle2
                                 .copyWith(color: FineTheme.palettes.shades100),
                           ),

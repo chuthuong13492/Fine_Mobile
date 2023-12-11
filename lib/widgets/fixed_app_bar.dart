@@ -295,7 +295,7 @@ class _FixedAppBarState extends State<FixedAppBar> {
                     widget.searchFocusNode.unfocus();
                   });
 
-                  await showPartyDialog(isHome: true);
+                  await showPartyDialog(false, isHome: true);
                   // final root = Get.find<RootViewModel>();
                   // await root.navOrder();
                 },

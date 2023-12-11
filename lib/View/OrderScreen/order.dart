@@ -901,7 +901,7 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               InkWell(
                 onTap: () async {
-                  await showPartyDialog(isHome: false);
+                  await showPartyDialog(true, isHome: false);
                 },
                 child: Text(
                   "Tạo đơn",

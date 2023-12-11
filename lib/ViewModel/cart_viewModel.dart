@@ -592,6 +592,12 @@ class CartViewModel extends BaseModel {
             checkCart?.removeItem(cartItem);
             currentCart = await getCart();
             return false;
+          case 4001:
+            await showStatusDialog("assets/images/error.png", "Oops!!",
+                "Đã hết thời gian mất rùi 😢");
+            await removeCart();
+
+            return false;
           default:
             return false;
         }

@@ -16,7 +16,9 @@ import 'dialog.dart';
 
 class CustomeCreateParty extends StatefulWidget {
   final bool isHome;
-  const CustomeCreateParty({super.key, required this.isHome});
+  final bool hasLinked;
+  const CustomeCreateParty(
+      {super.key, required this.isHome, required this.hasLinked});
 
   @override
   State<CustomeCreateParty> createState() => _CustomeCreatePartyState();
@@ -68,105 +70,112 @@ class _CustomeCreatePartyState extends State<CustomeCreateParty> {
             }
             return Column(
               children: [
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Đơn liên kết',
-                        style: FineTheme.typograhpy.subtitle1,
-                      ),
-                    ),
-                    CustomCupertinoSwitch(
-                      value: isLinked!,
-                      onChanged: (value) {
-                        setState(() {
-                          isLinked = value;
-                        });
-                        print(isLinked);
-                        // model.setLinkedParty(value);
-                      },
-                    )
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Flexible(
-                      flex: 7,
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                            border: Border.all(
-                                color: FineTheme.palettes.primary100)),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                          child: TextField(
-                            onChanged: (input) {},
-                            controller: controller,
-                            decoration: InputDecoration(
-                                hintText: 'Nhập code party',
-                                border: InputBorder.none,
-                                suffixIcon: IconButton(
-                                  icon: const Icon(
-                                    Icons.clear,
-                                    size: 16,
-                                    color: Colors.grey,
-                                  ),
-                                  onPressed: () {
-                                    controller.clear();
-                                  },
-                                )),
-                            style: TextStyle(
-                              fontFamily: 'Montserrat',
-                              fontWeight: FontWeight.w500,
-                              fontSize: 16,
-                              fontStyle: FontStyle.normal,
-                              color: FineTheme.palettes.neutral500,
+                widget.hasLinked == true
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const SizedBox(height: 12),
+                          Expanded(
+                            child: Text(
+                              'Đơn liên kết',
+                              style: FineTheme.typograhpy.subtitle1,
                             ),
-                            keyboardType: TextInputType.multiline,
-                            maxLines: 1,
-                            autofocus: true,
                           ),
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 3,
-                      fit: FlexFit.tight,
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)),
-                              color: FineTheme.palettes.primary100,
-                              border: Border.all(
-                                color: FineTheme.palettes.primary100,
-                              )),
-                          child: TextButton(
-                              onPressed: () async {
-                                hideDialog();
-                                if (controller.text.contains("CPO")) {
-                                  await model.joinPartyOrder(
-                                      code: controller.text);
-                                } else {
-                                  await showStatusDialog(
-                                      "assets/images/logo2.png",
-                                      "Sai mã mất rùi",
-                                      "Mã code hong đúng nè 😓");
-                                }
-                              },
-                              child: const Text('Tham gia',
+                          CustomCupertinoSwitch(
+                            value: isLinked!,
+                            onChanged: (value) {
+                              setState(() {
+                                isLinked = value;
+                              });
+                              print(isLinked);
+                              // model.setLinkedParty(value);
+                            },
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
+                isLinked == false
+                    ? const SizedBox(height: 12)
+                    : const SizedBox.shrink(),
+                isLinked == false
+                    ? Row(
+                        children: [
+                          Flexible(
+                            flex: 7,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(8)),
+                                  border: Border.all(
+                                      color: FineTheme.palettes.primary100)),
+                              child: Padding(
+                                padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                                child: TextField(
+                                  onChanged: (input) {},
+                                  controller: controller,
+                                  decoration: InputDecoration(
+                                      hintText: 'Nhập code party',
+                                      border: InputBorder.none,
+                                      suffixIcon: IconButton(
+                                        icon: const Icon(
+                                          Icons.clear,
+                                          size: 16,
+                                          color: Colors.grey,
+                                        ),
+                                        onPressed: () {
+                                          controller.clear();
+                                        },
+                                      )),
                                   style: TextStyle(
-                                      color: Colors.white, fontSize: 15))),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                                    fontFamily: 'Montserrat',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16,
+                                    fontStyle: FontStyle.normal,
+                                    color: FineTheme.palettes.neutral500,
+                                  ),
+                                  keyboardType: TextInputType.multiline,
+                                  maxLines: 1,
+                                  autofocus: true,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            flex: 3,
+                            fit: FlexFit.tight,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(8)),
+                                    color: FineTheme.palettes.primary100,
+                                    border: Border.all(
+                                      color: FineTheme.palettes.primary100,
+                                    )),
+                                child: TextButton(
+                                    onPressed: () async {
+                                      hideDialog();
+                                      if (controller.text.contains("CPO")) {
+                                        await model.joinPartyOrder(
+                                            code: controller.text);
+                                      } else {
+                                        await showStatusDialog(
+                                            "assets/images/logo2.png",
+                                            "Sai mã mất rùi",
+                                            "Mã code hong đúng nè 😓");
+                                      }
+                                    },
+                                    child: const Text('Tham gia',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15))),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
                 const SizedBox(height: 12),
                 InkWell(
                   onTap: () async {

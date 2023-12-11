@@ -1253,7 +1253,7 @@ Future<int> showConfirmOrderDialog(
   return option!;
 }
 
-Future<void> showPartyDialog({bool? isHome}) async {
+Future<void> showPartyDialog(bool hasLinked, {bool? isHome}) async {
   bool isErrorInput = false;
   // hideDialog();
   int? option;
@@ -1341,6 +1341,7 @@ Future<void> showPartyDialog({bool? isHome}) async {
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     child: CustomeCreateParty(
                       isHome: isHome!,
+                      hasLinked: hasLinked,
                     )),
               ],
             ),

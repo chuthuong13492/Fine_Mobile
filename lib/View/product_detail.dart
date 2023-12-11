@@ -176,7 +176,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               ),
               InkWell(
                 onTap: () async {
-                  await showPartyDialog(isHome: false);
+                  await showPartyDialog(false, isHome: false);
                 },
                 child: Text(
                   "Tạo phòng",
@@ -213,14 +213,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ),
                 ],
               ),
-              InkWell(
-                onTap: () {},
-                child: Text(
-                  "Xem thêm",
-                  style: FineTheme.typograhpy.body2
-                      .copyWith(color: FineTheme.palettes.primary100),
-                ),
-              ),
+              // InkWell(
+              //   onTap: () {},
+              //   child: Text(
+              //     "Xem thêm",
+              //     style: FineTheme.typograhpy.body2
+              //         .copyWith(color: FineTheme.palettes.primary100),
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(

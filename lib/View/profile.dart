@@ -168,7 +168,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
               const SizedBox(
-                width: 16,
+                width: 12,
               ),
               Flexible(
                 child: Column(
@@ -208,17 +208,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         //         height: 20,
                         //       ))
                         // ]),
-                        infoDetail("Số điện thoại: ",
-                            color: Colors.black,
-                            list: [
-                              TextSpan(
-                                  text:
-                                      formatPhoneNumberWithDots(user.phone!) ??
-                                          "-",
-                                  style: FineTheme.typograhpy.subtitle2
-                                      .copyWith(
-                                          color: FineTheme.palettes.primary100))
-                            ]),
+                        infoDetail("Sđt: ", color: Colors.black, list: [
+                          TextSpan(
+                              text:
+                                  formatPhoneNumberWithDots(user.phone!) ?? "-",
+                              style: FineTheme.typograhpy.subtitle2.copyWith(
+                                  color: FineTheme.palettes.primary100))
+                        ]),
                         const SizedBox(
                           height: 4,
                         ),
