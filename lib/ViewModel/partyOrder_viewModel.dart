@@ -458,7 +458,7 @@ class PartyOrderViewModel extends BaseModel {
   }
 
   Future<void> confirmationTimeout() async {
-    if (isAdmin == false && isConfirm == false) {
+    if (partyCode != null && isAdmin == false && isConfirm == false) {
       Timer.periodic(const Duration(seconds: 1), (timer) async {
         if (notifierMemberTimeout.value > 0) {
           notifierMemberTimeout.value--;
