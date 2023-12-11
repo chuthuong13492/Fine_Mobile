@@ -21,6 +21,7 @@ class OrderHistoryViewModel extends BaseModel {
   List<bool> selections = [true, false];
   OrderDTO? newTodayOrders;
   Uint8List? imageBytes;
+  bool? isOrderCancel;
 
   OrderHistoryViewModel() {
     // orderDTO = dto;

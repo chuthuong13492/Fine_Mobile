@@ -59,6 +59,10 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
           await showStatusDialog("assets/images/icon-success.png",
               notification!.title!, notification.body!);
           break;
+        case 'forOrderCancel':
+          final model = Get.find<OrderHistoryViewModel>();
+          model.isOrderCancel = true;
+          break;
         case "ForCoOrderRemove":
           deletePartCart();
           deletePartyCode();

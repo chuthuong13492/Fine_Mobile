@@ -32,7 +32,6 @@ class PartyOrderViewModel extends BaseModel {
   PartyOrderDAO? _partyDAO;
   AccountDTO? acount;
   Customer? customer;
-  // Cart? currentCart;
   String? errorMessage;
   List<OrderDetails>? listOrderDetail;
   List<String> listError = <String>[];
@@ -46,6 +45,7 @@ class PartyOrderViewModel extends BaseModel {
   bool? isConfirm = false;
   bool? isFinished = false;
   int adminQuantity = 0;
+  Timer? _timer;
 
   final ValueNotifier<int> notifier = ValueNotifier(0);
   final ValueNotifier<int> notifierMemberTimeout = ValueNotifier(0);
@@ -185,33 +185,6 @@ class PartyOrderViewModel extends BaseModel {
               }
             } else {
               isAdmin = false;
-              if (notifierMemberTimeout.value > 0) {
-                notifierMemberTimeout.value--;
-              } else {
-                if (userParty.customer?.isConfirm == false) {
-                  // await cancelCoOrder(false);
-                  final success = await _partyDAO?.logoutCoOrder(
-                      partyCode!, null, isLinked == true ? 2 : 1);
-                  if (success!) {
-                    await deletePartyCode();
-                    partyCode = await getPartyCode();
-                    final cart = await getCart();
-                    if (cart != null) {
-                      final listItem = cart.items!
-                          .where((element) => element.isAddParty == true)
-                          .toList();
-                      for (var item in listItem) {
-                        await updateAddedItemtoCart(item, false);
-                      }
-                    }
-                    await _cartViewModel.getCurrentCart();
-                    Get.back();
-                    showStatusDialog("assets/images/logo2.png", "Oops!",
-                        "Đã hết thời gian xác nhận mất rồi!");
-                    return;
-                  }
-                }
-              }
             }
             if (userParty.orderDetails != null) {
               for (var item in userParty.orderDetails!) {
@@ -481,6 +454,40 @@ class PartyOrderViewModel extends BaseModel {
       // await showStatusDialog("assets/images/icon-success.png", 'Oops!!',
       //     'Hong có sđt này mất rùi');
       setState(ViewStatus.Completed);
+    }
+  }
+
+  Future<void> confirmationTimeout() async {
+    if (isAdmin == false && isConfirm == false) {
+      Timer.periodic(const Duration(seconds: 1), (timer) async {
+        if (notifierMemberTimeout.value > 0) {
+          notifierMemberTimeout.value--;
+        } else {
+          timer.cancel();
+          if (isConfirm == false) {
+            // await cancelCoOrder(false);
+            final success = await _partyDAO?.logoutCoOrder(
+                partyCode!, null, isLinked == true ? 2 : 1);
+            if (success!) {
+              await deletePartyCode();
+              partyCode = await getPartyCode();
+              final cart = await getCart();
+              if (cart != null) {
+                final listItem = cart.items!
+                    .where((element) => element.isAddParty == true)
+                    .toList();
+                for (var item in listItem) {
+                  await updateAddedItemtoCart(item, false);
+                }
+              }
+              await _cartViewModel.getCurrentCart();
+              Get.back();
+              showStatusDialog("assets/images/logo2.png", "Oops!",
+                  "Đã hết thời gian xác nhận mất rồi!");
+            }
+          }
+        }
+      });
     }
   }
 

@@ -61,6 +61,25 @@ class _OrderHistoryDetailState extends State<OrderHistoryDetail> {
               final orderDTO = model.orderDTO;
               if (model.status == ViewStatus.Loading) {
                 return const SizedBox.shrink();
+              } else if (model.isOrderCancel != null &&
+                  model.isOrderCancel == true) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "assets/images/logo2.png",
+                      width: 40,
+                      height: 40,
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Text(
+                      "Đơn hàng này đã bị hủy mất ruìi 🥺",
+                      style: FineTheme.typograhpy.subtitle1,
+                    )
+                  ],
+                );
               }
               List<Widget> refundWidgetList = [];
               final refundProduct = orderDTO?.otherAmounts

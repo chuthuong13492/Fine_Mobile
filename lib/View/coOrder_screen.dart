@@ -39,6 +39,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   Timer? _timer;
   int index = 0;
   bool? checkAdmin;
+
   @override
   void initState() {
     super.initState();
@@ -53,10 +54,11 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     _timer?.cancel();
   }
 
-  void _coOrder() {
+  void _coOrder() async {
     setState(() {
       checkAdmin = _partyViewModel?.isAdmin;
     });
+    await _partyViewModel?.confirmationTimeout();
   }
   // void _stopTimer() {
   //   _timer?.cancel();
@@ -252,10 +254,94 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     }
     return Column(
       children: [
-        Container(
-          height: 16,
-          color: FineTheme.palettes.neutral200,
-        ),
+        isConfirm == false
+            ? ValueListenableBuilder<int>(
+                valueListenable: _partyViewModel!.notifierMemberTimeout,
+                builder: (context, value, child) {
+                  Duration duration = Duration(seconds: value);
+                  int minutes = duration.inMinutes;
+                  int remainingSeconds = duration.inSeconds % 60;
+
+                  String minutesStr = minutes.toString().padLeft(2, '0');
+                  String secondsStr =
+                      remainingSeconds.toString().padLeft(2, '0');
+
+                  if (value == 0) {
+                    return const SizedBox.shrink();
+                  }
+                  return Container(
+                    width: Get.width,
+                    color: FineTheme.palettes.primary100,
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    color: FineTheme.palettes.shades100),
+                                padding: const EdgeInsets.all(4),
+                                child: Center(
+                                  child: Text(
+                                    minutesStr,
+                                    style: FineTheme.typograhpy.subtitle1
+                                        .copyWith(
+                                            color:
+                                                FineTheme.palettes.primary100),
+                                  ),
+                                )),
+                            const SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                              ":",
+                              style: FineTheme.typograhpy.h2
+                                  .copyWith(color: Colors.white),
+                            ),
+                            const SizedBox(
+                              width: 4,
+                            ),
+                            Container(
+                                width: 30,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(4),
+                                    color: FineTheme.palettes.shades100),
+                                padding: const EdgeInsets.all(4),
+                                child: Center(
+                                  child: Text(
+                                    secondsStr,
+                                    style: FineTheme.typograhpy.subtitle1
+                                        .copyWith(
+                                            color:
+                                                FineTheme.palettes.primary100),
+                                  ),
+                                )),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Tíc tắc, Chốt đơn ngay nàoo!!",
+                          style: FineTheme.typograhpy.subtitle1
+                              .copyWith(color: Colors.white),
+                        )
+                      ],
+                    ),
+                  );
+                },
+              )
+            : const SizedBox.shrink(),
+        isConfirm == false
+            ? Container(
+                height: 16,
+                color: FineTheme.palettes.neutral200,
+              )
+            : const SizedBox.shrink(),
         Container(
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
           child: SlideFadeTransition(
@@ -583,49 +669,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                           ? Text(
                               '${userConfirm?.length}/${customer} thành viên đã xác nhận')
                           : isUserConfirm == false
-                              ? ValueListenableBuilder<int>(
-                                  valueListenable: model.notifierMemberTimeout,
-                                  builder: (context, value, child) {
-                                    Duration duration =
-                                        Duration(seconds: value);
-                                    String formatDuration(Duration duration) {
-                                      int minutes = duration.inMinutes;
-                                      int remainingSeconds =
-                                          duration.inSeconds % 60;
-
-                                      String minutesStr =
-                                          minutes.toString().padLeft(2, '0');
-                                      String secondsStr = remainingSeconds
-                                          .toString()
-                                          .padLeft(2, '0');
-
-                                      return '$minutesStr:$secondsStr';
-                                    }
-
-                                    String formattedDuration =
-                                        formatDuration(duration);
-
-                                    if (value == 0) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    return Row(
-                                      children: [
-                                        Text(
-                                          formattedDuration,
-                                          style: FineTheme.typograhpy.body1
-                                              .copyWith(
-                                                  color: FineTheme
-                                                      .palettes.primary100),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          "Xác nhận đơn hàng",
-                                          style: FineTheme.typograhpy.body1,
-                                        )
-                                      ],
-                                    );
-                                  },
-                                )
+                              ? Text("Chưa xác nhận")
                               : Text(
                                   "Đã chốt đơn",
                                   style: FineTheme.typograhpy.body1,

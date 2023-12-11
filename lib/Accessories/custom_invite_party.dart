@@ -39,7 +39,7 @@ class _CustomInvitePartyState extends State<CustomInviteParty> {
   @override
   void initState() {
     super.initState();
-    _secondsRemaining = 10;
+    _secondsRemaining = 5;
     // _timer = Timer.periodic(const Duration(seconds: 1), _updateTimer);
     _notifier = ValueNotifier<int>(_secondsRemaining);
 
