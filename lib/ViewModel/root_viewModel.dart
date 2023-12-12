@@ -280,7 +280,7 @@ class RootViewModel extends BaseModel {
     await party.getPartyOrder();
     final partyCode = await getPartyCode();
     if (party.partyOrderDTO != null && partyCode != null) {
-      await Future.delayed(const Duration(microseconds: 500));
+      await party.confirmationTimeout();
       await Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
     }
   }

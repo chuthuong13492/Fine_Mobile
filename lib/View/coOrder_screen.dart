@@ -58,11 +58,8 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
     setState(() {
       checkAdmin = _partyViewModel?.isAdmin;
     });
-    await _partyViewModel?.confirmationTimeout();
+    // await _partyViewModel?.confirmationTimeout();
   }
-  // void _stopTimer() {
-  //   _timer?.cancel();
-  // }
 
   @override
   Widget build(BuildContext context) {

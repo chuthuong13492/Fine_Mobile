@@ -44,6 +44,7 @@ class PartyOrderViewModel extends BaseModel {
   bool? isAdmin = false;
   bool? isConfirm = false;
   bool? isFinished = false;
+  bool? isTimerStart = true;
   int adminQuantity = 0;
   Timer? _timer;
 
@@ -84,6 +85,8 @@ class PartyOrderViewModel extends BaseModel {
           }
 
           partyOrderDTO = await _partyDAO?.coOrder(cart);
+          notifierMemberTimeout.value = 0;
+          isTimerStart = true;
           for (var item in cart.orderDetails!) {
             CartItem cartItem = CartItem(item.productId, "", "", "", 0, 0, 0, 0,
                 0, 0, 0, false, false, true);
@@ -99,6 +102,7 @@ class PartyOrderViewModel extends BaseModel {
           partyOrderDTO = await _partyDAO?.coOrder(cart);
           await setPartyCode(partyOrderDTO!.partyCode!);
           notifierMemberTimeout.value = 0;
+          isTimerStart = true;
           errorMessage = null;
           hideDialog();
         }
@@ -279,17 +283,10 @@ class PartyOrderViewModel extends BaseModel {
               root.checkCartAvailable();
               Get.find<CartViewModel>().getCurrentCart();
               notifierMemberTimeout.value = 300;
+              isTimerStart = true;
               await getPartyOrder();
-              // Timer.periodic(const Duration(seconds: 1), (timer) async {
-              //   if (notifierMemberTimeout.value > 0) {
-              //     notifierMemberTimeout.value--;
-              //   } else {
-              //     timer.cancel();
-
-              //   }
-              // });
+              await confirmationTimeout();
               await Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
-
               break;
             case 4001:
               await deletePartyCode();
@@ -327,7 +324,10 @@ class PartyOrderViewModel extends BaseModel {
                 root.checkCartAvailable();
                 Get.find<CartViewModel>().removeCart();
                 Get.find<CartViewModel>().getCurrentCart();
+                notifierMemberTimeout.value = 300;
+                isTimerStart = true;
                 await getPartyOrder();
+                confirmationTimeout();
                 await Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
               }
 
@@ -459,13 +459,13 @@ class PartyOrderViewModel extends BaseModel {
 
   Future<void> confirmationTimeout() async {
     if (partyCode != null && isAdmin == false && isConfirm == false) {
-      Timer.periodic(const Duration(seconds: 1), (timer) async {
-        if (notifierMemberTimeout.value > 0) {
+      _timer?.cancel();
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+        if (notifierMemberTimeout.value > 0 && isConfirm == false) {
           notifierMemberTimeout.value--;
         } else {
           timer.cancel();
           if (isConfirm == false) {
-            // await cancelCoOrder(false);
             final success = await _partyDAO?.logoutCoOrder(
                 partyCode!, null, isLinked == true ? 2 : 1);
             if (success!) {
@@ -488,6 +488,7 @@ class PartyOrderViewModel extends BaseModel {
           }
         }
       });
+      notifyListeners();
     }
   }
 
