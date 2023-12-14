@@ -489,6 +489,8 @@ class PartyOrderViewModel extends BaseModel {
         }
       });
       notifyListeners();
+    } else {
+      _timer?.cancel();
     }
   }
 
