@@ -241,7 +241,7 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
               return Container(
                 padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
                 width: Get.width,
-                height: 550,
+                height: Get.height * 0.55,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.all(
@@ -287,9 +287,9 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
               );
             }
             return Container(
-              padding: const EdgeInsets.fromLTRB(24, 40, 24, 40),
+              padding: const EdgeInsets.fromLTRB(24, 30, 24, 40),
               width: Get.width,
-              height: 550,
+              height: Get.height * 0.52,
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(
@@ -328,9 +328,9 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 30),
                   Container(
-                    height: 300,
+                    height: Get.height * 0.3,
                     width: 300,
                     child: Image.memory(
                       model.imageBytes!,

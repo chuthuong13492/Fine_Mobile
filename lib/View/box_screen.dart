@@ -130,7 +130,7 @@ class _BoxScreenState extends State<BoxScreen> {
                           height: Get.height,
                           child: GridView.count(
                             physics: const NeverScrollableScrollPhysics(),
-                            crossAxisCount: list!.length > 4 ? 4 : 5,
+                            crossAxisCount: list!.length > 4 ? 5 : 2,
                             children: [...list.map((box) => _buildBoxes(box))],
                           )),
                     )

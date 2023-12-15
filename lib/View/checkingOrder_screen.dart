@@ -94,16 +94,16 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                       child: Container(
                           // margin: const EdgeInsets.only(top: -50),
                           transform: Matrix4.translationValues(30, 0.0, 0.0),
-                          height: 400,
+                          // height: Get.height * 0.4,
                           child: Image.asset(
                             'assets/images/human_boxes.png',
-                            height: 410,
+                            height: Get.height * 0.42,
                             width: 200,
                           )),
                     ),
                     Container(
                       width: Get.width,
-                      height: 350,
+                      height: Get.height * 0.45,
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(36),
@@ -112,16 +112,16 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           Container(
                             width: 85,
-                            height: 8,
+                            height: 7,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
                               color: Colors.white,
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 12),
                           _buildCheckingOrder(),
                         ],
                       ),
@@ -186,7 +186,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
 
           return Container(
             width: Get.width,
-            height: 290,
+            height: Get.height * 0.38,
             child: Column(
               children: [
                 StepProgressView(
@@ -251,7 +251,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 15),
+                const SizedBox(height: 12),
                 Container(
                   width: Get.width,
                   // height: 1,
@@ -264,24 +264,94 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 15),
-                Expanded(
-                  child: Container(
-                    width: Get.width,
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
+                const SizedBox(height: 12),
+                Container(
+                  width: Get.width,
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          // width: 120,
+                          height: Get.height * 0.05,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                size: 20,
+                                color: FineTheme.palettes.shades100,
+                              ),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Khung giờ giao',
+                                      style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 14,
+                                          fontStyle: FontStyle.normal,
+                                          color: FineTheme.palettes.neutral400),
+                                    ),
+                                    Text(
+                                      '$arriveTime - $checkoutTime',
+                                      style: TextStyle(
+                                          fontFamily: 'Montserrat',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 14,
+                                          fontStyle: FontStyle.normal,
+                                          color: FineTheme.palettes.shades100),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () async {
+                            await orderHistory.getOrderByOrderId(
+                                id: widget.order.id);
+                            final orderDTO = orderHistory.orderDTO;
+                            if (hasBox) {
+                              Get.toNamed(
+                                RouteHandler.QRCODE_SCREEN,
+                                arguments: orderDTO,
+                              );
+                            } else if (status == 11) {
+                              await showStatusDialog(
+                                  "assets/images/logo2.png",
+                                  'Đã lấy hàng',
+                                  'Bạn đã nhận đơn hàng này rùi nè');
+                            } else {
+                              await showStatusDialog(
+                                  "assets/images/error-loading.gif",
+                                  'Chưa có QR Code rùi',
+                                  'Đơn hàng chưa tới station');
+                            }
+                          },
                           child: Container(
-                            // width: 120,
-                            height: 40,
+                            // width: 80,
+                            height: Get.height * 0.05,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                // SvgPicture.asset(
+                                //   'assets/icons/Home.svg',
+                                //   height: 20,
+                                //   width: 20,
+                                // ),
                                 Icon(
-                                  Icons.access_time,
+                                  Icons.qr_code,
                                   size: 20,
                                   color: FineTheme.palettes.shades100,
                                 ),
@@ -294,7 +364,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Khung giờ giao',
+                                        'Mã Qr Code',
                                         style: TextStyle(
                                             fontFamily: 'Montserrat',
                                             fontWeight: FontWeight.w700,
@@ -303,15 +373,23 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                                             color:
                                                 FineTheme.palettes.neutral400),
                                       ),
-                                      Text(
-                                        '$arriveTime - $checkoutTime',
-                                        style: TextStyle(
-                                            fontFamily: 'Montserrat',
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14,
-                                            fontStyle: FontStyle.normal,
-                                            color:
-                                                FineTheme.palettes.shades100),
+                                      Container(
+                                        width: 150,
+                                        child: Text(
+                                          hasBox
+                                              ? 'Chi tiết QR Code'
+                                              : status != 11
+                                                  ? 'Đang xử lý...'
+                                                  : "Đã lấy hàng",
+                                          style: TextStyle(
+                                              fontFamily: 'Montserrat',
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 14,
+                                              fontStyle: FontStyle.normal,
+                                              color:
+                                                  FineTheme.palettes.shades100),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -320,91 +398,8 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                             ),
                           ),
                         ),
-                        Expanded(
-                          child: InkWell(
-                            onTap: () async {
-                              await orderHistory.getOrderByOrderId(
-                                  id: widget.order.id);
-                              final orderDTO = orderHistory.orderDTO;
-                              if (hasBox) {
-                                Get.toNamed(
-                                  RouteHandler.QRCODE_SCREEN,
-                                  arguments: orderDTO,
-                                );
-                              } else if (status == 11) {
-                                await showStatusDialog(
-                                    "assets/images/logo2.png",
-                                    'Đã lấy hàng',
-                                    'Bạn đã nhận đơn hàng này rùi nè');
-                              } else {
-                                await showStatusDialog(
-                                    "assets/images/error-loading.gif",
-                                    'Chưa có QR Code rùi',
-                                    'Đơn hàng chưa tới station');
-                              }
-                            },
-                            child: Container(
-                              // width: 80,
-                              height: 40,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // SvgPicture.asset(
-                                  //   'assets/icons/Home.svg',
-                                  //   height: 20,
-                                  //   width: 20,
-                                  // ),
-                                  Icon(
-                                    Icons.qr_code,
-                                    size: 20,
-                                    color: FineTheme.palettes.shades100,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Mã Qr Code',
-                                          style: TextStyle(
-                                              fontFamily: 'Montserrat',
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 14,
-                                              fontStyle: FontStyle.normal,
-                                              color: FineTheme
-                                                  .palettes.neutral400),
-                                        ),
-                                        Container(
-                                          width: 150,
-                                          child: Text(
-                                            hasBox
-                                                ? 'Chi tiết QR Code'
-                                                : status != 11
-                                                    ? 'Đang xử lý...'
-                                                    : "Đã lấy hàng",
-                                            style: TextStyle(
-                                                fontFamily: 'Montserrat',
-                                                fontWeight: FontWeight.w500,
-                                                fontSize: 14,
-                                                fontStyle: FontStyle.normal,
-                                                color: FineTheme
-                                                    .palettes.shades100),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ],
