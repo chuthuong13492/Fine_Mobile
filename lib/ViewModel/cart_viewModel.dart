@@ -33,6 +33,7 @@ class CartViewModel extends BaseModel {
   double total = 0, fixTotal = 0, extraTotal = 0;
   int quantityChecked = 0;
   bool? isSelected = false;
+  bool? isConfirm;
   String? code;
   BoxesResponse? boxes;
   DestinationDAO? _destinationDAO;
@@ -194,6 +195,7 @@ class CartViewModel extends BaseModel {
       checkCart = Cart(timeSlotId: root.selectedTimeSlot!.id);
 
       if (currentCart == null) {
+        isConfirm = false;
         notifier.value = 0;
         quantityChecked = 0;
         total = 0;
@@ -222,6 +224,8 @@ class CartViewModel extends BaseModel {
         isSelected =
             currentCart!.items!.any((element) => element.isChecked == true);
         if (isSelected == true) {
+          final partyModel = Get.find<PartyOrderViewModel>();
+          isConfirm = partyModel.isConfirm;
           List<ConfirmCartItem> martItem = [];
           final list = currentCart?.items
               ?.where((element) => element.isChecked == true)

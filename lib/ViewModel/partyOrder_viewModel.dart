@@ -30,6 +30,7 @@ class PartyOrderViewModel extends BaseModel {
   PartyOrderDTO? partyOrderDTO;
   OrderDTO? orderDTO;
   PartyOrderDAO? _partyDAO;
+  ProductDAO? _productDAO;
   AccountDTO? acount;
   Customer? customer;
   String? errorMessage;
@@ -57,6 +58,7 @@ class PartyOrderViewModel extends BaseModel {
 
   PartyOrderViewModel() {
     _partyDAO = PartyOrderDAO();
+    _productDAO = ProductDAO();
     partyCode = null;
     partyStatus = null;
     // isPreCoOrder = false;
@@ -357,6 +359,7 @@ class PartyOrderViewModel extends BaseModel {
 
       setState(ViewStatus.Completed);
     } catch (e) {
+      await _productDAO?.logError(messageBody: e.toString());
       partyOrderDTO = null;
       setState(ViewStatus.Error);
     }

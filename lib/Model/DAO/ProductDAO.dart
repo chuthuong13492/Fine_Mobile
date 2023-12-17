@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:fine/Constant/addProdcutToCart_status.dart';
 import 'package:fine/Model/DAO/index.dart';
@@ -166,6 +169,21 @@ class ProductDAO extends BaseDAO {
       return listJson.map((e) => ProductDTO.fromJson(e)).toList();
     }
     return null;
+  }
+
+  Future<int?> logError({required String messageBody}) async {
+    try {
+      const USER_MOBILE = 1;
+      final response = await request.post('/log',
+          data: jsonEncode(messageBody),
+          queryParameters: {'appCatch': USER_MOBILE});
+      if (response.statusCode != null) {
+        return response.statusCode;
+      }
+      return null;
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   // Future<ProductDTO>? getProductDetail(int? productId,

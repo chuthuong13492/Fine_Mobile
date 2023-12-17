@@ -312,6 +312,7 @@ class OrderViewModel extends BaseModel {
         notifyListeners();
       }
     } catch (e) {
+      await _productDAO?.logError(messageBody: e.toString());
       bool result = await showErrorDialog();
       if (result) {
         await prepareOrder();

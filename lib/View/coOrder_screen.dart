@@ -250,6 +250,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
       isConfirm = true;
     }
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         isConfirm == false
             ? ValueListenableBuilder<int>(
@@ -333,12 +334,11 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                 },
               )
             : const SizedBox.shrink(),
-        isConfirm == false
-            ? Container(
-                height: 16,
-                color: FineTheme.palettes.neutral200,
-              )
-            : const SizedBox.shrink(),
+        Container(
+          width: Get.width,
+          height: 16,
+          color: FineTheme.palettes.neutral200,
+        ),
         Container(
           padding: const EdgeInsets.fromLTRB(16, 24, 16, 24),
           child: SlideFadeTransition(

@@ -601,15 +601,19 @@ class _CartScreenState extends State<CartScreen>
                       children: [
                         InkWell(
                           onTap: item.isAddParty == true
-                              ? () async {
-                                  await editProduct(context, item);
-                                }
+                              ? cartViewModel?.isConfirm == false
+                                  ? () async {
+                                      await editProduct(context, item);
+                                    }
+                                  : null
                               : null,
                           child: Text(
                             "Thay đổi",
                             style: FineTheme.typograhpy.caption1.copyWith(
                                 color: item.isAddParty == true
-                                    ? FineTheme.palettes.primary400
+                                    ? cartViewModel?.isConfirm == false
+                                        ? FineTheme.palettes.primary400
+                                        : FineTheme.palettes.shades100
                                     : FineTheme.palettes.shades100),
                           ),
                         ),

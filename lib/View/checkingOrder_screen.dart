@@ -103,16 +103,16 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                     ),
                     Container(
                       width: Get.width,
-                      height: Get.height * 0.45,
+                      height: Get.height * 0.4,
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(36),
                         color: FineTheme.palettes.primary100,
                       ),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           Container(
                             width: 85,
                             height: 7,
@@ -121,7 +121,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
                               color: Colors.white,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 16),
                           _buildCheckingOrder(),
                         ],
                       ),
@@ -185,8 +185,9 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
           }
 
           return Container(
+            alignment: Alignment.center,
             width: Get.width,
-            height: Get.height * 0.38,
+            // height: Get.height * 0.32,
             child: Column(
               children: [
                 StepProgressView(
