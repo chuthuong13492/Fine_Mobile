@@ -161,7 +161,7 @@ class PartyOrderViewModel extends BaseModel {
           partyOrderDTO = null;
           partyCode = null;
           notifier.value = 0;
-          Get.back();
+
           final cart = await getCart();
           if (cart != null) {
             final listItem = cart.items!
@@ -172,8 +172,9 @@ class PartyOrderViewModel extends BaseModel {
             }
           }
           _cartViewModel.getCurrentCart();
-          await showStatusDialog("assets/images/error.png", "Oops!",
+          showStatusDialog("assets/images/error.png", "Oops!",
               "Bạn hong có trong party này!!");
+          Get.back();
         } else {
           partyOrderDTO = result.partyOrderDTO;
 
@@ -236,15 +237,16 @@ class PartyOrderViewModel extends BaseModel {
         isFinished = false;
         isJoinParty = true;
         isConfirm = false;
-        await setPartyCode(code!);
-        partyCode = await getPartyCode();
-        PartyOrderStatus? result = await _partyDAO?.joinPartyOrder(
-            partyCode, root.selectedTimeSlot?.id);
-        if (partyCode!.contains("LPO")) {
-          if (result?.code == 4007) {
+        // await setPartyCode(code!);
+        // partyCode = await getPartyCode();
+        PartyOrderStatus? result =
+            await _partyDAO?.joinPartyOrder(code, root.selectedTimeSlot?.id);
+        if (result != null &&
+            result.partyOrderDTO!.partyCode!.contains("LPO")) {
+          if (result.code == 4007) {
             isLinked = true;
             RegExp regex = RegExp(r'\b\w{8}-\w{4}-\w{4}-\w{4}-\w{12}\b');
-            Match? match = regex.firstMatch(result!.message!);
+            Match? match = regex.firstMatch(result.message!);
             String linkedTimeSlot = match!.group(0)!;
             if (root.selectedTimeSlot?.checkoutTime != linkedTimeSlot) {
               int option = await showOptionDialog(
@@ -275,6 +277,8 @@ class PartyOrderViewModel extends BaseModel {
         } else {
           switch (result?.code) {
             case 0:
+              await setPartyCode(code!);
+              // partyCode = await getPartyCode();
               final data = result?.partyOrderDTO;
               final cart = await getCart();
               if (cart != null) {
@@ -283,7 +287,6 @@ class PartyOrderViewModel extends BaseModel {
                 }
               }
               root.checkCartAvailable();
-              Get.find<CartViewModel>().getCurrentCart();
               notifierMemberTimeout.value = 300;
               isTimerStart = true;
               await getPartyOrder();
@@ -305,7 +308,7 @@ class PartyOrderViewModel extends BaseModel {
               RegExp regex = RegExp(r'CPO(\w+)');
               Match? match = regex.firstMatch(msg);
               String? previousCode = "CPO${match?.group(1)}";
-              await getPartyOrder(code: previousCode);
+              // await getPartyOrder(code: previousCode);
               bool? success;
               int option = await showOptionDialog(
                   "Bạn đang trong đơn nhóm với mã code: $previousCode. Bạn muốn qua đơn nhóm mới hay ở lại nè!!",
@@ -323,13 +326,14 @@ class PartyOrderViewModel extends BaseModel {
                   await joinPartyOrder(code: code);
                 }
               } else {
-                root.checkCartAvailable();
-                Get.find<CartViewModel>().removeCart();
-                Get.find<CartViewModel>().getCurrentCart();
+                await setPartyCode(previousCode);
+                await root.checkCartAvailable();
+                // await Get.find<CartViewModel>().removeCart();
+                // Get.find<CartViewModel>().getCurrentCart();
                 notifierMemberTimeout.value = 300;
                 isTimerStart = true;
                 await getPartyOrder();
-                confirmationTimeout();
+                await confirmationTimeout();
                 await Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
               }
 
@@ -636,9 +640,10 @@ class PartyOrderViewModel extends BaseModel {
             }
           }
           await _cartViewModel.getCurrentCart();
-          deletePartyCode();
+
+          await deletePartyCode();
           deletePartCart();
-          partyCode = null;
+          partyCode = await getPartyCode();
           partyOrderDTO = null;
           if (isAdmin == false) {
             if (Get.currentRoute == "/party_order_screen") {

@@ -170,7 +170,7 @@ class _CartButtonState extends State<CartButton> {
                               },
                             ),
                           ),
-                          model.partyStatus != null
+                          model.partyStatus != null && model.isAdmin == true
                               ? Positioned(
                                   // top: -8,
                                   bottom: -25,
