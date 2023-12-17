@@ -48,6 +48,7 @@ class PartyOrderViewModel extends BaseModel {
   bool? isTimerStart = true;
   int adminQuantity = 0;
   Timer? _timer;
+  Timer? _getPartyTimer;
 
   final ValueNotifier<int> notifier = ValueNotifier(0);
   final ValueNotifier<int> notifierMemberTimeout = ValueNotifier(0);
@@ -149,19 +150,70 @@ class PartyOrderViewModel extends BaseModel {
     try {
       partyCode = await getPartyCode();
 
-      PartyOrderStatus? result =
-          await _partyDAO?.getPartyOrder(code ?? partyCode);
+      PartyOrderStatus? result;
+      _getPartyTimer?.cancel();
+      _getPartyTimer =
+          Timer.periodic(const Duration(seconds: 1), (timer) async {
+        result = await _partyDAO?.getPartyOrder(code ?? partyCode);
+        if (result != null && result?.statusCode == 200) {
+          bool? hasUser = result?.partyOrderDTO?.partyOrder
+              ?.any((element) => element.customer?.id == acc.currentUser?.id);
+          if (hasUser == false) {
+            timer.cancel();
+            deletePartCart();
+            deletePartyCode();
+            partyOrderDTO = null;
+            partyCode = null;
+            notifier.value = 0;
 
-      if (result != null && result.statusCode == 200) {
-        bool? hasUser = result.partyOrderDTO?.partyOrder
-            ?.any((element) => element.customer?.id == acc.currentUser?.id);
-        if (hasUser == false) {
+            final cart = await getCart();
+            if (cart != null) {
+              final listItem = cart.items!
+                  .where((element) => element.isAddParty == true)
+                  .toList();
+              for (var item in listItem) {
+                await updateAddedItemtoCart(item, false);
+              }
+            }
+            _cartViewModel.getCurrentCart();
+            showStatusDialog("assets/images/error.png", "Oops!",
+                "Bạn hong có trong party này!!");
+            Get.back();
+          } else {
+            partyOrderDTO = result?.partyOrderDTO;
+
+            final userParty = partyOrderDTO?.partyOrder?.firstWhere(
+                (element) => element.customer!.id == acc.currentUser!.id);
+            await deletePartCart();
+            if (userParty != null) {
+              if (userParty.customer!.isAdmin == true) {
+                isAdmin = true;
+                adminQuantity = 0;
+                for (var partyList in partyOrderDTO!.partyOrder!) {
+                  for (var item in partyList.orderDetails!) {
+                    adminQuantity += item.quantity;
+                  }
+                }
+              } else {
+                isAdmin = false;
+              }
+              if (userParty.orderDetails != null) {
+                for (var item in userParty.orderDetails!) {
+                  ConfirmCartItem cartItem =
+                      ConfirmCartItem(item.productId, item.quantity, null);
+                  await addPartyItem(cartItem, root.selectedTimeSlot!.id!);
+                }
+              }
+            }
+            final cart = await getPartyCart();
+
+            notifier.value = cart == null ? 0 : cart.itemQuantity();
+          }
+        } else if (result != null && result!.statusCode == 404) {
           deletePartCart();
           deletePartyCode();
-          partyOrderDTO = null;
           partyCode = null;
-          notifier.value = 0;
-
+          partyOrderDTO = null;
           final cart = await getCart();
           if (cart != null) {
             final listItem = cart.items!
@@ -172,55 +224,9 @@ class PartyOrderViewModel extends BaseModel {
             }
           }
           _cartViewModel.getCurrentCart();
-          showStatusDialog("assets/images/error.png", "Oops!",
-              "Bạn hong có trong party này!!");
-          Get.back();
-        } else {
-          partyOrderDTO = result.partyOrderDTO;
-
-          final userParty = partyOrderDTO?.partyOrder?.firstWhere(
-              (element) => element.customer!.id == acc.currentUser!.id);
-          await deletePartCart();
-          if (userParty != null) {
-            if (userParty.customer!.isAdmin == true) {
-              isAdmin = true;
-              adminQuantity = 0;
-              for (var partyList in partyOrderDTO!.partyOrder!) {
-                for (var item in partyList.orderDetails!) {
-                  adminQuantity += item.quantity;
-                }
-              }
-            } else {
-              isAdmin = false;
-            }
-            if (userParty.orderDetails != null) {
-              for (var item in userParty.orderDetails!) {
-                ConfirmCartItem cartItem =
-                    ConfirmCartItem(item.productId, item.quantity, null);
-                await addPartyItem(cartItem, root.selectedTimeSlot!.id!);
-              }
-            }
-          }
-          final cart = await getPartyCart();
-
-          notifier.value = cart == null ? 0 : cart.itemQuantity();
         }
-      } else if (result!.statusCode == 404) {
-        deletePartCart();
-        deletePartyCode();
-        partyCode = null;
-        partyOrderDTO = null;
-        final cart = await getCart();
-        if (cart != null) {
-          final listItem = cart.items!
-              .where((element) => element.isAddParty == true)
-              .toList();
-          for (var item in listItem) {
-            await updateAddedItemtoCart(item, false);
-          }
-        }
-        _cartViewModel.getCurrentCart();
-      }
+      });
+
       setState(ViewStatus.Completed);
       notifyListeners();
     } catch (e) {
@@ -546,6 +552,7 @@ class PartyOrderViewModel extends BaseModel {
         option = await showOptionDialog("Hãy thử những món khác bạn nhé 😥.");
       }
       if (option == 1) {
+        _getPartyTimer?.cancel();
         partyCode = await getPartyCode();
         final success = await _partyDAO?.logoutCoOrder(
             partyCode!, id, isLinked == true ? 2 : 1);
@@ -629,6 +636,7 @@ class PartyOrderViewModel extends BaseModel {
 
       if (partyStatus != null) {
         if (partyStatus?.isFinish == true) {
+          _getPartyTimer?.cancel();
           isFinished = true;
           final cart = await getCart();
           if (cart != null) {

@@ -71,14 +71,15 @@ class PartyOrderDAO extends BaseDAO {
         );
       }
     } on DioError catch (e) {
-      return PartyOrderStatus(
-          statusCode: e.response!.data["statusCode"],
-          code: e.response!.data['errorCode'],
-          message: e.response!.data['message']);
-    } catch (e) {
-      throw e;
+      if (e.response != null && e.response?.statusCode != 500) {
+        return PartyOrderStatus(
+            statusCode: e.response!.data["statusCode"],
+            code: e.response!.data['errorCode'],
+            message: e.response!.data['message']);
+      } else {
+        return PartyOrderStatus(statusCode: 500, code: null, message: null);
+      }
     }
-    // print("Request Note: " + note);
   }
 
   Future<PartyOrderStatus?> joinPartyOrder(

@@ -43,8 +43,9 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 1),
-        (timer) => _partyViewModel!.getPartyOrder());
+    // _timer = Timer.periodic(const Duration(seconds: 1),
+    //     (timer) => _partyViewModel!.getPartyOrder());
+
     _coOrder();
   }
 
@@ -55,6 +56,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   }
 
   void _coOrder() async {
+    await _partyViewModel!.getPartyOrder();
     setState(() {
       checkAdmin = _partyViewModel?.isAdmin;
     });
@@ -164,6 +166,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                 builder: (context, child, model) {
                   List<Widget> card = [];
                   List<Party>? list;
+
                   if (model.partyOrderDTO != null) {
                     list = model.partyOrderDTO!.partyOrder!;
                   }
