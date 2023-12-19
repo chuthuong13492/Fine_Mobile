@@ -290,19 +290,19 @@ class OrderDetails {
 
 class OrderStatusDTO {
   int? orderStatus;
-  String? boxId;
+  // String? boxId;
   String? stationName;
 
   OrderStatusDTO({
     this.orderStatus,
-    this.boxId,
+    // this.boxId,
     this.stationName,
   });
 
   OrderStatusDTO.fromJson(Map<String, dynamic> json) {
-    orderStatus = json["orderStatus"] as int;
-    boxId = json["boxId"] as String;
-    stationName = json["stationName"] as String ?? null;
+    orderStatus = json["OrderStatus"] as int;
+    // boxId = json["boxId"] as String;
+    stationName = json["StationName"] as String ?? null;
   }
 
   static List<OrderStatusDTO> fromList(List<Map<String, dynamic>> list) {
@@ -311,9 +311,9 @@ class OrderStatusDTO {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> _data = <String, dynamic>{};
-    _data["orderStatus"] = orderStatus;
-    _data["boxId"] = boxId;
-    _data["stationName"] = stationName;
+    _data["OrderStatus"] = orderStatus;
+    // _data["boxId"] = boxId;
+    _data["StationName"] = stationName;
     return _data;
   }
 }

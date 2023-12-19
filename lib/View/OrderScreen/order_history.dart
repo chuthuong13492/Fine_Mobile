@@ -310,7 +310,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                       await _orderHistoryViewModel.getOrderByOrderId(
                           id: orderDTO.id);
                       await Get.find<OrderViewModel>()
-                          .fetchStatus(orderDTO.id!);
+                          .fetchStatus(orderDTO.orderCode!);
                       await Get.toNamed(RouteHandler.QRCODE_SCREEN,
                           arguments: _orderHistoryViewModel.orderDTO);
                     } else {
@@ -427,7 +427,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     //     arguments: _orderHistoryViewModel.orderDTO);
     // _orderHistoryViewModel.getOrders();
     await Get.find<OrderViewModel>()
-        .fetchStatus(_orderHistoryViewModel.orderDTO!.id!);
+        .fetchStatus(_orderHistoryViewModel.orderDTO!.orderCode!);
     await Get.toNamed(RouteHandler.CHECKING_ORDER_SCREEN, arguments: {
       "order": _orderHistoryViewModel.orderDTO,
       "isFetch": false,

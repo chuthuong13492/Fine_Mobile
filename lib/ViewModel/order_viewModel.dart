@@ -258,7 +258,7 @@ class OrderViewModel extends BaseModel {
             isCreate = true;
             timeRemaining = 0;
             notifierTimeRemaining.value = 0;
-            await fetchStatus(result.order!.id!);
+            await fetchStatus(result.order!.orderCode!);
             orderHistoryViewModel.orderDTO = result.order;
             // await showStatusDialog("assets/images/icon-success.png", 'Success',
             //     'Bạn đã đặt hàng thành công');
@@ -346,10 +346,10 @@ class OrderViewModel extends BaseModel {
     }
   }
 
-  Future<void> fetchStatus(String orderId) async {
+  Future<void> fetchStatus(String orderCode) async {
     try {
       setState(ViewStatus.Loading);
-      orderStatusDTO = await _dao!.fetchOrderStatus(orderId);
+      orderStatusDTO = await _dao!.fetchOrderStatus(orderCode);
       if (orderStatusDTO != null) {
         if (orderStatusDTO?.orderStatus == 13) {
           if (Get.currentRoute == "/checking_order_screen" ||
@@ -363,7 +363,7 @@ class OrderViewModel extends BaseModel {
             Get.currentRoute == '/qrcode_screen') {
           final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
           await orderHistoryViewModel.getOrders();
-          await orderHistoryViewModel.getOrderByOrderId(id: orderId);
+          await orderHistoryViewModel.getOrderByOrderId(id: orderCode);
           if (orderHistoryViewModel.orderDTO != null) {
             Get.offAndToNamed(RouteHandler.ORDER_HISTORY_DETAIL,
                 arguments: orderHistoryViewModel.orderDTO);

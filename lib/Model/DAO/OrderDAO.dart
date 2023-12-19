@@ -75,9 +75,9 @@ class OrderDAO extends BaseDAO {
     return null;
   }
 
-  Future<OrderStatusDTO?> fetchOrderStatus(String orderId) async {
+  Future<OrderStatusDTO?> fetchOrderStatus(String orderCode) async {
     final res = await request.get(
-      'order/status/$orderId',
+      'order/status/$orderCode',
     );
     if (res.statusCode == 200) {
       return OrderStatusDTO.fromJson(res.data['data']);

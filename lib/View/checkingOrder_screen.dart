@@ -38,7 +38,7 @@ class _CheckingOrderScreenState extends State<CheckingOrderScreen> {
     _timer = Timer.periodic(
         const Duration(seconds: 2),
         (timer) async =>
-            await _orderViewModel.fetchStatus(this.widget.order.id!));
+            await _orderViewModel.fetchStatus(this.widget.order.orderCode!));
     // } else {
     //   _orderViewModel.fetchStatus(this.widget.order.id!);
     // }

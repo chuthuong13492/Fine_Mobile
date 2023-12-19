@@ -401,7 +401,7 @@ class PartyOrderViewModel extends BaseModel {
       if (option != 1) {
         return;
       }
-      _getPartyTimer?.cancel();
+      // _getPartyTimer?.cancel();
       partyCode = await getPartyCode();
       orderDTO = await _partyDAO?.preparePartyOrder(
           root.selectedTimeSlot!.id!, partyCode);
@@ -416,7 +416,27 @@ class PartyOrderViewModel extends BaseModel {
         orderDetails: detailList,
       );
       _orderViewModel.currentCart = cart;
-      await Get.offAndToNamed(RouteHandler.ORDER);
+      await _orderViewModel.prepareOrder();
+      if (_orderViewModel.errorMessage == null) {
+        await Get.offAndToNamed(RouteHandler.ORDER);
+      } else {
+        deletePartCart();
+        deletePartyCode();
+        partyCode = null;
+        partyOrderDTO = null;
+        final cart = await getCart();
+        if (cart != null) {
+          final listItem = cart.items!
+              .where((element) => element.isAddParty == true)
+              .toList();
+          for (var item in listItem) {
+            await updateAddedItemtoCart(item, false);
+          }
+        }
+        _cartViewModel.getCurrentCart();
+        Get.back();
+      }
+
       // _orderViewModel.orderDTO = orderDTO;
 
       notifyListeners();
