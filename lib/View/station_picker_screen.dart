@@ -82,8 +82,14 @@ class _StationPickerScreenState extends State<StationPickerScreen> {
                   );
                 },
               ),
-              const SizedBox(height: 8),
-              // _buildFilter(),
+
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 8, 0, 8),
+                child: Text(
+                  'Các station có đủ box cho bạn nè',
+                  style: FineTheme.typograhpy.subtitle1,
+                ),
+              ),
 
               _buildListStation(),
             ],

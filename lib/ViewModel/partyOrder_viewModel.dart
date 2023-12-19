@@ -46,6 +46,7 @@ class PartyOrderViewModel extends BaseModel {
   bool? isConfirm = false;
   bool? isFinished = false;
   bool? isTimerStart = true;
+  bool? isLoading = true;
   int adminQuantity = 0;
   Timer? _timer;
   Timer? _getPartyTimer;
@@ -210,6 +211,7 @@ class PartyOrderViewModel extends BaseModel {
             notifier.value = cart == null ? 0 : cart.itemQuantity();
           }
         } else if (result != null && result!.statusCode == 404) {
+          timer.cancel();
           deletePartCart();
           deletePartyCode();
           partyCode = null;
@@ -227,10 +229,29 @@ class PartyOrderViewModel extends BaseModel {
         }
       });
 
-      setState(ViewStatus.Completed);
+      // setState(ViewStatus.Completed);
       notifyListeners();
     } catch (e) {
+      // setState(ViewStatus.Completed);
+    }
+  }
+
+  Future<void> navParty(bool isHome) async {
+    try {
+      setState(ViewStatus.Loading);
+
+      await confirmationTimeout();
+      if (isHome == true) {
+        await getPartyOrder();
+        Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+      } else {
+        await getPartyOrder();
+        Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
+      }
+      await Future.delayed(const Duration(milliseconds: 1000));
       setState(ViewStatus.Completed);
+    } catch (e) {
+      setState(ViewStatus.Error);
     }
   }
 
@@ -295,9 +316,7 @@ class PartyOrderViewModel extends BaseModel {
               root.checkCartAvailable();
               notifierMemberTimeout.value = 300;
               isTimerStart = true;
-              await getPartyOrder();
-              await confirmationTimeout();
-              await Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+              await navParty(true);
               break;
             case 4001:
               await deletePartyCode();
@@ -338,9 +357,7 @@ class PartyOrderViewModel extends BaseModel {
                 // Get.find<CartViewModel>().getCurrentCart();
                 notifierMemberTimeout.value = 300;
                 isTimerStart = true;
-                await getPartyOrder();
-                await confirmationTimeout();
-                await Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                await navParty(true);
               }
 
               break;
@@ -384,6 +401,7 @@ class PartyOrderViewModel extends BaseModel {
       if (option != 1) {
         return;
       }
+      _getPartyTimer?.cancel();
       partyCode = await getPartyCode();
       orderDTO = await _partyDAO?.preparePartyOrder(
           root.selectedTimeSlot!.id!, partyCode);
@@ -398,7 +416,7 @@ class PartyOrderViewModel extends BaseModel {
         orderDetails: detailList,
       );
       _orderViewModel.currentCart = cart;
-      Get.offAndToNamed(RouteHandler.ORDER);
+      await Get.offAndToNamed(RouteHandler.ORDER);
       // _orderViewModel.orderDTO = orderDTO;
 
       notifyListeners();
@@ -544,6 +562,7 @@ class PartyOrderViewModel extends BaseModel {
   Future<void> cancelCoOrder(bool isOrder, {String? id}) async {
     hideDialog();
     try {
+      // setState(ViewStatus.Loading);
       int? option;
       if (isOrder == true) {
         option = await showOptionDialog(
@@ -552,15 +571,15 @@ class PartyOrderViewModel extends BaseModel {
         option = await showOptionDialog("Hãy thử những món khác bạn nhé 😥.");
       }
       if (option == 1) {
-        _getPartyTimer?.cancel();
         partyCode = await getPartyCode();
         final success = await _partyDAO?.logoutCoOrder(
             partyCode!, id, isLinked == true ? 2 : 1);
         // await Future.delayed(const Duration(microseconds: 500));
         if (success!) {
           if (isOrder == false) {
-            await deletePartyCode();
-            partyCode = await getPartyCode();
+            _getPartyTimer?.cancel();
+            deletePartyCode();
+            partyCode = null;
             final cart = await getCart();
             if (cart != null) {
               final listItem = cart.items!
@@ -588,6 +607,7 @@ class PartyOrderViewModel extends BaseModel {
           );
         }
       }
+      setState(ViewStatus.Empty);
     } catch (e) {
       await showStatusDialog(
         "assets/images/error.png",
@@ -625,7 +645,7 @@ class PartyOrderViewModel extends BaseModel {
 
   Future<void> getCoOrderStatus() async {
     try {
-      setState(ViewStatus.Loading);
+      // setState(ViewStatus.Loading);
       partyCode = await getPartyCode();
       if (partyCode == null) {
         return;
@@ -664,10 +684,10 @@ class PartyOrderViewModel extends BaseModel {
       }
 
       notifyListeners();
-      setState(ViewStatus.Completed);
+      // setState(ViewStatus.Completed);
     } catch (e) {
       // partyStatus = null;
-      setState(ViewStatus.Completed);
+      // setState(ViewStatus.Completed);
     }
   }
 

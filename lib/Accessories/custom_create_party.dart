@@ -186,13 +186,10 @@ class _CustomeCreatePartyState extends State<CustomeCreateParty> {
                       if (model.partyOrderDTO!.partyType == 1) {
                         if (widget.isHome == true) {
                           hideDialog();
-                          // await model.getPartyOrder();
-                          await Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                          await model.navParty(widget.isHome);
                         } else {
                           hideDialog();
-                          // await model.getPartyOrder();
-
-                          await Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
+                          await model.navParty(widget.isHome);
                         }
                       } else {
                         hideDialog();

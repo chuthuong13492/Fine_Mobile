@@ -275,7 +275,7 @@ class CartViewModel extends BaseModel {
         }
         currentCart = await getCart();
       }
-      await Get.find<PartyOrderViewModel>().getPartyOrder();
+      Get.find<PartyOrderViewModel>().getPartyOrder();
       // setState(ViewStatus.Completed);
       notifyListeners();
     } catch (e) {

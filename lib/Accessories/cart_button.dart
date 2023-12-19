@@ -83,7 +83,7 @@ class _CartButtonState extends State<CartButton> {
                         // side: BorderSide(color: Colors.red),
                       ),
                       onPressed: () async {
-                        await Get.find<RootViewModel>().navParty();
+                        await model.navParty(true);
                       },
                       child: Stack(
                         clipBehavior: Clip.none,

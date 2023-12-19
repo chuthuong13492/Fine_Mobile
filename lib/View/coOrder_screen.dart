@@ -27,8 +27,8 @@ import 'package:scoped_model/scoped_model.dart';
 import '../ViewModel/cart_viewModel.dart';
 
 class PartyOrderScreen extends StatefulWidget {
-  final PartyOrderDTO? dto;
-  const PartyOrderScreen({super.key, this.dto});
+  // final PartyOrderDTO? dto;
+  const PartyOrderScreen({super.key});
 
   @override
   State<PartyOrderScreen> createState() => _PartyOrderScreenState();
@@ -39,6 +39,7 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   Timer? _timer;
   int index = 0;
   bool? checkAdmin;
+  bool? isLoading = true;
 
   @override
   void initState() {
@@ -56,8 +57,9 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
   }
 
   void _coOrder() async {
-    await _partyViewModel!.getPartyOrder();
+    // await _partyViewModel!.getPartyOrder();
     setState(() {
+      isLoading = false;
       checkAdmin = _partyViewModel?.isAdmin;
     });
     // await _partyViewModel?.confirmationTimeout();
@@ -117,110 +119,107 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
           ],
         ),
         body: SafeArea(
-          child: ListView(
-            children: [
-              SizedBox(
-                  height: 8,
-                  child: Container(
-                    color: FineTheme.palettes.neutral200,
-                  )),
-              // ScopedModelDescendant<PartyOrderViewModel>(
-              //   builder: (context, child, model) {
-              //     final partyCode = model.partyOrderDTO!.partyCode;
-              //     return ;
-              //   },
-              // ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Mã:',
-                    style: FineTheme.typograhpy.subtitle2
-                        .copyWith(color: FineTheme.palettes.neutral400),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    _partyViewModel!.partyCode!,
-                    style: FineTheme.typograhpy.subtitle2
-                        .copyWith(color: FineTheme.palettes.shades200),
-                  ),
-                  // const SizedBox(width: 8),
-                  IconButton(
-                      onPressed: () {
-                        Clipboard.setData(new ClipboardData(
-                            text: _partyViewModel!.partyCode!));
-                      },
-                      icon: Icon(
-                        Icons.copy,
-                        size: 20,
-                        color: FineTheme.palettes.neutral500,
-                      ))
-                ],
-              ),
-              // SizedBox(
-              //     height: 8,
-              //     child: Container(
-              //       color: FineTheme.palettes.neutral200,
-              //     )),
-              ScopedModelDescendant<PartyOrderViewModel>(
-                builder: (context, child, model) {
-                  List<Widget> card = [];
-                  List<Party>? list;
+          child: ScopedModelDescendant<PartyOrderViewModel>(
+            builder: (context, child, model) {
+              List<Widget> card = [];
+              List<Party>? list;
 
-                  if (model.partyOrderDTO != null) {
-                    list = model.partyOrderDTO!.partyOrder!;
-                  }
-                  List<Party>? user;
-                  if (list != null) {
-                    user = list
-                        .where((element) =>
-                            element.customer!.id == acc.currentUser!.id)
-                        .toList();
-                  }
+              if (model.partyOrderDTO != null) {
+                list = model.partyOrderDTO!.partyOrder!;
+              }
+              List<Party>? user;
+              if (list != null) {
+                user = list
+                    .where((element) =>
+                        element.customer!.id == acc.currentUser!.id)
+                    .toList();
+              }
 
-                  if (user != null) {
-                    for (var item in user) {
-                      if (item.customer!.isAdmin == true) {
-                        list;
-                        for (var item in list!) {
-                          card.add(_buildPartyList(item));
-                        }
-                        // for (int i = 0; i < list.length; i++) {
-                        //   if (i % 2 != 0) {
-                        //     card.insert(
-                        //       i,
-                        //       Container(
-                        //         height: 24,
-                        //         color: FineTheme.palettes.neutral200,
-                        //       ),
-                        //     );
-                        //   }
-                        // }
-                        // checkAdmin = true;
-                      } else {
-                        user;
-                        for (var item in user) {
-                          card.add(_buildPartyList(item));
-                        }
-                        // checkAdmin = false;
-                      }
+              if (user != null) {
+                for (var item in user) {
+                  if (item.customer!.isAdmin == true) {
+                    list;
+                    for (var item in list!) {
+                      card.add(_buildPartyList(item));
                     }
+                    // for (int i = 0; i < list.length; i++) {
+                    //   if (i % 2 != 0) {
+                    //     card.insert(
+                    //       i,
+                    //       Container(
+                    //         height: 24,
+                    //         color: FineTheme.palettes.neutral200,
+                    //       ),
+                    //     );
+                    //   }
+                    // }
+                    // checkAdmin = true;
+                  } else {
+                    user;
+                    for (var item in user) {
+                      card.add(_buildPartyList(item));
+                    }
+                    // checkAdmin = false;
                   }
-                  // if (list == null || list.isEmpty) {
-                  //   return const Padding(
-                  //     padding: EdgeInsets.all(8.0),
-                  //     child: Text("Không có người tham gia"),
-                  //   );
-                  // }
-                  return Container(
-                    color: FineTheme.palettes.shades100,
-                    child: Column(
-                      children: card,
+                }
+              }
+              if (model.status == ViewStatus.Loading) {
+                return const Center(
+                  child: LoadingFine(),
+                );
+              } else if (model.status == ViewStatus.Empty) {
+                return const SizedBox.shrink();
+              } else {
+                return ListView(
+                  children: [
+                    SizedBox(
+                        height: 8,
+                        child: Container(
+                          color: FineTheme.palettes.neutral200,
+                        )),
+                    // ScopedModelDescendant<PartyOrderViewModel>(
+                    //   builder: (context, child, model) {
+                    //     final partyCode = model.partyOrderDTO!.partyCode;
+                    //     return ;
+                    //   },
+                    // ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Mã:',
+                          style: FineTheme.typograhpy.subtitle2
+                              .copyWith(color: FineTheme.palettes.neutral400),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          model.partyCode!,
+                          style: FineTheme.typograhpy.subtitle2
+                              .copyWith(color: FineTheme.palettes.shades200),
+                        ),
+                        // const SizedBox(width: 8),
+                        IconButton(
+                            onPressed: () {
+                              Clipboard.setData(
+                                  new ClipboardData(text: model.partyCode!));
+                            },
+                            icon: Icon(
+                              Icons.copy,
+                              size: 20,
+                              color: FineTheme.palettes.neutral500,
+                            ))
+                      ],
                     ),
-                  );
-                },
-              ),
-            ],
+                    Container(
+                      color: FineTheme.palettes.shades100,
+                      child: Column(
+                        children: card,
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
         ),
         // bottomNavigationBar: bottomBar(),
@@ -531,10 +530,11 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                     padding: const EdgeInsets.fromLTRB(0, 0, 8, 0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4),
-                      child: const SizedBox(
+                      child: SizedBox(
                         width: 31,
                         height: 28,
-                        child: CacheImage(imageUrl: defaultImage),
+                        child: CacheImage(
+                            imageUrl: orderDetails.imageUrl ?? defaultImage),
                       ),
                     ),
                   ),

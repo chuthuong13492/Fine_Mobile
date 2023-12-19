@@ -275,16 +275,6 @@ class RootViewModel extends BaseModel {
     }
   }
 
-  Future<void> navParty() async {
-    final party = Get.find<PartyOrderViewModel>();
-    await party.getPartyOrder();
-    final partyCode = await getPartyCode();
-    if (party.partyOrderDTO != null && partyCode != null) {
-      await party.confirmationTimeout();
-      await Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
-    }
-  }
-
   Future<void> getListTimeSlot() async {
     Timer.periodic(
         const Duration(seconds: 1), (timer) => now.value = DateTime.now());

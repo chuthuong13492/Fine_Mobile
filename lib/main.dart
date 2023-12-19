@@ -162,10 +162,7 @@ class MyApp extends StatelessWidget {
                 settings: settings);
           case RouteHandler.PARTY_ORDER_SCREEN:
             return CupertinoPageRoute<bool>(
-                builder: (context) => PartyOrderScreen(
-                      dto: settings.arguments as dynamic,
-                    ),
-                settings: settings);
+                builder: (context) => PartyOrderScreen(), settings: settings);
           case RouteHandler.CONFIRM_ORDER_SCREEN:
             return CupertinoPageRoute<bool>(
                 builder: (context) => const PartyConfirmScreen(),
