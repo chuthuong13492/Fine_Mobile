@@ -230,60 +230,70 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                             ))
                       ],
                     ),
-                    Container(
-                      color: FineTheme.palettes.primary100,
-                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                      child: CountdownTimer(
-                        endTime: DateTime.now().millisecondsSinceEpoch +
-                            differentTime,
-                        onEnd: () async {
-                          Get.find<RootViewModel>().isOnClick = true;
-                          await showStatusDialog(
-                            "assets/images/global_error.png",
-                            "Khung giờ đã kết thúc",
-                            "Đã hết giờ chốt đơn cho khung giờ hiện tại. \n Hẹn gặp bạn ở khung giờ khác nhé 😢.",
-                          );
-                          await Get.find<RootViewModel>().getListTimeSlot();
-                          Get.back();
-                        },
-                        widgetBuilder: (context, time) {
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Kết thúc đặt đơn: ",
-                                style: FineTheme.typograhpy.subtitle2.copyWith(
-                                    color: FineTheme.palettes.shades100),
-                              ),
-                              Row(
-                                children: [
-                                  buildTimeBlock(
-                                      "${(time?.hours ?? 0) < 10 ? "0" : ""}${time?.hours ?? "0"}"),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    ":",
-                                    style: FineTheme.typograhpy.h2.copyWith(
-                                        color: FineTheme.palettes.shades100),
-                                  ),
-                                  const SizedBox(width: 2),
-                                  buildTimeBlock(
-                                      "${(time?.min ?? 0) < 10 ? "0" : ""}${time?.min ?? "0"}"),
-                                  const SizedBox(width: 2),
-                                  Text(
-                                    ":",
-                                    style: FineTheme.typograhpy.h2.copyWith(
-                                        color: FineTheme.palettes.shades100),
-                                  ),
-                                  const SizedBox(width: 2),
-                                  buildTimeBlock(
-                                      "${(time?.sec ?? 0) < 10 ? "0" : ""}${time?.sec ?? "0"}"),
-                                ],
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    ),
+                    model.isAdmin == true
+                        ? Container(
+                            color: FineTheme.palettes.primary100,
+                            padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                            child: CountdownTimer(
+                              endTime: DateTime.now().millisecondsSinceEpoch +
+                                  differentTime,
+                              onEnd: () async {
+                                Get.find<RootViewModel>().isOnClick = true;
+                                await showStatusDialog(
+                                  "assets/images/global_error.png",
+                                  "Khung giờ đã kết thúc",
+                                  "Đã hết giờ chốt đơn cho khung giờ hiện tại. \n Hẹn gặp bạn ở khung giờ khác nhé 😢.",
+                                );
+                                await Get.find<RootViewModel>()
+                                    .getListTimeSlot();
+                                Get.back();
+                              },
+                              widgetBuilder: (context, time) {
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Kết thúc đặt đơn: ",
+                                      style: FineTheme.typograhpy.subtitle2
+                                          .copyWith(
+                                              color:
+                                                  FineTheme.palettes.shades100),
+                                    ),
+                                    Row(
+                                      children: [
+                                        buildTimeBlock(
+                                            "${(time?.hours ?? 0) < 10 ? "0" : ""}${time?.hours ?? "0"}"),
+                                        const SizedBox(width: 2),
+                                        Text(
+                                          ":",
+                                          style: FineTheme.typograhpy.h2
+                                              .copyWith(
+                                                  color: FineTheme
+                                                      .palettes.shades100),
+                                        ),
+                                        const SizedBox(width: 2),
+                                        buildTimeBlock(
+                                            "${(time?.min ?? 0) < 10 ? "0" : ""}${time?.min ?? "0"}"),
+                                        const SizedBox(width: 2),
+                                        Text(
+                                          ":",
+                                          style: FineTheme.typograhpy.h2
+                                              .copyWith(
+                                                  color: FineTheme
+                                                      .palettes.shades100),
+                                        ),
+                                        const SizedBox(width: 2),
+                                        buildTimeBlock(
+                                            "${(time?.sec ?? 0) < 10 ? "0" : ""}${time?.sec ?? "0"}"),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          )
+                        : const SizedBox.shrink(),
 
                     Container(
                       color: FineTheme.palettes.shades100,
