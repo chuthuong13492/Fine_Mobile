@@ -76,10 +76,9 @@ class CartViewModel extends BaseModel {
         total -= cartItem.fixTotal!;
         quantityChecked += quantity;
         total += editTotal;
-        // getTotalQuantity(isAdded!, cartItem);
+        await addProductToPartyOrder();
       }
       currentCart = await getCart();
-      await addProductToPartyOrder();
       notifyListeners();
     } catch (e) {
       print(e);
@@ -459,11 +458,11 @@ class CartViewModel extends BaseModel {
         checkCart!.items!.add(cartItem);
       }
     }
-    if (checkCart!.itemQuantity() > 5) {
+    if (checkCart!.itemQuantity() > 6) {
       checkCart!.items!
           .removeWhere((element) => element.productId == cartItem.productId);
       await showStatusDialog("assets/images/error.png", "Box đã đầy",
-          "Box đã đầy ùi, Box chỉ chứa tối đa 5 món thui nè");
+          "Box đã đầy ùi, Box chỉ chứa tối đa 6 món thui nè");
       return false;
     }
 

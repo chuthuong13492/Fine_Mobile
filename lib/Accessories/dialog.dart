@@ -1158,6 +1158,27 @@ Future<int> showConfirmOrderDialog(
                     ],
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Điều khoản đặt hàng ",
+                        style: FineTheme.typograhpy.subtitle2
+                            .copyWith(color: FineTheme.palettes.neutral600),
+                      ),
+                      InkWell(
+                        onTap: null,
+                        child: Icon(
+                          Icons.info,
+                          size: 16,
+                          color: FineTheme.palettes.neutral600,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
                 const SizedBox(
                   height: 16,
                 ),

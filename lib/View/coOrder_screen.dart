@@ -14,6 +14,7 @@ import 'package:fine/ViewModel/order_viewModel.dart';
 import 'package:fine/ViewModel/partyOrder_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
+import 'package:fine/widgets/CountdownTimer/index.dart';
 import 'package:fine/widgets/cache_image.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -102,25 +103,44 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
             ),
           ),
           actionButton: [
-            checkAdmin == true
-                ? Container(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: IconButton(
-                        onPressed: () async {
-                          await showInviteDialog('text');
-                        },
-                        icon: Icon(
-                          Icons.group_add_rounded,
-                          color: FineTheme.palettes.primary100,
-                          size: 30,
-                        )),
-                  )
-                : const SizedBox.shrink()
+            ScopedModelDescendant<PartyOrderViewModel>(
+              builder: (context, child, model) {
+                return model.isAdmin == true
+                    ? Container(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: IconButton(
+                            onPressed: () async {
+                              await showInviteDialog('text');
+                            },
+                            icon: Icon(
+                              Icons.group_add_rounded,
+                              color: FineTheme.palettes.primary100,
+                              size: 30,
+                            )),
+                      )
+                    : const SizedBox.shrink();
+              },
+            )
           ],
         ),
         body: SafeArea(
           child: ScopedModelDescendant<PartyOrderViewModel>(
             builder: (context, child, model) {
+              var timeslot =
+                  Get.find<RootViewModel>().selectedTimeSlot?.closeTime;
+              final currentDate = DateTime.now();
+              String currentTimeSlot = timeslot!;
+              var beanTime = new DateTime(
+                currentDate.year,
+                currentDate.month,
+                currentDate.day,
+                double.parse(currentTimeSlot.split(':')[0]).round(),
+                double.parse(currentTimeSlot.split(':')[1]).round(),
+              );
+
+              int differentTime =
+                  beanTime.difference(currentDate).inMilliseconds;
+
               List<Widget> card = [];
               List<Party>? list;
 
@@ -211,6 +231,61 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                       ],
                     ),
                     Container(
+                      color: FineTheme.palettes.primary100,
+                      padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
+                      child: CountdownTimer(
+                        endTime: DateTime.now().millisecondsSinceEpoch +
+                            differentTime,
+                        onEnd: () async {
+                          Get.find<RootViewModel>().isOnClick = true;
+                          await showStatusDialog(
+                            "assets/images/global_error.png",
+                            "Khung giờ đã kết thúc",
+                            "Đã hết giờ chốt đơn cho khung giờ hiện tại. \n Hẹn gặp bạn ở khung giờ khác nhé 😢.",
+                          );
+                          await Get.find<RootViewModel>().getListTimeSlot();
+                          Get.back();
+                        },
+                        widgetBuilder: (context, time) {
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Kết thúc đặt đơn: ",
+                                style: FineTheme.typograhpy.subtitle2.copyWith(
+                                    color: FineTheme.palettes.shades100),
+                              ),
+                              Row(
+                                children: [
+                                  buildTimeBlock(
+                                      "${(time?.hours ?? 0) < 10 ? "0" : ""}${time?.hours ?? "0"}"),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    ":",
+                                    style: FineTheme.typograhpy.h2.copyWith(
+                                        color: FineTheme.palettes.shades100),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  buildTimeBlock(
+                                      "${(time?.min ?? 0) < 10 ? "0" : ""}${time?.min ?? "0"}"),
+                                  const SizedBox(width: 2),
+                                  Text(
+                                    ":",
+                                    style: FineTheme.typograhpy.h2.copyWith(
+                                        color: FineTheme.palettes.shades100),
+                                  ),
+                                  const SizedBox(width: 2),
+                                  buildTimeBlock(
+                                      "${(time?.sec ?? 0) < 10 ? "0" : ""}${time?.sec ?? "0"}"),
+                                ],
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+
+                    Container(
                       color: FineTheme.palettes.shades100,
                       child: Column(
                         children: card,
@@ -225,6 +300,24 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
         // bottomNavigationBar: bottomBar(),
       ),
     );
+  }
+
+  Widget buildTimeBlock(String text) {
+    return Container(
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: FineTheme.palettes.primary50),
+            color: FineTheme.palettes.shades100),
+        padding: const EdgeInsets.all(4),
+        child: Center(
+          child: Text(
+            text,
+            style: FineTheme.typograhpy.subtitle2
+                .copyWith(color: FineTheme.palettes.primary100),
+          ),
+        ));
   }
 
   Widget _buildPartyList(Party party) {
