@@ -439,7 +439,7 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                     ],
                   ),
                 );
@@ -456,8 +456,8 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: 90,
-                    height: 90,
+                    width: Get.width * 0.2,
+                    height: Get.width * 0.2,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(100),
                       child: CacheImage(
@@ -551,7 +551,7 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                           Get.back();
                         },
                         child: Container(
-                          width: 100,
+                          width: Get.width * 0.25,
                           padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),

@@ -1209,6 +1209,7 @@ class _CartScreenState extends State<CartScreen>
   Widget bottomBar() {
     return ScopedModelDescendant<CartViewModel>(
       builder: (context, child, model) {
+        String totalString = model.total.toString().replaceAll('.', '');
         return Container(
           height: 220,
           padding: const EdgeInsets.fromLTRB(0, 0, 0, 120),
@@ -1364,7 +1365,9 @@ class _CartScreenState extends State<CartScreen>
                                   }
                             : null,
                         child: Container(
-                          width: 160,
+                          width: totalString.length > 6
+                              ? Get.width * 0.38
+                              : Get.width * 0.4,
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: Colors.white,
