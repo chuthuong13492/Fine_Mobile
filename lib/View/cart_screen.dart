@@ -219,6 +219,19 @@ class _CartScreenState extends State<CartScreen>
               DateFormat outputFormat = DateFormat('HH:mm');
               String arriveTime = outputFormat.format(arrive);
               String checkoutTime = outputFormat.format(checkout);
+              var timeslot = root.selectedTimeSlot?.closeTime;
+              final currentDate = DateTime.now();
+              String currentTimeSlot = timeslot!;
+              var beanTime = DateTime(
+                currentDate.year,
+                currentDate.month,
+                currentDate.day,
+                double.parse(currentTimeSlot.split(':')[0]).round(),
+                double.parse(currentTimeSlot.split(':')[1]).round(),
+              );
+
+              int differentTime =
+                  beanTime.difference(currentDate).inMilliseconds;
               final cart = model.currentCart;
               final reOrderList = model.reOrderList;
               List<CartItem>? itemsChecked;
@@ -352,6 +365,51 @@ class _CartScreenState extends State<CartScreen>
                     cart != null
                         ? Column(
                             children: [
+                              Container(
+                                color: FineTheme.palettes.primary300,
+                                padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      "Kết thúc đặt đơn:   ",
+                                      style: FineTheme.typograhpy.subtitle2
+                                          .copyWith(
+                                              color:
+                                                  FineTheme.palettes.shades100),
+                                    ),
+                                    Row(
+                                      children: [
+                                        buildTimeBlock(
+                                            "${(beanTime.hour ?? 0) < 10 ? "0" : ""}${beanTime.hour ?? "0"}"),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          ":",
+                                          style: FineTheme.typograhpy.h2
+                                              .copyWith(
+                                                  color: FineTheme
+                                                      .palettes.shades100),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        buildTimeBlock(
+                                            "${(beanTime.minute ?? 0) < 10 ? "0" : ""}${beanTime.minute ?? "0"}"),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          ":",
+                                          style: FineTheme.typograhpy.h2
+                                              .copyWith(
+                                                  color: FineTheme
+                                                      .palettes.shades100),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        buildTimeBlock(
+                                            "${(beanTime.second ?? 0) < 10 ? "0" : ""}${beanTime.second ?? "0"}"),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
                               hasVoucher
                                   ? Container(
                                       width: Get.width,
@@ -423,7 +481,7 @@ class _CartScreenState extends State<CartScreen>
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.only(
-                                              left: 8, top: 16),
+                                              left: 8, top: 4),
                                           child: Text(
                                             "Món trong 🛒",
                                             style:
@@ -695,6 +753,24 @@ class _CartScreenState extends State<CartScreen>
         ],
       ),
     );
+  }
+
+  Widget buildTimeBlock(String text) {
+    return Container(
+        width: 30,
+        height: 30,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(4),
+            border: Border.all(color: FineTheme.palettes.primary300),
+            color: FineTheme.palettes.shades100),
+        padding: const EdgeInsets.all(4),
+        child: Center(
+          child: Text(
+            text,
+            style: FineTheme.typograhpy.subtitle2
+                .copyWith(color: FineTheme.palettes.primary300),
+          ),
+        ));
   }
 
   Widget buildReOrder(

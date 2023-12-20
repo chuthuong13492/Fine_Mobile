@@ -78,6 +78,7 @@ class PartyOrderViewModel extends BaseModel {
       if (root.isNextDay == false) {
         isFinished = false;
         isConfirm = false;
+        isAdmin = true;
         if (isLinkedMode == true) {
           isLinked = isLinkedMode;
         }
@@ -240,15 +241,16 @@ class PartyOrderViewModel extends BaseModel {
     try {
       setState(ViewStatus.Loading);
 
-      await confirmationTimeout();
       if (isHome == true) {
         await getPartyOrder();
+        if (isAdmin == false) await confirmationTimeout();
         Get.toNamed(RouteHandler.PARTY_ORDER_SCREEN);
       } else {
         await getPartyOrder();
+        if (isAdmin == false) await confirmationTimeout();
         Get.offNamed(RouteHandler.PARTY_ORDER_SCREEN);
       }
-      await Future.delayed(const Duration(milliseconds: 1000));
+      await Future.delayed(const Duration(milliseconds: 500));
       setState(ViewStatus.Completed);
     } catch (e) {
       setState(ViewStatus.Error);
@@ -394,7 +396,7 @@ class PartyOrderViewModel extends BaseModel {
 
   Future<void> preCoOrder() async {
     try {
-      setState(ViewStatus.Loading);
+      // setState(ViewStatus.Loading);
       int option =
           await showOptionDialog("Bạn vui lòng xác nhận lại giỏ hàng nha 😊.");
 
@@ -440,15 +442,16 @@ class PartyOrderViewModel extends BaseModel {
       // _orderViewModel.orderDTO = orderDTO;
 
       notifyListeners();
-      setState(ViewStatus.Completed);
+      // setState(ViewStatus.Completed);
     } catch (e) {
-      setState(ViewStatus.Error);
+      await _productDAO?.logError(messageBody: e.toString());
+      // setState(ViewStatus.Error);
     }
   }
 
   Future<void> confirmationParty() async {
     try {
-      setState(ViewStatus.Loading);
+      // setState(ViewStatus.Loading);
       int? option;
       final cart = await getMart();
       if (cart == null) {
@@ -469,10 +472,11 @@ class PartyOrderViewModel extends BaseModel {
 
       await getPartyOrder();
       // Get.toNamed(RouteHandler.CONFIRM_ORDER_SCREEN);
-      setState(ViewStatus.Completed);
+      // setState(ViewStatus.Completed);
     } catch (e) {
+      await _productDAO?.logError(messageBody: e.toString());
       // partyOrderDTO = null;
-      setState(ViewStatus.Error);
+      // setState(ViewStatus.Error);
     }
   }
 
@@ -547,11 +551,9 @@ class PartyOrderViewModel extends BaseModel {
 
   Future<void> inviteParty(String cusId, String partyCode) async {
     try {
-      setState(ViewStatus.Loading);
       isInvited = await _partyDAO?.inviteToParty(cusId, partyCode);
-      setState(ViewStatus.Completed);
     } catch (e) {
-      setState(ViewStatus.Completed);
+      await _productDAO?.logError(messageBody: e.toString());
     }
   }
 
@@ -610,9 +612,10 @@ class PartyOrderViewModel extends BaseModel {
               }
             }
             await _cartViewModel.getCurrentCart();
+
+            await showStatusDialog("assets/images/icon-success.png",
+                "Thành công", "Hãy xem thử các món khác bạn nhé 😓");
             Get.back();
-            showStatusDialog("assets/images/icon-success.png", "Thành công",
-                "Hãy xem thử các món khác bạn nhé 😓");
           } else {
             await deletePartyCode();
             partyCode = await getPartyCode();
@@ -626,8 +629,9 @@ class PartyOrderViewModel extends BaseModel {
             "Chưa hủy đươc đơn bạn vui lòng thử lại nhé 😓",
           );
         }
+        notifyListeners();
+        setState(ViewStatus.Empty);
       }
-      setState(ViewStatus.Empty);
     } catch (e) {
       await showStatusDialog(
         "assets/images/error.png",
@@ -694,11 +698,12 @@ class PartyOrderViewModel extends BaseModel {
           partyCode = await getPartyCode();
           partyOrderDTO = null;
           if (isAdmin == false) {
+            await showStatusDialog("assets/images/logo2.png", "Đã thanh toán",
+                "Đơn nhóm đã được thanh toán thành công");
             if (Get.currentRoute == "/party_order_screen") {
               Get.back();
             }
-            showStatusDialog("assets/images/logo2.png", "Đã thanh toán",
-                "Đơn nhóm đã được thanh toán thành công");
+            setState(ViewStatus.Empty);
           }
         }
       }

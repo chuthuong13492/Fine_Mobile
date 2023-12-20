@@ -584,6 +584,7 @@ class CartViewModel extends BaseModel {
           case 4006:
             await showStatusDialog("assets/images/error.png", "Oops!!",
                 "1 khung giờ chỉ được đặt tối đa 2 đơn thui nè!");
+            await removeCart();
             return false;
           case 4002:
             await showStatusDialog("assets/images/error.png", "Oops!!",
