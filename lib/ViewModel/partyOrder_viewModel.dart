@@ -482,7 +482,7 @@ class PartyOrderViewModel extends BaseModel {
 
   Future<void> getCustomerByPhone(String phone) async {
     try {
-      setState(ViewStatus.Loading);
+      // setState(ViewStatus.Loading);
       String numericPhoneNumber = Uri.encodeComponent(phone);
       acount = await _partyDAO?.getCustomerByPhone(numericPhoneNumber);
       setState(ViewStatus.Completed);
@@ -508,7 +508,7 @@ class PartyOrderViewModel extends BaseModel {
       }
       // await showStatusDialog("assets/images/icon-success.png", 'Oops!!',
       //     'Hong có sđt này mất rùi');
-      setState(ViewStatus.Completed);
+      // setState(ViewStatus.Completed);
     }
   }
 
