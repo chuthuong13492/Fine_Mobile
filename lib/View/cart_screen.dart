@@ -1366,7 +1366,7 @@ class _CartScreenState extends State<CartScreen>
                             : null,
                         child: Container(
                           width: totalString.length > 6
-                              ? Get.width * 0.38
+                              ? Get.width * 0.36
                               : Get.width * 0.4,
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
@@ -1412,6 +1412,7 @@ class _CartScreenState extends State<CartScreen>
                                             : FineTheme.palettes.neutral700
                                     : FineTheme.palettes.neutral700,
                               ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),

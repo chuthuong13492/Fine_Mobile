@@ -551,7 +551,7 @@ class _HomeSpecifiHomeSectionState extends State<HomeSpecifiHomeSection> {
                           Get.back();
                         },
                         child: Container(
-                          width: Get.width * 0.25,
+                          width: Get.width * 0.22,
                           padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
