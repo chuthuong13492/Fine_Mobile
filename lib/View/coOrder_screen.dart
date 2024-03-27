@@ -163,18 +163,6 @@ class _PartyOrderScreenState extends State<PartyOrderScreen> {
                     for (var item in list!) {
                       card.add(_buildPartyList(item));
                     }
-                    // for (int i = 0; i < list.length; i++) {
-                    //   if (i % 2 != 0) {
-                    //     card.insert(
-                    //       i,
-                    //       Container(
-                    //         height: 24,
-                    //         color: FineTheme.palettes.neutral200,
-                    //       ),
-                    //     );
-                    //   }
-                    // }
-                    // checkAdmin = true;
                   } else {
                     user;
                     for (var item in user) {

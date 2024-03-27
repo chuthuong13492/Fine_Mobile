@@ -300,9 +300,9 @@ class OrderStatusDTO {
   });
 
   OrderStatusDTO.fromJson(Map<String, dynamic> json) {
-    orderStatus = json["OrderStatus"] as int;
+    orderStatus = json["orderStatus"] as int;
     // boxId = json["boxId"] as String;
-    stationName = json["StationName"] as String ?? null;
+    stationName = json["stationName"] as String ?? null;
   }
 
   static List<OrderStatusDTO> fromList(List<Map<String, dynamic>> list) {
