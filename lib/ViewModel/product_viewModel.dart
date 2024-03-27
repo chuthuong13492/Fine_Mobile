@@ -52,6 +52,7 @@ class ProductDetailViewModel extends BaseModel {
 
     if (selectAttribute == null) {
       if (master != null) {
+        master?.attributes?.sort((a, b) => a.price!.compareTo(b.price!));
         selectAttribute = master!.attributes![0];
         fixTotal = (selectAttribute!.price ?? 0) * count;
         // // total = fixTotal + extraTotal;

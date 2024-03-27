@@ -78,6 +78,7 @@ class PartyOrderViewModel extends BaseModel {
       if (root.isNextDay == false) {
         isFinished = false;
         isConfirm = false;
+        isAdmin = true;
         if (isLinkedMode == true) {
           isLinked = isLinkedMode;
         }
@@ -481,7 +482,7 @@ class PartyOrderViewModel extends BaseModel {
 
   Future<void> getCustomerByPhone(String phone) async {
     try {
-      setState(ViewStatus.Loading);
+      // setState(ViewStatus.Loading);
       String numericPhoneNumber = Uri.encodeComponent(phone);
       acount = await _partyDAO?.getCustomerByPhone(numericPhoneNumber);
       setState(ViewStatus.Completed);
@@ -507,7 +508,7 @@ class PartyOrderViewModel extends BaseModel {
       }
       // await showStatusDialog("assets/images/icon-success.png", 'Oops!!',
       //     'Hong có sđt này mất rùi');
-      setState(ViewStatus.Completed);
+      // setState(ViewStatus.Completed);
     }
   }
 
@@ -611,9 +612,10 @@ class PartyOrderViewModel extends BaseModel {
               }
             }
             await _cartViewModel.getCurrentCart();
+
+            await showStatusDialog("assets/images/icon-success.png",
+                "Thành công", "Hãy xem thử các món khác bạn nhé 😓");
             Get.back();
-            showStatusDialog("assets/images/icon-success.png", "Thành công",
-                "Hãy xem thử các món khác bạn nhé 😓");
           } else {
             await deletePartyCode();
             partyCode = await getPartyCode();
@@ -627,8 +629,9 @@ class PartyOrderViewModel extends BaseModel {
             "Chưa hủy đươc đơn bạn vui lòng thử lại nhé 😓",
           );
         }
+        notifyListeners();
+        setState(ViewStatus.Empty);
       }
-      setState(ViewStatus.Empty);
     } catch (e) {
       await showStatusDialog(
         "assets/images/error.png",
@@ -700,6 +703,7 @@ class PartyOrderViewModel extends BaseModel {
             if (Get.currentRoute == "/party_order_screen") {
               Get.back();
             }
+            setState(ViewStatus.Empty);
           }
         }
       }
