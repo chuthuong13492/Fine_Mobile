@@ -2,10 +2,13 @@ import 'package:fine/theme/FineTheme/index.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+// ignore: must_be_immutable
 class DefaultAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String? title;
   Widget? backButton;
-  DefaultAppBar({Key? key, @required this.title, this.backButton})
+  List<Widget>? actionButton;
+  DefaultAppBar(
+      {Key? key, @required this.title, this.backButton, this.actionButton})
       : super(key: key);
 
   @override
@@ -24,7 +27,7 @@ class _AppBarSate extends State<DefaultAppBar> {
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.white,
-      elevation: 2.0,
+      elevation: 0.6,
       centerTitle: true,
       // ignore: prefer_if_null_operators
       leading: widget.backButton != null
@@ -47,6 +50,7 @@ class _AppBarSate extends State<DefaultAppBar> {
       title: Text(widget.title!.toUpperCase(),
           style: FineTheme.typograhpy.h2
               .copyWith(color: FineTheme.palettes.primary100)),
+      actions: widget.actionButton ?? [],
     );
   }
 }

@@ -9,6 +9,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: FineTheme.palettes.shades100,
       body: Stack(
         children: [
@@ -58,7 +59,7 @@ class WelcomeScreen extends StatelessWidget {
               right: 18,
               child: InkWell(
                 onTap: () {
-                  Get.toNamed(RoutHandler.LOGIN);
+                  Get.toNamed(RouteHandler.LOGIN);
                 },
                 child: Image.asset(
                   "assets/icons/icon_right.png",

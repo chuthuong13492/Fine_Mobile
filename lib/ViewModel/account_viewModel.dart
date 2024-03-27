@@ -3,17 +3,20 @@ import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DAO/index.dart';
 import 'package:fine/Model/DTO/index.dart';
+import 'package:fine/Utils/platform.dart';
 import 'package:fine/ViewModel/base_model.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'root_viewModel.dart';
 
 class AccountViewModel extends BaseModel {
   late AccountDAO _dao;
   AccountDTO? currentUser;
+  String? version;
 
   AccountViewModel() {
     _dao = AccountDAO();
@@ -32,6 +35,11 @@ class AccountViewModel extends BaseModel {
 
       String? token = await getToken();
       print(token.toString());
+
+      if (version == null && isSmartPhoneDevice()) {
+        PackageInfo packageInfo = await PackageInfo.fromPlatform();
+        version = packageInfo.version;
+      }
       // if(currentUser.phone != null || currentUser.phone != ""){
 
       // }
@@ -67,7 +75,7 @@ class AccountViewModel extends BaseModel {
         // }
         // await Get.find<RootViewModel>().startUp();
         hideDialog();
-        Get.toNamed(RoutHandler.LOGIN);
+        Get.toNamed(RouteHandler.LOGIN);
       }
     } catch (e) {
       print(e);

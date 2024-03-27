@@ -7,16 +7,23 @@ import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/request.dart';
 
+import '../DTO/ConfirmCartDTO.dart';
+
 class OrderDAO extends BaseDAO {
+  Future<OrderDTO?> getOrderById(String? orderId) async {
+    // data["destination_location_id"] = destinationId;
+    final res = await request.get(
+      '/order/$orderId',
+    );
+    if (res.data['data'] != null) {
+      return OrderDTO.fromJson(res.data['data']);
+    }
+    return null;
+  }
+
   Future<List<OrderDTO>?> getOrders({int? page, int? size}) async {
     final res = await request.get(
       '/customer/orders',
-      queryParameters: {
-        // "order-status":
-        //     filter == OrderFilter.NEW ? ORDER_NEW_STATUS : ORDER_DONE_STATUS,
-        "size": size ?? DEFAULT_SIZE,
-        "page": page ?? 1,
-      },
     );
     if (res.statusCode == 200) {
       var listJson = res.data['data'] as List;
@@ -29,15 +36,12 @@ class OrderDAO extends BaseDAO {
 
   Future<List<OrderDTO>?> getMoreOrders({int? page, int? size}) async {
     final res = await request.get(
-      '/customer/orders?Page=$page',
+      '/customer/orders',
       queryParameters: {
-        // "order-status":
-        //     filter == OrderFilter.NEW ? ORDER_NEW_STATUS : ORDER_DONE_STATUS,
-        // "size": size ?? DEFAULT_SIZE,
-        // "page": page ?? 1,
+        "Page": page,
       },
     );
-    List<OrderDTO>? orderSummaryList;
+    // List<OrderDTO>? orderSummaryList;
     if (res.statusCode == 200) {
       var listJson = res.data['data'] as List;
       metaDataDTO = MetaDataDTO.fromJson(res.data["metadata"]);
@@ -47,18 +51,36 @@ class OrderDAO extends BaseDAO {
     return null;
   }
 
-  Future<OrderDTO?> prepareOrder(Cart cart) async {
-    if (cart != null) {
-      // print("Request Note: " + note);
-      final res = await request.post(
-        '/order/preOrder',
-        data: cart.toJsonAPi(),
-      );
-      if (res.statusCode == 200) {
-        return OrderDTO.fromJson(res.data['data']);
-      }
+  Future<OrderDTO?> prepareOrder(ConfirmCart cart) async {
+    final res = await request.post(
+      '/order/preOrder',
+      data: cart.toJsonAPi(),
+    );
+    if (res.statusCode == 200) {
+      return OrderDTO.fromJson(res.data['data']);
+    }
 
-      return null;
+    return null;
+  }
+
+  Future<OrderDTO?> prepareReOrder(String orderId, int orderType) async {
+    final res = await request.post('/order/reOrder', queryParameters: {
+      'orderId': orderId,
+      'orderType': orderType,
+    });
+    if (res.statusCode == 200) {
+      return OrderDTO.fromJson(res.data['data']['orderResponse']);
+    }
+
+    return null;
+  }
+
+  Future<OrderStatusDTO?> fetchOrderStatus(String orderCode) async {
+    final res = await request.get(
+      'order/status/$orderCode',
+    );
+    if (res.statusCode == 200) {
+      return OrderStatusDTO.fromJson(res.data['data']);
     }
     return null;
   }
@@ -74,28 +96,26 @@ class OrderDAO extends BaseDAO {
 
   Future<OrderStatus?> createOrders(OrderDTO orderDTO) async {
     try {
-      if (orderDTO != null) {
-        Map data = orderDTO.toJsonAPi();
-        // data["destination_location_id"] = destinationId;
-        final res = await request.post(
-          '/order',
-          data: data,
-        );
+      Map data = orderDTO.toJsonAPi();
+      // data["destination_location_id"] = destinationId;
+      final res = await request.post(
+        '/order',
+        data: data,
+      );
+      if (res.statusCode == 200) {
         return OrderStatus(
           statusCode: res.statusCode,
-          code: res.data['code'],
-          message: res.data['message'],
+          code: res.data['status']['errorCode'],
+          message: res.data['status']['message'],
           order: OrderDTO.fromJson(res.data['data']),
         );
       }
+      return null;
     } on DioError catch (e) {
       return OrderStatus(
-          statusCode: e.response!.statusCode,
-          code: e.response!.data['code'],
+          statusCode: e.response!.data["statusCode"],
+          code: e.response!.data['errorCode'],
           message: e.response!.data['message']);
-    } catch (e) {
-      throw e;
     }
-    return null;
   }
 }

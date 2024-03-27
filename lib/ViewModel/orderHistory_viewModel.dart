@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:fine/Accessories/dialog.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Utils/constrant.dart';
@@ -13,14 +15,18 @@ class OrderHistoryViewModel extends BaseModel {
   List<OrderDTO> orderThumbnail = [];
   OrderDAO? _orderDAO;
   dynamic error;
-  OrderDTO? orderDetail;
+  OrderDTO? orderDTO;
+  StationDAO? _stationDAO;
   ScrollController? scrollController;
   List<bool> selections = [true, false];
   OrderDTO? newTodayOrders;
+  Uint8List? imageBytes;
+  bool? isOrderCancel;
 
-  OrderHistoryViewModel({OrderDTO? dto}) {
-    orderDetail = dto;
+  OrderHistoryViewModel() {
+    // orderDTO = dto;
     _orderDAO = OrderDAO();
+    _stationDAO = StationDAO();
     scrollController = ScrollController();
     scrollController!.addListener(() async {
       if (scrollController!.position.pixels ==
@@ -33,25 +39,32 @@ class OrderHistoryViewModel extends BaseModel {
     });
   }
 
-  // Future<void> changeStatus(int index) async {
-  //   selections = selections.map((e) => false).toList();
-  //   selections[index] = true;
-  //   notifyListeners();
-  //   await getOrders();
-  // }
+  Future<void> changeStatus(int index) async {
+    selections = selections.map((e) => false).toList();
+    selections[index] = true;
+    notifyListeners();
+    await getOrders();
+  }
+
   Future<void> getOrders() async {
     try {
       setState(ViewStatus.Loading);
-      // OrderFilter filter = selections[0] ? OrderFilter.NEW : OrderFilter.DONE;
-      final data = await _orderDAO?.getOrders();
-      orderThumbnail = data!;
-      // if (_orderDAO!.metaDataDTO.size! != _orderDAO!.metaDataDTO.total!) {
-      //   int size = _orderDAO!.metaDataDTO.total!;
-      //   final data = await _orderDAO?.getOrders(size: size);
-      //   orderThumbnail = data!;
-      // }
 
-      // print(size);
+      if (selections[0] == true) {
+        final data = await _orderDAO?.getOrders();
+        orderThumbnail = data!
+            .where((element) =>
+                element.orderStatus != 10 && element.orderStatus != 11)
+            .toList();
+      }
+      if (selections[1] == true) {
+        final data = await _orderDAO?.getOrders();
+        orderThumbnail = data!
+            .where((element) =>
+                element.orderStatus == 10 || element.orderStatus == 11)
+            .toList();
+      }
+
       setState(ViewStatus.Completed);
       // notifyListeners();
     } catch (e) {
@@ -64,16 +77,26 @@ class OrderHistoryViewModel extends BaseModel {
     } finally {}
   }
 
+  Future<void> getOrderByOrderId({String? id}) async {
+    try {
+      setState(ViewStatus.Loading);
+
+      orderDTO = await _orderDAO?.getOrderById(id);
+
+      setState(ViewStatus.Completed);
+      notifyListeners();
+    } catch (e) {
+      setState(ViewStatus.Error, e.toString());
+    }
+  }
+
   Future<void> getNewOrder() async {
     try {
       setState(ViewStatus.Loading);
       final data = await _orderDAO?.getOrders();
       final currentDateData = data?.firstWhere(
           (orderSummary) =>
-              DateTime.parse(orderSummary.checkInDate!)
-                  .difference(DateTime.now())
-                  .inDays ==
-              0,
+              orderSummary.checkInDate!.difference(DateTime.now()).inDays == 0,
           orElse: () => null as dynamic);
       if (currentDateData != null) {
         orderThumbnail.add(currentDateData);
@@ -95,7 +118,6 @@ class OrderHistoryViewModel extends BaseModel {
       int option = await showOptionDialog("Hãy thử những món khác bạn nhé 😥.");
       if (option == 1) {
         showLoadingDialog();
-        // CampusDTO storeDTO = await getStore();
         final success = await _orderDAO?.cancelOrder(orderId);
         if (success!) {
           clearNewOrder(orderId);
@@ -125,12 +147,25 @@ class OrderHistoryViewModel extends BaseModel {
     notifyListeners();
   }
 
+  Future<void> getBoxQrCode(String orderId) async {
+    try {
+      setState(ViewStatus.Loading);
+      if (orderId != null) {
+        final qrcode = await _stationDAO!.getBoxById(orderId);
+        imageBytes = qrcode;
+      }
+      await Future.delayed(const Duration(milliseconds: 200));
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      imageBytes = null;
+      print(e.toString());
+      setState(ViewStatus.Completed);
+    }
+  }
+
   Future<void> getMoreOrders() async {
     try {
       setState(ViewStatus.LoadMore);
-      // OrderFilter filter =
-      //     selections[0] ? OrderFilter.ORDERING : OrderFilter.DONE;
-
       final data = await _orderDAO?.getMoreOrders(
           page: _orderDAO!.metaDataDTO.page! + 1);
 

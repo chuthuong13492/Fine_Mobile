@@ -13,9 +13,9 @@ class CacheImage extends StatelessWidget {
         // color: Colors.grey[200],
         decoration: BoxDecoration(
           color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(100),
         ),
-        child: Center(
+        child: const Center(
             child: FittedBox(
           fit: BoxFit.fitWidth,
           child: Text(
@@ -48,7 +48,10 @@ class CacheImage extends StatelessWidget {
         child: Container(
           width: MediaQuery.of(context).size.width,
           // height: 100,
-          color: Colors.grey,
+          decoration: BoxDecoration(
+            color: Colors.grey,
+            borderRadius: BorderRadius.circular(100),
+          ),
         ),
       ),
       errorWidget: (context, url, error) => Container(
@@ -57,7 +60,7 @@ class CacheImage extends StatelessWidget {
           color: Colors.grey[200],
           borderRadius: BorderRadius.circular(100),
         ),
-        child: Center(
+        child: const Center(
             child: FittedBox(
           fit: BoxFit.fitWidth,
           child: Text(
@@ -85,7 +88,7 @@ class CacheStoreImage extends StatelessWidget {
         // color: Colors.grey[200],
         decoration: BoxDecoration(
           color: Colors.grey[200],
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(100),
         ),
         child: Center(
             child: FittedBox(
@@ -128,7 +131,7 @@ class CacheStoreImage extends StatelessWidget {
           color: Colors.grey[200],
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Center(
+        child: const Center(
             child: FittedBox(
           fit: BoxFit.fitWidth,
           child: Text(

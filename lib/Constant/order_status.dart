@@ -2,7 +2,7 @@ import 'package:fine/Model/DTO/OrderDTO.dart';
 
 class OrderStatus {
   int? statusCode;
-  String? code;
+  int? code;
   String? message;
   OrderDTO? order;
 

@@ -36,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return ScopedModel(
-      model: LoginViewModel(),
+      model: Get.find<LoginViewModel>(),
       child: Scaffold(
         body: getBody(),
       ),
@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height,
-      padding: EdgeInsets.fromLTRB(0, 150, 0, 150),
+      padding: const EdgeInsets.fromLTRB(0, 150, 0, 150),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -1,13 +1,15 @@
 class AccountDTO {
-  int? id;
+  String? id;
   String? name;
   String? customerCode;
   String? email;
   String? phone;
+  double? balance;
   DateTime? dateOfBirth;
   String? imageUrl;
-  int? universityId;
-  int? uniInfoId;
+  // bool? isFirstLogin;
+  // int? universityId;
+  // int? uniInfoId;
   DateTime? createAt;
   DateTime? updateAt;
 
@@ -17,25 +19,30 @@ class AccountDTO {
       this.customerCode,
       this.email,
       this.phone,
+      this.balance,
       this.dateOfBirth,
       this.imageUrl,
-      this.universityId,
-      this.uniInfoId,
+      // this.isFirstLogin = true,
+      // this.universityId,
+      // this.uniInfoId,
       this.createAt,
       this.updateAt});
 
   AccountDTO.fromJson(Map<String, dynamic> json) {
-    id = json["id"];
+    id = json["id"] as String;
     name = json["name"];
     customerCode = json["customerCode"];
     email = json["email"];
-    phone = json["phone"];
+    phone = json["phone"] ?? null;
+    balance = json["balance"] ?? null;
     dateOfBirth = json['dateOfBirth'] as String != null
         ? DateTime.parse(json['dateOfBirth'] as String)
         : null;
     imageUrl = json["imageUrl"];
-    universityId = json["universityId"];
-    uniInfoId = json["uniInfoId"];
+    // isFirstLogin:
+    // (json['isFirstLogin'] as bool) ?? false;
+    // universityId = json["universityId"];
+    // uniInfoId = json["uniInfoId"];
     createAt = json['createAt'] as String != null
         ? DateTime.parse(json['createAt'] as String)
         : null;
@@ -57,8 +64,8 @@ class AccountDTO {
     _data["phone"] = phone;
     _data["dateOfBirth"] = dateOfBirth;
     _data["imageUrl"] = imageUrl;
-    _data["universityId"] = universityId;
-    _data["uniInfoId"] = uniInfoId;
+    // _data["universityId"] = universityId;
+    // _data["uniInfoId"] = uniInfoId;
     _data["createAt"] = createAt;
     _data["updateAt"] = updateAt;
     return _data;

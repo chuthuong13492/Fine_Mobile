@@ -14,10 +14,11 @@ import 'BaseDAO.dart';
 // TODO: Test Start_up Screen + FCM TOken
 
 class AccountDAO extends BaseDAO {
-  Future<AccountDTO?> login(String idToken, String fcmToken) async {
+  Future<AccountDTO?> login(
+      String idToken, String fcmToken, bool isPhone) async {
     try {
       Response response = await request.post("customer/login",
-          data: {"idToken": idToken, 'fcmToken': fcmToken});
+          data: {"idToken": idToken, 'fcmToken': fcmToken, 'isPhone': isPhone});
       final user = response.data['data'];
       final userDTO = AccountDTO.fromJson(user['customer']);
       final accessToken = user["access_token"] as String;
@@ -39,7 +40,7 @@ class AccountDAO extends BaseDAO {
   }
 
   Future<AccountDTO> getUser() async {
-    Response response = await request.get("/customer/Authorization");
+    Response response = await request.get("/customer/authorization");
     // set access token
     final user = response.data['data'];
     return AccountDTO.fromJson(user);
@@ -77,10 +78,27 @@ class AccountDAO extends BaseDAO {
     await request.post("/customer/logout", data: {"fcmToken": fcmToken});
   }
 
-  Future<AccountDTO> updateUser(AccountDTO updateUser) async {
-    var dataJson = updateUser.toJson();
-    Response res = await request.put("users/me", data: dataJson);
-    return AccountDTO.fromJson(res.data);
+  Future<AccountDTO?> updateUser(AccountDTO updateUser) async {
+    AccountDTO? acc;
+    Response? res;
+    if (updateUser.phone != null) {
+      res = await request.put("/customer?Phone=${updateUser.phone}");
+      acc = AccountDTO.fromJson(res.data);
+    }
+    if (updateUser.name != null) {
+      res = await request.put("/customer?Name=${updateUser.name}");
+      acc = AccountDTO.fromJson(res.data);
+    }
+    // var dataJson = updateUser.toJson();
+    return acc;
+  }
+
+  Future<String?> getCurrentTime() async {
+    final res = await request.get("/customer/time");
+    if (res.data != null) {
+      return res.data;
+    }
+    return null;
   }
 
   // Future<UserWallet> linkAccountToWallet(String phone) async {

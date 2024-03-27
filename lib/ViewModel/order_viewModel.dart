@@ -1,76 +1,110 @@
+import 'dart:async';
+import 'dart:ffi';
+
 import 'package:dio/dio.dart';
 import 'package:fine/Accessories/dialog.dart';
+import 'package:fine/Accessories/index.dart';
 import 'package:fine/Constant/order_status.dart';
 import 'package:fine/Constant/route_constraint.dart';
+import 'package:fine/Constant/stationList_status.dart';
 import 'package:fine/Constant/view_status.dart';
 import 'package:fine/Model/DTO/CartDTO.dart';
 import 'package:fine/Model/DTO/index.dart';
 import 'package:fine/Service/analytic_service.dart';
+import 'package:fine/Utils/constrant.dart';
 import 'package:fine/Utils/shared_pref.dart';
 import 'package:fine/ViewModel/account_viewModel.dart';
 import 'package:fine/ViewModel/base_model.dart';
+import 'package:fine/ViewModel/cart_viewModel.dart';
+import 'package:fine/ViewModel/home_viewModel.dart';
 import 'package:fine/ViewModel/orderHistory_viewModel.dart';
+import 'package:fine/ViewModel/partyOrder_viewModel.dart';
+import 'package:fine/ViewModel/product_viewModel.dart';
 import 'package:fine/ViewModel/root_viewModel.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../Model/DAO/index.dart';
+import '../Model/DTO/ConfirmCartDTO.dart';
 
 class OrderViewModel extends BaseModel {
-  Cart? currentCart;
+  ConfirmCart? currentCart;
   OrderDAO? _dao;
+  ProductDAO? _productDAO;
+  StationDAO? _stationDAO;
   OrderDTO? orderDTO;
-  bool? loadingUpsell;
+  OrderStatusDTO? orderStatusDTO;
+  PartyOrderDTO? partyOrderDTO;
+  PartyOrderDAO? _partyDAO;
+  List<StationDTO>? stationList;
+  List<ProductInCart>? productRecomend;
+  bool? isPartyOrder;
+  bool? isLinked;
+  bool? isCreate;
+  String? codeParty;
   String? errorMessage;
   List<String> listError = <String>[];
+  RootViewModel? root = Get.find<RootViewModel>();
+
+  final ValueNotifier<int> notifierTimeRemaining = ValueNotifier(0);
+  int? timeRemaining;
 
   OrderViewModel() {
-    _dao = new OrderDAO();
-    // promoDao = new PromotionDAO();
-    // _collectionDAO = CollectionDAO();
-    loadingUpsell = false;
+    _dao = OrderDAO();
+    _stationDAO = StationDAO();
+    _partyDAO = PartyOrderDAO();
+    _productDAO = ProductDAO();
+    // isPartyOrder = false;
     currentCart = null;
+    codeParty = null;
   }
 
   Future<void> prepareOrder() async {
+    // final party = Get.find<PartyOrderViewModel>();
     try {
-      if (Get.isDialogOpen!) {
+      if (!Get.isDialogOpen!) {
         setState(ViewStatus.Loading);
       }
-      // if (campusDTO == null) {
-      //   RootViewModel root = Get.find<RootViewModel>();
-      //   campusDTO = root.currentStore;
-      // }
-      AccountViewModel accountRoot = Get.find<AccountViewModel>();
-      AccountDTO? user = accountRoot.currentUser!;
-      RootViewModel root = Get.find<RootViewModel>();
-      currentCart = await getCart();
+      codeParty = await getPartyCode();
+      isLinked = false;
+      isCreate = false;
+      if (codeParty != null) {
+        if (codeParty!.contains("LPO")) {
+          isLinked = true;
+        } else {
+          isPartyOrder = true;
+          isLinked = false;
+        }
+      } else {
+        isPartyOrder = false;
+      }
+      await getCurrentCart();
+      if (currentCart != null) {
+        if (currentCart!.orderDetails!.isEmpty &&
+            currentCart?.partyType == null) {
+          Get.back();
+          Get.find<PartyOrderViewModel>().isLinked = false;
+          isLinked = false;
+          // await removeCart();
+          if (notifierTimeRemaining.value > 0) {
+            await delLockBox();
+          }
+          await deletePartyCode();
+        }
+      }
+      // isPartyOrder = false;
+      if (isPartyOrder == true && isPartyOrder != null) {
+        productRecomend = [];
+      }
 
-      currentCart?.addProperties(user.phone!, root.selectedTimeSlot!.id!);
-      // currentCart?.addProperties(5, '0902915671', root.selectedTimeSlot!.id!);
-      // currentCart = await getCart();
-
-      // await deleteCart();
-      // await deleteMart();
-      //       if (currentCart.payment == null) {
-      //   if (listPayments.values.contains(1)) {
-      //     currentCart.payment = PaymentTypeEnum.Cash;
-      //   }
-      // }
-      // if (currentCart.timeSlotId == null) {
-      //   if (Get.find<RootViewModel>().listAvailableTimeSlots.isNotEmpty) {
-      //     currentCart.timeSlotId =
-      //         Get.find<RootViewModel>().listAvailableTimeSlots[0].id;
-      //   } else {
-      //     errorMessage = "Hiện tại đã hết khung giờ giao hàng";
-      //   }
-      // }
       listError.clear();
       if (currentCart != null) {
         orderDTO = await _dao?.prepareOrder(currentCart!);
+
         // Get.back();
       } else {
-        await deleteCart();
-        await deleteMart();
+        // await removeCart();
+        // await getCurrentCart();
         Get.back();
       }
 
@@ -78,17 +112,25 @@ class OrderViewModel extends BaseModel {
       hideDialog();
       setState(ViewStatus.Completed);
     } on DioError catch (e, stacktra) {
+      RootViewModel root = Get.find<RootViewModel>();
       print(stacktra.toString());
-      if (e.response?.statusCode == 400) {
-        String errorMsg = e.response?.data["message"];
-        errorMessage = errorMsg;
-        if (e.response?.data['data'] != null) {
-          // orderAmount = OrderAmountDTO.fromJson(e.response.data['data']);
+      if (e.response?.data["statusCode"] == 400) {
+        if (e.response?.data["errorCode"] == 4002) {
+          errorMessage = e.response?.data["message"];
+          showStatusDialog("assets/images/error.png", "Hết món!!",
+              "Món này đã hết mất rồiii");
+        } else {
+          String errorMsg = e.response?.data["message"];
+          errorMessage = errorMsg;
+          Get.back;
+          showStatusDialog("assets/images/error.png", "Khung giờ đã qua rồi",
+              "Hiện tại khung giờ này đã đóng vào lúc ${root.selectedTimeSlot!.closeTime}, bạn hãy xem khung giờ khác nhé 😃.");
         }
+
         setState(ViewStatus.Completed);
-      } else if (e.response?.statusCode == 404) {
+      } else if (e.response?.data["statusCode"] == 404) {
         if (e.response?.data["error"] != null) {
-          setCart(currentCart!);
+          // setCart(currentCart!);
           setState(ViewStatus.Completed);
         }
       } else {
@@ -102,43 +144,175 @@ class OrderViewModel extends BaseModel {
     }
   }
 
-  Future<void> orderCart() async {
+  Future<void> getListStation() async {
     try {
-      int option =
-          await showOptionDialog("Bạn vui lòng xác nhận lại giỏ hàng nha 😊.");
-
-      if (option != 1) {
-        return;
+      setState(ViewStatus.Loading);
+      StationStatus? station = await _stationDAO?.getStationList(
+          DESTINATIONID, orderDTO!.boxQuantity!, orderDTO!.orderCode!);
+      if (station?.listStation != null) {
+        stationList = station?.listStation;
       }
-      showLoadingDialog();
-      // LocationDTO location =
-      //     campusDTO.locations.firstWhere((element) => element.isSelected);
+      notifierTimeRemaining.value = station!.countDown!;
+      timeRemaining = station.countDown;
+      Timer.periodic(const Duration(seconds: 1), (timer) async {
+        if (notifierTimeRemaining.value > 0) {
+          notifierTimeRemaining.value--;
+        } else {
+          timer.cancel();
+          if (isCreate == false) {
+            if (orderDTO?.stationDTO != null) {
+              await delLockBox();
+            }
+          }
+          if (Get.currentRoute == "/station_picker_screen") {
+            Get.back();
+          }
+        }
+      });
 
-      // DestinationDTO destination =
-      //     location.destinations.firstWhere((element) => element.isSelected);
-      OrderStatus? result = await _dao?.createOrders(orderDTO!);
-      // await Get.find<AccountViewModel>().fetchUser();
-      if (result!.statusCode == 200) {
-        await removeCart();
-        hideDialog();
-        await showStatusDialog("assets/images/icon-success.png", 'Success',
-            'Bạn đã đặt hàng thành công');
-        // await Get.find<OrderHistoryViewModel>().getOrders();
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      stationList = null;
+      setState(ViewStatus.Error);
+    }
+  }
 
-        await Get.find<OrderHistoryViewModel>().getNewOrder();
-        // Get.offAndToNamed(
-        //   RoutHandler.ORDER_HISTORY_DETAIL,
-        //   arguments: result.order,
-        // );
-        Get.offAndToNamed(RoutHandler.NAV);
-        // prepareOrder();
-        // Get.back(result: true);
+  Future<void> addStationToCart(StationDTO? dto) async {
+    try {
+      if (orderDTO!.stationDTO != null) {
+        if (notifierTimeRemaining.value > 0) {
+          orderDTO!.stationDTO = null;
+          orderDTO!.stationDTO = dto;
+          await _stationDAO?.changeStation(orderDTO!.orderCode!, 2,
+              stationId: orderDTO!.stationDTO!.id!);
+        } else {
+          showStatusDialog("assets/images/logo2.png", "Đã lố thời gian",
+              "Thời gian giao dịch đã hết!");
+          await delLockBox();
+          orderDTO!.stationDTO = null;
+
+          Get.back();
+        }
       } else {
-        hideDialog();
-        await showStatusDialog(
-            "assets/images/error.png", result.code!, result.message!);
+        orderDTO!.stationDTO = dto;
+        final isLockBox = await _stationDAO?.lockBoxOrder(
+            orderDTO!.stationDTO!.id!,
+            orderDTO!.orderCode!,
+            orderDTO!.boxQuantity!);
+      }
+      notifyListeners();
+    } catch (e) {
+      orderDTO?.stationDTO = null;
+    }
+  }
+
+  Future<void> delLockBox() async {
+    try {
+      timeRemaining = 0;
+      notifierTimeRemaining.value = 0;
+      orderDTO!.stationDTO = null;
+      await _stationDAO?.changeStation(orderDTO!.orderCode!, 1);
+      notifyListeners();
+    } catch (e) {
+      orderDTO!.stationDTO = null;
+      throw e;
+    }
+  }
+
+  Future<void> orderCart() async {
+    final partyModel = Get.find<PartyOrderViewModel>();
+    final cartModel = Get.find<CartViewModel>();
+    final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
+    try {
+      if (orderDTO!.stationDTO == null) {
+        showStatusDialog("assets/icons/box_icon.png", "Opps",
+            "Bạn chưa chọn nơi nhận kìa 🥹");
+      } else {
+        final otherAmounts =
+            orderDTO!.otherAmounts!.firstWhere((element) => element.type == 1);
+        int option = await showConfirmOrderDialog(
+            orderDTO!.itemQuantity!,
+            orderDTO!.totalAmount!,
+            otherAmounts.amount!,
+            orderDTO!.finalAmount!);
+
+        if (option != 1) {
+          return;
+        }
+
+        final code = await getPartyCode();
+        if (code != null) {
+          orderDTO!.addProperties(code);
+        }
+        OrderStatus? result;
+        if (orderDTO!.stationDTO != null && notifierTimeRemaining.value != 0) {
+          result = await _dao?.createOrders(orderDTO!);
+        } else {
+          showStatusDialog("assets/images/logo2.png", "Quá thời gian",
+              "Đã quá thời gian đặt đơn hàng 🥺");
+          return;
+        }
+
+        if (result != null) {
+          if (result.statusCode == 200) {
+            isCreate = true;
+            timeRemaining = 0;
+            notifierTimeRemaining.value = 0;
+            await fetchStatus(result.order!.orderCode!);
+            orderHistoryViewModel.orderDTO = result.order;
+            // await showStatusDialog("assets/images/icon-success.png", 'Success',
+            //     'Bạn đã đặt hàng thành công');
+
+            await Get.offAndToNamed(RouteHandler.CHECKING_ORDER_SCREEN,
+                arguments: {"order": result.order});
+            final cart = await getMart();
+            if (cart != null) {
+              for (var item in cart.orderDetails!) {
+                CartItem cartItem = CartItem(item.productId, "", "", "", 0, 0,
+                    0, 0, 0, 0, item.quantity, false, false, false);
+                await removeItemFromCart(cartItem);
+              }
+            }
+            await deleteMart();
+            // cartModel.total = 0;
+            // cartModel.quantityChecked = 0;
+            // cartModel.notifier.value = 0;
+            await cartModel.getCurrentCart();
+            await deletePartyCode();
+            partyModel.partyOrderDTO = null;
+            partyModel.partyCode = null;
+            partyModel.isLinked = false;
+          } else if (result.statusCode == 400) {
+            orderDTO!.stationDTO = null;
+            await delLockBox();
+            Get.back();
+            String errorMsg = result.message!;
+            errorMessage = errorMsg;
+            await showStatusDialog(
+                "assets/images/error.png", "Oops!", "Số dư trong ví hong đủ!!");
+            setState(ViewStatus.Completed);
+          } else if (result.statusCode == 404) {
+            orderDTO!.stationDTO = null;
+            await delLockBox();
+            String errorMsg = result.message!;
+            errorMessage = errorMsg;
+            await showStatusDialog(
+                "assets/images/error.png", "Oops!", errorMessage!);
+            setState(ViewStatus.Completed);
+          }
+        } else {
+          bool result = await showErrorDialog();
+          if (result) {
+            await prepareOrder();
+          } else {
+            setState(ViewStatus.Error);
+          }
+        }
+
+        notifyListeners();
       }
     } catch (e) {
+      await _productDAO?.logError(messageBody: e.toString());
       bool result = await showErrorDialog();
       if (result) {
         await prepareOrder();
@@ -148,66 +322,77 @@ class OrderViewModel extends BaseModel {
     }
   }
 
-  Future<void> deleteItem(OrderDetails item) async {
-    // showLoadingDialog();
-    print("Delete item...");
-    bool result;
-    ProductDTO product =
-        new ProductDTO(id: item.productInMenuId, productName: item.productName);
-    CartItem cartItem =
-        new CartItem(item.productInMenuId, 0, item.quantity, null);
-    result = await removeItemFromCart(cartItem);
-    print("Result: $result");
-    if (result) {
-      await AnalyticsService.getInstance()
-          ?.logChangeCart(product, item.quantity, false);
-      // Get.back(result: true);
-      await prepareOrder();
-    } else {
-      currentCart = await getCart();
+  Future<void> addProductRecommend(ProductAttributes attr, bool isAdded) async {
+    if (isAdded == true) {
+      final cart = await getCart();
+      final itemCart =
+          cart!.items!.firstWhere((element) => element.productId == attr.id);
+      await Get.find<CartViewModel>().changeValueChecked(true, itemCart);
+      if (notifierTimeRemaining.value > 0) {
+        await delLockBox();
+      }
       await prepareOrder();
     }
   }
 
-  Future<void> updateQuantity(OrderDetails item) async {
-    // showLoadingDialog();
-    // if (item.master.type == ProductType.GIFT_PRODUCT) {
-    //   int originalQuantity = 0;
-    //   AccountViewModel account = Get.find<AccountViewModel>();
-    //   if (account.currentUser == null) {
-    //     await account.fetchUser();
-    //   }
-    //   double totalBean = account.currentUser.point;
-
-    //   currentCart.items.forEach((element) {
-    //     if (element.master.type == ProductType.GIFT_PRODUCT) {
-    //       if (element.master.id != item.master.id) {
-    //         totalBean -= (element.master.price * element.quantity);
-    //       } else {
-    //         originalQuantity = element.quantity;
-    //       }
-    //     }
-    //   });
-
-    //   if (totalBean < (item.master.price * item.quantity)) {
-    //     await showStatusDialog("assets/images/global_error.png",
-    //         "Không đủ bean", "Số bean hiện tại không đủ");
-    //     item.quantity = originalQuantity;
-    //     hideDialog();
-    //     return;
-    //   }
-    // }
-    CartItem cartItem =
-        new CartItem(item.productInMenuId, 0, item.quantity, null);
-    await updateItemFromCart(cartItem);
-    await prepareOrder();
-    // notifyListeners();
+  Future<void> createReOrder(String orderId) async {
+    try {
+      setState(ViewStatus.Loading);
+      orderDTO =
+          await _dao?.prepareReOrder(orderId, root!.isNextDay == true ? 2 : 1);
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      setState(ViewStatus.Error);
+    }
   }
 
-  Future<void> removeCart() async {
-    await deleteCart();
-    await deleteMart();
-    currentCart = null;
-    notifyListeners();
+  Future<void> fetchStatus(String orderCode) async {
+    try {
+      setState(ViewStatus.Loading);
+      orderStatusDTO = await _dao!.fetchOrderStatus(orderCode);
+      if (orderStatusDTO != null) {
+        if (orderStatusDTO?.orderStatus == 13) {
+          if (Get.currentRoute == "/checking_order_screen" ||
+              Get.currentRoute == "/order_detail") {
+            await Get.find<OrderHistoryViewModel>().getOrders();
+            Get.back();
+          }
+          showStatusDialog(
+              "assets/images/logo2.png", "Oops!", "Đơn hàng đã bị hủy mất rùi");
+        } else if (orderStatusDTO?.orderStatus == 11 &&
+            Get.currentRoute == '/qrcode_screen') {
+          final orderHistoryViewModel = Get.find<OrderHistoryViewModel>();
+          await orderHistoryViewModel.getOrders();
+          await orderHistoryViewModel.getOrderByOrderId(id: orderCode);
+          if (orderHistoryViewModel.orderDTO != null) {
+            Get.offAndToNamed(RouteHandler.ORDER_HISTORY_DETAIL,
+                arguments: orderHistoryViewModel.orderDTO);
+            await showStatusDialog("assets/images/icon-success.png",
+                "Lấy hàng thành công", "Bạn đã lấy hàng thành công rùi nè");
+          }
+        }
+      }
+      setState(ViewStatus.Completed);
+    } catch (e) {
+      setState(ViewStatus.Completed);
+    }
+  }
+
+  Future<void> getCurrentCart() async {
+    try {
+      setState(ViewStatus.Loading);
+      RootViewModel root = Get.find<RootViewModel>();
+      if (isPartyOrder == false || isPartyOrder == null) {
+        currentCart = await getMart();
+        currentCart?.addProperties(root.isNextDay == true ? 2 : 1);
+      }
+
+      setState(ViewStatus.Completed);
+
+      notifyListeners();
+    } catch (e) {
+      // currentCart = null;
+      setState(ViewStatus.Completed);
+    }
   }
 }

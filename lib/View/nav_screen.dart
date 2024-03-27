@@ -1,18 +1,31 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:fine/Accessories/cart_button.dart';
-import 'package:fine/View/barcode_screen.dart';
+import 'package:fine/View/cart_screen.dart';
+import 'package:fine/View/qrcode_screen.dart';
 import 'package:fine/View/box_screen.dart';
-import 'package:fine/View/home.dart';
-import 'package:fine/View/order_history.dart';
+import 'package:fine/View/Home/home.dart';
+import 'package:fine/View/OrderScreen/order_history.dart';
 import 'package:fine/View/profile.dart';
 import 'package:fine/Utils/constrant.dart';
+import 'package:fine/ViewModel/cart_viewModel.dart';
+import 'package:fine/ViewModel/orderHistory_viewModel.dart';
+import 'package:fine/ViewModel/root_viewModel.dart';
 import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/theme/color.dart';
 import 'package:fine/widgets/bottom_bar_item.dart';
 import 'package:fine/widgets/cruved_navigation_bar.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flash/flash.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
+
+import '../Accessories/dialog.dart';
+import '../Model/DTO/index.dart';
+import '../Utils/shared_pref.dart';
+import '../ViewModel/partyOrder_viewModel.dart';
 
 class RootScreen extends StatefulWidget {
   final int initScreenIndex;
@@ -23,6 +36,137 @@ class RootScreen extends StatefulWidget {
 }
 
 class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
+  PartyOrderViewModel party = Get.find<PartyOrderViewModel>();
+  Future listenFireBaseMessages() async {
+    FirebaseMessaging.onMessage.listen((event) async {
+      hideSnackbar();
+      RemoteNotification? notification;
+      if (event.notification != null) {
+        notification = event.notification!;
+      }
+
+      switch (event.data["type"]) {
+        case 'ForInvitation':
+          int option = await showOptionDialog('${notification!.body}');
+          if (option == 1) {
+            await deletePartyCode();
+            String code = event.data['key'];
+            await party.joinPartyOrder(code: code);
+            hideDialog();
+          }
+          break;
+        case 'ForPopup':
+          await showStatusDialog("assets/images/icon-success.png",
+              notification!.title!, notification.body!);
+          break;
+        case 'forOrderCancel':
+          final model = Get.find<OrderHistoryViewModel>();
+          model.isOrderCancel = true;
+          break;
+        case "ForCoOrderRemove":
+          deletePartCart();
+          deletePartyCode();
+          party.partyCode = null;
+          party.partyOrderDTO = null;
+          final cart = await getCart();
+          if (cart != null) {
+            final listItem = cart.items!
+                .where((element) => element.isAddParty == true)
+                .toList();
+            for (var item in listItem) {
+              await updateAddedItemtoCart(item, false);
+            }
+          }
+          Get.find<CartViewModel>().getCurrentCart();
+          await showStatusDialog("assets/images/error.png", "Oops!",
+              "Bạn hong có trong party này!!");
+          break;
+        case 'ForFinishOrder':
+          // OrderDTO? dto;
+          // if (event.data["orderId"] != null) {
+          //   await Get.find<OrderHistoryViewModel>()
+          //       .getOrderByOrderId(id: event.data["orderId"]);
+          //   if (Get.find<OrderHistoryViewModel>().orderDTO != null) {
+          //     if (Get.find<OrderHistoryViewModel>().orderDTO!.id ==
+          //         event.data["orderId"]) {
+          //       dto = Get.find<OrderHistoryViewModel>().orderDTO!;
+          //     }
+          //   }
+          // }
+          // if (dto != null) {
+          //   final otherAmounts =
+          //       dto.otherAmounts!.firstWhere((element) => element.type == 1);
+          //   showOrderDetailDialog(dto.itemQuantity!, dto.totalAmount!,
+          //       otherAmounts.amount!, dto.finalAmount!);
+          // }
+
+          break;
+        case 'ForRefund':
+          if (event.data["orderId"] != null) {
+            await Get.find<OrderHistoryViewModel>()
+                .getOrderByOrderId(id: event.data["orderId"]);
+          }
+          await Get.find<RootViewModel>().refreshMenu();
+          await showStatusDialog("assets/images/logo2.png",
+              notification!.title!, notification.body!);
+          break;
+        case 'ForUsual':
+          await showFlash(
+            context: context,
+            duration: const Duration(seconds: 5),
+            builder: (context, controller) {
+              return FlashBar(
+                controller: controller,
+                position: FlashPosition.bottom,
+                margin: const EdgeInsets.all(8),
+                shape: BeveledRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
+                dismissDirections: const [
+                  FlashDismissDirection.startToEnd,
+                  FlashDismissDirection.endToStart,
+                  FlashDismissDirection.vertical,
+                ],
+                forwardAnimationCurve: Curves.easeInOut,
+                reverseAnimationCurve: Curves.slowMiddle,
+                backgroundColor: FineTheme.palettes.primary50,
+                icon: Padding(
+                  padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: FineTheme.palettes.shades100,
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    child: const Icon(
+                      Icons.check_circle_outline,
+                      color: Colors.green,
+                    ),
+                  ),
+                ),
+                content: Text(
+                  notification!.body!,
+                  style: FineTheme.typograhpy.subtitle1
+                      .copyWith(color: FineTheme.palettes.primary100),
+                ),
+                title: Text(
+                  notification.title!,
+                  style: FineTheme.typograhpy.h2
+                      .copyWith(color: FineTheme.palettes.primary100),
+                ),
+              );
+            },
+          );
+          break;
+        default:
+          await showStatusDialog("assets/images/logo2.png",
+              notification!.title!, notification.body!);
+          break;
+      }
+      print(event.data);
+    });
+  }
+
+  RootViewModel? _rootViewModel;
   final navigationKey = GlobalKey<CurvedNavigationBarState>();
   int activeTab = 0;
   List barItems = [
@@ -45,35 +189,96 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   final screens = [
     const HomeScreen(),
     const OrderHistoryScreen(),
-    const BarcodeScreen(),
-    const BoxScreen(),
+    const CartScreen(),
     const ProfileScreen()
   ];
   final items = <Widget>[
-    SvgPicture.asset(
-      "assets/icons/Home.svg",
-      width: 32,
-      height: 32,
+    SizedBox(
+      width: 40,
+      height: 40,
+      child: Center(
+        child: SvgPicture.asset(
+          "assets/icons/Home.svg",
+          width: 32,
+          height: 32,
+        ),
+      ),
     ),
-    SvgPicture.asset(
-      "assets/icons/Order.svg",
-      width: 32,
-      height: 32,
+    SizedBox(
+      width: 40,
+      height: 40,
+      child: Center(
+        child: SvgPicture.asset(
+          "assets/icons/Order.svg",
+          width: 32,
+          height: 32,
+        ),
+      ),
     ),
-    SvgPicture.asset(
-      "assets/icons/Scan.svg",
-      width: 32,
-      height: 32,
+    Stack(
+      children: [
+        SizedBox(
+          width: 40,
+          height: 40,
+          child: Center(
+            child: Image.asset(
+              "assets/icons/shopping-bag-02.png",
+              width: 32,
+              height: 32,
+            ),
+          ),
+        ),
+        ValueListenableBuilder(
+          valueListenable: Get.find<CartViewModel>().notifier,
+          builder: (context, value, child) {
+            bool check = false;
+            if (value as int > 99) {
+              check = true;
+            } else {
+              check = false;
+            }
+            if (value != 0) {
+              return Positioned(
+                top: 2,
+                left: check ? 20 : 25,
+                child: AnimatedContainer(
+                  duration: const Duration(microseconds: 300),
+                  width: check ? 20 : 15,
+                  height: 15,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.red,
+                    //border: Border.all(color: Colors.grey),
+                  ),
+                  child: Center(
+                    child: Text(
+                      check ? "99" : value.toString(),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight:
+                              check ? FontWeight.w500 : FontWeight.w600),
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              return const SizedBox.shrink();
+            }
+          },
+        ),
+      ],
     ),
-    SvgPicture.asset(
-      "assets/icons/Box.svg",
-      width: 32,
-      height: 32,
-    ),
-    SvgPicture.asset(
-      "assets/icons/Profile.svg",
-      width: 32,
-      height: 32,
+    SizedBox(
+      width: 40,
+      height: 40,
+      child: Center(
+        child: SvgPicture.asset(
+          "assets/icons/Profile.svg",
+          width: 32,
+          height: 32,
+        ),
+      ),
     ),
   ];
 
@@ -89,6 +294,11 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    // _rootViewModel = Get.find<RootViewModel>();
+    // Timer.periodic(const Duration(milliseconds: 500), (_) {
+    //   _rootViewModel!.liveLocation();
+    // });
+    listenFireBaseMessages();
     activeTab = widget.initScreenIndex;
     _controller.forward();
   }
@@ -121,7 +331,7 @@ class _RootScreenState extends State<RootScreen> with TickerProviderStateMixin {
   Widget MainScreen() {
     return Scaffold(
         extendBody: true,
-        // floatingActionButton: CartButton(),
+        floatingActionButton: CartButton(),
         backgroundColor: FineTheme.palettes.neutral200,
         bottomNavigationBar: CurvedNavigationBar(
           color: FineTheme.palettes.primary100,

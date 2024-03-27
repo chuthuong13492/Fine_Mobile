@@ -77,7 +77,8 @@ class CustomInterceptors extends Interceptor {
 
 class MyRequest {
   static BaseOptions options = new BaseOptions(
-      baseUrl: 'https://dev.fine-api.smjle.vn/api/',
+      baseUrl: 'https://dev.fine-api.smjle.xyz/api/',
+      // baseUrl: 'https://localhost:7058/api/',
       headers: {
         Headers.contentTypeHeader: "application/json",
       },
@@ -101,7 +102,7 @@ class MyRequest {
           );
           // await showStatusDialog("assets/images/global_error.png", "Lỗi",
           //     "Vui lòng đăng nhập lại");
-          Get.Get.offAllNamed(RoutHandler.LOGIN);
+          Get.Get.offAllNamed(RouteHandler.LOGIN);
         } else {
           handler.next(e);
         }

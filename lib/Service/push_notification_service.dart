@@ -1,11 +1,14 @@
 import 'package:fine/Constant/route_constraint.dart';
 import 'package:fine/Utils/platform.dart';
+import 'package:fine/theme/FineTheme/index.dart';
 import 'package:fine/widgets/custom_dialog.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:flutter/foundation.dart';
+
+import '../Accessories/dialog.dart';
 
 class PushNotificationService {
   static PushNotificationService? _instance;
@@ -33,14 +36,7 @@ class PushNotificationService {
     //   provisional: false,
     //   sound: true,
     // );
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Got a message whilst in the foreground!');
-      print('Message data: ${message.data}');
 
-      if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification}');
-      }
-    });
     if ((defaultTargetPlatform == TargetPlatform.iOS)) {
       await _fcm.requestPermission();
       _fcm.setForegroundNotificationPresentationOptions(
@@ -58,19 +54,17 @@ class PushNotificationService {
       );
     }
 
+    // FirebaseMessaging.onMessage.listen((event) async {
+    //   hideSnackbar();
+
+    //   RemoteNotification notification = event.notification!;
+
+    //   await showStatusDialog(
+    //       "assets/images/logo2.png", notification.title!, notification.body!);
+    //   print(event.data);
+    // });
     // RemoteMessage? message =
     //     await FirebaseMessaging.instance.getInitialMessage();
-
-    FirebaseMessaging.onMessage.listen((event) async {
-      // hideSnackbar();
-      RemoteNotification? notification = event.notification;
-      await CustomDialogBox(
-        title: notification!.title ?? "",
-        descriptions: notification.body ?? "",
-      );
-      // await showStatusDialog(
-      //     "assets/images/option.png", notification.title, notification.body);
-    });
 
     // FirebaseMessaging.onMessageOpenedApp.listen((event) {
     //   var screen = event.data['screen'];
